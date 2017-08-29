@@ -1,0 +1,1619 @@
+#!/bin/ksh
+
+####################################################################
+# Script to create HPSS archives of the operational CFSv2 analysis daily runs
+# These archives contain the same data as the existing reanalysis archives from the CFSRR
+# This script runs monthly after the last cycle of the analysis for the month runs
+#
+# Incoming parameters
+# --------------------
+# YYYYMM - The year month to run
+#
+# September 2010
+# Patrick Tripp EMC/NCEP/NOAA
+####################################################################
+## FIX
+## Check the .5x variables are archived e.g soil.x.5 or something like that
+
+#######################################################
+# Incoming parameters
+#######################################################
+set -x
+
+YYYYMM=${1:-${YYYYMM:-201005}}
+
+echo "YYYYMM=$YYYYMM"
+
+#######################################################
+
+export machine=${machine:-WCOSS}
+
+if [ $machine = IBM ]; then
+   export APRUN=${APRUN:-poe}
+elif [ $machine = WCOSS ]; then
+   export APRUN=${APRUN:-mpirun.lsf}
+else
+   echo "please specify APRUN variable"
+fi
+
+rundate=${YYYYMM}0100
+
+YYYYMMDD=`echo $rundate | cut -c1-8`
+YYYY=`echo $rundate | cut -c1-4`
+MM=`echo $rundate | cut -c5-6`
+
+######################
+# Base directories
+######################
+
+COMROT=${COMROT:-$COMROOT/cfs/prod}
+
+HPSSROT=${HPSSROT:-/NCEPPROD/hpssprod/runhistory}
+HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM}
+
+export TEMPDIR=$DATA/monthly_analysis.$$}             # stmp unique directory for temp files
+mkdir -p $TEMPDIR
+
+export TIMEAVGEXEC=${TIMEAVGEXEC:-$EXECcfs/cfs_mpi_timavg_3d}
+export TIMEMEANEXEC=${TIMEAVGEXEC:-$EXECcfs/cfs_mpi_timavg_3d}
+export AVMOCEXEC=${AVMOCEXEC:-$EXECcfs/cfs_cdas_avg_moc}
+
+## FIX - this needs to be brought in from Moorthi's CFSR sources
+export AVGPKEEXEC=${AVGPKEEXEC:-$EXECcfs/cfs_cdas_avg_pke}
+
+export AVGPKESH=${AVGPKESH:-$USHcfs/cfs_cdas_avg_pke.sh}
+
+## Must use THIS one and not grib_check.sh
+export GRIBCHECKSH=${GRIBCHECKSH:-$USHcfs/cfs_cdas_grib_check.sh}
+
+## FIX - Monthly and tser locations on com defaults
+export MONTHDIR=${MONTHDIR:-$COMROT/cdas.$YYYY$MM/monthly}
+export TIMEDIR=${TIMEDIR:-$COMROT/cdas.$YYYY$MM/time}
+mkdir -p $MONTHDIR
+mkdir -p $TIMEDIR
+
+
+ANALYSISTEMP=${ANALYSISTEMP:-$TEMPDIR/cdas.$YYYY$MM}
+mkdir -p $ANALYSISTEMP
+
+export INDIR=$ANALYSISTEMP    # Needed by averaging programs
+
+###############################
+# Define some external utils
+###############################
+
+export COPYGBFIX=${COPYGBFIX:-$USHcfs/cfs_copygb_bigfix.sh}
+
+# Special cnvgrib used here for monthly analysis files
+export CNVGRIBFIX=${CNVGRIBFIX:-$USHcfs/cfs_cnvgrib_bigfix.sh}
+
+hpsstar=$USHcfs/cfs_hpsstar 
+
+PUTCMD=${PUTCMD:-putv}
+
+rcall=0    # error code tracking
+
+## Selectively choose which sections to run
+## Later items in the list depend on earlier items
+
+makelinks=${makelinks:-YES}	       # Create links to analysis files for tser and means scripts
+makemean=${makemean:-YES}	       # Create the monthly means
+makemeanpke=${makemeanpke:-YES}	   # Create the monthly pke energetics means
+maketime=${maketime:-YES}	       # Create the timeseries
+dogrib2means=${dogrib2means:-YES}  # Convert means to grib2
+dohpssmeans=${dohpssmeans:-YES}    # Archive the monthly means
+dogrib2time=${dogrib2time:-YES}	   # Convert timeseries to grib2
+dohpsstime=${dohpsstime:-YES}	   # Archive the timeseries
+
+# Monthly means selection
+# Forecast types
+export namelistmnf=${namelistmnf:-'pgb ipv ocn ocnm flx spl'}
+# Analysis types
+export namelistmna=${namelistmna:-'pgb ipv spl'}
+
+
+####################################################################
+
+
+
+####################################################################
+## LINK ANALYSIS FILES 
+## Create the links for the timeseries and monthly means scripts 
+## They expect the filenames to be in a particular format
+## These get created in a temporary location
+####################################################################
+if [ $makelinks = "YES" ] ; then
+
+  echo "BEGIN: Creating links to analysis files"
+  now=`date`
+  echo $now
+
+  rc=0
+
+  dds=01
+  dde=`$USHcfs/cfs_daysinmonth.sh $YYYY $MM`
+
+  hhlist='00 06 12 18'
+
+  # Forecast types
+  # pgbh, ipvh, ocnh, flxf, splf
+
+  # Analysis types
+  # pgbhanl, ipvhanl, splanl
+
+  sdate=$YYYY$MM${dds}00
+  edate=$YYYY$MM${dde}18
+
+  echo "sdate: $sdate, edate: $edate"
+
+  date=$sdate
+
+  while [[ $date -le $edate ]]
+  do
+
+    yyyy=`echo $date | cut -c1-4`
+    mm=`echo $date | cut -c5-6`
+    dd=`echo $date | cut -c7-8`
+
+    COMINDIR=$COMROT/cdas.$yyyy$mm$dd
+
+    for hh in $hhlist
+    do
+
+      # Hourly pgb files
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.pgrbhanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.pgrbhanl  $ANALYSISTEMP/pgbhnl.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.pgrbanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.pgrbanl  $ANALYSISTEMP/pgbanl.gdas.$yyyy$mm$dd$hh
+
+      for tt in 00 01 02 03 04 05 06 09
+      do
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.pgrbh$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.pgrbh$tt  $ANALYSISTEMP/pgbh$tt.gdas.$yyyy$mm$dd$hh
+      done
+
+      # Hourly ipv files
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.ipvgrbhanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.ipvgrbhanl  $ANALYSISTEMP/ipvhnl.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.ipvgrbanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.ipvgrbanl  $ANALYSISTEMP/ipvanl.gdas.$yyyy$mm$dd$hh
+ 
+ 
+      for tt in 00 01 02 03 04 05 06 09
+      do
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.ipvgrbh$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.ipvgrbh$tt  $ANALYSISTEMP/ipvh$tt.gdas.$yyyy$mm$dd$hh
+      done
+
+      # Hourly flx files
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.splgrbanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.splgrbanl  $ANALYSISTEMP/splanl.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.splgrbf06
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.splgrbf06  $ANALYSISTEMP/splf06.gdas.$yyyy$mm$dd$hh
+
+      for tt in 00 01 02 03 04 05 06 09
+      do
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.sfluxgrbf$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.sfluxgrbf$tt  $ANALYSISTEMP/flxf$tt.gdas.$yyyy$mm$dd$hh
+      done
+
+      # Hourly ocn files
+      for tt in 01 02 03 04 05 06 09
+      do
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.ocngrbh$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.ocngrbh$tt  $ANALYSISTEMP/ocnh$tt.gdas.$yyyy$mm$dd$hh
+      done
+
+      # Ocean Diagnostics
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.moch06m
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.moch06m  $ANALYSISTEMP/moch06m.gdas.$yyyy$mm$dd$hh
+
+
+      # Fix for means and tser scripts ocnmh06
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.ocngrbh06m
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.ocngrbh06m  $ANALYSISTEMP/ocnmh06.gdas.$yyyy$mm$dd$hh
+
+      # Low res
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.splgrblanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.splgrblanl  $ANALYSISTEMP/spllnl.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.splgrbl06
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.splgrbl06  $ANALYSISTEMP/spll06.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.ipvgrblanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.ipvgrblanl  $ANALYSISTEMP/ipvlnl.gdas.$yyyy$mm$dd$hh
+
+      /bin/ls -l $COMINDIR/cdas1.t${hh}z.pgrblanl
+      ((rc+=$?))
+      /bin/ln -s $COMINDIR/cdas1.t${hh}z.pgrblanl  $ANALYSISTEMP/pgblnl.gdas.$yyyy$mm$dd$hh
+
+      for tt in 00 01 02 03 04 05 06
+      do
+
+        # There is no ocngrbf00
+        if [ $tt -ne 00 ] ; then
+          /bin/ls -l $COMINDIR/cdas1.t${hh}z.ocngrbf$tt
+          ((rc+=$?))
+          /bin/ln -s $COMINDIR/cdas1.t${hh}z.ocngrbf$tt  $ANALYSISTEMP/ocnf$tt.gdas.$yyyy$mm$dd$hh
+        fi
+
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.sfluxgrbl$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.sfluxgrbl$tt  $ANALYSISTEMP/flxl$tt.gdas.$yyyy$mm$dd$hh
+
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.ipvgrbl$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.ipvgrbl$tt  $ANALYSISTEMP/ipvl$tt.gdas.$yyyy$mm$dd$hh
+
+        /bin/ls -l $COMINDIR/cdas1.t${hh}z.pgrbl$tt
+        ((rc+=$?))
+        /bin/ln -s $COMINDIR/cdas1.t${hh}z.pgrbl$tt  $ANALYSISTEMP/pgbl$tt.gdas.$yyyy$mm$dd$hh
+      done
+    done  # hhlist
+
+    date=`$NDATE 24 $date`
+  done  # date -le edate
+
+  echo "END: Creating links to analysis files - rc: $rc"
+  now=`date`
+  echo $now
+
+  ((rcall+=$rc))    # Accumulator for error code
+
+fi # if dolinks
+#########################################################################################
+## END LINK Analysis
+#########################################################################################
+
+
+
+
+
+
+#########################################################################################
+# MONTHLY MEANS Creation  -   MPI Job
+#########################################################################################
+if [ $makemean = "YES" ] ; then
+
+  echo "BEGIN: Monthly Means"
+  now=`date`
+  echo $now
+
+  yyyy=$YYYY
+  mm=$MM
+  datefix=$YYYY$MM
+
+  export hhlist='00 06 12 18'
+
+  export fout=24
+
+  # Forecast types
+  # export namelistmnf='pgb ipv ocn ocnm flx spl'
+
+  # Analysis types
+  # export namelistmna='pgb ipv spl'
+
+  export CDUMP=gdas
+
+  export makelow=1     # Make low-res versions
+  domoch=${domoch:-1}  # Compute moch means
+
+  FHOUT=6
+
+  rc=0
+
+  dds=01
+  dde=`$USHcfs/cfs_daysinmonth.sh $yyyy $mm`
+
+  cd $ANALYSISTEMP   # Location of file links
+
+
+  ### make averages for forecast files...(f00 to f06)
+  export type=fcst
+
+  for name in $namelistmnf
+  do
+
+    export prefix1=$name
+    export prefix2=h
+    export prefixo=l
+    export ogrid=2
+
+    export fhlist='00 01 02 03 04 05 06'     # used for makelow of fcst types
+
+    export fhini=00
+    export fhmax=06
+    export fhout=01
+
+    if [ $name = "ocn" ] ; then
+      export prefixo=f
+      export ogrid=3
+      export fhlist='01 02 03 04 05 06'
+      export fhini=01
+
+      ## Create ocean diagnostics .ieee file
+      if [[ $domoch -eq 1 ]] ; then
+        $USHcfs/cfs_cdas_avg_moc.sh $yyyy $mm $FHOUT
+        if [[ $? -ne 0 ]] ; then
+          echo "ERROR: avmoc.sh returned with non-zero exit"
+          ((rc+=1))
+        fi
+      fi
+    fi
+
+    if [ $name = "ocnm" ] ; then
+      export prefixo=f    # output prefix but really uses h files.
+      export ogrid=3
+      export fhlist='06'
+      export fhini=06
+      export fhmax=06
+      export fhout=06
+    fi
+
+    if [ $name = "flx" ] ; then
+      export prefix2=f
+      export ogrid=98
+    fi
+
+    if [ $name = "spl" ] ; then
+      export prefix2=f
+      export fhlist='06'
+      export ogrid=98
+      export fhini=06
+      export fhmax=06
+      export fhout=06
+    fi
+
+    #export RUNDIR=$TEMPDIR/run
+    export RUNDIR=$TEMPDIR/run/mean
+    /bin/rm -rf $RUNDIR
+    mkdir -p $RUNDIR
+
+    export cdate1=${datefix}${dds}00
+    export cdate2=${datefix}${dde}18
+    export nhours=6
+    export SUFOUT=.$CDUMP.$datefix
+
+    export dogribchk=YES     # only do for first
+
+    # Create the daily average mean
+    $USHcfs/cfs_cdas_avgmean.monthly.sh
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: avgmean returned non-zero exit for $name"
+      export err=$?; err_chk
+    fi
+
+
+    ### for forecast average over each forecast hour cycle ... diurnal averages
+    for hh in $hhlist
+    do
+
+      #export RUNDIR=$TEMPDIR/run
+      export RUNDIR=$TEMPDIR/run/mean_$hh
+      /bin/rm -rf $RUNDIR
+      mkdir -p $RUNDIR
+
+      export cdate1=${datefix}${dds}$hh
+      export cdate2=${datefix}${dde}$hh
+      export nhours=24
+      export SUFOUT=.$CDUMP.${datefix}.${hh}Z
+
+      export dogribchk=NO
+      $USHcfs/cfs_cdas_avgmean.monthly.sh
+      if [[ $? -ne 0 ]] ; then
+        ((rc+=1))
+        echo "ERROR: avgmean returned non-zero exit for $name"
+        export err=$?; err_chk
+      fi
+
+    done  # hhlist
+  done  # namelistmnf
+
+  ### make averages for analysis files...
+  export type=vrfy
+
+  for name in $namelistmna
+  do
+
+    export prefix1=${name}
+    export prefix2=hnl
+    export fhlist='hnl'
+    export ogrid=2
+    if [ $name = "spl" ] ; then
+      export prefix2=anl
+      export ogrid=98
+      export fhlist='anl'
+    fi
+
+    export prefixo=${name}lnl
+    export fhini=' '
+    export fhmax=' '
+    export fhout=' '
+
+    #export RUNDIR=$TEMPDIR/run
+    export RUNDIR=$TEMPDIR/run/mean_anl
+    /bin/rm -rf $RUNDIR
+    mkdir -p $RUNDIR
+
+    export cdate1=${datefix}${dds}00
+    export cdate2=${datefix}${dde}18
+    export nhours=6
+    export SUFOUT=.$CDUMP.$datefix
+
+    export dogribchk=YES
+
+    $USHcfs/cfs_cdas_avgmean.monthly.sh
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: avgmean returned non-zero exit for $name"
+      export err=$?; err_chk
+    fi
+
+    ### for analysis average over each forecast hour cycle ...
+
+    for hh in $hhlist
+    do
+
+      #export RUNDIR=$TEMPDIR/run
+      export RUNDIR=$TEMPDIR/run/mean_anl_$hh
+      /bin/rm -rf $RUNDIR
+      mkdir -p $RUNDIR
+
+      export cdate1=${datefix}${dds}$hh
+      export cdate2=${datefix}${dde}$hh
+      export nhours=24
+      export SUFOUT=.$CDUMP.${datefix}.${hh}Z
+   
+      export dogribchk=NO
+      $USHcfs/cfs_cdas_avgmean.monthly.sh
+
+      if [[ $? -ne 0 ]] ; then
+        ((rc+=1))
+        echo "ERROR: avgmean returned non-zero exit for $name"
+        export err=$?; err_chk
+      fi
+
+    done # hhlist
+  done  # namelistmna
+
+  echo "END: Creating Monthly Means - rc: $rc"
+  now=`date`
+  echo $now
+
+  ((rcall+=$rc))    # Accumulator for error code
+
+fi # makemean
+##########################################################################
+## END MONTHLY MEANS 
+##########################################################################
+
+
+
+##########################################################################
+# MONTHLY MEANS PKE  - Create monthly meaks of pgb pke types MPI Job
+##########################################################################
+if [ $makemeanpke = "YES" ] ; then
+
+  echo "BEGIN: Monthly Means PKE"
+  now=`date`
+  echo $now
+
+  yyyy=$YYYY
+  mm=$MM
+
+  datefix=$YYYY$MM
+
+  export hhlist='00 06 12 18'
+
+  ## TESTING
+  #export hhlist=' '
+
+  rc=0
+
+  name=egy
+
+  export makelow=1
+  export CDUMP=gdas
+
+  export LONB=720
+  export LATB=361
+  export LEVS=37
+
+  export polist="1000.,975.,950.,925.,900.,875.,850.,825.,800.,775.,750.,700.,650.,600.,550.,500.,450.,400.,350.,300.,250.,225.,200.,175.,150.,125.,100.,70.,50.,30.,20.,10.,7.,5.,3.,2.,1."
+
+  export prefix1=$name
+  export prefix2=h
+  export prefixo=l
+  export ogrid=2
+
+  export fhini=00
+  export fhmax=06
+  export fhout=01
+
+  ### for forecast average over each forecast hour...
+
+  export fhlist='00 01 02 03 04 05 06'
+
+  export type=fcst
+
+  #export RUNDIR=$TEMPDIR/run
+  export RUNDIR=$TEMPDIR/run/pke
+  # /bin/rm -rf $RUNDIR
+  mkdir -p $RUNDIR
+
+  dds=01
+  dde=`$USHcfs/cfs_daysinmonth.sh $YYYY $MM`
+
+  export cdate1=${datefix}${dds}00
+  export cdate2=${datefix}${dde}18
+  export nhours=6
+  export SUFOUT=.$CDUMP.$datefix
+
+  export dogribchk=YES     # only do for first
+
+  $USHcfs/cfs_cdas_avgpke.monthly.sh
+  if [[ $? -ne 0 ]] ; then
+    echo "ERROR: avgpke returned non-zero exit for $name"
+    ((rc+=1))
+    export err=$rc; err_chk
+  fi
+  # /bin/rm -rf $RUNDIR
+
+  ### for forecast average over each forecast hour cycle ...
+
+  for hh in $hhlist
+  do
+
+    #export RUNDIR=$TEMPDIR/run
+    export RUNDIR=$TEMPDIR/run/pke_$hh
+    # /bin/rm -rf $RUNDIR
+    mkdir -p $RUNDIR
+
+    export cdate1=${datefix}${dds}$hh
+    export cdate2=${datefix}${dde}$hh
+    export nhours=24
+    export SUFOUT=.$CDUMP.${datefix}.${hh}Z
+
+    export dogribchk=NO
+    $USHcfs/cfs_cdas_avgpke.monthly.sh
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: avgpke returned non-zero exit for $name"
+      export err=$rc; err_chk
+    fi
+    # /bin/rm -rf $RUNDIR
+
+  done
+
+  ### make averages for analysis files...
+
+  export fhlist='nl'
+  export type=vrfy
+  export prefix1=${name}
+  export prefix2=hnl
+  export prefixo=${name}lnl
+  export ogrid=2
+  export fhini='  '
+  export fhmax='  '
+  export fhout='  '
+
+  ### for analysis average over each forecast hour...
+
+  #export RUNDIR=$TEMPDIR/run
+  export RUNDIR=$TEMPDIR/run/pke_anl
+  # /bin/rm -rf $RUNDIR
+  mkdir -p $RUNDIR
+
+  export cdate1=${datefix}${dds}00
+  export cdate2=${datefix}${dde}18
+  export nhours=6
+  export SUFOUT=.$CDUMP.$datefix
+
+  export dogribchk=YES     # only do for first
+
+  $USHcfs/cfs_cdas_avgpke.monthly.sh
+  if [[ $? -ne 0 ]] ; then
+    ((rc+=1))
+    echo "ERROR: avgpke returned non-zero exit for $name"
+    export err=$rc; err_chk
+  fi
+  # /bin/rm -rf $RUNDIR
+
+  ### for analysis average over each forecast hour cycle ...
+  for hh in $hhlist
+  do
+
+    #export RUNDIR=$TEMPDIR/run
+    export RUNDIR=$TEMPDIR/run/pke_anl_$hh
+    # /bin/rm -rf $RUNDIR
+    mkdir -p $RUNDIR
+
+    export cdate1=${datefix}${dds}$hh
+    export cdate2=${datefix}${dde}$hh
+    export nhours=24
+    export SUFOUT=.$CDUMP.${datefix}.${hh}Z
+
+    export dogribchk=NO
+    $USHcfs/cfs_cdas_avgpke.monthly.sh
+
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: avgpke returned non-zero exit for $name"
+      export err=$rc; err_chk
+    fi
+    # /bin/rm -rf $RUNDIR
+
+  done
+
+  echo "END: Creating Monthly Means PKE - rc: $rc"
+  now=`date`
+  echo $now
+
+  ((rcall+=$rc))    # Accumulator for error code
+
+fi  # makemean pke
+##########################################################################
+##  END MONTHLY MEANS PKE
+##########################################################################
+
+
+
+if [ $dogrib2means = "YES" ] ; then
+##########################################################################
+# MONTHLY MEANS GRIB2 CONVERSION - MPMD Job
+##########################################################################
+
+  echo "BEGIN: Monthly Means Grib2 Conversion"
+  now=`date`
+  echo $now
+
+  rc=0
+
+  namelist='flx pgb ipv ocn egy'
+
+  datefix=$YYYY$MM
+  CDUMP=gdas
+
+  # include moc and ocnm for 06
+  inclmoc=${inclmoc:-YES}
+  inclocnm=${inclocnm:-YES}
+
+  fhlista='nl 00 01 02 03 04 05 06'
+  fhlistf='00 01 02 03 04 05 06'
+  fhlisto='01 02 03 04 05 06'
+
+  poescript=$TEMPDIR/$datefix.means.cnvgrib.poelist
+  > $poescript
+
+  ## Add all of the files to the poescript
+
+  cd $TEMPDIR
+
+  for name in $namelist
+  do
+
+    if [ $name = "pgb" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "ipv" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "egy" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "flx" ] ; then
+      prefixlist='f l'
+      fhlist=$fhlistf
+    fi
+    if [ $name = "ocn" ] ; then
+      prefixlist='h f'
+      fhlist=$fhlisto
+    fi
+
+
+    for prefix in $prefixlist
+    do
+      for fh in $fhlist    # e.g. 00 01 02 03 04 05 06
+      do
+
+        excnt=-1
+        if [[ $name = "egy" ]] ; then
+          excnt=482
+        else
+
+          # Get record count from first file of month
+          tfile=$ANALYSISTEMP/${name}${prefix}$fh.$CDUMP.${datefix}0100
+          ls -l $tfile
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $tfile not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          excnt=`$WGRIB -s $tfile | wc -l`
+          if [ $excnt -le 0 ] ; then
+            echo "ERROR: expected count should not be <= 0 for $file"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+        fi
+
+        file=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix
+        ls -l $file
+        if [[ $? -ne 0 ]] ; then
+          echo "ERROR: $file not found"
+          ((rc+=1))
+          export err=$rc; err_chk
+        fi
+
+        cnt=`$WGRIB -s $file | wc -l`
+        if [[ $cnt -ne $excnt ]] ; then
+          echo "ERROR: $file contains $cnt records - expected $excnt"
+          ((rc+=1))
+          export err=$rc; err_chk
+        fi
+
+        ## Add cnvgrib command to poescript
+        ofile=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix.grib2
+        echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+
+        if [[ $name = "ocn" && $inclocnm = "YES" && $fh = "06" ]] ; then
+
+          ocnmfile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix
+          ls -l $ocnmfile
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $ocnmfile not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          ## Add cnvgrib command to poescript
+          ofile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix.grib2
+          echo "$CNVGRIBFIX -g12 -p40 -nv $ocnmfile $ofile" >> $poescript
+
+        fi
+
+        for hh in $hhlist     # 00,12, etc.
+        do
+
+          file=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix.${hh}Z
+          ls -l $file
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $file not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          cnt=`$WGRIB -s $file | wc -l`
+          if [[ $cnt -ne $excnt ]] ; then
+            echo "ERROR: $file contains $cnt records - expected $excnt"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          ## Add cnvgrib command to poescript
+          ofile=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix.${hh}Z.grib2
+          echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+
+
+          # Add ocnm if ocn
+          if [[ $name = "ocn" && $inclocnm = "YES" && $fh = "06" ]] ; then
+
+            ocnmfile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix.${hh}Z
+            ls -l $ocnmfile
+            if [[ $? -ne 0 ]] ; then
+              echo "ERROR: $ocnmfile not found"
+              ((rc+=1))
+              export err=$rc; err_chk
+            fi
+
+            ## Add cnvgrib command to poescript
+            ofile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix.${hh}Z.grib2
+            echo "$CNVGRIBFIX -g12 -p40 -nv $ocnmfile $ofile" >> $poescript
+
+          fi
+
+        done  # hhlist
+      done   # fhlist
+    done # prefixlist
+  done   # namelist
+
+
+  # Submit MPMD Job to do grib2 conversion
+
+  if [ -s $poescript ] ; then
+    if [ $machine = IBM ]; then
+      nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
+      # only valid if count .le. 128
+      [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
+    elif [ $machine = WCOSS ]; then
+      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+         nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+         nprocs=$LSB_DJOB_NUMPROC
+      else
+         nprocs=1
+      fi
+    else
+      echo "nprocs calculation is not defined here"
+    fi
+
+    remainder=$(($nprocs-$(cat $poescript|wc -l)%$nprocs))
+    n=0
+    while [ $((n+=1)) -le $remainder ]
+    do
+      echo "echo do nothing" >> $poescript
+    done
+
+    l=0
+    n=-1
+    while read line
+    do
+      ((n+=1))
+      if [ $((n%nprocs)) -eq 0 ] ; then
+        ((l+=1))
+        >cmdlist.$l
+      fi
+      echo "$line" >> cmdlist.$l
+    done < $poescript
+
+    n=0
+    while [ $((n+=1)) -le $l ]
+    do
+      #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
+      cp cmdlist.$n cmdfile
+      $APRUN mpiserial
+      # Error check
+      export err=$?; err_chk
+      ((rc+=$err))
+    done
+  fi
+
+
+  ## Cleanup
+  /bin/rm -f $poelist
+  /bin/rm -f cmdlist*
+
+  ((rcall+=$rc))    # Accumulator for error code
+  export err=$rcall; err_chk
+
+  if [ $SENDDBN = YES ]
+  then
+    cd $MONTHDIR
+    for dbn_file in `ls *.grib2`
+    do
+       $DBNROOT/bin/dbn_alert MODEL CDAS1_MONTHLY_MEAN $job $MONTHDIR/$dbn_file
+    done
+  fi
+
+  cd $TEMPDIR
+  echo "END: Monthly Means Grib2 Conversion - rc: $rc"
+  now=`date`
+  echo $now
+
+##########################################################################
+# END MONTHLY MEANS GRIB2 CONVERSION
+##########################################################################
+fi  # dogrib2means
+
+
+
+
+if [ $maketime = "YES" ] ; then
+##########################################################################
+#  CREATE TIMESERIES - MPI Job
+##########################################################################
+
+  echo "BEGIN: Timeseries Creation"
+  now=`date`
+  echo $now
+
+  rc=0
+
+  export yyyymm=$YYYY$MM
+  export CDUMP=gdas
+  export fout=6
+
+  export RUNDIR=$TEMPDIR/run
+  /bin/rm -rf $RUNDIR
+  mkdir -p $RUNDIR
+  cd $RUNDIR
+
+  # Arrays to names and if low res is to be made.
+  i=-1
+
+  ((i+=1));inp_name[i]=ocnh;low[i]=1
+  ((i+=1));inp_name[i]=flxf;low[i]=1
+  ((i+=1));inp_name[i]=ipvh;low[i]=1
+  ((i+=1));inp_name[i]=pgbh;low[i]=0
+  ((i+=1));inp_name[i]=pgbl;low[i]=0
+
+  i=-1
+  while [ $((i+=1)) -lt ${#inp_name[*]} ]
+  do
+    export inp_file=${inp_name[i]}
+
+    # maketim=1 creates timeseries; =0 skips
+    export maketim=1
+
+    # makefix removes any blank space in time series files 
+    # if not run, file size is larger than expected
+
+    ## FIX - TESTING
+    # export makefix=1
+    export makefix=1
+
+    # makelow = 1 make low resolution time series via mpi of copygb from full res files
+    export makelow=${low[i]}
+
+    $USHcfs/cfs_cdas_tser_anl.sh
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: cfs_cdas_tser_anl returned non-zero exit."
+      export err=$rc; err_chk
+    fi
+  done  # inp_name loop
+
+  # /bin/rm -rf $RUNDIR
+
+  ((rcall+=$rc))    # Accumulator for error code
+
+  echo "END: Timeseries Creation - rc: $rc"
+  now=`date`
+  echo $now
+
+##########################################################################
+##  END TIMESERIES
+##########################################################################
+fi  # maketime
+
+
+
+
+
+
+if [ $dogrib2time = "YES" ] ; then
+##########################################################################
+# TIMESERIES GRIB2 CONVERSION
+##########################################################################
+
+  echo "BEGIN: Timeseries Grib2 Conversion"
+  now=`date`
+  echo $now
+
+  typelist='flx pgb ocn'
+  CDUMP=gdas
+
+  rc=0
+
+  ndays=`$USHcfs/cfs_daysinmonth.sh $YYYY $MM`
+  zcnt=4
+  datefix=$YYYY$MM
+
+  cd $TEMPDIR
+  poescript=$TEMPDIR/$datefix.tser.cnvgrib.poelist
+  > $poescript
+
+  for type in $typelist
+  do
+
+    ## FLX Types
+    if [ $type = "flx" ] ; then
+       namelist='lhtfl shtfl wnd10m wndstrs pressfc tmp2m tmpsfc tmphy1 dlwsfc dswsfc ulwsfc ulwtoa uswsfc uswtoa csusf csdsf csdlf soilm1 soilm2 soilm3 soilm4 soilt1 gflux weasd pwat cprat prate runoff tmin tmax q2m icecon icethk snohf tcdcclm'
+
+      # fhlist='00 01 02 03 04 05 06'
+      fhcnt=7    # used to calculate expected records
+    fi
+
+    ## PGB Types
+    if [ $type = "pgb" ] ; then
+      export namelist='z200 z500 z700 z850 z1000 t2 t50 t200 t250 t500 t700 t850 t1000 psi200 psi850 chi200 chi850 vvel500 q500 q700 q850 q925 prmsl wnd200 wnd250 wnd500 wnd700 wnd850 wnd925 wnd1000 ipv450 ipv550 ipv650'
+
+      # export fhlist='nl 00 01 02 03 04 05 06'
+      fhcnt=8
+    fi
+
+    # OCN Types
+    if [ $type = "ocn" ] ; then
+      export namelist='ocndt20c ocnheat ocnslh ocnsst ocnu5 ocnv5 ocnsal5 ocnu15 ocnv15 ocnt15 ocnsal15 ocnvv55 ocnmld  ocndt2.5c ocndt5c ocndt10c ocndt15c ocndt25c ocndt28c ocnsild ocntchp'
+
+      # export fhlist='01 02 03 04 05 06'
+      fhcnt=6
+    fi
+
+    # Save the original fhcnt because there are a couple of exceptions below
+    fhcntorig=$fhcnt
+
+    #cd $TIMEDIR
+
+    ## Archive each timeseries by name
+    for name in $namelist
+    do
+
+      fhcnt=$fhcntorig
+      if [ $name = "pressfc" -o $name = "pwat" -o $name = "tmphy1" ] ; then
+        # fhlist='nl 00 01 02 03 04 05 06'
+        fhcnt=8
+      fi
+
+      ## calculated expected record count
+      excnt=-1
+      ((calcnt = $ndays * $fhcnt * $zcnt))
+      excnt=$calcnt
+      prname=`echo $name | cut -c1-3`
+      if [[ $prname = "wnd" ]] ; then
+        ((excnt = $calcnt * 2))
+      fi
+
+      if [[ $excnt -le 0 ]] ; then
+        echo "ERROR: $name should not have expected count of $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+
+      file=$TIMEDIR/${name}.$CDUMP.$datefix
+      /bin/ls -l $file
+      if [[ $? -ne 0 ]] ; then
+        echo "ERROR: $file not found"
+        ((rc+=1))
+      fi
+
+      cnt=`$WGRIB -s $file | wc -l`
+      if [[ $cnt -ne $excnt ]] ; then
+        echo "ERROR $file contains $cnt records - expected $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+
+      ## Add cnvgrib command to poescript
+      ofile=${file}.grib2
+      echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+
+
+      ### Lowr-res versions of timeseries
+      file=$TIMEDIR/${name}.l.$CDUMP.$datefix
+      ls -l $file
+      if [[ $? -ne 0 ]] ; then
+        echo "ERROR: $file not found"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+      cnt=`$WGRIB -s $file | wc -l`
+      if [[ $cnt -ne $excnt ]] ; then
+        echo "ERROR $file contains $cnt records - expected $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+
+      ## Add cnvgrib command to poescript
+      ofile=${file}.grib2
+      echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+
+
+    done  ## end variable-loop namelist
+  done  # typelist
+
+
+  ## MPMD Loop
+  # Submit MPMD Job to do grib2 conversion
+
+#  cd $TEMPDIR
+  if [ -s $poescript ] ; then
+    if [ $machine = IBM ]; then
+      nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
+      # only valid if count .le. 128
+      [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
+    elif [ $machine = WCOSS ]; then
+      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+        nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+        nprocs=$LSB_DJOB_NUMPROC
+      else
+        nprocs=1
+      fi
+    else
+      echo "nprocs has not been defined for platform $machine"
+    fi
+
+    remainder=$(($nprocs-$(cat $poescript|wc -l)%$nprocs))
+    n=0
+    while [ $((n+=1)) -le $remainder ]
+    do
+      echo "echo do nothing" >> $poescript
+    done
+
+    l=0
+    n=-1
+    while read line
+    do
+      ((n+=1))
+      if [ $((n%nprocs)) -eq 0 ] ; then
+        ((l+=1))
+        >cmdlist.$l
+      fi
+      echo "$line" >> cmdlist.$l
+    done < $poescript
+
+    n=0
+    while [ $((n+=1)) -le $l ]
+    do
+      #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
+      cp cmdlist.$n cmdfile
+      $APRUN mpiserial
+      # Error check
+      export err=$?; err_chk
+      ((rc+=$err))
+    done
+  fi
+
+
+  ## Cleanup
+  /bin/rm -f $poescript
+
+  ((rcall+=$rc))    # Accumulator for error code
+  export err=$rcall; err_chk
+
+  if [ $SENDDBN = YES ]
+  then
+    cd $TIMEDIR
+    for dbn_file in `ls *.grib2`
+    do
+       $DBNROOT/bin/dbn_alert MODEL CDAS1_MONTHLY_TIME $job $TIMEDIR/$dbn_file
+    done
+  fi
+
+  cd $TEMPDIR
+  echo "END: Timeseries Grib2 Conversion - rc: $rc"
+  now=`date`
+  echo $now
+
+################################################################################
+## END TIMESERIES GRIB2 CONVERSION
+################################################################################
+fi  # dogrib2time
+
+
+
+
+##########################################################################
+#  ARCHIVAL JOBS - Archive to HPSS
+##########################################################################
+
+
+if [ $dohpssmeans = "YES" ] ; then
+##########################################################################
+# MONTHLY MEANS HPSS
+##########################################################################
+
+  echo "BEGIN: Monthly Means HPSS"
+  now=`date`
+  echo $now
+
+  rc=0
+
+  namelist='flx pgb ipv ocn egy'
+
+  datefix=$YYYY$MM
+  CDUMP=gdas
+
+  # include moc and ocnm for 06 
+  inclmoc=${inclmoc:-YES}
+  inclocnm=${inclocnm:-YES}
+
+ # fhlista='anl 00 01 02 03 04 05 06'
+  fhlista='nl 00 01 02 03 04 05 06'
+  fhlistf='00 01 02 03 04 05 06'
+  fhlisto='01 02 03 04 05 06'
+
+  for name in $namelist
+  do
+
+    mkhpss=1
+
+    cd $MONTHDIR
+    hpsslist=$TEMPDIR/$name.$datefix.means.hpsslist
+    > $hpsslist
+
+    if [ $name = "pgb" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "ipv" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "egy" ] ; then
+      prefixlist='h l'
+      fhlist=$fhlista
+    fi
+    if [ $name = "flx" ] ; then
+      prefixlist='f l'
+      fhlist=$fhlistf
+    fi
+    if [ $name = "diab" ] ; then
+      prefixlist='f l'
+      fhlist=$fhlistf
+    fi
+    if [ $name = "ocn" ] ; then
+      prefixlist='h f'
+      fhlist=$fhlisto
+    fi
+
+    for prefix in $prefixlist
+    do
+      for fh in $fhlist    # e.g. 00 01 02 03 04 05 06
+      do
+
+        excnt=-1
+        if [[ $name = "egy" ]] ; then
+          excnt=482
+        else
+
+          # Get record count from first file of month
+          tfile=$ANALYSISTEMP/${name}${prefix}$fh.$CDUMP.${datefix}0100
+          ls -l $tfile
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $tfile not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          excnt=`$WGRIB -s $tfile | wc -l`
+          if [ $excnt -le 0 ] ; then
+            echo "ERROR: expected count should not be <= 0 for $file"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+        fi
+
+        file=${name}${prefix}$fh.$CDUMP.$datefix.grib2
+        ls -l $file
+        if [[ $? -ne 0 ]] ; then
+          echo "ERROR: $file not found"
+          ((rc+=1))
+          export err=$rc; err_chk
+        fi
+
+        cnt=`$WGRIB2 -s $file | wc -l`
+        if [[ $cnt -ne $excnt ]] ; then
+          echo "ERROR: $file contains $cnt records - expected $excnt"
+          ((rc+=1))
+          export err=$rc; err_chk
+        fi
+
+        echo $file >> $hpsslist
+
+        # add moch and ocnm for ocn
+        if [[ $name = "ocn" && $inclmoc = "YES" && $fh = "06" && $prefix = 'h' ]] ; then
+
+          mochfile=moc${prefix}${fh}m.$CDUMP.$datefix.ieee
+
+          ls -l $mochfile
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $mochfile not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          echo $mochfile >> $hpsslist
+        fi 
+
+        if [[ $name = "ocn" && $inclocnm = "YES" && $fh = "06" ]] ; then
+
+          ocnmfile=ocnm${prefix}${fh}.$CDUMP.$datefix.grib2
+          ls -l $ocnmfile
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $ocnmfile not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          echo $ocnmfile >> $hpsslist
+        fi
+
+        for hh in $hhlist     # 00,12, etc.
+        do
+
+          file=${name}${prefix}$fh.$CDUMP.$datefix.${hh}Z.grib2
+          ls -l $file
+          if [[ $? -ne 0 ]] ; then
+            echo "ERROR: $file not found"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+
+          cnt=`$WGRIB2 -s $file | wc -l`
+          if [[ $cnt -ne $excnt ]] ; then
+            echo "ERROR: $file contains $cnt records - expected $excnt"
+            ((rc+=1))
+            export err=$rc; err_chk
+          fi
+          echo $file >> $hpsslist
+
+          # Add ocnm if ocn
+          if [[ $name = "ocn" && $inclocnm = "YES" && $fh = "06" ]] ; then
+     
+            ocnmfile=ocnm${prefix}${fh}.$CDUMP.$datefix.${hh}Z.grib2
+            ls -l $ocnmfile
+            if [[ $? -ne 0 ]] ; then
+              echo "ERROR: $ocnmfile not found"
+              ((rc+=1))
+              export err=$rc; err_chk
+            fi
+            echo $ocnmfile >> $hpsslist
+          fi
+  
+        done  # hhlist
+      done   # fhlist
+    done # prefixlist
+
+    #################################
+    # HPSS Section
+    # Monthly means archived per name
+    #################################
+
+    HPSSDIR=$HPSSBASE/monthly_analysis
+    $hpsstar mkd $HPSSDIR
+
+    hpssfile=cfs.$name.$YYYY$MM.monthly.tar
+
+    $hpsstar $PUTCMD $HPSSDIR/$hpssfile `cat $hpsslist`
+    if [[ $? -ne 0 ]] ; then
+      ((rc+=1))
+      echo "ERROR: hpsstar $PUTCMD $HPSSDIR/$hpssfile"
+      export err=$rc; err_chk
+    fi
+
+    # Local file count
+    lcnt=`cat $hpsslist | grep $YYYY$MM | wc -l`
+    cat $hpsslist
+
+    hpssout=$TEMPDIR/$name.$YYYY$MM.chk.out
+    hpssinvo=$TEMPDIR/$name.$YYYY$MM.chk.inv
+    $hpsstar inv $HPSSDIR/$hpssfile > $hpssout
+    grep $YYYY$MM $hpssout |grep -v Listing > $hpssinvo
+
+    # HPSS file count
+    hcnt=`cat $hpssinvo |  wc -l`
+    cat $hpssinvo
+
+    # This should ALWAYS be the same
+    if [[ $lcnt -ne $hcnt ]]; then
+      echo "ERROR: local file cnt is $lcnt, hpss tar count is $hcnt"
+      echo "Local filelist"
+      echo "*************************"
+      cat $hpsslist | grep $YYYY$MM
+      echo ""
+      echo "HPSS filelist"
+      echo "*************************"
+      cat $hpssinvo
+      ((rc+=1))
+      export err=$rc; err_chk
+    fi
+  done   # namelist
+
+  ## Cleanup
+  /bin/rm -f $hpsslist
+  /bin/rm -f $hpssout
+  /bin/rm -f $hpssinvo
+
+  ((rcall+=$rc))    # Accumulator for error code
+  
+  echo "END: Monthly Means HPSS - rc: $rc"
+  now=`date`
+  echo $now
+
+##########################################################################
+# END MONTHLY MEANS HPSS
+##########################################################################
+fi  # dohpssmeans
+
+
+
+
+if [ $dohpsstime = "YES" ] ; then
+##########################################################################
+# TIMESERIES HPSS
+##########################################################################
+
+  echo "BEGIN: Timeseries HPSS"
+  now=`date`
+  echo $now
+
+  typelist='flx pgb ocn'
+  CDUMP=gdas
+
+  rc=0
+
+  ndays=`$USHcfs/cfs_daysinmonth.sh $YYYY $MM`
+  zcnt=4
+  datefix=$YYYY$MM
+
+  hpsslist=$TEMPDIR/$datefix.tser.hpsslist
+  > $hpsslist
+
+  for type in $typelist
+  do
+
+    ## FLX Types
+    if [ $type = "flx" ] ; then
+       namelist='lhtfl shtfl wnd10m wndstrs pressfc tmp2m tmpsfc tmphy1 dlwsfc dswsfc ulwsfc ulwtoa uswsfc uswtoa csusf csdsf csdlf soilm1 soilm2 soilm3 soilm4 soilt1 gflux weasd pwat cprat prate runoff tmin tmax q2m icecon icethk snohf tcdcclm'
+
+      # fhlist='00 01 02 03 04 05 06'
+      fhcnt=7    # used to calculate expected records
+    fi
+
+    ## PGB Types
+    if [ $type = "pgb" ] ; then
+      export namelist='z200 z500 z700 z850 z1000 t2 t50 t200 t250 t500 t700 t850 t1000 psi200 psi850 chi200 chi850 vvel500 q500 q700 q850 q925 prmsl wnd200 wnd250 wnd500 wnd700 wnd850 wnd925 wnd1000 ipv450 ipv550 ipv650'
+
+      # fhlist='nl 00 01 02 03 04 05 06'
+      fhcnt=8
+    fi
+
+    # OCN Types
+    if [ $type = "ocn" ] ; then
+      export namelist='ocndt20c ocnheat ocnslh ocnsst ocnu5 ocnv5 ocnsal5 ocnu15 ocnv15 ocnt15 ocnsal15 ocnvv55 ocnmld  ocndt2.5c ocndt5c ocndt10c ocndt15c ocndt25c ocndt28c ocnsild ocntchp'
+
+      # fhlist='01 02 03 04 05 06'
+      fhcnt=6
+    fi
+
+    # Save the original fhcnt because there are a couple of exceptions below
+    fhcntorig=$fhcnt
+
+    cd $TIMEDIR
+
+    for name in $namelist
+    do
+ 
+      fhcnt=$fhcntorig
+      if [ $name = "pressfc" -o $name = "pwat" -o $name = "tmphy1" ] ; then
+        # fhlist='nl 00 01 02 03 04 05 06'
+        fhcnt=8
+      fi
+
+      ## calculated expected record count
+      excnt=-1
+      ((calcnt = $ndays * $fhcnt * $zcnt))
+      excnt=$calcnt
+      prname=`echo $name | cut -c1-3`
+      if [[ $prname = "wnd" ]] ; then
+        ((excnt = $calcnt * 2))
+      fi
+
+      if [[ $excnt -le 0 ]] ; then
+        echo "ERROR: $name should not have expected count of $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+      file=${name}.$CDUMP.$datefix.grib2
+      /bin/ls -l $file
+      if [[ $? -ne 0 ]] ; then
+        echo "ERROR: $file not found"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+      cnt=`$WGRIB2 -s $file | wc -l`
+      if [[ $cnt -ne $excnt ]] ; then
+        echo "ERROR $file contains $cnt records - expected $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+      echo $file >> $hpsslist
+
+      ### Lowr-res versions of timeseries
+      file=${name}.l.$CDUMP.$datefix.grib2
+      ls -l $file
+      if [[ $? -ne 0 ]] ; then
+        echo "ERROR: $file not found"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+
+      cnt=`$WGRIB2 -s $file | wc -l`
+      if [[ $cnt -ne $excnt ]] ; then
+        echo "ERROR $file contains $cnt records - expected $excnt"
+        ((rc+=1))
+        export err=$rc; err_chk
+      fi
+      echo $file >> $hpsslist
+    done  ## end variable-loop namelist
+  done  # typelist
+
+  # Archive all timeseries in one file
+  #################################
+  # HPSS Section
+  #################################
+
+  HPSSDIR=$HPSSBASE/time_analysis
+  $hpsstar mkd $HPSSDIR
+  hpssfile=cfs.$YYYY$MM.time.tar
+
+  $hpsstar $PUTCMD $HPSSDIR/$hpssfile `cat $hpsslist`
+  if [[ $? -ne 0 ]] ; then
+    ((rc+=1))
+    echo "ERROR: hpsstar $PUTCMD $HPSSDIR/$hpssfile"
+    export err=$rc; err_chk
+  fi
+
+  # Local file count
+  lcnt=`cat $hpsslist | grep $YYYY$MM | wc -l`
+  cat $hpsslist
+
+  hpssout=$TEMPDIR/tser.$YYYY$MM.chk.out
+  hpssinvo=$TEMPDIR/tser.$YYYY$MM.chk.inv
+  $hpsstar inv $HPSSDIR/$hpssfile > $hpssout
+  grep $YYYY$MM $hpssout |grep -v Listing > $hpssinvo
+
+  # HPSS file count
+  hcnt=`cat $hpssinvo |  wc -l`
+  cat $hpssinvo
+
+  # This should ALWAYS be the same
+  if [[ $lcnt -ne $hcnt ]]; then
+    echo "ERROR: local file cnt is $lcnt, hpss tar count is $hcnt"
+    echo "Local filelist"
+    echo "*************************"
+    cat $hpsslist | grep $YYYY$MM
+    echo ""
+    echo "HPSS filelist"
+    echo "*************************"
+    cat $hpssinvo
+    ((rc+=1))
+    export err=$rc; err_chk
+  fi
+
+  ## Cleanup
+  /bin/rm -f $hpsslist
+  /bin/rm -f $hpssout
+  /bin/rm -f $hpssinvo
+  
+  ## FIX 
+  ## cleanup analysis temp
+  ## cleanup grib1 from monthly means and tser directory
+
+  ((rcall+=$rc))    # Accumulator for error code
+
+  echo "END: Timeseries HPSS - rc: $rc"
+  now=`date`
+  echo $now
+
+################################################################################
+## END TIMESERIES HPSS
+################################################################################
+fi  # dohpsstime
+
+export err=$rcall; err_chk
+
+exit $rcall
+

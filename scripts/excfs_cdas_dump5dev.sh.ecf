@@ -1,0 +1,131 @@
+#!/bin/ksh
+set -x
+
+[ -d $DATA ] && cd $DATA || exit 99
+msg="HAS BEGUN on `hostname`"
+postmsg "$jlogfile" "$msg"
+cat break > $pgmout
+
+export machine=${machine:-WCOSS}
+export NET_uc=$(echo $NET | tr [a-z] [A-Z])
+export tmmark_uc=$(echo $tmmark | tr [a-z] [A-Z])
+export PROCESS_GRIBFLDS=${PROCESS_GRIBFLDS:-YES}
+export PROCESS_GDAS_DUMP=${PROCESS_GDAS_DUMP:-YES}
+export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
+export COMSP=${COMSP:-$COMOUT/${RUN1}.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
+export COMGDAS=${COMGDAS:-$COMROOT/gfs/prod/gdas.$PDY} # GDAS file directory
+
+date=$1
+PDY=`echo $date |cut -c1-8`
+cyc=`echo $date |cut -c9-10`
+
+export COMGLBDUMP=${COMGLBDUMP:-/globaldump}
+export COMRTDUMP=${COMRTDUMP:-/sss/emc/climate/shared/emc.climpara/rtdump}
+newdir=$COMOUT
+
+date_tm06=`$NDATE -6 $date`
+date_tm12=`$NDATE -12 $date`
+cyc_tm06=`echo $date_tm06 |cut -c9-10`
+cyc_tm12=`echo $date_tm12 |cut -c9-10`
+pdy_tm06=`echo $date_tm06 |cut -c1-8`
+pdy_tm12=`echo $date_tm12 |cut -c1-8`
+newdir_tm06=$COMROT/cdas.$pdy_tm06
+newdir_tm12=$COMROT/cdas.$pdy_tm12
+
+if [ $date -le 2010072700 ]; then
+  gdas574=gdasx
+else
+  gdas574=gdas
+fi
+mkdir -p $newdir $newdir_tm06 $newdir_tm12
+
+# parse a list of bufr files in $COMGLBDUMP/$date/gdas
+
+set +x
+echo
+for files in $(ls $COMGLBDUMP/$date/gdas); do
+od -N 8 $COMGLBDUMP/$date/gdas/$files|grep '052502 051106' >/dev/null; bufr=$?
+[ $bufr -eq 0 ] && echo $files|IFS='.' read file rest || continue
+[ $file = gdas -o $file = prepbufr ] && continue
+cp -p $COMGLBDUMP/$date/gdas/${file}.gdas.${date} $newdir/cdas1.t${cyc}z.${file}.tm00.bufr_d
+echo $files
+done
+echo
+set -x
+
+# copy boundary and misc files from $COMGLBDUMP/$date/gdas
+
+cp $COMGLBDUMP/$date/gdas/icegrb.gdas.${date}               $newdir/cdas1.t${cyc}z.engicegrb
+cp $COMGLBDUMP/$date/gdas/snogrb.gdas.${date}               $newdir/cdas1.t${cyc}z.snogrb
+cp $COMGLBDUMP/$date/gdas/snogrb_t382.gdas.${date}          $newdir/cdas1.t${cyc}z.snogrb_t382
+cp $COMGLBDUMP/$date/gdas/snogrb_t574.gdas.${date}          $newdir/cdas1.t${cyc}z.snogrb_t574 # before 2015 Jan 14 12Z GFS upgrade
+cp $COMGLBDUMP/$date/gdas/snogrb_t574.1152.576.gdas.${date} $newdir/cdas1.t${cyc}z.snogrb_t574
+cp $COMGLBDUMP/$date/gdas/tcvitl.gdas.${date}               $newdir/cdas1.t${cyc}z.syndata.tcvitals.tm00
+cp $COMGLBDUMP/$date/gdas/stat01.gdas.${date}               $newdir/cdas1.t${cyc}z.status.tm00.bufr_d
+cp $COMGLBDUMP/$date/gdas/statup.gdas.${date}               $newdir/cdas1.t${cyc}z.updated.status.tm00.bufr_d
+
+if [ ! -s $newdir_tm06/cdas1.t${cyc_tm06}z.syndata.tcvitals.tm00 ]; then
+  cp $COMGLBDUMP/${date_tm06}/gdas/tcvitl.gdas.${date_tm06} $newdir_tm06/cdas1.t${cyc_tm06}z.syndata.tcvitals.tm00
+fi
+if [ ! -s $newdir_tm12/cdas1.t${cyc_tm12}z.syndata.tcvitals.tm00 ]; then
+  cp $COMGLBDUMP/${date_tm12}/gdas/tcvitl.gdas.${date_tm12} $newdir_tm12/cdas1.t${cyc_tm12}z.syndata.tcvitals.tm00
+fi
+if [ ! -s  $newdir_tm06/cdas1.t${cyc_tm06}z.snogrb_t574 ]
+then
+  cp $COMGLBDUMP/${date_tm06}/$gdas574/snogrb_t574.gdas.${date_tm06} $newdir_tm06/cdas1.t${cyc_tm06}z.snogrb_t574
+fi
+
+# get rtdump ocean-ice-sst-cmap data dumps
+
+scp $mash:$COMRTDUMP/$date/gdas/cmapgrb.gdas.$date $newdir/cdas1.t${cyc}z.cmapgrb
+set -e
+scp $mash:$COMRTDUMP/$date/gdas/icegrb.gdas.$date  $newdir/cdas1.t${cyc}z.icegrb
+scp $mash:$COMRTDUMP/$date/gdas/sstgrb.gdas.$date  $newdir/cdas1.t${cyc}z.sstgrb
+scp $mash:$COMRTDUMP/$date/gdas/cbathy.gdas.$date  $newdir/cdas1.t${cyc}z.cbathy.tm00.mbufr_d
+scp $mash:$COMRTDUMP/$date/gdas/cdbuoy.gdas.$date  $newdir/cdas1.t${cyc}z.cdbuoy.tm00.mbufr_d
+scp $mash:$COMRTDUMP/$date/gdas/ctesac.gdas.$date  $newdir/cdas1.t${cyc}z.ctesac.tm00.mbufr_d
+set +e
+
+#  set important file permissions
+
+chmod 664  $newdir/cdas1.t${cyc}z.*mbufr_d
+chgrp rstprod $newdir/cdas1.t${cyc}z.sstgrb
+chgrp rstprod $newdir/cdas1.t${cyc}z.icegrb
+chgrp rstprod $newdir/cdas1.t${cyc}z.aircft.tm00.bufr_d
+chgrp rstprod $newdir/cdas1.t${cyc}z.aircar.tm00.bufr_d
+chgrp rstprod $newdir/cdas1.t${cyc}z.adpsfc.tm00.bufr_d
+chgrp rstprod $newdir/cdas1.t${cyc}z.sfcshp.tm00.bufr_d
+
+export STATUS=YES
+
+echo " " >> $pgmout
+echo "##################################################################\
+####################"  >> $pgmout
+echo " " >> $pgmout
+
+#================================================================
+#================================================================
+
+
+# GOOD RUN
+set +x
+echo " "
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " "
+set -x
+
+
+# save standard output
+cat  break $pgmout break > allout
+cat allout
+# rm allout
+
+sleep 10
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+
