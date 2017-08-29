@@ -1,0 +1,5 @@
+How to compile this code:
+1. cd make
+2. type "gmake"
+3. back to source directory and copy exec to ../../exec
+

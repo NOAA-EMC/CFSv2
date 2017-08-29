@@ -1,0 +1,2390 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/filename_mod.F 03/09/11 11:03:51
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../core/filename_mod.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |!  !MODULE: filename_mod.F90
+         24 |!
+         25 |!  !DESCRIPTION:
+         26 |!   Generates filenames for a number of routines.
+         27 |!
+         28 |!  !REVISION HISTORY:
+         29 |!  13 Mar 2004   Sujay Kumar  Initial Specification
+         30 |!
+         31 |!EOP
+         32 |module filename_mod
+         33 |contains
+         34 |!BOP
+         35 |! !ROUTINE: avhrr_file_1km
+         36 |!
+         37 |! !DESCRIPTION:
+         38 |! Generates the 1km filenames for AVHHR LAI data.
+         39 |!
+         40 |! !INTERFACE:
+         41 |  subroutine avhrr_laifile_1km (name9,name10,name11,name12,&
+         42 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+         43 |
+         44 |    implicit none
+         45 |! !ARGUMENTS:
+         46 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+         47 |    character(len=40), intent(in)  :: avhrrdir
+         48 |    character(len=4), intent(in)   :: cyr1, cyr2
+         49 |    character(len=2), intent(in)   :: cmo1, cmo2
+         50 |!EOP
+         51 |    character(len=100) :: temp1
+         52 |    character(len=100) :: temp2
+         53 |    character(len=100) :: temp3
+         54 |    character(len=100) :: temp4
+         55 |    integer :: i,c
+         56 |
+         57 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+         58 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+         59 |    character*1 :: fsubsn(19), fsubsn_2(19), fsubsn_3(19), fsubsn_4(19)
+         60 |
+         61 |    write(unit=temp1, fmt='(a40)') avhrrdir
+         62 |    write(unit=temp2, fmt='(a40)') avhrrdir
+         63 |    write(unit=temp3, fmt='(a40)') avhrrdir
+         64 |    write(unit=temp4, fmt='(a40)') avhrrdir
+         65 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+         66 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+         67 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+         68 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+         69 |
+         70 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+         71 |    read(unit=temp1, fmt='(7a1)') fdir
+         72 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+         73 |    read(unit=temp2, fmt='(7a1)') fdir_2
+         74 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+         75 |    read(unit=temp3, fmt='(7a1)') fdir_3
+         76 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+         77 |    read(unit=temp4, fmt='(7a1)') fdir_4
+         78 |
+         79 |    do i = 1, 7
+         80 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+         81 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+         82 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+         83 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+         84 |    enddo
+         85 |
+         86 |    write(unit=temp1, fmt='(a19)') '_avhrrlai_1km.1gd1c'
+         87 |    write(unit=temp2, fmt='(a19)') '_avhrrlai_1km.1gd1c'
+         88 |    write(unit=temp3, fmt='(a19)') '_avhrrlai_1km.1gd1c'
+         89 |    write(unit=temp4, fmt='(a19)') '_avhrrlai_1km.1gd1c'
+         90 |    read (unit=temp1, fmt='(80a1)') (fsubsn(i), i=1,19)
+         91 |    read (unit=temp2, fmt='(80a1)') (fsubsn_2(i), i=1,19)
+         92 |    read (unit=temp3, fmt='(80a1)') (fsubsn_3(i), i=1,19)
+         93 |    read (unit=temp4, fmt='(80a1)') (fsubsn_4(i), i=1,19)
+         94 |
+         95 |    c = 0
+         96 |    do i = 1, 80
+         97 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+         98 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+         99 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        100 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        101 |    end do
+        102 |
+        103 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        104 |         (fsubsn(i), i=1,19)
+        105 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        106 |         (fsubsn_2(i), i=1,19)
+        107 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        108 |         (fsubsn_3(i), i=1,19)
+        109 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        110 |         (fsubsn_4(i), i=1,19)
+        111 |    read(unit=temp1, fmt='(a80)') name9
+        112 |    read(unit=temp2, fmt='(a80)') name10
+        113 |    read(unit=temp3, fmt='(a80)') name11
+        114 |    read(unit=temp4, fmt='(a80)') name12
+        115 |
+        116 |    write(*, *) "Name9: ", name9
+        117 |    write(*, *) "Name10: ", name10
+        118 |    write(*, *) "Name11: ", name11
+        119 |    write(*, *) "Name12: ", name12
+        120 |
+        121 |    return
+        122 |
+        123 |  end subroutine avhrr_laifile_1km
+        124 |
+        125 |!BOP
+        126 |! !ROUTINE: avhrr_file_1km
+        127 |!
+        128 |! !DESCRIPTION:
+        129 |! Generates the 1km filenames for AVHHR LAI data.
+        130 |!
+        131 |! !INTERFACE:
+        132 |  subroutine avhrr_saifile_1km (name13,&
+        133 |       name14,name15,name16, &
+        134 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+        135 |
+        136 |    implicit none
+        137 |! !ARGUMENTS:
+        138 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        139 |    character(len=40), intent(in)  :: avhrrdir
+        140 |    character(len=4), intent(in)   :: cyr1, cyr2
+        141 |    character(len=2), intent(in)   :: cmo1, cmo2
+        142 |!EOP
+        143 |    character(len=100) :: temp1
+        144 |    character(len=100) :: temp2
+        145 |    character(len=100) :: temp3
+        146 |    character(len=100) :: temp4
+        147 |    integer :: i,c
+        148 |
+        149 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        150 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        151 |    character*1 :: fsubsn(19), fsubsn_2(19), fsubsn_3(19), fsubsn_4(19)
+        152 |    character*1 :: fsubsn_5(19), fsubsn_6(19), fsubsn_7(19), fsubsn_8(19)
+        153 |
+        154 |    write(unit=temp1, fmt='(a40)') avhrrdir
+        155 |    write(unit=temp2, fmt='(a40)') avhrrdir
+        156 |    write(unit=temp3, fmt='(a40)') avhrrdir
+        157 |    write(unit=temp4, fmt='(a40)') avhrrdir
+        158 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        159 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        160 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        161 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        162 |
+        163 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        164 |    read(unit=temp1, fmt='(7a1)') fdir
+        165 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        166 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        167 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        168 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        169 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        170 |    read(unit=temp4, fmt='(7a1)') fdir_4
+        171 |
+        172 |    do i = 1, 7
+        173 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        174 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        175 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        176 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        177 |    enddo
+        178 |
+        179 |    write(unit=temp1, fmt='(a19)') '_avhrrsai_1km.1gd1c'
+        180 |    write(unit=temp2, fmt='(a19)') '_avhrrsai_1km.1gd1c'
+        181 |    write(unit=temp3, fmt='(a19)') '_avhrrsai_1km.1gd1c'
+        182 |    write(unit=temp4, fmt='(a19)') '_avhrrsai_1km.1gd1c'
+        183 |    read (unit=temp1, fmt='(80a1)') (fsubsn_5(i), i=1,19)
+        184 |    read (unit=temp2, fmt='(80a1)') (fsubsn_6(i), i=1,19)
+        185 |    read (unit=temp3, fmt='(80a1)') (fsubsn_7(i), i=1,19)
+        186 |    read (unit=temp4, fmt='(80a1)') (fsubsn_8(i), i=1,19)
+        187 |
+        188 |    c = 0
+        189 |    do i = 1, 80
+        190 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        191 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        192 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        193 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        194 |    end do
+        195 |
+        196 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        197 |         (fsubsn_5(i), i=1,19)
+        198 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        199 |         (fsubsn_6(i), i=1,19)
+        200 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        201 |         (fsubsn_7(i), i=1,19)
+        202 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        203 |         (fsubsn_8(i), i=1,19)
+        204 |    read(unit=temp1, fmt='(a80)') name13
+        205 |    read(unit=temp2, fmt='(a80)') name14
+        206 |    read(unit=temp3, fmt='(a80)') name15
+        207 |    read(unit=temp4, fmt='(a80)') name16
+        208 |
+        209 |    write(*, *) "Name13: ", name13
+        210 |    write(*, *) "Name14: ", name14
+        211 |    write(*, *) "Name15: ", name15
+        212 |    write(*, *) "Name16: ", name16
+        213 |
+        214 |    return
+        215 |
+        216 |  end subroutine avhrr_saifile_1km
+        217 |!BOP
+        218 |! !ROUTINE: modis_file_1km
+        219 |!
+        220 |! !DESCRIPTION:
+        221 |! Generates the 1km filenames for MODIS LAI data.
+        222 |!
+        223 |! !INTERFACE:
+        224 |  subroutine modis_file_1km (name9,name10,name11,name12,name13,&
+        225 |       name14,name15,name16, &
+        226 |       modisdir, cyr1, cyr2, cmo1, cmo2 )
+        227 |
+        228 |    implicit none
+        229 |! !ARGUMENTS:
+        230 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+        231 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        232 |    character(len=40), intent(in)  :: modisdir
+        233 |    character(len=4), intent(in)   :: cyr1, cyr2
+        234 |    character(len=2), intent(in)   :: cmo1, cmo2
+        235 |!EOP
+        236 |    !==== Local Variables=======================
+        237 |    character(len=100) :: temp1
+        238 |    character(len=100) :: temp2
+        239 |    character(len=100) :: temp3
+        240 |    character(len=100) :: temp4
+        241 |
+        242 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        243 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        244 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        245 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+        246 |
+        247 |    integer :: i,c
+        248 |
+        249 |    write(unit=temp1, fmt='(a40)') modisdir
+        250 |    write(unit=temp2, fmt='(a40)') modisdir
+        251 |    write(unit=temp3, fmt='(a40)') modisdir
+        252 |    write(unit=temp4, fmt='(a40)') modisdir
+        253 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        254 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        255 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        256 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        257 |
+        258 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        259 |    read(unit=temp1, fmt='(7a1)') fdir
+        260 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        261 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        262 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        263 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        264 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        265 |    read(unit=temp4, fmt='(7a1)') fdir_4
+        266 |
+        267 |    do i = 1, 7
+        268 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        269 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        270 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        271 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        272 |    enddo
+        273 |
+        274 |    write(unit=temp1, fmt='(a10)') '_1KM.1gd1c'
+        275 |    write(unit=temp2, fmt='(a10)') '_1KM.1gd1c'
+        276 |    write(unit=temp3, fmt='(a10)') '_1KM.1gd1c'
+        277 |    write(unit=temp4, fmt='(a10)') '_1KM.1gd1c'
+        278 |    read (unit=temp1, fmt='(80a1)') (fsubsn(i), i=1,15)
+        279 |    read (unit=temp2, fmt='(80a1)') (fsubsn_2(i), i=1,15)
+        280 |    read (unit=temp3, fmt='(80a1)') (fsubsn_3(i), i=1,15)
+        281 |    read (unit=temp4, fmt='(80a1)') (fsubsn_4(i), i=1,15)
+        282 |    write(unit=temp1, fmt='(a14)') '_SAI_1KM.1gd1c'
+        283 |    write(unit=temp2, fmt='(a14)') '_SAI_1KM.1gd1c'
+        284 |    write(unit=temp3, fmt='(a14)') '_SAI_1KM.1gd1c'
+        285 |    write(unit=temp4, fmt='(a14)') '_SAI_1KM.1gd1c'
+        286 |    read (unit=temp1, fmt='(80a1)') (fsubsn_5(i), i=1,15)
+        287 |    read (unit=temp2, fmt='(80a1)') (fsubsn_6(i), i=1,15)
+        288 |    read (unit=temp3, fmt='(80a1)') (fsubsn_7(i), i=1,15)
+        289 |    read (unit=temp4, fmt='(80a1)') (fsubsn_8(i), i=1,15)
+        290 |
+        291 |    c = 0
+        292 |    do i = 1, 80
+        293 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        294 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        295 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        296 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        297 |    end do
+        298 |
+        299 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        300 |         (fsubsn(i), i=1,15)
+        301 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        302 |         (fsubsn_2(i), i=1,15)
+        303 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        304 |         (fsubsn_3(i), i=1,15)
+        305 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        306 |         (fsubsn_4(i), i=1,15)
+        307 |    read(unit=temp1, fmt='(a80)') name9
+        308 |    read(unit=temp2, fmt='(a80)') name10
+        309 |    read(unit=temp3, fmt='(a80)') name11
+        310 |    read(unit=temp4, fmt='(a80)') name12
+        311 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        312 |         (fsubsn_5(i), i=1,15)
+        313 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        314 |         (fsubsn_6(i), i=1,15)
+        315 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        316 |         (fsubsn_7(i), i=1,15)
+        317 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        318 |         (fsubsn_8(i), i=1,15)
+        319 |    read(unit=temp1, fmt='(a80)') name13
+        320 |    read(unit=temp2, fmt='(a80)') name14
+        321 |    read(unit=temp3, fmt='(a80)') name15
+        322 |    read(unit=temp4, fmt='(a80)') name16
+        323 |
+        324 |    write(*, *) "Name9: ", name9
+        325 |    write(*, *) "Name10: ", name10
+        326 |    write(*, *) "Name11: ", name11
+        327 |    write(*, *) "Name15: ", name15
+        328 |
+        329 |    return
+        330 |
+        331 |  end subroutine modis_file_1km
+        332 |
+        333 |  !BOP
+        334 |  ! !ROUTINE: avhrr_laifilename
+        335 |  !
+        336 |  ! !DESCRIPTION: This subroutine puts together AVHRR file name
+        337 |  !
+        338 |  ! !INTERFACE:
+        339 |  subroutine avhrr_laifilename ( &
+        340 |       name9,name10,name11,name12, &
+        341 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+        342 |
+        343 |    implicit none
+        344 |  ! !ARGUMENTS:
+        345 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+        346 |    character(len=40), intent(in)  :: avhrrdir
+        347 |    character(len=4),  intent(in)  :: cyr1, cyr2
+        348 |    character(len=2),  intent(in)  :: cmo1, cmo2
+        349 |  !EOP
+        350 |    !==== Local Variables=======================
+        351 |    character(len=100) :: temp1
+        352 |    character(len=100) :: temp2
+        353 |    character(len=100) :: temp3
+        354 |    character(len=100) :: temp4
+        355 |    integer :: i, c
+        356 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        357 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        358 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        359 |
+        360 |    !=== End Variable Definition ===============
+        361 |    !=== formats for filename segments
+        362 |    !BOC
+        363 |    write(unit=temp1,fmt='(a40)') avhrrdir
+        364 |    write(unit=temp2,fmt='(a40)') avhrrdir
+        365 |    write(unit=temp3,fmt='(a40)') avhrrdir
+        366 |    write(unit=temp4,fmt='(a40)') avhrrdir
+        367 |
+        368 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        369 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        370 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        371 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        372 |
+        373 |    write(unit=temp1,fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        374 |    read(unit=temp1, fmt='(7a1)') fdir
+        375 |    write(unit=temp2,fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        376 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        377 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        378 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        379 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        380 |    read(unit=temp4,fmt='(7a1)') fdir_4
+        381 |
+        382 |    do i = 1, 7
+        383 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        384 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        385 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        386 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        387 |    enddo
+        388 |
+        389 |    write(unit=temp1, fmt='(a15)') '_AVHRRLAI_0.125'
+        390 |    write(unit=temp2, fmt='(a15)') '_AVHRRLAI_0.125'
+        391 |    write(unit=temp3, fmt='(a15)') '_AVHRRLAI_0.125'
+        392 |    write(unit=temp4, fmt='(a15)') '_AVHRRLAI_0.125'
+        393 |    read (unit=temp1, fmt='(80a1)') (fsubsn(i), i=1,15)
+        394 |    read (unit=temp2, fmt='(80a1)') (fsubsn_2(i), i=1,15)
+        395 |    read (unit=temp3, fmt='(80a1)') (fsubsn_3(i), i=1,15)
+        396 |    read (unit=temp4, fmt='(80a1)') (fsubsn_4(i), i=1,15)
+        397 |
+        398 |    c = 0
+        399 |    do i = 1, 80
+        400 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        401 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        402 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        403 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        404 |    end do
+        405 |
+        406 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        407 |         (fsubsn(i), i=1,15)
+        408 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        409 |         (fsubsn_2(i), i=1,15)
+        410 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        411 |         (fsubsn_3(i), i=1,15)
+        412 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        413 |         (fsubsn_4(i), i=1,15)
+        414 |    read(unit=temp1, fmt='(a80)') name9
+        415 |    read(unit=temp2, fmt='(a80)') name10
+        416 |    read(unit=temp3, fmt='(a80)') name11
+        417 |    read(unit=temp4, fmt='(a80)') name12
+        418 |
+        419 |    print*, 'lai1 : rt ',name9
+        420 |    print*, 'lai2 : rt ',name10
+        421 |    print*, 'lai1 : clim ',name11
+        422 |    print*, 'lai2 : clim ',name12
+        423 |#line 425
+        425 |    return
+        426 |    !EOC
+        427 |  end subroutine avhrr_laifilename
+        428 |
+        429 |  !BOP
+        430 |  ! !ROUTINE: avhrr_laifilename
+        431 |  !
+        432 |  ! !DESCRIPTION: This subroutine puts together AVHRR file name
+        433 |  !
+        434 |  ! !INTERFACE:
+        435 |  subroutine avhrr_saifilename ( &
+        436 |       name13,name14,name15,name16, &
+        437 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+        438 |
+        439 |    implicit none
+        440 |  ! !ARGUMENTS:
+        441 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        442 |    character(len=40), intent(in)  :: avhrrdir
+        443 |    character(len=4),  intent(in)  :: cyr1, cyr2
+        444 |    character(len=2),  intent(in)  :: cmo1, cmo2
+        445 |  !EOP
+        446 |    !==== Local Variables=======================
+        447 |    character(len=100) :: temp1
+        448 |    character(len=100) :: temp2
+        449 |    character(len=100) :: temp3
+        450 |    character(len=100) :: temp4
+        451 |    integer :: i, c
+        452 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        453 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        454 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+        455 |
+        456 |    !=== End Variable Definition ===============
+        457 |    !=== formats for filename segments
+        458 |    !BOC
+        459 |    write(unit=temp1,fmt='(a40)') avhrrdir
+        460 |    write(unit=temp2,fmt='(a40)') avhrrdir
+        461 |    write(unit=temp3,fmt='(a40)') avhrrdir
+        462 |    write(unit=temp4,fmt='(a40)') avhrrdir
+        463 |
+        464 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        465 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        466 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        467 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        468 |
+        469 |    write(unit=temp1,fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        470 |    read(unit=temp1, fmt='(7a1)') fdir
+        471 |    write(unit=temp2,fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        472 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        473 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        474 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        475 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        476 |    read(unit=temp4,fmt='(7a1)') fdir_4
+        477 |
+        478 |    do i = 1, 7
+        479 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        480 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        481 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        482 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        483 |    enddo
+        484 |
+        485 |    write(unit=temp1, fmt='(a15)') '_AVHRRSAI_0.125'
+        486 |    write(unit=temp2, fmt='(a15)') '_AVHRRSAI_0.125'
+        487 |    write(unit=temp3, fmt='(a15)') '_AVHRRSAI_0.125'
+        488 |    write(unit=temp4, fmt='(a15)') '_AVHRRSAI_0.125'
+        489 |    read (unit=temp1, fmt='(80a1)') (fsubsn_5(i), i=1,15)
+        490 |    read (unit=temp2, fmt='(80a1)') (fsubsn_6(i), i=1,15)
+        491 |    read (unit=temp3, fmt='(80a1)') (fsubsn_7(i), i=1,15)
+        492 |    read (unit=temp4, fmt='(80a1)') (fsubsn_8(i), i=1,15)
+        493 |
+        494 |    c = 0
+        495 |    do i = 1, 80
+        496 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        497 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        498 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        499 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        500 |    end do
+        501 |
+        502 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        503 |         (fsubsn_5(i), i=1,15)
+        504 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        505 |         (fsubsn_6(i), i=1,15)
+        506 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        507 |         (fsubsn_7(i), i=1,15)
+        508 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        509 |         (fsubsn_8(i), i=1,15)
+        510 |    read(unit=temp1, fmt='(a80)') name13
+        511 |    read(unit=temp2, fmt='(a80)') name14
+        512 |    read(unit=temp3, fmt='(a80)') name15
+        513 |    read(unit=temp4, fmt='(a80)') name16
+        514 |
+        515 |    print*, 'sai1: real ',name13
+        516 |    print*, 'sai2: real ',name14
+        517 |    print*, 'sai1: clim ',name15
+        518 |    print*, 'sai2: clim ',name16
+        519 |
+        520 |    return
+        521 |    !EOC
+        522 |  end subroutine avhrr_saifilename
+        523 |
+        524 |  !BOP
+        525 |  !
+        526 |  ! !ROUTINE: avhrr_file_5km
+        527 |  !
+        528 |  ! !DESCRIPTION: This subroutine puts together AVHRR file name
+        529 |  !
+        530 |  ! !INTERFACE:
+        531 |  subroutine avhrr_laifile_5km ( &
+        532 |       name9,name10,name11,name12, &
+        533 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+        534 |    implicit none
+        535 |
+        536 |    character(len=40), intent(in) :: avhrrdir
+        537 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+        538 |    character(len=4), intent(in)  :: cyr1, cyr2
+        539 |    character(len=2), intent(in)  :: cmo1, cmo2
+        540 |    !EOP
+        541 |
+        542 |    integer :: i, c
+        543 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        544 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        545 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        546 |    character(len=100) :: temp1
+        547 |    character(len=100) :: temp2
+        548 |    character(len=100) :: temp3
+        549 |    character(len=100) :: temp4
+        550 |    !=== End Variable Definition ===============
+        551 |    !=== formats for filename segments
+        552 |    !BOC
+        553 |    write(unit=temp1, fmt='(a40)') avhrrdir
+        554 |    write(unit=temp2, fmt='(a40)') avhrrdir
+        555 |    write(unit=temp3, fmt='(a40)') avhrrdir
+        556 |    write(unit=temp4, fmt='(a40)') avhrrdir
+        557 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        558 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        559 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        560 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        561 |
+        562 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        563 |    read(unit=temp1, fmt='(7a1)') fdir
+        564 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        565 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        566 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        567 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        568 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        569 |    read(unit=temp4, fmt='(7a1)') fdir_4
+        570 |
+        571 |    do i = 1, 7
+        572 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        573 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        574 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        575 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        576 |    enddo
+        577 |
+        578 |    write(unit=temp1, fmt='(a8)') '_5KM.bin'
+        579 |    write(unit=temp2, fmt='(a8)') '_5KM.bin'
+        580 |    write(unit=temp3, fmt='(a8)') '_5KM.bin'
+        581 |    write(unit=temp4, fmt='(a8)') '_5KM.bin'
+        582 |    read (unit=temp1, fmt='(80a1)') (fsubsn(i), i=1,15)
+        583 |    read (unit=temp2, fmt='(80a1)') (fsubsn_2(i), i=1,15)
+        584 |    read (unit=temp3, fmt='(80a1)') (fsubsn_3(i), i=1,15)
+        585 |    read (unit=temp4, fmt='(80a1)') (fsubsn_4(i), i=1,15)
+        586 |
+        587 |    c = 0
+        588 |    do i = 1, 80
+        589 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        590 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        591 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        592 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        593 |    end do
+        594 |
+        595 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        596 |         (fsubsn(i), i=1,15)
+        597 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        598 |         (fsubsn_2(i), i=1,15)
+        599 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        600 |         (fsubsn_3(i), i=1,15)
+        601 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        602 |         (fsubsn_4(i), i=1,15)
+        603 |    read(unit=temp1, fmt='(a80)') name9
+        604 |    read(unit=temp2, fmt='(a80)') name10
+        605 |    read(unit=temp3, fmt='(a80)') name11
+        606 |    read(unit=temp4, fmt='(a80)') name12
+        607 |
+        608 |    return
+        609 |    !EOC
+        610 |  end subroutine avhrr_laifile_5km
+        611 |#line 613
+        613 |  !BOP
+        614 |  !
+        615 |  ! !ROUTINE: avhrr_file_5km
+        616 |  !
+        617 |  ! !DESCRIPTION: This subroutine puts together AVHRR file name
+        618 |  !
+        619 |  ! !INTERFACE:
+        620 |  subroutine avhrr_saifile_5km ( &
+        621 |       name13,name14,name15,name16, &
+        622 |       avhrrdir, cyr1, cyr2, cmo1, cmo2 )
+        623 |    implicit none
+        624 |
+        625 |    character(len=40), intent(in) :: avhrrdir
+        626 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        627 |    character(len=4), intent(in)  :: cyr1, cyr2
+        628 |    character(len=2), intent(in)  :: cmo1, cmo2
+        629 |    !EOP
+        630 |
+        631 |    integer :: i, c
+        632 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        633 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        634 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+        635 |    character(len=100) :: temp1
+        636 |    character(len=100) :: temp2
+        637 |    character(len=100) :: temp3
+        638 |    character(len=100) :: temp4
+        639 |    !=== End Variable Definition ===============
+        640 |    !=== formats for filename segments
+        641 |    !BOC
+        642 |    write(unit=temp1, fmt='(a40)') avhrrdir
+        643 |    write(unit=temp2, fmt='(a40)') avhrrdir
+        644 |    write(unit=temp3, fmt='(a40)') avhrrdir
+        645 |    write(unit=temp4, fmt='(a40)') avhrrdir
+        646 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        647 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        648 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        649 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        650 |
+        651 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        652 |    read(unit=temp1, fmt='(7a1)') fdir
+        653 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        654 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        655 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        656 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        657 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        658 |    read(unit=temp4, fmt='(7a1)') fdir_4
+        659 |
+        660 |    do i = 1, 7
+        661 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        662 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        663 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        664 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        665 |    enddo
+        666 |
+        667 |    write(unit=temp1, fmt='(a12)') '_SAI_5KM.bin'
+        668 |    write(unit=temp2, fmt='(a12)') '_SAI_5KM.bin'
+        669 |    write(unit=temp3, fmt='(a12)') '_SAI_5KM.bin'
+        670 |    write(unit=temp4, fmt='(a12)') '_SAI_5KM.bin'
+        671 |    read (unit=temp1, fmt='(80a1)') (fsubsn_5(i), i=1,15)
+        672 |    read (unit=temp2, fmt='(80a1)') (fsubsn_6(i), i=1,15)
+        673 |    read (unit=temp3, fmt='(80a1)') (fsubsn_7(i), i=1,15)
+        674 |    read (unit=temp4, fmt='(80a1)') (fsubsn_8(i), i=1,15)
+        675 |
+        676 |    c = 0
+        677 |    do i = 1, 80
+        678 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        679 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        680 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        681 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        682 |    end do
+        683 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        684 |         (fsubsn_5(i), i=1,15)
+        685 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        686 |         (fsubsn_6(i), i=1,15)
+        687 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        688 |         (fsubsn_7(i), i=1,15)
+        689 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        690 |         (fsubsn_8(i), i=1,15)
+        691 |    read(unit=temp1, fmt='(a80)') name13
+        692 |    read(unit=temp2, fmt='(a80)') name14
+        693 |    read(unit=temp3, fmt='(a80)') name15
+        694 |    read(unit=temp4, fmt='(a80)') name16
+        695 |
+        696 |    return
+        697 |    !EOC
+        698 |  end subroutine avhrr_saifile_5km
+        699 |#line 701
+        701 |  !BOP
+        702 |  !
+        703 |  ! !ROUTINE: modis_file_2
+        704 |  !
+        705 |  ! !DESCRIPTION: This subroutine puts together MODIS file name
+        706 |  !
+        707 |  ! !INTERFACE:
+        708 |  subroutine modis_file_2 (name9,name10,name11,name12,&
+        709 |       name13,name14,name15,name16, &
+        710 |       modisdir, cyr1, cyr2, cmo1, cmo2 )
+        711 |    !EOP
+        712 |    implicit none
+        713 |    character(len=40), intent(in) :: modisdir
+        714 |    character(len=80), intent(out):: name9,  name10, name11, name12
+        715 |    character(len=80), intent(out):: name13, name14, name15, name16
+        716 |    character(len=4), intent(in)  :: cyr1, cyr2
+        717 |    character(len=2), intent(in)  :: cmo1, cmo2
+        718 |    integer :: i, c
+        719 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        720 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        721 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        722 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+        723 |
+        724 |    !=== End Variable Definition ===============
+        725 |    !=== formats for filename segments
+        726 |    !BOC
+        727 |92  format (80a1)
+        728 |93  format (a80)
+        729 |94  format (i4, i2, i2, i2)
+        730 |95  format (10a1)
+        731 |96  format (a40)
+        732 |97  format (a9)
+        733 |67  format (a15)
+        734 |98  format (a1, a4, a2)
+        735 |66  format (a5,a2)
+        736 |99  format (7a1)
+        737 |
+        738 |    write(90, 96, rec=1) modisdir
+        739 |    write(91, 96, rec=1) modisdir
+        740 |    write(92, 96, rec=1) modisdir
+        741 |    write(93, 96, rec=1) modisdir
+        742 |    read(90, 92, rec=1) (fbase(i), i=1,80)
+        743 |    read(91, 92, rec=1) (fbase_2(i), i=1,80)
+        744 |    read(92, 92, rec=1) (fbase_3(i), i=1,80)
+        745 |    read(93, 92, rec=1) (fbase_4(i), i=1,80)
+        746 |
+        747 |    write(90, 98, rec=1) '/', cyr1, cmo1
+        748 |    read(90, 99, rec=1) fdir
+        749 |    write(91, 98, rec=1) '/', cyr2, cmo2
+        750 |    read(91, 99, rec=1) fdir_2
+        751 |    write(92, 66, rec=1) '/CLIM', cmo1
+        752 |    read(92, 99, rec=1) fdir_3
+        753 |    write(93, 66, rec=1) '/CLIM', cmo2
+        754 |    read(93, 99, rec=1) fdir_4
+        755 |
+        756 |    do i = 1, 7
+        757 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        758 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        759 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        760 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        761 |    enddo
+        762 |
+        763 |    write(90, 67, rec=1) '_MODISLAI_0.125'
+        764 |    write(91, 67, rec=1) '_MODISLAI_0.125'
+        765 |    write(92, 67, rec=1) '_MODISLAI_0.125'
+        766 |    write(93, 67, rec=1) '_MODISLAI_0.125'
+        767 |    read (90, 92, rec=1) (fsubsn(i), i=1,15)
+        768 |    read (91, 92, rec=1) (fsubsn_2(i), i=1,15)
+        769 |    read (92, 92, rec=1) (fsubsn_3(i), i=1,15)
+        770 |    read (93, 92, rec=1) (fsubsn_4(i), i=1,15)
+        771 |    write(90, 67, rec=1) '_MODISSAI_0.125'
+        772 |    write(91, 67, rec=1) '_MODISSAI_0.125'
+        773 |    write(92, 67, rec=1) '_MODISSAI_0.125'
+        774 |    write(93, 67, rec=1) '_MODISSAI_0.125'
+        775 |    read (90, 92, rec=1) (fsubsn_5(i), i=1,15)
+        776 |    read (91, 92, rec=1) (fsubsn_6(i), i=1,15)
+        777 |    read (92, 92, rec=1) (fsubsn_7(i), i=1,15)
+        778 |    read (93, 92, rec=1) (fsubsn_8(i), i=1,15)
+        779 |
+        780 |    c = 0
+        781 |    do i = 1, 80
+        782 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        783 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        784 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        785 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        786 |    end do
+        787 |
+        788 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        789 |         (fsubsn(i), i=1,15)
+        790 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        791 |         (fsubsn_2(i), i=1,15)
+        792 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        793 |         (fsubsn_3(i), i=1,15)
+        794 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        795 |         (fsubsn_4(i), i=1,15)
+        796 |    read(90, 93, rec=1) name9
+        797 |    read(91, 93, rec=1) name10
+        798 |    read(92, 93, rec=1) name11
+        799 |    read(93, 93, rec=1) name12
+        800 |
+        801 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        802 |         (fsubsn_5(i), i=1,15)
+        803 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        804 |         (fsubsn_6(i), i=1,15)
+        805 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        806 |         (fsubsn_7(i), i=1,15)
+        807 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        808 |         (fsubsn_8(i), i=1,15)
+        809 |    read(90, 93, rec=1) name13
+        810 |    read(91, 93, rec=1) name14
+        811 |    read(92, 93, rec=1) name15
+        812 |    read(93, 93, rec=1) name16
+        813 |
+        814 |    close(90)
+        815 |    close(91)
+        816 |    close(92)
+        817 |    close(93)
+        818 |
+        819 |    !  print*, 'n9 ',name9
+        820 |    !  print*, 'n10 ',name10
+        821 |    !  print*, 'n11 ',name11
+        822 |    !  print*, 'n12 ',name12
+        823 |    !  print*, 'n13 ',name13
+        824 |    !  print*, 'n14 ',name14
+        825 |    !  print*, 'n15 ',name15
+        826 |    !  print*, 'n16 ',name16
+        827 |    return
+        828 |    !EOC
+        829 |  end subroutine modis_file_2
+        830 |  !BOP
+        831 |  !
+        832 |  ! !ROUTINE: modis_file_5km
+        833 |  !
+        834 |  ! !DESCRIPTION: This subroutine puts together MODIS file name
+        835 |  !
+        836 |  ! !INTERFACE:
+        837 |
+        838 |  subroutine modis_file_5km(name9,name10,name11,name12,name13,&
+        839 |       name14,name15,name16, &
+        840 |       modisdir, cyr1, cyr2, cmo1, cmo2 )
+        841 |    !EOP
+        842 |    implicit none
+        843 |
+        844 |    character(len=40), intent(in)  :: modisdir
+        845 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+        846 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        847 |    character(len=4), intent(in) :: cyr1, cyr2
+        848 |    character(len=2), intent(in)  :: cmo1, cmo2
+        849 |    integer :: i, c
+        850 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        851 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        852 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        853 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+        854 |    character(len=100) :: temp1
+        855 |    character(len=100) :: temp2
+        856 |    character(len=100) :: temp3
+        857 |    character(len=100) :: temp4
+        858 |    !=== End Variable Definition ===============
+        859 |    !=== formats for filename segments
+        860 |    !BOC
+        861 |92  format (80a1)
+        862 |93  format (a80)
+        863 |94  format (i4, i2, i2, i2)
+        864 |95  format (10a1)
+        865 |96  format (a40)
+        866 |97  format (a9)
+        867 |67  format (a8)
+        868 |68  format (a12)
+        869 |98  format (a1, a4, a2)
+        870 |66  format (a5,a2)
+        871 |99  format (7a1)
+        872 |
+        873 |    write(unit=temp1, fmt='(a40)') modisdir
+        874 |    write(unit=temp2, fmt='(a40)') modisdir
+        875 |    write(unit=temp3, fmt='(a40)') modisdir
+        876 |    write(unit=temp4, fmt='(a40)') modisdir
+        877 |    read(unit=temp1, fmt='(80a1)') (fbase(i), i=1,80)
+        878 |    read(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,80)
+        879 |    read(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,80)
+        880 |    read(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,80)
+        881 |
+        882 |    write(unit=temp1, fmt='(a1,a4,a2)') '/', cyr1, cmo1
+        883 |    read(unit=temp1, fmt='(7a1)') fdir
+        884 |    write(unit=temp2, fmt='(a1,a4,a2)') '/', cyr2, cmo2
+        885 |    read(unit=temp2, fmt='(7a1)') fdir_2
+        886 |    write(unit=temp3, fmt='(a5,a2)') '/CLIM', cmo1
+        887 |    read(unit=temp3, fmt='(7a1)') fdir_3
+        888 |    write(unit=temp4, fmt='(a5,a2)') '/CLIM', cmo2
+        889 |    read(unit=temp4, fmt='(7a1)') fdir_4
+        890 |
+        891 |    do i = 1, 7
+        892 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+        893 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+        894 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+        895 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+        896 |    enddo
+        897 |
+        898 |    write(unit=temp1, fmt='(a8)') '_5KM.bin'
+        899 |    write(unit=temp2, fmt='(a8)') '_5KM.bin'
+        900 |    write(unit=temp3, fmt='(a8)') '_5KM.bin'
+        901 |    write(unit=temp4, fmt='(a8)') '_5KM.bin'
+        902 |    read (unit=temp1, fmt='(80a1)') (fsubsn(i), i=1,15)
+        903 |    read (unit=temp2, fmt='(80a1)') (fsubsn_2(i), i=1,15)
+        904 |    read (unit=temp3, fmt='(80a1)') (fsubsn_3(i), i=1,15)
+        905 |    read (unit=temp4, fmt='(80a1)') (fsubsn_4(i), i=1,15)
+        906 |    write(unit=temp1, fmt='(a12)') '_SAI_5KM.bin'
+        907 |    write(unit=temp2, fmt='(a12)') '_SAI_5KM.bin'
+        908 |    write(unit=temp3, fmt='(a12)') '_SAI_5KM.bin'
+        909 |    write(unit=temp4, fmt='(a12)') '_SAI_5KM.bin'
+        910 |    read (unit=temp1, fmt='(80a1)') (fsubsn_5(i), i=1,15)
+        911 |    read (unit=temp2, fmt='(80a1)') (fsubsn_6(i), i=1,15)
+        912 |    read (unit=temp3, fmt='(80a1)') (fsubsn_7(i), i=1,15)
+        913 |    read (unit=temp4, fmt='(80a1)') (fsubsn_8(i), i=1,15)
+        914 |
+        915 |    c = 0
+        916 |    do i = 1, 80
+        917 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+        918 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+        919 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+        920 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+        921 |    end do
+        922 |
+        923 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        924 |         (fsubsn(i), i=1,15)
+        925 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        926 |         (fsubsn_2(i), i=1,15)
+        927 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        928 |         (fsubsn_3(i), i=1,15)
+        929 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        930 |         (fsubsn_4(i), i=1,15)
+        931 |    read(unit=temp1, fmt='(a80)') name9
+        932 |    read(unit=temp2, fmt='(a80)') name10
+        933 |    read(unit=temp3, fmt='(a80)') name11
+        934 |    read(unit=temp4, fmt='(a80)') name12
+        935 |    write(unit=temp1, fmt='(80a1)') (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+        936 |         (fsubsn_5(i), i=1,15)
+        937 |    write(unit=temp2, fmt='(80a1)') (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+        938 |         (fsubsn_6(i), i=1,15)
+        939 |    write(unit=temp3, fmt='(80a1)') (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+        940 |         (fsubsn_7(i), i=1,15)
+        941 |    write(unit=temp4, fmt='(80a1)') (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+        942 |         (fsubsn_8(i), i=1,15)
+        943 |    read(unit=temp1, fmt='(a80)') name13
+        944 |    read(unit=temp2, fmt='(a80)') name14
+        945 |    read(unit=temp3, fmt='(a80)') name15
+        946 |    read(unit=temp4, fmt='(a80)') name16
+        947 |    print*, 'n11',name11
+        948 |    print*, 'n15',name15
+        949 |    return
+        950 |  end subroutine modis_file_5KM
+        951 |#line 953
+        953 |  !BOP
+        954 |  ! !ROUTINE: avhrr_g_file
+        955 |  !
+        956 |  !  This subroutine puts together AVHRR LAI file name
+        957 |  !
+        958 |  ! !INTERFACE:
+        959 |  subroutine avhrr_g_file (name9,name10,name11,name12,name13,name14, &
+        960 |       name15,name16,avhrrdir,cyr1,cyr2,cmo1,cmo2 )
+        961 |
+        962 |    implicit none
+        963 |    ! !ARGUMENTS:
+        964 |    character(len=40), intent(in)  :: avhrrdir
+        965 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+        966 |    character(len=80), intent(out) :: name13, name14, name15, name16
+        967 |    character(len=4), intent(in)   :: cyr1, cyr2
+        968 |    character(len=2), intent(in)   :: cmo1, cmo2
+        969 |    !EOP
+        970 |    integer :: i, c
+        971 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+        972 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+        973 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+        974 |    character*1 :: fsubsn_5(15),fsubsn_6(15),fsubsn_7(15),fsubsn_8(15)
+        975 |
+        976 |    !=== End Variable Definition ===============
+        977 |    !=== formats for filename segments
+        978 |92  format (80a1)
+        979 |93  format (a80)
+        980 |94  format (i4, i2, i2, i2)
+        981 |95  format (10a1)
+        982 |96  format (a40)
+        983 |97  format (a9)
+        984 |58  format (a9)
+        985 |67  format (a15)
+        986 |68  format (a15)
+        987 |98  format (a1, a4, a2)
+        988 |66  format (a5,a2)
+        989 |99  format (7a1)		
+        990 |
+        991 |    open(unit=90, file='temp', form='formatted', access='direct', recl=80)
+        992 |    open(unit=91, file='temp_2', form='formatted', access='direct', recl=80)
+        993 |    open(unit=92, file='temp_3', form='formatted', access='direct', recl=80)
+        994 |    open(unit=93, file='temp_4', form='formatted', access='direct', recl=80)
+        995 |    write(90, 96, rec=1) avhrrdir
+        996 |    write(91, 96, rec=1) avhrrdir
+        997 |    write(92, 96, rec=1) avhrrdir
+        998 |    write(93, 96, rec=1) avhrrdir
+        999 |    read(90, 92, rec=1) (fbase(i), i=1,80)
+       1000 |    read(91, 92, rec=1) (fbase_2(i), i=1,80)
+       1001 |    read(92, 92, rec=1) (fbase_3(i), i=1,80)
+       1002 |    read(93, 92, rec=1) (fbase_4(i), i=1,80)
+       1003 |
+       1004 |    write(90, 98, rec=1) '/', cyr1, cmo1
+       1005 |    read(90, 99, rec=1) fdir
+       1006 |    write(91, 98, rec=1) '/', cyr2, cmo2
+       1007 |    read(91, 99, rec=1) fdir_2
+       1008 |    write(92, 66, rec=1) '/CLIM', cmo1
+       1009 |    read(92, 99, rec=1) fdir_3
+       1010 |    write(93, 66, rec=1) '/CLIM', cmo2
+       1011 |    read(93, 99, rec=1) fdir_4
+       1012 |
+       1013 |    do i = 1, 7
+       1014 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+       1015 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+       1016 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+       1017 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+       1018 |    enddo
+       1019 |
+       1020 |    write(90, 67, rec=1) '_AVHRRLAI_0.125'
+       1021 |    write(91, 67, rec=1) '_AVHRRLAI_0.125'
+       1022 |    write(92, 67, rec=1) '_AVHRRLAI_0.125'
+       1023 |    write(93, 67, rec=1) '_AVHRRLAI_0.125'
+       1024 |    read (90, 92, rec=1) (fsubsn(i), i=1,15)
+       1025 |    read (91, 92, rec=1) (fsubsn_2(i), i=1,15)
+       1026 |    read (92, 92, rec=1) (fsubsn_3(i), i=1,15)
+       1027 |    read (93, 92, rec=1) (fsubsn_4(i), i=1,15)
+       1028 |    write(90, 68, rec=1) '_AVHRRSAI_0.125'
+       1029 |    write(91, 68, rec=1) '_AVHRRSAI_0.125'
+       1030 |    write(92, 68, rec=1) '_AVHRRSAI_0.125'
+       1031 |    write(93, 68, rec=1) '_AVHRRSAI_0.125'
+       1032 |    read (90, 92, rec=1) (fsubsn_5(i), i=1,15)
+       1033 |    read (91, 92, rec=1) (fsubsn_6(i), i=1,15)
+       1034 |    read (92, 92, rec=1) (fsubsn_7(i), i=1,15)
+       1035 |    read (93, 92, rec=1) (fsubsn_8(i), i=1,15)
+       1036 |
+       1037 |    !sets c as the last character position of fbase
+       1038 |    c = 0
+       1039 |    do i = 1, 80
+       1040 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+       1041 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+       1042 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+       1043 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+       1044 |    end do
+       1045 |
+       1046 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+       1047 |         (fsubsn(i), i=1,15)
+       1048 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+       1049 |         (fsubsn_2(i), i=1,15)
+       1050 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+       1051 |         (fsubsn_3(i), i=1,15)
+       1052 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+       1053 |         (fsubsn_4(i), i=1,15)
+       1054 |    read(90, 93, rec=1) name9
+       1055 |    read(91, 93, rec=1) name10
+       1056 |    read(92, 93, rec=1) name11
+       1057 |    read(93, 93, rec=1) name12
+       1058 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+       1059 |         (fsubsn_5(i), i=1,15)
+       1060 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+       1061 |         (fsubsn_6(i), i=1,15)
+       1062 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+       1063 |         (fsubsn_7(i), i=1,15)
+       1064 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+       1065 |         (fsubsn_8(i), i=1,15)
+       1066 |    read(90, 93, rec=1) name13
+       1067 |    read(91, 93, rec=1) name14
+       1068 |    read(92, 93, rec=1) name15
+       1069 |    read(93, 93, rec=1) name16
+       1070 |
+       1071 |    close(90)
+       1072 |    close(91)
+       1073 |    close(92)
+       1074 |    close(93)
+       1075 |
+       1076 |    return
+       1077 |
+       1078 |  end subroutine avhrr_g_file
+       1079 |
+       1080 |  !BOP
+       1081 |  ! !ROUTINE: modis_g_file
+       1082 |  !
+       1083 |  ! !DESCRIPTION:
+       1084 |  ! This subroutine puts together MODIS LAI file name
+       1085 |  !
+       1086 |  ! !INTERFACE:
+       1087 |  subroutine modis_g_file (name9,name10,name11,name12,name13,name14, &
+       1088 |       name15,name16,modisdir,cyr1,cyr2,cmo1,cmo2 )
+       1089 |
+       1090 |    implicit none
+       1091 |    ! !ARGUMENTS:
+       1092 |    character(len=40), intent(in)  :: modisdir
+       1093 |    character(len=80), intent(out) :: name9,  name10, name11, name12
+       1094 |    character(len=80), intent(out) :: name13, name14, name15, name16
+       1095 |    character(len=4), intent(in)   :: cyr1, cyr2
+       1096 |    character(len=2), intent(in)   :: cmo1, cmo2
+       1097 |    !EOP
+       1098 |    integer :: i, c
+       1099 |    character*1 :: fbase(80), fbase_2(80), fbase_3(80), fbase_4(80)
+       1100 |    character*1 :: fdir(7), fdir_2(7), fdir_3(7), fdir_4(7)
+       1101 |    character*1 :: fsubsn(15), fsubsn_2(15), fsubsn_3(15), fsubsn_4(15)
+       1102 |    character*1 :: fsubsn_5(15), fsubsn_6(15), fsubsn_7(15), fsubsn_8(15)
+       1103 |
+       1104 |    !=== End Variable Definition ===============
+       1105 |    !=== formats for filename segments
+       1106 |92  format (80a1)
+       1107 |93  format (a80)
+       1108 |94  format (i4, i2, i2, i2)
+       1109 |95  format (10a1)
+       1110 |96  format (a40)
+       1111 |97  format (a9)
+       1112 |58  format (a9)
+       1113 |67  format (a15)
+       1114 |68  format (a15)
+       1115 |98  format (a1, a4, a2)
+       1116 |66  format (a5,a2)
+       1117 |99  format (7a1)
+       1118 |
+       1119 |    open(unit=90, file='temp', form='formatted', access='direct', recl=80)
+       1120 |    open(unit=91, file='temp_2', form='formatted', access='direct', recl=80)
+       1121 |    open(unit=92, file='temp_3', form='formatted', access='direct', recl=80)
+       1122 |    open(unit=93, file='temp_4', form='formatted', access='direct', recl=80)
+       1123 |    write(90, 96, rec=1) modisdir
+       1124 |    write(91, 96, rec=1) modisdir
+       1125 |    write(92, 96, rec=1) modisdir
+       1126 |    write(93, 96, rec=1) modisdir
+       1127 |    read(90, 92, rec=1) (fbase(i), i=1,80)
+       1128 |    read(91, 92, rec=1) (fbase_2(i), i=1,80)
+       1129 |    read(92, 92, rec=1) (fbase_3(i), i=1,80)
+       1130 |    read(93, 92, rec=1) (fbase_4(i), i=1,80)
+       1131 |
+       1132 |    write(90, 98, rec=1) '/', cyr1, cmo1
+       1133 |    read(90, 99, rec=1) fdir
+       1134 |    write(91, 98, rec=1) '/', cyr2, cmo2
+       1135 |    read(91, 99, rec=1) fdir_2
+       1136 |    write(92, 66, rec=1) '/CLIM', cmo1
+       1137 |    read(92, 99, rec=1) fdir_3
+       1138 |    write(93, 66, rec=1) '/CLIM', cmo2
+       1139 |    read(93, 99, rec=1) fdir_4
+       1140 |
+       1141 |    do i = 1, 7
+       1142 |       if ( fdir(i) == ' ' ) fdir(i) = '0'
+       1143 |       if ( fdir_2(i) == ' ' ) fdir_2(i) = '0'
+       1144 |       if ( fdir_3(i) == ' ' ) fdir_3(i) = '0'
+       1145 |       if ( fdir_4(i) == ' ' ) fdir_4(i) = '0'
+       1146 |    enddo
+       1147 |
+       1148 |    write(90, 67, rec=1) '_MODISLAI_0.125'
+       1149 |    write(91, 67, rec=1) '_MODISLAI_0.125'
+       1150 |    write(92, 67, rec=1) '_MODISLAI_0.125'
+       1151 |    write(93, 67, rec=1) '_MODISLAI_0.125'
+       1152 |    read (90, 92, rec=1) (fsubsn(i), i=1,15)
+       1153 |    read (91, 92, rec=1) (fsubsn_2(i), i=1,15)
+       1154 |    read (92, 92, rec=1) (fsubsn_3(i), i=1,15)
+       1155 |    read (93, 92, rec=1) (fsubsn_4(i), i=1,15)
+       1156 |    write(90, 68, rec=1) '_MODISSAI_0.125'
+       1157 |    write(91, 68, rec=1) '_MODISSAI_0.125'
+       1158 |    write(92, 68, rec=1) '_MODISSAI_0.125'
+       1159 |    write(93, 68, rec=1) '_MODISSAI_0.125'
+       1160 |    read (90, 92, rec=1) (fsubsn_5(i), i=1,15)
+       1161 |    read (91, 92, rec=1) (fsubsn_6(i), i=1,15)
+       1162 |    read (92, 92, rec=1) (fsubsn_7(i), i=1,15)
+       1163 |    read (93, 92, rec=1) (fsubsn_8(i), i=1,15)
+       1164 |
+       1165 |    !sets c as the last character position of fbase
+       1166 |    c = 0
+       1167 |    do i = 1, 80
+       1168 |       if ( (fbase(i) == ' ') .and. (c == 0) ) c = i-1
+       1169 |       if ( (fbase_2(i) == ' ') .and. (c == 0) ) c = i-1
+       1170 |       if ( (fbase_3(i) == ' ') .and. (c == 0) ) c = i-1
+       1171 |       if ( (fbase_4(i) == ' ') .and. (c == 0) ) c = i-1
+       1172 |    end do
+       1173 |
+       1174 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+       1175 |         (fsubsn(i), i=1,15)
+       1176 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+       1177 |         (fsubsn_2(i), i=1,15)
+       1178 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+       1179 |         (fsubsn_3(i), i=1,15)
+       1180 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+       1181 |         (fsubsn_4(i), i=1,15)
+       1182 |    read(90, 93, rec=1) name9
+       1183 |    read(91, 93, rec=1) name10
+       1184 |    read(92, 93, rec=1) name11
+       1185 |    read(93, 93, rec=1) name12
+       1186 |    write(90, 92, rec=1) (fbase(i), i=1,c), (fdir(i), i=1,7),  &
+       1187 |         (fsubsn_5(i), i=1,15)
+       1188 |    write(91, 92, rec=1) (fbase_2(i), i=1,c), (fdir_2(i), i=1,7),  &
+       1189 |         (fsubsn_6(i), i=1,15)
+       1190 |    write(92, 92, rec=1) (fbase_3(i), i=1,c), (fdir_3(i), i=1,7),  &
+       1191 |         (fsubsn_7(i), i=1,15)
+       1192 |    write(93, 92, rec=1) (fbase_4(i), i=1,c), (fdir_4(i), i=1,7),  &
+       1193 |         (fsubsn_8(i), i=1,15)
+       1194 |    read(90, 93, rec=1) name13
+       1195 |    read(91, 93, rec=1) name14
+       1196 |    read(92, 93, rec=1) name15
+       1197 |    read(93, 93, rec=1) name16
+       1198 |
+       1199 |    close(90)
+       1200 |    close(91)
+       1201 |    close(92)
+       1202 |    close(93)
+       1203 |
+       1204 |    return
+       1205 |
+       1206 |  end subroutine modis_g_file
+       1207 |#line 1209
+       1209 |end module filename_mod
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+avhrr_g_file                     Public, Module Subroutine
+                                 0-959.14$
+ 
+avhrr_laifile_1km                Public, Module Subroutine
+                                 0-41.14$
+ 
+avhrr_laifile_5km                Public, Module Subroutine
+                                 0-531.14$
+ 
+avhrr_laifilename                Public, Module Subroutine
+                                 0-339.14$
+ 
+avhrr_saifile_1km                Public, Module Subroutine
+                                 0-132.14$
+ 
+avhrr_saifile_5km                Public, Module Subroutine
+                                 0-620.14$
+ 
+avhrr_saifilename                Public, Module Subroutine
+                                 0-435.14$
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-47.39$  0-42.8  0-61.36  0-62.36  0-63.36  0-64.36
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-964.39$  0-960.22  0-995.26  0-996.26  0-997.26  0-998.26
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-442.39$  0-437.8  0-459.35  0-460.35  0-461.35  0-462.35
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-536.38$  0-533.8  0-553.36  0-554.36  0-555.36  0-556.36
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-346.39$  0-341.8  0-363.35  0-364.35  0-365.35  0-366.35
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-139.39$  0-134.8  0-154.36  0-155.36  0-156.36  0-157.36
+ 
+avhrrdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-625.38$  0-622.8  0-642.36  0-643.36  0-644.36  0-645.36
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-451.19$  0-494.5@  0-496.38  0-496.48@  0-497.40  0-497.50@  0-498.40  0-498.50@  0-499.40
+                                 0-499.50@  0-502.52  0-504.54  0-506.54  0-508.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-970.19$  0-1038.5@  0-1040.38  0-1040.48@  0-1041.40  0-1041.50@  0-1042.40  0-1042.50@
+                                 0-1043.40  0-1043.50@  0-1046.41  0-1048.43  0-1050.43  0-1052.43  0-1058.41  0-1060.43  0-1062.43
+                                 0-1064.43
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-55.18$  0-95.5@  0-97.38  0-97.48@  0-98.40  0-98.50@  0-99.40  0-99.50@  0-100.40  0-100.50@
+                                 0-103.52  0-105.54  0-107.54  0-109.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-542.19$  0-587.5@  0-589.38  0-589.48@  0-590.40  0-590.50@  0-591.40  0-591.50@  0-592.40
+                                 0-592.50@  0-595.52  0-597.54  0-599.54  0-601.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-631.19$  0-676.5@  0-678.38  0-678.48@  0-679.40  0-679.50@  0-680.40  0-680.50@  0-681.40
+                                 0-681.50@  0-683.52  0-685.54  0-687.54  0-689.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-247.18$  0-291.5@  0-293.38  0-293.48@  0-294.40  0-294.50@  0-295.40  0-295.50@  0-296.40
+                                 0-296.50@  0-299.52  0-301.54  0-303.54  0-305.54  0-311.52  0-313.54  0-315.54  0-317.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-147.18$  0-188.5@  0-190.38  0-190.48@  0-191.40  0-191.50@  0-192.40  0-192.50@  0-193.40
+                                 0-193.50@  0-196.52  0-198.54  0-200.54  0-202.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-849.19$  0-915.5@  0-917.38  0-917.48@  0-918.40  0-918.50@  0-919.40  0-919.50@  0-920.40
+                                 0-920.50@  0-923.52  0-925.54  0-927.54  0-929.54  0-935.52  0-937.54  0-939.54  0-941.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-355.19$  0-398.5@  0-400.38  0-400.48@  0-401.40  0-401.50@  0-402.40  0-402.50@  0-403.40
+                                 0-403.50@  0-406.52  0-408.54  0-410.54  0-412.54
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-1098.19$  0-1166.5@  0-1168.38  0-1168.48@  0-1169.40  0-1169.50@  0-1170.40  0-1170.50@
+                                 0-1171.40  0-1171.50@  0-1174.41  0-1176.43  0-1178.43  0-1180.43  0-1186.41  0-1188.43  0-1190.43
+                                 0-1192.43
+ 
+c                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-718.19$  0-780.5@  0-782.38  0-782.48@  0-783.40  0-783.50@  0-784.40  0-784.50@  0-785.40
+                                 0-785.50@  0-788.41  0-790.43  0-792.43  0-794.43  0-801.41  0-803.43  0-805.43  0-807.43
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-848.38$  0-840.30  0-882.52  0-886.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-234.39$  0-226.30  0-258.52  0-262.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-49.39$  0-42.30  0-70.52  0-74.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-1096.39$  0-1088.41  0-1132.37  0-1136.35
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-444.39$  0-437.30  0-469.51  0-473.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-968.39$  0-960.41  0-1004.37  0-1008.35
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-717.38$  0-710.30  0-747.37  0-751.35
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-348.39$  0-341.30  0-373.51  0-377.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-539.38$  0-533.30  0-562.52  0-566.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-141.39$  0-134.30  0-163.52  0-167.47
+ 
+cmo1                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-628.38$  0-622.30  0-651.52  0-655.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-848.44$  0-840.36  0-884.52  0-888.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-968.45$  0-960.46  0-1006.37  0-1010.35
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-348.45$  0-341.36  0-375.51  0-379.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-444.45$  0-437.36  0-471.51  0-475.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-141.45$  0-134.36  0-165.52  0-169.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-49.45$  0-42.36  0-72.52  0-76.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-628.44$  0-622.36  0-653.52  0-657.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-717.44$  0-710.36  0-749.37  0-753.35
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-539.44$  0-533.36  0-564.52  0-568.47
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-1096.45$  0-1088.46  0-1134.37  0-1138.35
+ 
+cmo2                             Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-234.45$  0-226.36  0-260.52  0-264.47
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-627.38$  0-622.18  0-651.46
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-140.39$  0-134.18  0-163.46
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-716.38$  0-710.18  0-747.31
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-233.39$  0-226.18  0-258.46
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-538.38$  0-533.18  0-562.46
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-967.39$  0-960.31  0-1004.31
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-443.39$  0-437.18  0-469.45
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-48.39$  0-42.18  0-70.46
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-1095.39$  0-1088.31  0-1132.31
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-347.39$  0-341.18  0-373.45
+ 
+cyr1                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-847.37$  0-840.18  0-882.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-140.45$  0-134.24  0-165.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-627.44$  0-622.24  0-653.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-48.45$  0-42.24  0-72.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-847.43$  0-840.24  0-884.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-538.44$  0-533.24  0-564.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-967.45$  0-960.36  0-1006.31
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-716.44$  0-710.24  0-749.31
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-233.45$  0-226.24  0-260.46
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-443.45$  0-437.24  0-471.45
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-1095.45$  0-1088.36  0-1134.31
+ 
+cyr2                             Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-347.45$  0-341.24  0-375.45
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-850.20$  0-877.37@  0-917.14  0-923.38  0-935.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-1099.20$  0-1127.26@  0-1168.14  0-1174.27  0-1186.27
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-543.20$  0-557.37@  0-589.14  0-595.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-632.20$  0-646.37@  0-678.14  0-683.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-719.20$  0-742.26@  0-782.14  0-788.27  0-801.27
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-57.20$  0-65.37@  0-97.14  0-103.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-452.20$  0-464.37@  0-496.14  0-502.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-242.20$  0-253.37@  0-293.14  0-299.38  0-311.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-149.20$  0-158.37@  0-190.14  0-196.38
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-971.20$  0-999.26@  0-1040.14  0-1046.27  0-1058.27
+ 
+fbase                            Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-356.20$  0-368.37@  0-400.14  0-406.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-850.31$  0-878.37@  0-918.14  0-925.38  0-937.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-149.31$  0-159.37@  0-191.14  0-198.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-242.31$  0-254.37@  0-294.14  0-301.38  0-313.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-971.31$  0-1000.26@  0-1041.14  0-1048.27  0-1060.27
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-57.31$  0-66.37@  0-98.14  0-105.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-452.31$  0-465.37@  0-497.14  0-504.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-632.31$  0-647.37@  0-679.14  0-685.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-356.31$  0-369.37@  0-401.14  0-408.38
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-1099.31$  0-1128.26@  0-1169.14  0-1176.27  0-1188.27
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-719.31$  0-743.26@  0-783.14  0-790.27  0-803.27
+ 
+fbase_2                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-543.31$  0-558.37@  0-590.14  0-597.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-632.44$  0-648.37@  0-680.14  0-687.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-149.44$  0-160.37@  0-192.14  0-200.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-242.44$  0-255.37@  0-295.14  0-303.38  0-315.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-850.44$  0-879.37@  0-919.14  0-927.38  0-939.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-1099.44$  0-1129.26@  0-1170.14  0-1178.27  0-1190.27
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-971.44$  0-1001.26@  0-1042.14  0-1050.27  0-1062.27
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-452.44$  0-466.37@  0-498.14  0-506.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-356.44$  0-370.37@  0-402.14  0-410.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-719.44$  0-744.26@  0-784.14  0-792.27  0-805.27
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-57.44$  0-67.37@  0-99.14  0-107.38
+ 
+fbase_3                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-543.44$  0-559.37@  0-591.14  0-599.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-149.57$  0-161.37@  0-193.14  0-202.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-242.57$  0-256.37@  0-296.14  0-305.38  0-317.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-1099.57$  0-1130.26@  0-1171.14  0-1180.27  0-1192.27
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-850.57$  0-880.37@  0-920.14  0-929.38  0-941.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-719.57$  0-745.26@  0-785.14  0-794.27  0-807.27
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-971.57$  0-1002.26@  0-1043.14  0-1052.27  0-1064.27
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-543.57$  0-560.37@  0-592.14  0-601.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-57.57$  0-68.37@  0-100.14  0-109.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-356.57$  0-371.37@  0-403.14  0-412.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-452.57$  0-467.37@  0-499.14  0-508.38
+ 
+fbase_4                          Automatic, Character(1) (1:80), Offset: 0, Alignment: full word
+                                 0-632.57$  0-649.37@  0-681.14  0-689.38
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-972.20$  0-1005.25@  0-1014.13  0-1014.30@  0-1046.46  0-1058.46
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-633.20$  0-652.35@  0-661.13  0-661.30@  0-683.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-150.20$  0-164.35@  0-173.13  0-173.30@  0-196.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-720.20$  0-748.25@  0-757.13  0-757.30@  0-788.46  0-801.46
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-1100.20$  0-1133.25@  0-1142.13  0-1142.30@  0-1174.46  0-1186.46
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-544.20$  0-563.35@  0-572.13  0-572.30@  0-595.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-357.20$  0-374.35@  0-383.13  0-383.30@  0-406.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-851.20$  0-883.35@  0-892.13  0-892.30@  0-923.57  0-935.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-453.20$  0-470.35@  0-479.13  0-479.30@  0-502.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-58.20$  0-71.35@  0-80.13  0-80.30@  0-103.57
+ 
+fdir                             Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-243.20$  0-259.35@  0-268.13  0-268.30@  0-299.57  0-311.57
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-453.29$  0-472.35@  0-480.13  0-480.32@  0-504.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-58.29$  0-73.35@  0-81.13  0-81.32@  0-105.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-357.29$  0-376.35@  0-384.13  0-384.32@  0-408.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-544.29$  0-565.35@  0-573.13  0-573.32@  0-597.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-972.29$  0-1007.25@  0-1015.13  0-1015.32@  0-1048.48  0-1060.48
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-720.29$  0-750.25@  0-758.13  0-758.32@  0-790.48  0-803.48
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-243.29$  0-261.35@  0-269.13  0-269.32@  0-301.59  0-313.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-633.29$  0-654.35@  0-662.13  0-662.32@  0-685.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-851.29$  0-885.35@  0-893.13  0-893.32@  0-925.59  0-937.59
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-1100.29$  0-1135.25@  0-1143.13  0-1143.32@  0-1176.48  0-1188.48
+ 
+fdir_2                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-150.29$  0-166.35@  0-174.13  0-174.32@  0-198.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-150.40$  0-168.35@  0-175.13  0-175.32@  0-200.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-243.40$  0-263.35@  0-270.13  0-270.32@  0-303.59  0-315.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-1100.40$  0-1137.25@  0-1144.13  0-1144.32@  0-1178.48  0-1190.48
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-58.40$  0-75.35@  0-82.13  0-82.32@  0-107.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-357.40$  0-378.35@  0-385.13  0-385.32@  0-410.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-851.40$  0-887.35@  0-894.13  0-894.32@  0-927.59  0-939.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-720.40$  0-752.25@  0-759.13  0-759.32@  0-792.48  0-805.48
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-972.40$  0-1009.25@  0-1016.13  0-1016.32@  0-1050.48  0-1062.48
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-544.40$  0-567.35@  0-574.13  0-574.32@  0-599.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-633.40$  0-656.35@  0-663.13  0-663.32@  0-687.59
+ 
+fdir_3                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-453.40$  0-474.35@  0-481.13  0-481.32@  0-506.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-357.51$  0-380.34@  0-386.13  0-386.32@  0-412.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-1100.51$  0-1139.25@  0-1145.13  0-1145.32@  0-1180.48  0-1192.48
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-453.51$  0-476.34@  0-482.13  0-482.32@  0-508.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-633.51$  0-658.35@  0-664.13  0-664.32@  0-689.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-150.51$  0-170.35@  0-176.13  0-176.32@  0-202.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-720.51$  0-754.25@  0-760.13  0-760.32@  0-794.48  0-807.48
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-972.51$  0-1011.25@  0-1017.13  0-1017.32@  0-1052.48  0-1064.48
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-58.51$  0-77.35@  0-83.13  0-83.32@  0-109.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-851.51$  0-889.35@  0-895.13  0-895.32@  0-929.59  0-941.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-243.51$  0-265.35@  0-271.13  0-271.32@  0-305.59  0-317.59
+ 
+fdir_4                           Automatic, Character(1) (1:7), Offset: 0, Alignment: full word
+                                 0-544.51$  0-569.35@  0-575.13  0-575.32@  0-601.59
+ 
+filename_mod                     Nonintrinsic Module
+                                 0-32.8$
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-721.20$  0-767.27@  0-789.11
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-244.20$  0-278.38@  0-300.11
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-358.20$  0-393.38@  0-407.11
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-852.20$  0-902.38@  0-924.11
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-973.20$  0-1024.27@  0-1047.11
+ 
+fsubsn                           Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-59.20$  0-90.38@  0-104.11
+ 
+fsubsn                           Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-151.20$
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-545.20$  0-582.38@  0-596.11
+ 
+fsubsn                           Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1101.20$  0-1152.27@  0-1175.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-151.32$
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1101.32$  0-1153.27@  0-1177.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-852.32$  0-903.38@  0-926.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-358.32$  0-394.38@  0-409.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-721.32$  0-768.27@  0-791.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-973.32$  0-1025.27@  0-1049.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-545.32$  0-583.38@  0-598.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-59.32$  0-91.38@  0-106.11
+ 
+fsubsn_2                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-244.32$  0-279.38@  0-302.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-721.46$  0-769.27@  0-793.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-545.46$  0-584.38@  0-600.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-358.46$  0-395.38@  0-411.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-973.46$  0-1026.27@  0-1051.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-244.46$  0-280.38@  0-304.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-59.46$  0-92.38@  0-108.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-151.46$
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1101.46$  0-1154.27@  0-1179.11
+ 
+fsubsn_3                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-852.46$  0-904.38@  0-928.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-358.60$  0-396.38@  0-413.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1101.60$  0-1155.27@  0-1181.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-545.60$  0-585.38@  0-602.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-151.60$
+ 
+fsubsn_4                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-59.60$  0-93.38@  0-110.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-244.60$  0-281.38@  0-306.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-973.60$  0-1027.27@  0-1053.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-852.60$  0-905.38@  0-930.11
+ 
+fsubsn_4                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-721.60$  0-770.27@  0-795.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-722.20$  0-775.27@  0-802.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1102.20$  0-1160.27@  0-1187.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-853.20$  0-910.38@  0-936.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-454.20$  0-489.38@  0-503.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-245.20$  0-286.38@  0-312.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-634.20$  0-671.38@  0-684.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-974.20$  0-1032.27@  0-1059.11
+ 
+fsubsn_5                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-152.20$  0-183.38@  0-197.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1102.34$  0-1161.27@  0-1189.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-454.34$  0-490.38@  0-505.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-634.34$  0-672.38@  0-686.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-853.34$  0-911.38@  0-938.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-152.34$  0-184.38@  0-199.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-974.33$  0-1033.27@  0-1061.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-722.34$  0-776.27@  0-804.11
+ 
+fsubsn_6                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-245.34$  0-287.38@  0-314.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-634.48$  0-673.38@  0-688.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-454.48$  0-491.38@  0-507.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-974.46$  0-1034.27@  0-1063.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-722.48$  0-777.27@  0-806.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-245.48$  0-288.38@  0-316.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-853.48$  0-912.38@  0-940.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1102.48$  0-1162.27@  0-1191.11
+ 
+fsubsn_7                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-152.48$  0-185.38@  0-201.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-974.59$  0-1035.27@  0-1065.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-853.62$  0-913.38@  0-942.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-1102.62$  0-1163.27@  0-1193.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-454.62$  0-492.38@  0-509.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-634.62$  0-674.38@  0-690.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-722.62$  0-778.27@  0-808.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:19), Offset: 0, Alignment: full word
+                                 0-152.62$  0-186.38@  0-203.11
+ 
+fsubsn_8                         Automatic, Character(1) (1:15), Offset: 0, Alignment: full word
+                                 0-245.62$  0-289.38@  0-318.11
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-147.16$  0-158.43  0-158.47@  0-159.45  0-159.49@  0-160.45  0-160.49@  0-161.45  0-161.49@
+                                 0-172.8@  0-173.18  0-173.35  0-174.20  0-174.39  0-175.20  0-175.39  0-176.20  0-176.39  0-183.47
+                                 0-183.51@  0-184.47  0-184.51@  0-185.47  0-185.51@  0-186.47  0-186.51@  0-189.8@  0-190.20
+                                 0-190.52  0-191.22  0-191.54  0-192.22  0-192.54  0-193.22  0-193.54  0-196.44  0-196.48@  0-196.62
+                                 0-196.66@  0-197.20  0-197.24@  0-198.46  0-198.50@  0-198.66  0-198.70@  0-199.20  0-199.24@
+                                 0-200.46  0-200.50@  0-200.66  0-200.70@  0-201.20  0-201.24@  0-202.46  0-202.50@  0-202.66
+                                 0-202.70@  0-203.20  0-203.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-55.16$  0-65.43  0-65.47@  0-66.45  0-66.49@  0-67.45  0-67.49@  0-68.45  0-68.49@  0-79.8@
+                                 0-80.18  0-80.35  0-81.20  0-81.39  0-82.20  0-82.39  0-83.20  0-83.39  0-90.45  0-90.49@  0-91.47
+                                 0-91.51@  0-92.47  0-92.51@  0-93.47  0-93.51@  0-96.8@  0-97.20  0-97.52  0-98.22  0-98.54
+                                 0-99.22  0-99.54  0-100.22  0-100.54  0-103.44  0-103.48@  0-103.62  0-103.66@  0-104.18  0-104.22@
+                                 0-105.46  0-105.50@  0-105.66  0-105.70@  0-106.20  0-106.24@  0-107.46  0-107.50@  0-107.66
+                                 0-107.70@  0-108.20  0-108.24@  0-109.46  0-109.50@  0-109.66  0-109.70@  0-110.20  0-110.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-247.16$  0-253.43  0-253.47@  0-254.45  0-254.49@  0-255.45  0-255.49@  0-256.45  0-256.49@
+                                 0-267.8@  0-268.18  0-268.35  0-269.20  0-269.39  0-270.20  0-270.39  0-271.20  0-271.39  0-278.45
+                                 0-278.49@  0-279.47  0-279.51@  0-280.47  0-280.51@  0-281.47  0-281.51@  0-286.47  0-286.51@
+                                 0-287.47  0-287.51@  0-288.47  0-288.51@  0-289.47  0-289.51@  0-292.8@  0-293.20  0-293.52
+                                 0-294.22  0-294.54  0-295.22  0-295.54  0-296.22  0-296.54  0-299.44  0-299.48@  0-299.62
+                                 0-299.66@  0-300.18  0-300.22@  0-301.46  0-301.50@  0-301.66  0-301.70@  0-302.20  0-302.24@
+                                 0-303.46  0-303.50@  0-303.66  0-303.70@  0-304.20  0-304.24@  0-305.46  0-305.50@  0-305.66
+                                 0-305.70@  0-306.20  0-306.24@  0-311.44  0-311.48@  0-311.62  0-311.66@  0-312.20  0-312.24@
+                                 0-313.46  0-313.50@  0-313.66  0-313.70@  0-314.20  0-314.24@  0-315.46  0-315.50@  0-315.66
+                                 0-315.70@  0-316.20  0-316.24@  0-317.46  0-317.50@  0-317.66  0-317.70@  0-318.20  0-318.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-355.16$  0-368.43  0-368.47@  0-369.45  0-369.49@  0-370.45  0-370.49@  0-371.45  0-371.49@
+                                 0-382.8@  0-383.18  0-383.35  0-384.20  0-384.39  0-385.20  0-385.39  0-386.20  0-386.39  0-393.45
+                                 0-393.49@  0-394.47  0-394.51@  0-395.47  0-395.51@  0-396.47  0-396.51@  0-399.8@  0-400.20
+                                 0-400.52  0-401.22  0-401.54  0-402.22  0-402.54  0-403.22  0-403.54  0-406.44  0-406.48@  0-406.62
+                                 0-406.66@  0-407.18  0-407.22@  0-408.46  0-408.50@  0-408.66  0-408.70@  0-409.20  0-409.24@
+                                 0-410.46  0-410.50@  0-410.66  0-410.70@  0-411.20  0-411.24@  0-412.46  0-412.50@  0-412.66
+                                 0-412.70@  0-413.20  0-413.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-631.16$  0-646.43  0-646.47@  0-647.45  0-647.49@  0-648.45  0-648.49@  0-649.45  0-649.49@
+                                 0-660.8@  0-661.18  0-661.35  0-662.20  0-662.39  0-663.20  0-663.39  0-664.20  0-664.39  0-671.47
+                                 0-671.51@  0-672.47  0-672.51@  0-673.47  0-673.51@  0-674.47  0-674.51@  0-677.8@  0-678.20
+                                 0-678.52  0-679.22  0-679.54  0-680.22  0-680.54  0-681.22  0-681.54  0-683.44  0-683.48@  0-683.62
+                                 0-683.66@  0-684.20  0-684.24@  0-685.46  0-685.50@  0-685.66  0-685.70@  0-686.20  0-686.24@
+                                 0-687.46  0-687.50@  0-687.66  0-687.70@  0-688.20  0-688.24@  0-689.46  0-689.50@  0-689.66
+                                 0-689.70@  0-690.20  0-690.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-849.16$  0-877.43  0-877.47@  0-878.45  0-878.49@  0-879.45  0-879.49@  0-880.45  0-880.49@
+                                 0-891.8@  0-892.18  0-892.35  0-893.20  0-893.39  0-894.20  0-894.39  0-895.20  0-895.39  0-902.45
+                                 0-902.49@  0-903.47  0-903.51@  0-904.47  0-904.51@  0-905.47  0-905.51@  0-910.47  0-910.51@
+                                 0-911.47  0-911.51@  0-912.47  0-912.51@  0-913.47  0-913.51@  0-916.8@  0-917.20  0-917.52
+                                 0-918.22  0-918.54  0-919.22  0-919.54  0-920.22  0-920.54  0-923.44  0-923.48@  0-923.62
+                                 0-923.66@  0-924.18  0-924.22@  0-925.46  0-925.50@  0-925.66  0-925.70@  0-926.20  0-926.24@
+                                 0-927.46  0-927.50@  0-927.66  0-927.70@  0-928.20  0-928.24@  0-929.46  0-929.50@  0-929.66
+                                 0-929.70@  0-930.20  0-930.24@  0-935.44  0-935.48@  0-935.62  0-935.66@  0-936.20  0-936.24@
+                                 0-937.46  0-937.50@  0-937.66  0-937.70@  0-938.20  0-938.24@  0-939.46  0-939.50@  0-939.66
+                                 0-939.70@  0-940.20  0-940.24@  0-941.46  0-941.50@  0-941.66  0-941.70@  0-942.20  0-942.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-718.16$  0-742.32  0-742.36@  0-743.34  0-743.38@  0-744.34  0-744.38@  0-745.34  0-745.38@
+                                 0-756.8@  0-757.18  0-757.35  0-758.20  0-758.39  0-759.20  0-759.39  0-760.20  0-760.39  0-767.34
+                                 0-767.38@  0-768.36  0-768.40@  0-769.36  0-769.40@  0-770.36  0-770.40@  0-775.36  0-775.40@
+                                 0-776.36  0-776.40@  0-777.36  0-777.40@  0-778.36  0-778.40@  0-781.8@  0-782.20  0-782.52
+                                 0-783.22  0-783.54  0-784.22  0-784.54  0-785.22  0-785.54  0-788.33  0-788.37@  0-788.51
+                                 0-788.55@  0-789.18  0-789.22@  0-790.35  0-790.39@  0-790.55  0-790.59@  0-791.20  0-791.24@
+                                 0-792.35  0-792.39@  0-792.55  0-792.59@  0-793.20  0-793.24@  0-794.35  0-794.39@  0-794.55
+                                 0-794.59@  0-795.20  0-795.24@  0-801.33  0-801.37@  0-801.51  0-801.55@  0-802.20  0-802.24@
+                                 0-803.35  0-803.39@  0-803.55  0-803.59@  0-804.20  0-804.24@  0-805.35  0-805.39@  0-805.55
+                                 0-805.59@  0-806.20  0-806.24@  0-807.35  0-807.39@  0-807.55  0-807.59@  0-808.20  0-808.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-1098.16$  0-1127.32  0-1127.36@  0-1128.34  0-1128.38@  0-1129.34  0-1129.38@  0-1130.34
+                                 0-1130.38@  0-1141.8@  0-1142.18  0-1142.35  0-1143.20  0-1143.39  0-1144.20  0-1144.39  0-1145.20
+                                 0-1145.39  0-1152.34  0-1152.38@  0-1153.36  0-1153.40@  0-1154.36  0-1154.40@  0-1155.36
+                                 0-1155.40@  0-1160.36  0-1160.40@  0-1161.36  0-1161.40@  0-1162.36  0-1162.40@  0-1163.36
+                                 0-1163.40@  0-1167.8@  0-1168.20  0-1168.52  0-1169.22  0-1169.54  0-1170.22  0-1170.54  0-1171.22
+                                 0-1171.54  0-1174.33  0-1174.37@  0-1174.51  0-1174.55@  0-1175.18  0-1175.22@  0-1176.35
+                                 0-1176.39@  0-1176.55  0-1176.59@  0-1177.20  0-1177.24@  0-1178.35  0-1178.39@  0-1178.55
+                                 0-1178.59@  0-1179.20  0-1179.24@  0-1180.35  0-1180.39@  0-1180.55  0-1180.59@  0-1181.20
+                                 0-1181.24@  0-1186.33  0-1186.37@  0-1186.51  0-1186.55@  0-1187.20  0-1187.24@  0-1188.35
+                                 0-1188.39@  0-1188.55  0-1188.59@  0-1189.20  0-1189.24@  0-1190.35  0-1190.39@  0-1190.55
+                                 0-1190.59@  0-1191.20  0-1191.24@  0-1192.35  0-1192.39@  0-1192.55  0-1192.59@  0-1193.20
+                                 0-1193.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-451.16$  0-464.43  0-464.47@  0-465.45  0-465.49@  0-466.45  0-466.49@  0-467.45  0-467.49@
+                                 0-478.8@  0-479.18  0-479.35  0-480.20  0-480.39  0-481.20  0-481.39  0-482.20  0-482.39  0-489.47
+                                 0-489.51@  0-490.47  0-490.51@  0-491.47  0-491.51@  0-492.47  0-492.51@  0-495.8@  0-496.20
+                                 0-496.52  0-497.22  0-497.54  0-498.22  0-498.54  0-499.22  0-499.54  0-502.44  0-502.48@  0-502.62
+                                 0-502.66@  0-503.20  0-503.24@  0-504.46  0-504.50@  0-504.66  0-504.70@  0-505.20  0-505.24@
+                                 0-506.46  0-506.50@  0-506.66  0-506.70@  0-507.20  0-507.24@  0-508.46  0-508.50@  0-508.66
+                                 0-508.70@  0-509.20  0-509.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-542.16$  0-557.43  0-557.47@  0-558.45  0-558.49@  0-559.45  0-559.49@  0-560.45  0-560.49@
+                                 0-571.8@  0-572.18  0-572.35  0-573.20  0-573.39  0-574.20  0-574.39  0-575.20  0-575.39  0-582.45
+                                 0-582.49@  0-583.47  0-583.51@  0-584.47  0-584.51@  0-585.47  0-585.51@  0-588.8@  0-589.20
+                                 0-589.52  0-590.22  0-590.54  0-591.22  0-591.54  0-592.22  0-592.54  0-595.44  0-595.48@  0-595.62
+                                 0-595.66@  0-596.18  0-596.22@  0-597.46  0-597.50@  0-597.66  0-597.70@  0-598.20  0-598.24@
+                                 0-599.46  0-599.50@  0-599.66  0-599.70@  0-600.20  0-600.24@  0-601.46  0-601.50@  0-601.66
+                                 0-601.70@  0-602.20  0-602.24@
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-970.16$  0-999.32  0-999.36@  0-1000.34  0-1000.38@  0-1001.34  0-1001.38@  0-1002.34  0-1002.38@
+                                 0-1013.8@  0-1014.18  0-1014.35  0-1015.20  0-1015.39  0-1016.20  0-1016.39  0-1017.20  0-1017.39
+                                 0-1024.34  0-1024.38@  0-1025.36  0-1025.40@  0-1026.36  0-1026.40@  0-1027.36  0-1027.40@
+                                 0-1032.36  0-1032.40@  0-1033.36  0-1033.40@  0-1034.36  0-1034.40@  0-1035.36  0-1035.40@
+                                 0-1039.8@  0-1040.20  0-1040.52  0-1041.22  0-1041.54  0-1042.22  0-1042.54  0-1043.22  0-1043.54
+                                 0-1046.33  0-1046.37@  0-1046.51  0-1046.55@  0-1047.18  0-1047.22@  0-1048.35  0-1048.39@
+                                 0-1048.55  0-1048.59@  0-1049.20  0-1049.24@  0-1050.35  0-1050.39@  0-1050.55  0-1050.59@
+                                 0-1051.20  0-1051.24@  0-1052.35  0-1052.39@  0-1052.55  0-1052.59@  0-1053.20  0-1053.24@
+                                 0-1058.33  0-1058.37@  0-1058.51  0-1058.55@  0-1059.20  0-1059.24@  0-1060.35  0-1060.39@
+                                 0-1060.55  0-1060.59@  0-1061.20  0-1061.24@  0-1062.35  0-1062.39@  0-1062.55  0-1062.59@
+                                 0-1063.20  0-1063.24@  0-1064.35  0-1064.39@  0-1064.55  0-1064.59@  0-1065.20  0-1065.24@
+ 
+modis_file_1km                   Public, Module Subroutine
+                                 0-224.14$
+ 
+modis_file_2                     Public, Module Subroutine
+                                 0-708.14$
+ 
+modis_file_5km                   Public, Module Subroutine
+                                 0-838.14$
+ 
+modis_g_file                     Public, Module Subroutine
+                                 0-1087.14$
+ 
+modisdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-713.38$  0-710.8  0-738.26  0-739.26  0-740.26  0-741.26
+ 
+modisdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-1092.39$  0-1088.22  0-1123.26  0-1124.26  0-1125.26  0-1126.26
+ 
+modisdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-844.39$  0-840.8  0-873.36  0-874.36  0-875.36  0-876.36
+ 
+modisdir                         Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-232.39$  0-226.8  0-249.36  0-250.36  0-251.36  0-252.36
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-845.47$  0-838.35  0-932.35@
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-230.47$  0-224.36  0-308.35@  0-325.29
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-345.47$  0-340.14  0-415.35@  0-420.26
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1093.47$  0-1087.34  0-1183.25@
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-965.47$  0-959.34  0-1055.25@
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-46.47$  0-41.39  0-112.35@  0-117.29
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-537.47$  0-532.14  0-604.35@
+ 
+name10                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-714.46$  0-708.34  0-797.25@
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-965.55$  0-959.41  0-1056.25@
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-845.55$  0-838.42  0-933.35@  0-947.19
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-714.54$  0-708.41  0-798.25@
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-537.55$  0-532.21  0-605.35@
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-345.55$  0-340.21  0-416.35@  0-421.28
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-230.55$  0-224.43  0-309.35@  0-326.29
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1093.55$  0-1087.41  0-1184.25@
+ 
+name11                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-46.55$  0-41.46  0-113.35@  0-118.29
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1093.63$  0-1087.48  0-1185.25@
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-845.63$  0-838.49  0-934.35@
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-965.63$  0-959.48  0-1057.25@
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-46.63$  0-41.53  0-114.35@  0-119.29
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-345.63$  0-340.28  0-417.35@  0-422.28
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-230.63$  0-224.50  0-310.35@
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-714.62$  0-708.48  0-799.25@
+ 
+name12                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-537.63$  0-532.28  0-606.35@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-138.39$  0-132.33  0-204.35@  0-209.29
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-441.39$  0-436.8  0-510.35@  0-515.27
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-231.39$  0-224.57  0-319.35@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-715.38$  0-709.8  0-809.25@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-846.39$  0-838.56  0-943.35@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-626.39$  0-621.8  0-691.35@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1094.39$  0-1087.55  0-1194.25@
+ 
+name13                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-966.39$  0-959.55  0-1066.25@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-138.47$  0-133.8  0-205.35@  0-210.29
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-441.47$  0-436.15  0-511.35@  0-516.27
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-846.47$  0-839.8  0-944.35@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-626.47$  0-621.15  0-692.35@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1094.47$  0-1087.62  0-1195.25@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-231.47$  0-225.8  0-320.35@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-966.47$  0-959.62  0-1067.25@
+ 
+name14                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-715.46$  0-709.15  0-810.25@
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-138.55$  0-133.15  0-206.35@  0-211.29
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-441.55$  0-436.22  0-512.35@  0-517.27
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-966.55$  0-960.8  0-1068.25@
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-846.55$  0-839.15  0-945.35@  0-948.19
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-715.54$  0-709.22  0-811.25@
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1094.55$  0-1088.8  0-1196.25@
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-626.55$  0-621.22  0-693.35@
+ 
+name15                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-231.55$  0-225.15  0-321.35@  0-327.29
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-966.63$  0-960.15  0-1069.25@
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-715.62$  0-709.29  0-812.25@
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-846.63$  0-839.22  0-946.35@
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-626.63$  0-621.29  0-694.35@
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-138.63$  0-133.22  0-207.35@  0-212.29
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-441.63$  0-436.29  0-513.35@  0-518.27
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-231.63$  0-225.22  0-322.35@
+ 
+name16                           Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1094.63$  0-1088.15  0-1197.25@
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-230.39$  0-224.30  0-307.35@  0-324.28
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-345.39$  0-340.8  0-414.35@  0-419.26
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-537.39$  0-532.8  0-603.35@
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-965.39$  0-959.28  0-1054.25@
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-714.38$  0-708.28  0-796.25@
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-845.39$  0-838.29  0-931.35@
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-46.39$  0-41.33  0-111.35@  0-116.28
+ 
+name9                            Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-1093.39$  0-1087.28  0-1182.25@
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-635.27$  0-642.16  0-646.15  0-651.16  0-652.15  0-667.16  0-671.16  0-683.16  0-691.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-854.27$  0-873.16  0-877.15  0-882.16  0-883.15  0-898.16  0-902.16  0-906.16  0-910.16  0-923.16
+                                 0-931.15  0-935.16  0-943.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-546.27$  0-553.16  0-557.15  0-562.16  0-563.15  0-578.16  0-582.16  0-595.16  0-603.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-447.27$  0-459.16  0-464.15  0-469.16  0-470.15  0-485.16  0-489.16  0-502.16  0-510.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-143.27$  0-154.16  0-158.15  0-163.16  0-164.15  0-179.16  0-183.16  0-196.16  0-204.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-51.27$  0-61.16  0-65.15  0-70.16  0-71.15  0-86.16  0-90.16  0-103.16  0-111.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-237.27$  0-249.16  0-253.15  0-258.16  0-259.15  0-274.16  0-278.16  0-282.16  0-286.16  0-299.16
+                                 0-307.15  0-311.16  0-319.15
+ 
+temp1                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-351.27$  0-363.16  0-368.15  0-373.16  0-374.15  0-389.16  0-393.16  0-406.16  0-414.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-448.27$  0-460.16  0-465.15  0-471.16  0-472.15  0-486.16  0-490.16  0-504.16  0-511.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-52.27$  0-62.16  0-66.15  0-72.16  0-73.15  0-87.16  0-91.16  0-105.16  0-112.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-352.27$  0-364.16  0-369.15  0-375.16  0-376.15  0-390.16  0-394.16  0-408.16  0-415.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-547.27$  0-554.16  0-558.15  0-564.16  0-565.15  0-579.16  0-583.16  0-597.16  0-604.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-855.27$  0-874.16  0-878.15  0-884.16  0-885.15  0-899.16  0-903.16  0-907.16  0-911.16  0-925.16
+                                 0-932.15  0-937.16  0-944.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-144.27$  0-155.16  0-159.15  0-165.16  0-166.15  0-180.16  0-184.16  0-198.16  0-205.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-238.27$  0-250.16  0-254.15  0-260.16  0-261.15  0-275.16  0-279.16  0-283.16  0-287.16  0-301.16
+                                 0-308.15  0-313.16  0-320.15
+ 
+temp2                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-636.27$  0-643.16  0-647.15  0-653.16  0-654.15  0-668.16  0-672.16  0-685.16  0-692.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-548.27$  0-555.16  0-559.15  0-566.16  0-567.15  0-580.16  0-584.16  0-599.16  0-605.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-449.27$  0-461.16  0-466.15  0-473.16  0-474.15  0-487.16  0-491.16  0-506.16  0-512.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-239.27$  0-251.16  0-255.15  0-262.16  0-263.15  0-276.16  0-280.16  0-284.16  0-288.16  0-303.16
+                                 0-309.15  0-315.16  0-321.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-637.27$  0-644.16  0-648.15  0-655.16  0-656.15  0-669.16  0-673.16  0-687.16  0-693.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-353.27$  0-365.16  0-370.15  0-377.16  0-378.15  0-391.16  0-395.16  0-410.16  0-416.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-145.27$  0-156.16  0-160.15  0-167.16  0-168.15  0-181.16  0-185.16  0-200.16  0-206.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-856.27$  0-875.16  0-879.15  0-886.16  0-887.15  0-900.16  0-904.16  0-908.16  0-912.16  0-927.16
+                                 0-933.15  0-939.16  0-945.15
+ 
+temp3                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-53.27$  0-63.16  0-67.15  0-74.16  0-75.15  0-88.16  0-92.16  0-107.16  0-113.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-146.27$  0-157.16  0-161.15  0-169.16  0-170.15  0-182.16  0-186.16  0-202.16  0-207.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-638.27$  0-645.16  0-649.15  0-657.16  0-658.15  0-670.16  0-674.16  0-689.16  0-694.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-240.27$  0-252.16  0-256.15  0-264.16  0-265.15  0-277.16  0-281.16  0-285.16  0-289.16  0-305.16
+                                 0-310.15  0-317.16  0-322.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-54.27$  0-64.16  0-68.15  0-76.16  0-77.15  0-89.16  0-93.16  0-109.16  0-114.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-857.27$  0-876.16  0-880.15  0-888.16  0-889.15  0-901.16  0-905.16  0-909.16  0-913.16  0-929.16
+                                 0-934.15  0-941.16  0-946.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-450.27$  0-462.16  0-467.15  0-475.16  0-476.15  0-488.16  0-492.16  0-508.16  0-513.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-354.27$  0-366.16  0-371.15  0-379.16  0-380.15  0-392.16  0-396.16  0-412.16  0-417.15
+ 
+temp4                            Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-549.27$  0-556.16  0-560.15  0-568.16  0-569.15  0-581.16  0-585.16  0-601.16  0-606.15
+ 
+** filename_mod   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/filename_mod.F      03/09/11   11:03:51
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................    1205
+1501-510  Compilation successful for file filename_mod.F.
+1501-543  Object file created.

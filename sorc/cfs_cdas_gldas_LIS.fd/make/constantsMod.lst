@@ -1,0 +1,207 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/constantsMod.F 03/09/11 11:03:48
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 2 "../core/constantsMod.F"
+          2 |MODULE constantsMod
+          3 |#line 5
+          5 |   !----------------------------------------------------------------------------
+          6 |   ! physical constants (all data public)
+          7 |   !----------------------------------------------------------------------------
+          8 |   public
+          9 |   real*8,parameter :: CONST_PI     = 3.14159265358979323846  ! pi
+         10 |   real*8,parameter :: CONST_CDAY   = 86400.0      ! sec in calendar day ~ sec
+         11 |   real*8,parameter :: CONST_SDAY   = 86164.0      ! sec in siderial day ~ sec
+         12 |   real*8,parameter :: CONST_OMEGA  = 2.0*CONST_PI/CONST_SDAY ! earth rot ~ rad/sec
+         13 |   real*8,parameter :: CONST_REARTH = 6.37122e6    ! radius of earth ~ m
+         14 |   real*8,parameter :: CONST_G      = 9.80616      ! acceleration of gravity ~ m/s^2
+         15 |   real*8,parameter :: CONST_PSTD   = 101325.0     ! standard pressure ~ pascals
+         16 |
+         17 |   real*8,parameter :: CONST_STEBOL = 5.67e-8      ! Stefan-Boltzmann constant ~ W/m^2/K^4
+         18 |   real*8,parameter :: CONST_BOLTZ  = 1.38065e-23  ! Boltzmann's constant ~ J/K/molecule
+         19 |   real*8,parameter :: CONST_AVOGAD = 6.02214e26   ! Avogadro's number ~ molecules/kmole
+         20 |   real*8,parameter :: CONST_RGAS   = CONST_AVOGAD*CONST_BOLTZ ! Universal gas constant ~ J/K/kmole
+         21 |   real*8,parameter :: CONST_MWDAIR = 28.966       ! molecular weight dry air ~ kg/kmole
+         22 |   real*8,parameter :: CONST_MWWV   = 18.016       ! molecular weight water vapor
+         23 |   real*8,parameter :: CONST_RDAIR  = CONST_RGAS/CONST_MWDAIR  ! Dry air gas constant ~ J/K/kg
+         24 |   real*8,parameter :: CONST_RWV    = CONST_RGAS/CONST_MWWV    ! Water vapor gas constant ~ J/K/kg
+         25 |   real*8,parameter :: CONST_ZVIR   = (CONST_RWV/CONST_RDAIR)-1.0   ! RWV/RDAIR - 1.0
+         26 |   real*8,parameter :: CONST_KARMAN = 0.4          ! Von Karman constant
+         27 |
+         28 |   real*8,parameter :: CONST_TKFRZ  = 273.16       ! freezing T of fresh water ~ K (intentionally made == to TKTRIP)
+         29 |   real*8,parameter :: CONST_TKTRIP = 273.16       ! triple point of fresh water ~ K
+         30 |
+         31 |   real*8,parameter :: CONST_RHODAIR=CONST_PSTD/ &
+         32 |     (CONST_RDAIR*CONST_TKFRZ)         ! density of dry air at STP   ~ kg/m^3
+         33 |   real*8,parameter :: CONST_RHOFW  = 1.000e3      ! density of fresh water ~ kg/m^3
+         34 |   real*8,parameter :: CONST_RHOSW  = 1.026e3      ! density of sea water ~ kg/m^3
+         35 |   real*8,parameter :: CONST_RHOICE = 0.917e3      ! density of ice   ~ kg/m^3
+         36 |   real*8,parameter :: CONST_CPDAIR = 1.00464e3    ! specific heat of dry air ~ J/kg/K
+         37 |   real*8,parameter :: CONST_CPFW   = 4.188e3      ! specific heat of fresh h2o ~ J/kg/K
+         38 |   real*8,parameter :: CONST_CPSW   = 3.996e3      ! specific heat of sea h2o ~ J/kg/K
+         39 |   real*8,parameter :: CONST_CPWV   = 1.810e3      ! specific heat of water vap ~ J/kg/K
+         40 |   real*8,parameter :: CONST_CPICE  = 2.11727e3    ! specific heat of fresh ice ~ J/kg/K
+         41 |   real*8,parameter :: CONST_LATICE = 3.337e5      ! latent heat of fusion ~ J/kg
+         42 |   real*8,parameter :: CONST_LATVAP = 2.501e6      ! latent heat of evaporation ~ J/kg
+         43 |   real*8,parameter :: CONST_LATSUB = CONST_LATICE + CONST_LATVAP ! latent heat of sublimation ~ J/kg
+         44 |
+         45 |   real*8,parameter :: CONST_OCN_REF_SAL = 34.7    ! ocn ref salinity (psu)
+         46 |   real*8,parameter :: CONST_ICE_REF_SAL =  4.0    ! ice ref salinity (psu)
+         47 |#line 49
+         49 | END MODULE constantsMod
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+const_avogad                     Public, Parameter, Real(8)
+                                 0-19.24$  0-20.39
+ 
+const_boltz                      Public, Parameter, Real(8)
+                                 0-18.24$  0-20.52
+ 
+const_cday                       Public, Parameter, Real(8)
+                                 0-10.24$
+ 
+const_cpdair                     Public, Parameter, Real(8)
+                                 0-36.24$
+ 
+const_cpfw                       Public, Parameter, Real(8)
+                                 0-37.24$
+ 
+const_cpice                      Public, Parameter, Real(8)
+                                 0-40.24$
+ 
+const_cpsw                       Public, Parameter, Real(8)
+                                 0-38.24$
+ 
+const_cpwv                       Public, Parameter, Real(8)
+                                 0-39.24$
+ 
+const_g                          Public, Parameter, Real(8)
+                                 0-14.24$
+ 
+const_ice_ref_sal                Public, Parameter, Real(8)
+                                 0-46.24$
+ 
+const_karman                     Public, Parameter, Real(8)
+                                 0-26.24$
+ 
+const_latice                     Public, Parameter, Real(8)
+                                 0-41.24$  0-43.39
+ 
+const_latsub                     Public, Parameter, Real(8)
+                                 0-43.24$
+ 
+const_latvap                     Public, Parameter, Real(8)
+                                 0-42.24$  0-43.54
+ 
+const_mwdair                     Public, Parameter, Real(8)
+                                 0-21.24$  0-23.50
+ 
+const_mwwv                       Public, Parameter, Real(8)
+                                 0-22.24$  0-24.50
+ 
+const_ocn_ref_sal                Public, Parameter, Real(8)
+                                 0-45.24$
+ 
+const_omega                      Public, Parameter, Real(8)
+                                 0-12.24$
+ 
+const_pi                         Public, Parameter, Real(8)
+                                 0-9.24$  0-12.43
+ 
+const_pstd                       Public, Parameter, Real(8)
+                                 0-15.24$  0-31.38
+ 
+const_rdair                      Public, Parameter, Real(8)
+                                 0-23.24$  0-25.50  0-32.7
+ 
+const_rearth                     Public, Parameter, Real(8)
+                                 0-13.24$
+ 
+const_rgas                       Public, Parameter, Real(8)
+                                 0-20.24$  0-23.39  0-24.39
+ 
+const_rhodair                    Public, Parameter, Real(8)
+                                 0-31.24$
+ 
+const_rhofw                      Public, Parameter, Real(8)
+                                 0-33.24$
+ 
+const_rhoice                     Public, Parameter, Real(8)
+                                 0-35.24$
+ 
+const_rhosw                      Public, Parameter, Real(8)
+                                 0-34.24$
+ 
+const_rwv                        Public, Parameter, Real(8)
+                                 0-24.24$  0-25.40
+ 
+const_sday                       Public, Parameter, Real(8)
+                                 0-11.24$  0-12.52
+ 
+const_stebol                     Public, Parameter, Real(8)
+                                 0-17.24$
+ 
+const_tkfrz                      Public, Parameter, Real(8)
+                                 0-28.24$  0-32.19
+ 
+const_tktrip                     Public, Parameter, Real(8)
+                                 0-29.24$
+ 
+const_zvir                       Public, Parameter, Real(8)
+                                 0-25.24$
+ 
+constantsmod                     Nonintrinsic Module
+                                 0-2.8$
+ 
+** constantsmod   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/constantsMod.F      03/09/11   11:03:48
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      47
+1501-510  Compilation successful for file constantsMod.F.
+1501-543  Object file created.

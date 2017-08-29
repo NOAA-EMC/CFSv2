@@ -1,0 +1,329 @@
+!-------------------------------------------------------------------------
+!     NASA GSFC Land Information Systems LIS 2.3                         !
+!-------------------------------------------------------------------------
+!BOP
+!
+! !ROUTINE: noah_tileout.F90
+!
+! !DESCRIPTION:  
+!  LIS NOAH data writer: Writes output in tile space 
+!
+! !REVISION HISTORY:
+! 02 Dec 2003; Sujay Kumar, Initial Version
+! 
+! !INTERFACE:
+subroutine noah_tileout(ld,tile,ftn,ftn_stats)
+! !USES:
+  use lis_module
+  use tile_module
+  use noah_varder
+
+  implicit none
+  
+  type(lisdec) :: ld
+  type(tiledec) :: tile
+  integer :: ftn,ftn_stats
+!EOP
+  real :: gtmp (ld%d%glbngrid)
+  real :: vmean,vstdev,vmin,vmax
+  real :: rainf(ld%d%glbnch)
+  real :: snowf(ld%d%glbnch)
+  integer :: t
+!BOC
+  do t=1,ld%d%glbnch
+     if(noah(t)%forcing(1) < 273.15) then
+        rainf(t) = 0.0
+        snowf(t) = noah(t)%forcing(8)
+     else
+        rainf(t) = noah(t)%forcing(8)
+        snowf(t) = 0.0
+     endif
+  enddo
+!-----------------------------------------------------------------
+! General Energy Balance Components
+!-----------------------------------------------------------------
+  noah%swnet = noah%swnet/float(noah%count)
+  call t2gr(noah%swnet,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Net shortwave radiation (surface) (W/m2)
+  call stats(noah%swnet,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'SWnet(W/m2)', &
+       vmean,vstdev,vmin,vmax
+  
+  noah%lwnet = noah%lwnet/float(noah%count)
+  call t2gr(noah%lwnet,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Net longwave radiation (surface) (W/m2)
+  
+  call stats(noah%lwnet,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'LWnet(W/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qle = noah%qle/float(noah%count)
+  call t2gr(noah%qle,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Latent Heat Flux (W/m2)
+  
+  call stats(noah%qle,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'Qle(W/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qh = noah%qh/float(noah%count)
+  call t2gr(noah%qh,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Sensible Heat Flux (W/m2)
+  
+  call stats(noah%qh,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'Qh(W/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qg = noah%qg/float(noah%count)
+  call t2gr(noah%qg,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Ground Heat Flux (W/m2)
+  
+  call stats(noah%qg,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'Qg(W/m2)',&
+       vmean,vstdev,vmin,vmax
+!-----------------------------------------------------------------  
+! General Water Balance Components
+!-----------------------------------------------------------------
+  noah%snowf = noah%snowf/float(noah%count)
+  call t2gr(noah%snowf,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Snowfall rate (kg/m2s)
+  
+  call stats(noah%snowf,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Snowf(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%rainf = noah%rainf/float(noah%count)
+  call t2gr(noah%rainf,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Snowfall rate (kg/m2s)
+  
+  call stats(noah%rainf,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Rainf(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%evap = noah%evap/float(noah%count)
+  call t2gr(noah%evap,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Evapotranspiration (kg/m2s)??
+  
+  call stats(noah%evap,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Evap(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qs = noah%qs/float(noah%count)
+  call t2gr(noah%qs,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Surface Runoff(kg/m2s)
+  
+  call stats(noah%qs,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Qs(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qsb = noah%qsb/float(noah%count)
+  call t2gr(noah%qsb,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Subsurface Runoff (kg/m2s)??
+  
+  call stats(noah%qsb,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Qsb(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%qsm = noah%qsm/float(noah%count)
+  call t2gr(noah%qsm,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Snowmelt (kg/m2s)
+  
+  call t2gr(noah%smc(1)*1000.0*0.1+ &
+       noah%smc(2)*1000.0*0.3 + & 
+       noah%smc(3)*1000.0*0.6 + & 
+       noah%smc(4)*1000.0 -noah%soilm_prev, & 
+       gtmp,ld%d%glbngrid, & 
+       ld%d%glbnch,tile)
+  write(ftn) gtmp        !DelSoilMoist
+  call stats(noah%smc(1)*1000.0*0.1+ &
+       noah%smc(2)*1000.0*0.3 + & 
+       noah%smc(3)*1000.0*0.6 + & 
+       noah%smc(4)*1000.0 -noah%soilm_prev, & 
+       ld%d%udef,ld%d%glbnch,vmean,vstdev,vmin, vmax)
+  write(ftn_stats,999) 'DelSoilMoist(kg/m2s)', & 
+       vmean,vstdev,vmin,vmax
+  call t2gr( noah%sneqv*1000.0-noah%swe_prev,gtmp,ld%d%glbngrid, & 
+       ld%d%glbnch,tile)
+  write(ftn) gtmp        !DelSWE
+  call stats( noah%sneqv*1000.0-noah%swe_prev, & 
+       ld%d%udef,ld%d%glbnch,vmean,vstdev,vmin, vmax)
+  write(ftn_stats,999) 'DelSWE(kg/m2s)', & 
+       vmean,vstdev,vmin,vmax
+!-----------------------------------------------------------------  
+! Surface State Variables
+! missing snowT, vegT, baresoilT,RadT
+!-----------------------------------------------------------------  
+  call t2gr(noah%avgsurft,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Average Surface Temperature (K)
+  
+  call stats(noah%avgsurft,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'AvgSurfT(K)',&
+       vmean,vstdev,vmin,vmax
+  
+  call t2gr(noah%albedo,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Surface Albedo (-)
+  
+  call stats(noah%albedo,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'Albedo(-)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%swe= noah%swe/float(noah%count)
+  call t2gr(noah%swe,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp !Snow water equivalent (kg/m2)
+  
+  call stats(noah%swe,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'SWE(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+!-----------------------------------------------------------------
+!=== Subsurface State Variables
+!-----------------------------------------------------------------
+  noah%soilmoist1= noah%soilmoist1/float(noah%count)
+  call t2gr(noah%soilmoist1,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Soil water content for layer1 (kg/m2)
+  
+  call stats(noah%soilmoist1,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'SoilMoist1(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%soilmoist2= noah%soilmoist2/float(noah%count)
+  call t2gr(noah%soilmoist1,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Soil water content for layer2 (kg/m2)
+  
+  call stats(noah%soilmoist2,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'SoilMoist2(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%soilmoist3= noah%soilmoist3/float(noah%count)
+  call t2gr(noah%soilmoist1,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Soil water content for layer3 (kg/m2)
+  
+  call stats(noah%soilmoist3,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'SoilMoist3(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%soilmoist4= noah%soilmoist4/float(noah%count)
+  call t2gr(noah%soilmoist1,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Soil water content for layer4 (kg/m2)
+          
+  call stats(noah%soilmoist4,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,999) 'SoilMoist4(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%soilwet= noah%soilwet/float(noah%count)
+  call t2gr(noah%soilwet,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Total Soil Wetness (-)
+  
+  call stats(noah%soilwet,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'SoilWet(-)',&
+       vmean,vstdev,vmin,vmax
+!-----------------------------------------------------------------  
+!=== Evaporation Components
+!-----------------------------------------------------------------  
+  noah%tveg= noah%tveg/float(noah%count)
+  call t2gr(noah%tveg,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Vegetation transpiration (kg/m2s)
+  
+  call stats(noah%tveg,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'TVeg(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%esoil= noah%esoil/float(noah%count)
+  call t2gr(noah%esoil,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Bare soil evaporation (kg/m2s)
+  
+  call stats(noah%esoil,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'ESoil(kg/m2s)',&
+       vmean,vstdev,vmin,vmax
+  
+  noah%rootmoist = noah%rootmoist/float(noah%count)
+  call t2gr(noah%rootmoist,gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+  write(ftn) gtmp ! Root zone soil moisture (kg/m2)
+  
+  call stats(noah%rootmoist,ld%d%udef,ld%d%glbnch,vmean, & 
+       vstdev,vmin, vmax)
+  write(ftn_stats,998) 'RootMoist(kg/m2)',&
+       vmean,vstdev,vmin,vmax
+  
+  if(ld%o%wfor.eq.1) then
+     call t2gr(sqrt(noah%forcing(5)*noah%forcing(5)+ & 
+          noah%forcing(6)*noah%forcing(6)),gtmp,ld%d%glbngrid, & 
+          ld%d%glbnch,tile)
+     write(ftn) gtmp        !Wind
+     call stats(sqrt(noah%forcing(5)*noah%forcing(5)+ & 
+          noah%forcing(6)*noah%forcing(6)), & 
+          ld%d%udef,ld%d%glbnch,vmean,vstdev,vmin, vmax)
+     write(ftn_stats,999) 'Wind(m/s)', & 
+          vmean,vstdev,vmin,vmax
+     
+     call t2gr(rainf, & 
+          gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !Rainf
+     call stats(rainf, & 
+          ld%d%udef,ld%d%glbnch,vmean,vstdev,vmin, vmax)
+     write(ftn_stats,998) 'Rainf(kg/m2s)', & 
+          vmean,vstdev,vmin,vmax
+     
+     call t2gr(snowf, & 
+          gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !Snowf
+     call stats(snowf, & 
+          ld%d%udef,ld%d%glbnch,vmean,vstdev,vmin, vmax)
+     write(ftn_stats,998) 'Snowf(kg/m2s)', & 
+          vmean,vstdev,vmin,vmax
+     
+     call t2gr(noah%forcing(1),gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !Tair
+     call stats(noah%forcing(1),ld%d%udef,ld%d%glbnch,vmean,vstdev, & 
+          vmin, vmax)
+     write(ftn_stats,999) 'Tair(K)', & 
+          vmean,vstdev,vmin,vmax
+     call t2gr(noah%forcing(2),gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !Qair
+     call stats(noah%forcing(2),ld%d%udef,ld%d%glbnch,vmean,vstdev, & 
+          vmin, vmax)
+     write(ftn_stats,999) 'Qair(kg/kg)', & 
+          vmean,vstdev,vmin,vmax
+     call t2gr(noah%forcing(7),gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !PSurf
+     call stats(noah%forcing(7),ld%d%udef,ld%d%glbnch,vmean,vstdev, & 
+          vmin, vmax)
+     write(ftn_stats,999) 'PSurf(Pa)', & 
+          vmean,vstdev,vmin,vmax
+     call t2gr(noah%forcing(3),gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !SWdown
+     call stats(noah%forcing(3),ld%d%udef,ld%d%glbnch,vmean,vstdev, & 
+          vmin, vmax)
+     write(ftn_stats,999) 'SWdown (W/m2)', & 
+          vmean,vstdev,vmin,vmax
+     
+     call t2gr(noah%forcing(4),gtmp,ld%d%glbngrid,ld%d%glbnch,tile)
+     write(ftn) gtmp        !LWdown
+     call stats(noah%forcing(4),ld%d%udef,ld%d%glbnch,vmean,vstdev, & 
+          vmin, vmax)
+     write(ftn_stats,999) 'LWdown(W/m2)', & 
+          vmean,vstdev,vmin,vmax
+     
+  endif
+998 FORMAT(1X,A18,4E14.3)
+999 FORMAT(1X,A18,4F14.3)
+!EOC
+end subroutine noah_tileout

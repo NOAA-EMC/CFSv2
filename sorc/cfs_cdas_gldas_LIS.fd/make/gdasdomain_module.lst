@@ -1,0 +1,646 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../baseforcing/gdas.20070502/gdasdomain_module.F 03/09/11 11:03:40
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../baseforcing/gdas.20070502/gdasdomain_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |!     NASA GSFC Land Information Systems LIS 2.3                         !
+          3 |!-------------------------------------------------------------------------
+          4 |!BOP
+          5 |! !MODULE: gdasdomain_module.F90
+          6 |!
+          7 |! !DESCRIPTION:
+          8 |!  Contains routines and variables that define the native domain for
+          9 |!  GDAS model forcing
+         10 |!
+         11 |! !INTERFACE:
+         12 |module gdasdomain_module
+         13 |! !USES:
+         14 |  use gdasdrv_module
+         15 |!EOP
+         16 |  type(gdasdrvdec) :: gdasdrv
+         17 |  integer :: mi
+         18 |contains
+         19 |
+         20 |!BOP
+         21 |!
+         22 |! !ROUTINE: defnatgdas.F90
+         23 |!
+         24 |! !DESCRIPTION:
+         25 |!  Defines the kgds array describing the native forcing resolution
+         26 |!  for GDAS data.
+         27 |!
+         28 |! !REVISION HISTORY:
+         29 |! 11Dec2003: Sujay Kumar; Initial Specification
+         30 |!
+         31 |! !INTERFACE:
+         32 |  subroutine defnatgdas(kgdsi)
+         33 |! !USES:
+         34 |    use lisdrv_module, only: lis
+         35 |    use time_manager, only: date2time
+         36 |! NOT USED IN 3.1   use time_module, only : date2time
+         37 |    implicit none
+         38 |! !ARGUMENTS:
+         39 |    integer, intent(inout) :: kgdsi(200)
+         40 |    integer :: updoy, yr1,mo1,da1,hr1,mn1,ss1
+         41 |    real :: upgmt
+         42 |!EOP
+         43 |!BOC
+         44 |    call readgdascrd(gdasdrv)
+         45 |    kgdsi(1) = 4
+         46 |    kgdsi(2) = 192
+         47 |    kgdsi(3) = 94
+         48 |    kgdsi(4) = 88542
+         49 |    kgdsi(5) = 0
+         50 |    kgdsi(6) = 128
+         51 |    kgdsi(7) = -88542
+         52 |    kgdsi(8) = -1875
+         53 |    kgdsi(9) = 1875
+         54 |    kgdsi(10) = 47
+         55 |    kgdsi(20) = 255
+         56 |    mi = gdasdrv%ncold*gdasdrv%nrold
+         57 |
+         58 |    yr1 = 2000
+         59 |    mo1 = 01
+         60 |    da1 = 24
+         61 |    hr1 = 12
+         62 |    mn1 = 0; ss1 = 0
+         63 |    call date2time( gdasdrv%griduptime1,updoy,upgmt,yr1,mo1,da1,hr1,mn1,ss1 )
+         64 |
+         65 |    yr1 = 2002     !grid update time
+         66 |    mo1 = 10
+         67 |    da1 = 29
+         68 |    hr1 = 12
+         69 |    mn1 = 0; ss1 = 0
+         70 |    call date2time(gdasdrv%griduptime2,updoy,upgmt,yr1,mo1,da1,hr1,mn1,ss1 )
+         71 |    gdasdrv%gridchange1 = .true.
+         72 |    gdasdrv%gridchange2 = .true.
+         73 |!EOC
+         74 |  end subroutine defnatgdas
+         75 |end module gdasdomain_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+a                                Use associated, Derived type: lisassimil, Component of Derived type definition: lisdec, Offset: 1276, Alignment: full word
+                                 0-34.9$
+ 
+avhrrdir                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 400, Alignment: byte
+                                 0-34.9$
+ 
+clfile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 160, Alignment: byte
+                                 0-34.9$
+ 
+d                                Use associated, Derived type: lisdomain, Component of Derived type definition: lisdec, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+da                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 88, Alignment: full word
+                                 0-34.9$
+ 
+da                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+da1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.31$  0-60.5@  0-63.61  0-67.5@  0-70.60
+ 
+date2time                        Use associated, Module Subroutine
+                                 0-35.29$  0-63.10  0-70.10
+ 
+defnatgdas                       Public, Module Subroutine
+                                 0-32.14$
+ 
+dfile                            Use associated, Character(40), Component of Derived type definition: lisoutput, Offset: 92, Alignment: byte
+                                 0-34.9$
+ 
+domain                           Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 28, Alignment: full word
+                                 0-34.9$
+ 
+doy                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 76, Alignment: full word
+                                 0-34.9$
+ 
+doy                              Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+ecor                             Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+eda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 48, Alignment: full word
+                                 0-34.9$
+ 
+edoy                             Use associated, Integer(4), Component of Derived type definition: listime, Offset: 40, Alignment: full word
+                                 0-34.9$
+ 
+egmt                             Use associated, Real(4), Component of Derived type definition: listime, Offset: 132, Alignment: full word
+                                 0-34.9$
+ 
+ehr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 44, Alignment: full word
+                                 0-34.9$
+ 
+elev                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+elev_griddesc                    Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 296, Alignment: full word
+                                 0-34.9$
+ 
+elevfile                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 520, Alignment: byte
+                                 0-34.9$
+ 
+emn                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 36, Alignment: full word
+                                 0-34.9$
+ 
+emo                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 52, Alignment: full word
+                                 0-34.9$
+ 
+endcode                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 28, Alignment: full word
+                                 0-34.9$
+ 
+endtime                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 104, Alignment: full word
+                                 0-34.9$
+ 
+ess                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 32, Alignment: full word
+                                 0-34.9$
+ 
+etime                            Use associated, Real(8), Component of Derived type definition: listime, Offset: 120, Alignment: double word
+                                 0-34.9$
+ 
+expcode                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 20, Alignment: full word
+                                 0-34.9$
+ 
+eyr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 56, Alignment: full word
+                                 0-34.9$
+ 
+f                                Use associated, Derived type: lisforcing, Component of Derived type definition: lisdec, Offset: 344, Alignment: full word
+                                 0-34.9$
+ 
+f00_flag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 60, Alignment: full word
+                                 0-34.9$
+ 
+f06_flag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 64, Alignment: full word
+                                 0-34.9$
+ 
+fidgm                            Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 36, Alignment: full word
+                                 0-34.9$
+ 
+fidtm                            Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 44, Alignment: full word
+                                 0-34.9$
+ 
+findagrtime1                     Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 52, Alignment: full word
+                                 0-34.9$
+ 
+findagrtime2                     Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 56, Alignment: full word
+                                 0-34.9$
+ 
+findtime1                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 44, Alignment: full word
+                                 0-34.9$
+ 
+findtime2                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 48, Alignment: full word
+                                 0-34.9$
+ 
+force                            Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+foropen                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 28, Alignment: full word
+                                 0-34.9$
+ 
+gdasdir                          Use associated, Character(40), Component of Derived type definition: gdasdrvdec, Offset: 12, Alignment: byte
+                                 0-14.7$
+ 
+gdasdomain_module                Nonintrinsic Module
+                                 0-12.8$
+ 
+gdasdrv                          Public, Static, Derived type: gdasdrvdec, Offset: 0, Alignment: quadruple word
+                                 0-16.23$  0-44.22
+ 
+gdasdrv%gdasdir                  Private, Static, Character(40), Offset: 12, Alignment: full word
+                                 0-16.23$
+ 
+gdasdrv%gdastime1                Private, Static, Real(8), Offset: 56, Alignment: double word
+                                 0-16.23$
+ 
+gdasdrv%gdastime2                Private, Static, Real(8), Offset: 64, Alignment: quadruple word
+                                 0-16.23$
+ 
+gdasdrv%gridchange1              Private, Static, Logical(4), Offset: 88, Alignment: double word
+                                 0-16.23$  0-71.5@
+ 
+gdasdrv%gridchange2              Private, Static, Logical(4), Offset: 92, Alignment: full word
+                                 0-16.23$  0-72.5@
+ 
+gdasdrv%griduptime1              Private, Static, Real(8), Offset: 72, Alignment: double word
+                                 0-16.23$  0-63.21
+ 
+gdasdrv%griduptime2              Private, Static, Real(8), Offset: 80, Alignment: quadruple word
+                                 0-16.23$  0-70.20
+ 
+gdasdrv%ncold                    Private, Static, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-16.23$  0-56.10
+ 
+gdasdrv%nmif                     Private, Static, Integer(4), Offset: 8, Alignment: double word
+                                 0-16.23$
+ 
+gdasdrv%nrold                    Private, Static, Integer(4), Offset: 4, Alignment: full word
+                                 0-16.23$  0-56.24
+ 
+gdasdrv_module                   Use associated, Nonintrinsic Module
+                                 0-14.7$  0-14.7
+ 
+gdasdrvdec                       Use associated, Public, Derived type definition
+                                 0-14.7$  0-16.8
+ 
+gdastime1                        Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 56, Alignment: double word
+                                 0-14.7$
+ 
+gdastime2                        Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 64, Alignment: double word
+                                 0-14.7$
+ 
+glbnch                           Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+glbngrid                         Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 24, Alignment: full word
+                                 0-34.9$
+ 
+gmt                              Use associated, Real(4), Component of Derived type definition: listime, Offset: 128, Alignment: full word
+                                 0-34.9$
+ 
+gmt                              Use associated, Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+gnc                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 36, Alignment: full word
+                                 0-34.9$
+ 
+gnr                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 40, Alignment: full word
+                                 0-34.9$
+ 
+gpcpsrc                          Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 68, Alignment: full word
+                                 0-34.9$
+ 
+gridchange                       Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 24, Alignment: full word
+                                 0-34.9$
+ 
+gridchange1                      Use associated, Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 88, Alignment: full word
+                                 0-14.7$
+ 
+gridchange2                      Use associated, Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 92, Alignment: full word
+                                 0-14.7$
+ 
+griddesc                         Use associated, Real(4) (1:50), Component of Derived type definition: lisdomain, Offset: 72, Alignment: full word
+                                 0-34.9$
+ 
+griduptime1                      Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 72, Alignment: double word
+                                 0-14.7$
+ 
+griduptime2                      Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 80, Alignment: double word
+                                 0-14.7$
+ 
+hhmmss                           Use associated, Integer(4), Component of Derived type definition: listime, Offset: 72, Alignment: full word
+                                 0-34.9$
+ 
+hr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+hr                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 92, Alignment: full word
+                                 0-34.9$
+ 
+hr1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.35$  0-61.5@  0-63.65  0-68.5@  0-70.64
+ 
+ic                               Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 52, Alignment: full word
+                                 0-34.9$
+ 
+interp                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 28, Alignment: full word
+                                 0-34.9$
+ 
+ir                               Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 56, Alignment: full word
+                                 0-34.9$
+ 
+iscfile                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 480, Alignment: byte
+                                 0-34.9$
+ 
+kgdsi                            Reference argument, Intent (INOUT), Integer(4) (1:200), Offset: 0, Alignment: full word
+                                 0-39.31$  0-32.25  0-45.5@  0-46.5@  0-47.5@  0-48.5@  0-49.5@  0-50.5@  0-51.5@  0-52.5@  0-53.5@
+                                 0-54.5@  0-55.5@
+ 
+lai                              Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+laiflag                          Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+laitime                          Use associated, Real(8), Component of Derived type definition: lisparameters, Offset: 560, Alignment: double word
+                                 0-34.9$
+ 
+landcover                        Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 32, Alignment: full word
+                                 0-34.9$
+ 
+latmax                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 32, Alignment: full word
+                                 0-34.9$
+ 
+lc_griddesc                      Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 320, Alignment: full word
+                                 0-34.9$
+ 
+lis                              Use associated, Static, Derived type: lisdec, Offset: 0, Alignment: quadruple word
+                                 0-34.30$
+ 
+lis_module                       Use associated, Nonintrinsic Module
+                                 0-34.9$
+ 
+lisdrv_module                    Use associated, Nonintrinsic Module
+                                 0-34.9$  0-34.9
+ 
+lnc                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 44, Alignment: full word
+                                 0-34.9$
+ 
+lnr                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 48, Alignment: full word
+                                 0-34.9$
+ 
+longflag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 40, Alignment: full word
+                                 0-34.9$
+ 
+lsm                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+maxt                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 60, Alignment: full word
+                                 0-34.9$
+ 
+mfile                            Use associated, Character(50), Component of Derived type definition: lisparameters, Offset: 20, Alignment: byte
+                                 0-34.9$
+ 
+mi                               Public, Static, Integer(4), Offset: 96, Alignment: quadruple word
+                                 0-17.14$  0-56.5@
+ 
+mina                             Use associated, Real(4), Component of Derived type definition: lisdomain, Offset: 64, Alignment: full word
+                                 0-34.9$
+ 
+mn                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+mn                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 96, Alignment: full word
+                                 0-34.9$
+ 
+mn1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.39$  0-62.5@  0-63.69  0-69.5@  0-70.68
+ 
+mo                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 84, Alignment: full word
+                                 0-34.9$
+ 
+mo                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+mo1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.27$  0-59.5@  0-63.57  0-66.5@  0-70.56
+ 
+modisdir                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 440, Alignment: byte
+                                 0-34.9$
+ 
+nch                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+ncold                            Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 0, Alignment: full word
+                                 0-14.7$
+ 
+nf                               Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+nforce                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+ngrid                            Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 20, Alignment: full word
+                                 0-34.9$
+ 
+nmif                             Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 8, Alignment: full word
+                                 0-14.7$
+ 
+nmif                             Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+nrold                            Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 4, Alignment: full word
+                                 0-14.7$
+ 
+nt                               Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+numoutf                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 32, Alignment: full word
+                                 0-34.9$
+ 
+o                                Use associated, Derived type: lisoutput, Component of Derived type definition: lisdec, Offset: 1144, Alignment: full word
+                                 0-34.9$
+ 
+odir                             Use associated, Character(40), Component of Derived type definition: lisoutput, Offset: 52, Alignment: byte
+                                 0-34.9$
+ 
+p                                Use associated, Derived type: lisparameters, Component of Derived type definition: lisdec, Offset: 424, Alignment: double word
+                                 0-34.9$
+ 
+pda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 108, Alignment: full word
+                                 0-34.9$
+ 
+po1file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 200, Alignment: byte
+                                 0-34.9$
+ 
+po2file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 240, Alignment: byte
+                                 0-34.9$
+ 
+po3file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 280, Alignment: byte
+                                 0-34.9$
+ 
+radsrc                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 72, Alignment: full word
+                                 0-34.9$
+ 
+rbias                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+rcgm                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 40, Alignment: full word
+                                 0-34.9$
+ 
+rctm                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 48, Alignment: full word
+                                 0-34.9$
+ 
+rdbc                             Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+readgdascrd                      External Subroutine
+                                 0-44.10
+ 
+ribc                             Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+rpsas                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+rsdbc                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+rstflag                          Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 20, Alignment: full word
+                                 0-34.9$
+ 
+safile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 120, Alignment: byte
+                                 0-34.9$
+ 
+saiflag                          Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+saitime                          Use associated, Real(8), Component of Derived type definition: lisparameters, Offset: 568, Alignment: double word
+                                 0-34.9$
+ 
+sda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+sdoy                             Use associated, Integer(4), Component of Derived type definition: listime, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+sgmt                             Use associated, Real(4), Component of Derived type definition: listime, Offset: 136, Alignment: full word
+                                 0-34.9$
+ 
+shortflag                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 36, Alignment: full word
+                                 0-34.9$
+ 
+shr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+sifile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 360, Alignment: byte
+                                 0-34.9$
+ 
+slfile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 320, Alignment: byte
+                                 0-34.9$
+ 
+smn                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+smo                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 20, Alignment: full word
+                                 0-34.9$
+ 
+soil                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+soil_griddesc                    Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 272, Alignment: full word
+                                 0-34.9$
+ 
+ss                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 100, Alignment: full word
+                                 0-34.9$
+ 
+ss                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+ss1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.43$  0-62.14@  0-63.73  0-69.14@  0-70.72
+ 
+sss                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+startcode                        Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 24, Alignment: full word
+                                 0-34.9$
+ 
+syr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 24, Alignment: full word
+                                 0-34.9$
+ 
+t                                Use associated, Derived type: listime, Component of Derived type definition: lisdec, Offset: 1000, Alignment: double word
+                                 0-34.9$
+ 
+time                             Use associated, Real(8), Component of Derived type definition: listime, Offset: 112, Alignment: double word
+                                 0-34.9$
+ 
+time                             Use associated, Reference argument, Real(8), Offset: 0, Alignment: double word
+                                 0-35.9$
+ 
+time_manager                     Use associated, Nonintrinsic Module
+                                 0-35.9$  0-35.9
+ 
+ts                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 60, Alignment: full word
+                                 0-34.9$
+ 
+tscount                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 64, Alignment: full word
+                                 0-34.9$
+ 
+udef                             Use associated, Real(4), Component of Derived type definition: lisdomain, Offset: 68, Alignment: full word
+                                 0-34.9$
+ 
+updoy                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.16$  0-63.41  0-70.40
+ 
+upgmt                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-41.13$  0-63.47  0-70.46
+ 
+vclass                           Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+vfile                            Use associated, Character(50), Component of Derived type definition: lisparameters, Offset: 70, Alignment: byte
+                                 0-34.9$
+ 
+wfor                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 0, Alignment: full word
+                                 0-34.9$
+ 
+wout                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 8, Alignment: full word
+                                 0-34.9$
+ 
+wparam                           Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 16, Alignment: full word
+                                 0-34.9$
+ 
+wsingle                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 12, Alignment: full word
+                                 0-34.9$
+ 
+wtil                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 4, Alignment: full word
+                                 0-34.9$
+ 
+yr                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 80, Alignment: full word
+                                 0-34.9$
+ 
+yr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.9$
+ 
+yr1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-40.23$  0-58.5@  0-63.53  0-65.5@  0-70.52
+ 
+yyyymmdd                         Use associated, Integer(4), Component of Derived type definition: listime, Offset: 68, Alignment: full word
+                                 0-34.9$
+ 
+** gdasdomain_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../baseforcing/gdas.20070502/gdasdomain_module.F
+                                      03/09/11   11:03:40
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      76
+1501-510  Compilation successful for file gdasdomain_module.F.
+1501-543  Object file created.

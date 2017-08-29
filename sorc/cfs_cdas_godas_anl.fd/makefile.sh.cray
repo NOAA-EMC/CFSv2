@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# compile script for godas and regrid_2d
+#
+module load PrgEnv-intel/5.2.56
+module unload craype-sandybridge
+module load craype-haswell
+module load HDF5-serial-intel-haswell/1.8.9
+module load ESMF-intel-haswell/3_1_0rp5
+module load bacio-intel/2.0.1
+module load nemsio-intel/2.2.2
+module load sp-intel/2.0.2
+module load w3emc-intel/2.2.0
+module load w3nco-intel/2.0.6
+module unload NetCDF-intel-haswell/3.6.3
+module load NetCDF-intel-haswell/4.2
+module load bufr-intel/11.0.1
+module load ip-intel/2.0.0
+module load sfcio-intel/1.0.0
+module load sigio-intel/2.0.1
+module load landsfcutil-intel/2.0.0
+module load zlib-intel-haswell/1.2.7
+module load iobuf
+
+export FFLAGSM=" -O3 -g -convert big_endian  -fp-model precise -align all -fno-alias -w -ftz -FR"
+export LDFLAGSM=
+
+export NETCDF_LDFLAGS="-L/gpfs/hps/usrx/local/prod/NetCDF/4.2/intel/haswell/lib -lnetcdff -lnetcdf -L/gpfs/hps/usrx/local/prod/HDF5/1.8.9/serial/intel/haswell/lib -lhdf5_hl -lhdf5hl_fortran -lhdf5 -lhdf5_fortran /usrx/local/prod/zlib/1.2.7/intel/haswell/lib/libz.a  "
+
+export NETCDF_INCLUDE="-I/gpfs/hps/usrx/local/prod/NetCDF/4.2/intel/haswell/include -I/gpfs/hps/usrx/local/prod/HDF5/1.8.9/serial/intel/haswell/include -I/usrx/local/prod/zlib/1.2.7/intel/haswell/include "
+
+
+# GODAS
+# -----
+
+echo
+platform=intel.WCRAY                        # A unique platform identifier
+nameG=gdsSOLO                             # Name for GODAS executable
+
+root=`pwd`
+code_dir=$root/src                        # source code directory
+execdirG=$root/exec/$nameG
+executableG=$root/exec/cfs_cdas_$nameG  # executable name
+mkmfTemplate=$root/bin/mkmf.template.$platform # path to template for your platform
+# mppnccombine=$root/bin/mppnccombine.$platform
+mkmf=$root/bin/mkmf                       # path to executable mkmf
+pathnames=$root/path_names              # path to file containing list of source paths
+cppDefs="-DENABLE_GDS -Duse_netCDF -Duse_libMPI"
+
+#-------------------------------------------------------------------------------
+# setup directory structure
+  if [ ! -d $execdirG ] ; then   mkdir  -p $execdirG ; fi
+#-------------------------------------------------------------------------------
+# skip this executabe for cfsv2.3 - only compile regrid  
+# -----------------------------------------------------  
+# compile the model code and create executable
+
+  cd $execdirG
+  echo `pwd`
+  $mkmf -a $code_dir -t $mkmfTemplate -p $executableG -c "$cppDefs" $pathnames $root/include $code_dir/shared/mpp/include 
+
+  rm -f *.o *.mod
+  make; mv $executableG $root/../../exec 
+  rm -f *.o *.mod
+  cd $root
+  
+# # regrid_2d
+# # ---------
+  
+ export  nameR=regrid_2d                          # Name for regrid code
+ export  execdirR=$root/exec/$nameR
+ #export  executableR=$root/exec/fms_$nameR     # executable name
+ export  executableR=$root/exec/cfs_cdas_$nameR # executable name
+ export  cppDefs="-Duse_netCDF -Duse_libMPI"
+ export  sharedir=$code_dir/shared
+ export  regridnames=$root/regrid_names
+ export  srclist=$code_dir/preprocessing/$nameR/$nameR.f90
+ 
+# #-------------------------------------------------------------------------------
+# # setup directory structure
+#   if [ ! -d $execdirR ] ; then   mkdir  -p $execdirR ; fi
+# #-------------------------------------------------------------------------------
+# # compile the model code and create executable
+
+  mkdir -p $execdirR
+  cd $execdirR
+  echo $(pwd)
+ 
+  $mkmf -a $code_dir -t $mkmfTemplate -p $executableR -c "$cppDefs" $regridnames $root/include $code_dir/shared/mpp/include
+ 
+  rm -f *.o *.mod
+  make; mv $executableR $root/../../exec 
+  rm -f *.o *.mod
+
+  cd $root; rm -rf exec Makefile .cppdefs
+

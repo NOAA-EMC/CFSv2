@@ -1,0 +1,16 @@
+# Template for INTEL
+#
+FC = mpfort 
+LD = mpfort 
+CC = mpcc
+FFLAGS= -real-size 64 -integer-size 32 -O3 -convert big_endian -align dcommons -traceback $(INCL)
+F0FLAGS= -real-size 64 -integer-size 32 -O0 -xHost -convert big_endian -traceback $(INCL)
+CFLAGS =
+LDFLAGS = $(LIBS)
+
+LIBS = /usrx/local/NetCDF/3.6.3/lib/libnetcdf.a 
+INCL = -I/usrx/local/NetCDF/3.6.3/include
+
+#LIBS=$(NETCDF_LDFLAGS)
+#INCL=$(NETCDF_INCLUDE)
+

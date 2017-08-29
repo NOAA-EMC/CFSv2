@@ -1,0 +1,639 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/lis_module.F 03/09/11 11:03:28
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../core/lis_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !MODULE: lis_module.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  Module for LDAS variable specification.  This file will contain no
+         27 |!   tile space or grid space variables.
+         28 |!
+         29 |! !REVISION HISTORY:
+         30 |!  15 Oct 1999: Paul Houser; Initial code
+         31 |!  4  Apr 2000: Jeffrey Walker; Added some catchment model variables
+         32 |!  11 Apr 2000: Brian Cosgrove; Elevation correction and Forcing Mask
+         33 |!               variables added
+         34 |!  6  Jun 2000: Jon Radakovich; Updated for new version of CLM
+         35 |!  23 Feb 2001: Urszula Jambor; Updated for GEOS & GDAS forcing in GLDAS
+         36 |!  27 Feb 2001: Brian Cosgrove; Added Catchment forcing data variables
+         37 |!  15 Mar 2001: Jon Gottschalck; Updated for GDAS initialization of Mosaic
+         38 |!  12 Apr 2001: Urszula Jambor; Added domain,lsm,& force namefile paramters
+         39 |!  30 Apr 2001: Jon Radakovich; Update for PSAS temperature assimilation
+         40 |!  17 Jul 2001: Jon Gottschalck; Update for global precipitation variables
+         41 |!  30 Jul 2001: Matt Rodell; Add new soil parameter variables
+         42 |!  05 Sep 2001: Brian Cosgrove; Add variables for PAR and BRTTMP, remove
+         43 |!               1/4 to 1/8 interp variables
+         44 |!  15 Oct 2001: Jesse Meng; Replace agrmet flag by agrmetsw and agrmetlw
+         45 |!  27 Nov 2001: Jon Gottschalck; Added variables for AVHRR LAI data
+         46 |!  07 Dec 2001: Urszula Jambor; Added LDAS_KGDS array
+         47 |!  03 Feb 2002: Jon Gottschalck; Added Koster tilespace variables
+         48 |!  05 Feb 2002: Brian Cosgrove; Added NLDAS 11 Layer soil class file from Yun Duan
+         49 |!               and ftype variable to indicate NLDAS ETA forcing source used
+         50 |!  08 Feb 2002: Urszula Jambor; Added latmax for AGRMET use.
+         51 |!  15 Apr 2002: Urszula Jambor; Added ECMWF forcing options.
+         52 |!  28 Apr 2002: Kristi Arsenault; Added NOAH LSM parameters and code
+         53 |!  14 Nov 2002; Sujay Kumar; Optimized version for LIS
+         54 |!  14 Oct 2003; Sujay Kumar; Removed LSM specific variables.
+         55 |!  17 Oct 2003: Yudong Tian; Added IC, IR for regional runs
+         56 |!
+         57 |! !INTERFACE:
+         58 |module lis_module
+         59 |! !USES:
+         60 |  implicit none
+         61 |! !ARGUMENTS:
+         62 |  type lisdomain
+         63 |     integer :: nch            !actual number of tiles
+         64 |     integer :: lsm            !land surface model (2=clm,4=noah)
+         65 |     integer :: soil           !soil parameter scheme (1=original veg-based, 2=reynolds soils)
+         66 |     integer :: elev           !elevation difference base
+         67 |     integer :: glbnch          !actual global number of tiles
+         68 |     integer :: ngrid           !actual number of grids
+         69 |     integer :: glbngrid        !actual global number of grids
+         70 |     integer :: domain         !model domain, (1=nldas, 2=gldas)
+         71 |     integer :: landcover      ! landcover type
+         72 |     integer :: gnc            !global array (different if subsetting is used)
+         73 |     integer :: gnr            !global array (different if subsetting is used)
+         74 |     integer :: lnc            !local number of columns in grid
+         75 |     integer :: lnr            !local number of rows in grid
+         76 |     integer :: ic             ! column index of sub-domain block
+         77 |     integer :: ir             ! row index of sub-domain block
+         78 |     integer :: maxt           !maximum tiles per grid
+         79 |     real :: mina              !min grid area for tile (%)
+         80 |     real :: udef              !undefined value
+         81 |     real :: gridDesc(50)      !grid definition array
+         82 |     real :: soil_gridDesc(6)   !grid definition for soil dataset
+         83 |     real :: elev_gridDesc(6)   !grid definition for elev dataset
+         84 |     real :: lc_gridDesc(6)   !grid definition for landcover dataset
+         85 |  end type lisdomain
+         86 |
+         87 |  type lisforcing
+         88 |     integer :: force          !forcing data type (1=gdas,2=geos)
+         89 |     integer :: ecor           !use elevation correction
+         90 |     integer :: nforce
+         91 |     integer :: nf             !number of forcing variables
+         92 |     integer :: nmif           !number of forcing variables for model initialization option
+         93 |     integer :: rstflag        !0=use only 1 forcing time, 1=find two forcing times upon restart                                !=== hdf output variables
+         94 |     integer :: gridchange
+         95 |     integer :: interp
+         96 |     integer :: latmax         !per hemisphere, for agrmet intepolation
+         97 |
+         98 |     integer :: shortflag      !shortwave radiation source flag
+         99 |                                !0=no radiation
+        100 |                                !1=instantaneous sw
+        101 |                                !2=time averaged sw
+        102 |     integer :: longflag       !longwave radiation source flag
+        103 |                                !0=no radiation
+        104 |                                !1=instantaneous lw
+        105 |                                !2=time averaged lw
+        106 |     integer :: findtime1,findtime2
+        107 |     integer :: findagrtime1,findagrtime2
+        108 |     integer :: f00_flag, f06_flag
+        109 |     integer :: gpcpsrc     !global precipitation flags
+        110 |     integer :: radsrc
+        111 |  end type lisforcing
+        112 |
+        113 |  type lisparameters
+        114 |     integer :: lai            !lai data source (1=original,
+        115 |                               !2=avhrr satellite data
+        116 |                               !3=modis satellite data)
+        117 |     integer :: nt             !number of vegetation types
+        118 |     integer :: vclass         !vegetation classification (1=umd)
+        119 |     integer  :: laiflag        !satellite lai time
+        120 |     integer  :: saiflag        !satellite lai time
+        121 |     character*50 :: mfile     !land/water mask file for modelling (avhrr)
+        122 |     character*50 :: vfile     !vegetation classification file (avhrr)!
+        123 |     character*40 :: safile    !sand fraction map file
+        124 |     character*40 :: clfile    !clay fraction map file
+        125 |     character*40 :: po1file    !porosity map file
+        126 |     character*40 :: po2file    !porosity map file
+        127 |     character*40 :: po3file    !porosity map file
+        128 |     character*40 :: slfile    !slope map file
+        129 |     character*40 :: sifile    !silt map file
+        130 |     character*40 :: avhrrdir     !avhrr data directory
+        131 |     character*40 :: modisdir  !modis data directory
+        132 |     character*40 :: iscfile   !soil color map file
+        133 |     character*40 :: elevfile
+        134 |     real*8  :: laitime        !satellite lai time
+        135 |!<kluge sai read>
+        136 |     real*8  :: saitime        !satellite sai time
+        137 |!</kluge sai read>
+        138 |
+        139 |  end type lisparameters
+        140 |
+        141 |  type lisoutput
+        142 |     integer :: wfor           !write forcing (0=no,1=yes)
+        143 |     integer :: wtil           !write tile space data (0=no, 1=yes)
+        144 |     integer :: wout           !output format option (1-binary, 2-grib)
+        145 |     integer :: wsingle        !write one variable per file
+        146 |     integer :: wparam         !write parameter file output
+        147 |     integer :: expcode        !3 digit experiment code
+        148 |     integer :: startcode      !0=restart date, 1=card date
+        149 |     integer :: foropen
+        150 |     integer :: numoutf        !counts number of output times for forcing data
+        151 |     integer :: fidgm,rcgm,fidtm,rctm
+        152 |     character*40 :: odir      !output data base directory
+        153 |     character*40 :: dfile     !runtime diagnostics file
+        154 |  end type lisoutput
+        155 |
+        156 |  type listime
+        157 |     integer :: sss            !starting second
+        158 |     integer :: sdoy           !starting day of year
+        159 |     integer :: smn            !starting minute
+        160 |     integer :: shr            !starting hour
+        161 |     integer :: sda            !starting day
+        162 |     integer :: smo            !starting month
+        163 |     integer :: syr            !starting year
+        164 |     integer :: endcode        !0=realtime, 1=specific date
+        165 |     integer :: ess            !ending second
+        166 |     integer :: emn            !ending minute
+        167 |     integer :: edoy           !ending day of year
+        168 |     integer :: ehr            !ending hour
+        169 |     integer :: eda            !ending day
+        170 |     integer :: emo            !ending month
+        171 |     integer :: eyr            !ending year
+        172 |     integer :: ts             !timestep (seconds)
+        173 |     integer :: tscount        !timestep count
+        174 |     integer :: yyyymmdd,hhmmss
+        175 |     integer :: doy,yr,mo,da,hr,mn,ss !lis current model timing variables
+        176 |     integer :: endtime        !lis stop (0=continue time looping)
+        177 |     integer :: pda            !lis previous timestep day
+        178 |     real*8 :: time            !lis current model time in years
+        179 |     real*8 :: etime           !lis end time in years
+        180 |     real :: gmt,egmt,sgmt
+        181 |  end type listime
+        182 |
+        183 |  type lisassimil
+        184 |     integer :: rpsas, rbias,ribc,rdbc,rsdbc
+        185 |  end type lisassimil
+        186 |
+        187 |  type lisdec
+        188 |     type(lisdomain)     :: d
+        189 |     type(lisforcing)    :: f
+        190 |     type(lisparameters) :: p
+        191 |     type(listime)       :: t
+        192 |     type(lisoutput)     :: o
+        193 |     type(lisassimil)    :: a
+        194 |  end type lisdec
+        195 |!EOP
+        196 |end module lis_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+a                                Derived type: lisassimil, Component of Derived type definition: lisdec, Offset: 1276, Alignment: full word
+                                 0-193.29$
+ 
+avhrrdir                         Character(40), Component of Derived type definition: lisparameters, Offset: 400, Alignment: byte
+                                 0-130.22$
+ 
+clfile                           Character(40), Component of Derived type definition: lisparameters, Offset: 160, Alignment: byte
+                                 0-124.22$
+ 
+d                                Derived type: lisdomain, Component of Derived type definition: lisdec, Offset: 0, Alignment: full word
+                                 0-188.29$
+ 
+da                               Integer(4), Component of Derived type definition: listime, Offset: 88, Alignment: full word
+                                 0-175.27$
+ 
+dfile                            Character(40), Component of Derived type definition: lisoutput, Offset: 92, Alignment: byte
+                                 0-153.22$
+ 
+domain                           Integer(4), Component of Derived type definition: lisdomain, Offset: 28, Alignment: full word
+                                 0-70.17$
+ 
+doy                              Integer(4), Component of Derived type definition: listime, Offset: 76, Alignment: full word
+                                 0-175.17$
+ 
+ecor                             Integer(4), Component of Derived type definition: lisforcing, Offset: 4, Alignment: full word
+                                 0-89.17$
+ 
+eda                              Integer(4), Component of Derived type definition: listime, Offset: 48, Alignment: full word
+                                 0-169.17$
+ 
+edoy                             Integer(4), Component of Derived type definition: listime, Offset: 40, Alignment: full word
+                                 0-167.17$
+ 
+egmt                             Real(4), Component of Derived type definition: listime, Offset: 132, Alignment: full word
+                                 0-180.18$
+ 
+ehr                              Integer(4), Component of Derived type definition: listime, Offset: 44, Alignment: full word
+                                 0-168.17$
+ 
+elev                             Integer(4), Component of Derived type definition: lisdomain, Offset: 12, Alignment: full word
+                                 0-66.17$
+ 
+elev_griddesc                    Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 296, Alignment: full word
+                                 0-83.14$
+ 
+elevfile                         Character(40), Component of Derived type definition: lisparameters, Offset: 520, Alignment: byte
+                                 0-133.22$
+ 
+emn                              Integer(4), Component of Derived type definition: listime, Offset: 36, Alignment: full word
+                                 0-166.17$
+ 
+emo                              Integer(4), Component of Derived type definition: listime, Offset: 52, Alignment: full word
+                                 0-170.17$
+ 
+endcode                          Integer(4), Component of Derived type definition: listime, Offset: 28, Alignment: full word
+                                 0-164.17$
+ 
+endtime                          Integer(4), Component of Derived type definition: listime, Offset: 104, Alignment: full word
+                                 0-176.17$
+ 
+ess                              Integer(4), Component of Derived type definition: listime, Offset: 32, Alignment: full word
+                                 0-165.17$
+ 
+etime                            Real(8), Component of Derived type definition: listime, Offset: 120, Alignment: double word
+                                 0-179.16$
+ 
+expcode                          Integer(4), Component of Derived type definition: lisoutput, Offset: 20, Alignment: full word
+                                 0-147.17$
+ 
+eyr                              Integer(4), Component of Derived type definition: listime, Offset: 56, Alignment: full word
+                                 0-171.17$
+ 
+f                                Derived type: lisforcing, Component of Derived type definition: lisdec, Offset: 344, Alignment: full word
+                                 0-189.29$
+ 
+f00_flag                         Integer(4), Component of Derived type definition: lisforcing, Offset: 60, Alignment: full word
+                                 0-108.17$
+ 
+f06_flag                         Integer(4), Component of Derived type definition: lisforcing, Offset: 64, Alignment: full word
+                                 0-108.27$
+ 
+fidgm                            Integer(4), Component of Derived type definition: lisoutput, Offset: 36, Alignment: full word
+                                 0-151.17$
+ 
+fidtm                            Integer(4), Component of Derived type definition: lisoutput, Offset: 44, Alignment: full word
+                                 0-151.28$
+ 
+findagrtime1                     Integer(4), Component of Derived type definition: lisforcing, Offset: 52, Alignment: full word
+                                 0-107.17$
+ 
+findagrtime2                     Integer(4), Component of Derived type definition: lisforcing, Offset: 56, Alignment: full word
+                                 0-107.30$
+ 
+findtime1                        Integer(4), Component of Derived type definition: lisforcing, Offset: 44, Alignment: full word
+                                 0-106.17$
+ 
+findtime2                        Integer(4), Component of Derived type definition: lisforcing, Offset: 48, Alignment: full word
+                                 0-106.27$
+ 
+force                            Integer(4), Component of Derived type definition: lisforcing, Offset: 0, Alignment: full word
+                                 0-88.17$
+ 
+foropen                          Integer(4), Component of Derived type definition: lisoutput, Offset: 28, Alignment: full word
+                                 0-149.17$
+ 
+glbnch                           Integer(4), Component of Derived type definition: lisdomain, Offset: 16, Alignment: full word
+                                 0-67.17$
+ 
+glbngrid                         Integer(4), Component of Derived type definition: lisdomain, Offset: 24, Alignment: full word
+                                 0-69.17$
+ 
+gmt                              Real(4), Component of Derived type definition: listime, Offset: 128, Alignment: full word
+                                 0-180.14$
+ 
+gnc                              Integer(4), Component of Derived type definition: lisdomain, Offset: 36, Alignment: full word
+                                 0-72.17$
+ 
+gnr                              Integer(4), Component of Derived type definition: lisdomain, Offset: 40, Alignment: full word
+                                 0-73.17$
+ 
+gpcpsrc                          Integer(4), Component of Derived type definition: lisforcing, Offset: 68, Alignment: full word
+                                 0-109.17$
+ 
+gridchange                       Integer(4), Component of Derived type definition: lisforcing, Offset: 24, Alignment: full word
+                                 0-94.17$
+ 
+griddesc                         Real(4) (1:50), Component of Derived type definition: lisdomain, Offset: 72, Alignment: full word
+                                 0-81.14$
+ 
+hhmmss                           Integer(4), Component of Derived type definition: listime, Offset: 72, Alignment: full word
+                                 0-174.26$
+ 
+hr                               Integer(4), Component of Derived type definition: listime, Offset: 92, Alignment: full word
+                                 0-175.30$
+ 
+ic                               Integer(4), Component of Derived type definition: lisdomain, Offset: 52, Alignment: full word
+                                 0-76.17$
+ 
+interp                           Integer(4), Component of Derived type definition: lisforcing, Offset: 28, Alignment: full word
+                                 0-95.17$
+ 
+ir                               Integer(4), Component of Derived type definition: lisdomain, Offset: 56, Alignment: full word
+                                 0-77.17$
+ 
+iscfile                          Character(40), Component of Derived type definition: lisparameters, Offset: 480, Alignment: byte
+                                 0-132.22$
+ 
+lai                              Integer(4), Component of Derived type definition: lisparameters, Offset: 0, Alignment: full word
+                                 0-114.17$
+ 
+laiflag                          Integer(4), Component of Derived type definition: lisparameters, Offset: 12, Alignment: full word
+                                 0-119.18$
+ 
+laitime                          Real(8), Component of Derived type definition: lisparameters, Offset: 560, Alignment: double word
+                                 0-134.17$
+ 
+landcover                        Integer(4), Component of Derived type definition: lisdomain, Offset: 32, Alignment: full word
+                                 0-71.17$
+ 
+latmax                           Integer(4), Component of Derived type definition: lisforcing, Offset: 32, Alignment: full word
+                                 0-96.17$
+ 
+lc_griddesc                      Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 320, Alignment: full word
+                                 0-84.14$
+ 
+lis_module                       Nonintrinsic Module
+                                 0-58.8$
+ 
+lisassimil                       Public, Derived type definition
+                                 0-183.8$  0-193.11
+ 
+lisdec                           Public, Derived type definition
+                                 0-187.8$
+ 
+lisdomain                        Public, Derived type definition
+                                 0-62.8$  0-188.11
+ 
+lisforcing                       Public, Derived type definition
+                                 0-87.8$  0-189.11
+ 
+lisoutput                        Public, Derived type definition
+                                 0-141.8$  0-192.11
+ 
+lisparameters                    Public, Derived type definition
+                                 0-113.8$  0-190.11
+ 
+listime                          Public, Derived type definition
+                                 0-156.8$  0-191.11
+ 
+lnc                              Integer(4), Component of Derived type definition: lisdomain, Offset: 44, Alignment: full word
+                                 0-74.17$
+ 
+lnr                              Integer(4), Component of Derived type definition: lisdomain, Offset: 48, Alignment: full word
+                                 0-75.17$
+ 
+longflag                         Integer(4), Component of Derived type definition: lisforcing, Offset: 40, Alignment: full word
+                                 0-102.17$
+ 
+lsm                              Integer(4), Component of Derived type definition: lisdomain, Offset: 4, Alignment: full word
+                                 0-64.17$
+ 
+maxt                             Integer(4), Component of Derived type definition: lisdomain, Offset: 60, Alignment: full word
+                                 0-78.17$
+ 
+mfile                            Character(50), Component of Derived type definition: lisparameters, Offset: 20, Alignment: byte
+                                 0-121.22$
+ 
+mina                             Real(4), Component of Derived type definition: lisdomain, Offset: 64, Alignment: full word
+                                 0-79.14$
+ 
+mn                               Integer(4), Component of Derived type definition: listime, Offset: 96, Alignment: full word
+                                 0-175.33$
+ 
+mo                               Integer(4), Component of Derived type definition: listime, Offset: 84, Alignment: full word
+                                 0-175.24$
+ 
+modisdir                         Character(40), Component of Derived type definition: lisparameters, Offset: 440, Alignment: byte
+                                 0-131.22$
+ 
+nch                              Integer(4), Component of Derived type definition: lisdomain, Offset: 0, Alignment: full word
+                                 0-63.17$
+ 
+nf                               Integer(4), Component of Derived type definition: lisforcing, Offset: 12, Alignment: full word
+                                 0-91.17$
+ 
+nforce                           Integer(4), Component of Derived type definition: lisforcing, Offset: 8, Alignment: full word
+                                 0-90.17$
+ 
+ngrid                            Integer(4), Component of Derived type definition: lisdomain, Offset: 20, Alignment: full word
+                                 0-68.17$
+ 
+nmif                             Integer(4), Component of Derived type definition: lisforcing, Offset: 16, Alignment: full word
+                                 0-92.17$
+ 
+nt                               Integer(4), Component of Derived type definition: lisparameters, Offset: 4, Alignment: full word
+                                 0-117.17$
+ 
+numoutf                          Integer(4), Component of Derived type definition: lisoutput, Offset: 32, Alignment: full word
+                                 0-150.17$
+ 
+o                                Derived type: lisoutput, Component of Derived type definition: lisdec, Offset: 1144, Alignment: full word
+                                 0-192.29$
+ 
+odir                             Character(40), Component of Derived type definition: lisoutput, Offset: 52, Alignment: byte
+                                 0-152.22$
+ 
+p                                Derived type: lisparameters, Component of Derived type definition: lisdec, Offset: 424, Alignment: double word
+                                 0-190.29$
+ 
+pda                              Integer(4), Component of Derived type definition: listime, Offset: 108, Alignment: full word
+                                 0-177.17$
+ 
+po1file                          Character(40), Component of Derived type definition: lisparameters, Offset: 200, Alignment: byte
+                                 0-125.22$
+ 
+po2file                          Character(40), Component of Derived type definition: lisparameters, Offset: 240, Alignment: byte
+                                 0-126.22$
+ 
+po3file                          Character(40), Component of Derived type definition: lisparameters, Offset: 280, Alignment: byte
+                                 0-127.22$
+ 
+radsrc                           Integer(4), Component of Derived type definition: lisforcing, Offset: 72, Alignment: full word
+                                 0-110.17$
+ 
+rbias                            Integer(4), Component of Derived type definition: lisassimil, Offset: 4, Alignment: full word
+                                 0-184.24$
+ 
+rcgm                             Integer(4), Component of Derived type definition: lisoutput, Offset: 40, Alignment: full word
+                                 0-151.23$
+ 
+rctm                             Integer(4), Component of Derived type definition: lisoutput, Offset: 48, Alignment: full word
+                                 0-151.34$
+ 
+rdbc                             Integer(4), Component of Derived type definition: lisassimil, Offset: 12, Alignment: full word
+                                 0-184.35$
+ 
+ribc                             Integer(4), Component of Derived type definition: lisassimil, Offset: 8, Alignment: full word
+                                 0-184.30$
+ 
+rpsas                            Integer(4), Component of Derived type definition: lisassimil, Offset: 0, Alignment: full word
+                                 0-184.17$
+ 
+rsdbc                            Integer(4), Component of Derived type definition: lisassimil, Offset: 16, Alignment: full word
+                                 0-184.40$
+ 
+rstflag                          Integer(4), Component of Derived type definition: lisforcing, Offset: 20, Alignment: full word
+                                 0-93.17$
+ 
+safile                           Character(40), Component of Derived type definition: lisparameters, Offset: 120, Alignment: byte
+                                 0-123.22$
+ 
+saiflag                          Integer(4), Component of Derived type definition: lisparameters, Offset: 16, Alignment: full word
+                                 0-120.18$
+ 
+saitime                          Real(8), Component of Derived type definition: lisparameters, Offset: 568, Alignment: double word
+                                 0-136.17$
+ 
+sda                              Integer(4), Component of Derived type definition: listime, Offset: 16, Alignment: full word
+                                 0-161.17$
+ 
+sdoy                             Integer(4), Component of Derived type definition: listime, Offset: 4, Alignment: full word
+                                 0-158.17$
+ 
+sgmt                             Real(4), Component of Derived type definition: listime, Offset: 136, Alignment: full word
+                                 0-180.23$
+ 
+shortflag                        Integer(4), Component of Derived type definition: lisforcing, Offset: 36, Alignment: full word
+                                 0-98.17$
+ 
+shr                              Integer(4), Component of Derived type definition: listime, Offset: 12, Alignment: full word
+                                 0-160.17$
+ 
+sifile                           Character(40), Component of Derived type definition: lisparameters, Offset: 360, Alignment: byte
+                                 0-129.22$
+ 
+slfile                           Character(40), Component of Derived type definition: lisparameters, Offset: 320, Alignment: byte
+                                 0-128.22$
+ 
+smn                              Integer(4), Component of Derived type definition: listime, Offset: 8, Alignment: full word
+                                 0-159.17$
+ 
+smo                              Integer(4), Component of Derived type definition: listime, Offset: 20, Alignment: full word
+                                 0-162.17$
+ 
+soil                             Integer(4), Component of Derived type definition: lisdomain, Offset: 8, Alignment: full word
+                                 0-65.17$
+ 
+soil_griddesc                    Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 272, Alignment: full word
+                                 0-82.14$
+ 
+ss                               Integer(4), Component of Derived type definition: listime, Offset: 100, Alignment: full word
+                                 0-175.36$
+ 
+sss                              Integer(4), Component of Derived type definition: listime, Offset: 0, Alignment: full word
+                                 0-157.17$
+ 
+startcode                        Integer(4), Component of Derived type definition: lisoutput, Offset: 24, Alignment: full word
+                                 0-148.17$
+ 
+syr                              Integer(4), Component of Derived type definition: listime, Offset: 24, Alignment: full word
+                                 0-163.17$
+ 
+t                                Derived type: listime, Component of Derived type definition: lisdec, Offset: 1000, Alignment: double word
+                                 0-191.29$
+ 
+time                             Real(8), Component of Derived type definition: listime, Offset: 112, Alignment: double word
+                                 0-178.16$
+ 
+ts                               Integer(4), Component of Derived type definition: listime, Offset: 60, Alignment: full word
+                                 0-172.17$
+ 
+tscount                          Integer(4), Component of Derived type definition: listime, Offset: 64, Alignment: full word
+                                 0-173.17$
+ 
+udef                             Real(4), Component of Derived type definition: lisdomain, Offset: 68, Alignment: full word
+                                 0-80.14$
+ 
+vclass                           Integer(4), Component of Derived type definition: lisparameters, Offset: 8, Alignment: full word
+                                 0-118.17$
+ 
+vfile                            Character(50), Component of Derived type definition: lisparameters, Offset: 70, Alignment: byte
+                                 0-122.22$
+ 
+wfor                             Integer(4), Component of Derived type definition: lisoutput, Offset: 0, Alignment: full word
+                                 0-142.17$
+ 
+wout                             Integer(4), Component of Derived type definition: lisoutput, Offset: 8, Alignment: full word
+                                 0-144.17$
+ 
+wparam                           Integer(4), Component of Derived type definition: lisoutput, Offset: 16, Alignment: full word
+                                 0-146.17$
+ 
+wsingle                          Integer(4), Component of Derived type definition: lisoutput, Offset: 12, Alignment: full word
+                                 0-145.17$
+ 
+wtil                             Integer(4), Component of Derived type definition: lisoutput, Offset: 4, Alignment: full word
+                                 0-143.17$
+ 
+yr                               Integer(4), Component of Derived type definition: listime, Offset: 80, Alignment: full word
+                                 0-175.21$
+ 
+yyyymmdd                         Integer(4), Component of Derived type definition: listime, Offset: 68, Alignment: full word
+                                 0-174.17$
+ 
+** lis_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/lis_module.F        03/09/11   11:03:28
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     197
+1501-510  Compilation successful for file lis_module.F.
+1501-543  Object file created.

@@ -1,0 +1,471 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../lsms/noah.20071219/sh2o_init.F 03/09/11 11:04:54
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../lsms/noah.20071219/sh2o_init.F"
+          1 |!-------------------------------------------------------------------------
+          2 |!     NASA GSFC Land Information Systems LIS 2.3                         !
+          3 |!-------------------------------------------------------------------------
+          4 |!BOP
+          5 |!
+          6 |! !ROUTINE: sh2o_init.F90
+          7 |!
+          8 |! !DESCRIPTION:
+          9 |!  To do a 'cold start' initialization of soil liquid water SH2O for
+         10 |!   NOAH LSM, though also adaptable for other land-surface models,
+         11 |!   using either GDAS or Eta forcing data.
+         12 |!
+         13 |! !REVISION HISTORY:
+         14 |!  NCEP;  Original code developed by NCEP for Eta model
+         15 |!           subroutines to initialize soil liquid water, SH2O
+         16 |!  04 Nov 2002: Kristi Arsenault; Modified code to be used with noahrst.f
+         17 |!                                 to initialize NOAH with NCEP forcing data
+         18 |!
+         19 |!
+         20 |! !INTERFACE:
+         21 |subroutine sh2oinit(smc,stc,smcmax,psis,beta,sh2o)
+         22 |
+         23 |  implicit none
+         24 |! !ARGUMENTS:
+         25 |  REAL STC      ! NOAH Soil Layer Temperature (K)
+         26 |  REAL SMC      ! NOAH Soil Layer Total Moisture (liq+frzn)
+         27 |  REAL SH2O     ! NOAH Soil Layer Liquid Moisture
+         28 |
+         29 |  REAL  PSIS                    ! Saturated soil potential
+         30 |  REAL  BETA                    ! B-parameter
+         31 |  REAL  SMCMAX                  ! Max soil moisture content (porosity)
+         32 |  REAL  BX
+         33 |!EOP
+         34 |  REAL  FK
+         35 |  REAL  FRH2O
+         36 |
+         37 |  REAL :: HLICE=3.335E5         ! Ice parameter
+         38 |  REAL :: GRAV=9.81             ! Gravity (m s-1)
+         39 |  REAL :: T0=273.15             ! Freezing point of water
+         40 |  REAL :: BLIM=5.5              ! B-parameter upper limit
+         41 |
+         42 |!=== End Variable Definition =============================================
+         43 |!BOC
+         44 |! ----------------------------------------------------------------------
+         45 |! COLD START:  determine liquid soil water content (SH2O)
+         46 |! NSOIL number of soil layers
+         47 |! ----------------------------------------------------------------------
+         48 |!  SH2O <= SMC for T < 273.149K (-0.001C)
+         49 |  IF (STC .LT. 273.149) THEN
+         50 |! ----------------------------------------------------------------------
+         51 |! first guess following explicit solution for Flerchinger Eqn from Koren
+         52 |! et al, JGR, 1999, Eqn 17 (KCOUNT=0 in FUNCTION FRH2O).
+         53 |! ----------------------------------------------------------------------
+         54 |     BX = BETA
+         55 |     IF ( BETA .GT. BLIM )  BX = BLIM
+         56 |     FK=(((HLICE/(GRAV*(-PSIS)))* &
+         57 |          ((STC-T0)/STC))**(-1/BX))*SMCMAX
+         58 |     IF (FK .LT. 0.02) FK = 0.02
+         59 |     SH2O = MIN ( FK, SMC )
+         60 |! ----------------------------------------------------------------------
+         61 |! now use iterative solution for liquid soil water content using
+         62 |! FUNCTION FRH2O with the initial guess for SH2O from above explicit
+         63 |! first guess.
+         64 |! ----------------------------------------------------------------------
+         65 |     SH2O = FRH2O(STC,SMC,SH2O,SMCMAX,BETA,PSIS)
+         66 |
+         67 |  ELSE
+         68 |! ----------------------------------------------------------------------
+         69 |!  SH2O = SMC for T => 273.149K (-0.001C)
+         70 |     SH2O=SMC
+         71 |! ----------------------------------------------------------------------
+         72 |  ENDIF
+         73 |
+         74 |  RETURN
+         75 |!EOC
+         76 |END subroutine sh2oinit
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+beta                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-30.9$  0-21.41  0-54.11  0-55.11  0-65.39
+ 
+blim                             Static, Real(4), Offset: 0, Alignment: full word
+                                 0-40.11&  0-55.21  0-55.34
+ 
+bx                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-32.9$  0-54.6@  0-55.29@  0-57.32
+ 
+fk                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-34.9$  0-56.6@  0-58.10  0-58.24@  0-59.19
+ 
+frh2o                            External Function Real(4)
+                                 0-35.9$  0-65.13
+ 
+grav                             Static, Real(4), Offset: 0, Alignment: full word
+                                 0-38.11&  0-56.19
+ 
+hlice                            Static, Real(4), Offset: 0, Alignment: full word
+                                 0-37.11&  0-56.12
+ 
+min                              Pure Intrinsic
+                                 0-59.13
+ 
+psis                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-29.9$  0-21.36  0-56.26  0-65.44
+ 
+sh2o                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-27.8$  0-21.46  0-59.6@  0-65.6@  0-65.27  0-70.6@
+ 
+sh2oinit                         Subroutine
+                                 0-21.12$
+ 
+smc                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-26.8$  0-21.21  0-59.23  0-65.23  0-70.11
+ 
+smcmax                           Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-31.9$  0-21.29  0-57.37  0-65.32
+ 
+stc                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-25.8$  0-21.25  0-49.7  0-57.13  0-57.21  0-65.19
+ 
+t0                               Static, Real(4), Offset: 0, Alignment: full word
+                                 0-39.11&  0-57.17
+ 
+** sh2oinit   === End of Compilation 1 ===
+ 
+>>>>> COMPILATION UNIT EPILOGUE SECTION <<<<<
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+         77 |
+         78 |!===========================================================================
+         79 |
+         80 |FUNCTION FRH2O(TKELV,SMC,SH2O,SMCMAX,BEXP,PSIS)
+         81 |
+         82 |  IMPLICIT NONE
+         83 |
+         84 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+         85 |!  PURPOSE:  CALCULATE AMOUNT OF SUPERCOOLED LIQUID SOIL WATER CONTENT
+         86 |!  IF TEMPERATURE IS BELOW 273.15K (T0).  REQUIRES NEWTON-TYPE ITERATION
+         87 |!  TO SOLVE THE NONLINEAR IMPLICIT EQUATION GIVEN IN EQN 17 OF
+         88 |!  KOREN ET AL. (1999, JGR, VOL 104(D16), 19569-19585).
+         89 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+         90 |!
+         91 |! New version (JUNE 2001): much faster and more accurate newton iteration
+         92 |! achieved by first taking log of eqn cited above -- less than 4
+         93 |! (typically 1 or 2) iterations achieves convergence.  Also, explicit
+         94 |! 1-step solution option for special case of parameter Ck=0, which reduces
+         95 |! the original implicit equation to a simpler explicit form, known as the
+         96 |! ""Flerchinger Eqn". Improved handling of solution in the limit of
+         97 |! freezing point temperature T0.
+         98 |!
+         99 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        100 |!
+        101 |! INPUT:
+        102 |!   TKELV.........Temperature (Kelvin)
+        103 |!   SMC...........Total soil moisture content (volumetric)
+        104 |!   SH2O..........Liquid soil moisture content (volumetric)
+        105 |!   SMCMAX........Saturation soil moisture content (from REDPRM)
+        106 |!   B.............Soil type "B" parameter (from REDPRM)
+        107 |!   PSIS..........Saturated soil matric potential (from REDPRM)
+        108 |!
+        109 |! OUTPUT:
+        110 |!   FRH2O.........supercooled liquid water content.
+        111 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        112 |
+        113 |       REAL BEXP
+        114 |       REAL BLIM
+        115 |       REAL BX
+        116 |       REAL CK
+        117 |       REAL DENOM
+        118 |       REAL DF
+        119 |!       REAL DH2O
+        120 |!       REAL DICE
+        121 |       REAL DSWL
+        122 |       REAL ERROR
+        123 |       REAL FK
+        124 |       REAL FRH2O
+        125 |       REAL GS
+        126 |       REAL HLICE
+        127 |       REAL PSIS
+        128 |       REAL SH2O
+        129 |       REAL SMC
+        130 |       REAL SMCMAX
+        131 |       REAL SWL
+        132 |       REAL SWLK
+        133 |       REAL TKELV
+        134 |       REAL T0
+        135 |
+        136 |       INTEGER NLOG
+        137 |       INTEGER KCOUNT
+        138 |
+        139 |       PARAMETER (CK=8.0)
+        140 |!      PARAMETER (CK=0.0)
+        141 |       PARAMETER (BLIM=5.5)
+        142 |!      PARAMETER (BLIM=7.0)
+        143 |       PARAMETER (ERROR=0.005)
+        144 |
+        145 |       PARAMETER (HLICE=3.335E5)
+        146 |       PARAMETER (GS = 9.81)
+        147 |!       PARAMETER (DICE=920.0)
+        148 |!       PARAMETER (DH2O=1000.0)
+        149 |       PARAMETER (T0=273.15)
+        150 |
+        151 |!  ###   LIMITS ON PARAMETER B: B < 5.5  (use parameter BLIM)  ####
+        152 |!  ###   SIMULATIONS SHOWED IF B > 5.5 UNFROZEN WATER CONTENT  ####
+        153 |!  ###   IS NON-REALISTICALLY HIGH AT VERY LOW TEMPERATURES    ####
+        154 |!##################################################################
+        155 |
+        156 |      BX = BEXP
+        157 |      IF ( BEXP .GT. BLIM ) BX = BLIM
+        158 |!------------------------------------------------------------------
+        159 |
+        160 |! INITIALIZING ITERATIONS COUNTER AND ITERATIVE SOLUTION FLAG.
+        161 |      NLOG=0
+        162 |      KCOUNT=0
+        163 |
+        164 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        165 |!  IF TEMPERATURE NOT SIGNIFICANTLY BELOW FREEZING (T0), SH2O = SMC
+        166 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        167 |
+        168 |      IF (TKELV .GT. (T0 - 1.E-3)) THEN
+        169 |         FRH2O=SMC
+        170 |
+        171 |      ELSE
+        172 |
+        173 |        IF (CK .NE. 0.0) THEN
+        174 |
+        175 |! -------------------------------------------------------------
+        176 |! OPTION 1: ITERATED SOLUTION FOR NONZERO CK
+        177 |! IN KOREN ET AL, JGR, 1999, EQN 17
+        178 |! -------------------------------------------------------------
+        179 |! INITIAL GUESS FOR SWL (frozen content)
+        180 |         SWL = SMC-SH2O
+        181 |
+        182 |! KEEP WITHIN BOUNDS.
+        183 |          IF (SWL .GT. (SMC-0.02)) SWL=SMC-0.02
+        184 |          IF(SWL .LT. 0.) SWL=0.
+        185 |!--------------------------------------------------------------
+        186 |!  START OF ITERATIONS
+        187 |!--------------------------------------------------------------
+        188 |         DO WHILE (NLOG .LT. 10 .AND. KCOUNT .EQ. 0)
+        189 |          NLOG = NLOG+1
+        190 |          DF = ALOG(( PSIS*GS/HLICE ) * ( ( 1.+CK*SWL )**2. ) * &
+        191 |          ( SMCMAX/(SMC-SWL) )**BX) - ALOG(-(TKELV-T0)/TKELV)
+        192 |          DENOM = 2. * CK / ( 1.+CK*SWL ) + BX / ( SMC - SWL )
+        193 |          SWLK = SWL - DF/DENOM
+        194 |! BOUNDS USEFUL FOR MATHEMATICAL SOLUTION.
+        195 |          IF (SWLK .GT. (SMC-0.02)) SWLK = SMC - 0.02
+        196 |          IF(SWLK .LT. 0.) SWLK = 0.
+        197 |! MATHEMATICAL SOLUTION BOUNDS APPLIED.
+        198 |          DSWL=ABS(SWLK-SWL)
+        199 |          SWL=SWLK
+        200 |
+        201 |!---------------------------------------------------------------
+        202 |! IF MORE THAN 10 ITERATIONS, USE EXPLICIT METHOD (CK=0 APPROX.)
+        203 |! WHEN DSWL LESS OR EQ. ERROR, NO MORE ITERATIONS REQUIRED.
+        204 |!---------------------------------------------------------------
+        205 |          IF ( DSWL .LE. ERROR )  THEN
+        206 |            KCOUNT=KCOUNT+1
+        207 |          END IF
+        208 |         END DO
+        209 |!---------------------------------------------------------------
+        210 |!  END OF ITERATIONS
+        211 |!---------------------------------------------------------------
+        212 |! BOUNDS APPLIED WITHIN DO-BLOCK ARE VALID FOR PHYSICAL SOLUTION.
+        213 |         FRH2O = SMC - SWL
+        214 |
+        215 |!CCCCCCCCCCCCCCCCCCCCCCC END OPTION 1 CCCCCCCCCCCCCCCCCCCCCCCCCCC
+        216 |
+        217 |        ENDIF
+        218 |
+        219 |!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+        220 |! OPTION 2: EXPLICIT SOLUTION FOR FLERCHINGER EQ. i.e. CK=0
+        221 |! IN KOREN ET AL., JGR, 1999, EQN 17
+        222 |!----------------------------------------------------------------
+        223 |        IF (KCOUNT .EQ. 0) THEN
+        224 |!      Print*,'Flerchinger used in NEW version. Iterations=',NLOG
+        225 |          FK=(((HLICE/(GS*(-PSIS)))*((TKELV-T0)/TKELV))** &
+        226 |           (-1/BX))*SMCMAX
+        227 |!  APPLY PHYSICAL BOUNDS TO FLERCHINGER SOLUTION
+        228 |          IF (FK .LT. 0.02) FK = 0.02
+        229 |          FRH2O = MIN ( FK, SMC )
+        230 |
+        231 |!CCCCCCCCCCCCCCCCCCCCCCCCC END OPTION 2 CCCCCCCCCCCCCCCCCCCCCCCCCC
+        232 |
+        233 |        ENDIF
+        234 |
+        235 |      ENDIF
+        236 |
+        237 |      RETURN
+        238 |      END
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+abs                              Pure Intrinsic
+                                 0-198.16
+ 
+alog                             Pure Intrinsic Real(4)
+                                 0-190.16  0-191.39
+ 
+bexp                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-113.13$  0-80.38  0-156.12  0-157.12
+ 
+blim                             Parameter, Real(4)
+                                 0-114.13$  0-141.19$  0-157.22  0-157.34
+ 
+bx                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.13$  0-156.7@  0-157.29@  0-191.33  0-192.45  0-226.16
+ 
+ck                               Parameter, Real(4)
+                                 0-116.13$  0-139.19$  0-173.13  0-190.48  0-192.24  0-192.34
+ 
+denom                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-117.13$  0-192.11@  0-193.27
+ 
+df                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-118.13$  0-190.11@  0-193.24
+ 
+dswl                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-121.13$  0-198.11@  0-205.16
+ 
+error                            Parameter, Real(4)
+                                 0-122.13$  0-143.19$  0-205.26
+ 
+fk                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-123.13$  0-225.11@  0-228.15  0-228.29@  0-229.25
+ 
+frh2o                            Function Real(4)
+                                 0-80.10$  0-124.13$  0-169.10@  0-213.10@  0-229.11@
+ 
+gs                               Parameter, Real(4)
+                                 0-125.13$  0-146.19$  0-190.28  0-225.24
+ 
+hlice                            Parameter, Real(4)
+                                 0-126.13$  0-145.19$  0-190.31  0-225.17
+ 
+kcount                           Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-137.16$  0-162.7@  0-188.39  0-206.13@  0-206.20  0-223.13
+ 
+min                              Pure Intrinsic
+                                 0-229.19
+ 
+nlog                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-136.16$  0-161.7@  0-188.20  0-189.11@  0-189.18
+ 
+psis                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-127.13$  0-80.43  0-190.23  0-225.29
+ 
+sh2o                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-128.13$  0-80.26  0-180.20
+ 
+smc                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-129.13$  0-80.22  0-169.16  0-180.16  0-183.25  0-183.40  0-191.21  0-192.52  0-195.26  0-195.44
+                                 0-213.18  0-229.29
+ 
+smcmax                           Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-130.13$  0-80.31  0-191.13  0-226.21
+ 
+swl                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-131.13$  0-180.10@  0-183.15  0-183.36@  0-184.14  0-184.27@  0-190.51  0-191.25  0-192.37
+                                 0-192.58  0-193.18  0-198.25  0-199.11@  0-213.24
+ 
+swlk                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-132.13$  0-193.11@  0-195.15  0-195.37@  0-196.14  0-196.28@  0-198.20  0-199.15
+ 
+t0                               Parameter, Real(4)
+                                 0-134.13$  0-149.19$  0-168.23  0-191.52  0-225.45
+ 
+tkelv                            Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-133.13$  0-80.16  0-168.11  0-191.46  0-191.56  0-225.39  0-225.49
+ 
+** frh2o   === End of Compilation 2 ===
+ 
+>>>>> COMPILATION UNIT EPILOGUE SECTION <<<<<
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../lsms/noah.20071219/sh2o_init.F
+                                      03/09/11   11:04:54
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     239
+1501-510  Compilation successful for file sh2o_init.F.
+1501-543  Object file created.

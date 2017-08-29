@@ -1,0 +1,219 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/gswp_module.F 03/09/11 11:04:03
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../core/gswp_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |!     NASA GSFC Land Information Systems LIS 2.3                         !
+          3 |!-------------------------------------------------------------------------
+          4 |
+          5 |!BOP
+          6 |!
+          7 |! !MODULE: gswp_module.F90
+          8 |!
+          9 |! !DESCRIPTION:
+         10 |!   This module contains useful routines that generates indices
+         11 |!   for reading the GSWP data
+         12 |!
+         13 |! !REVISION HISTORY:
+         14 |!  24Feb04    Sujay Kumar  Initial Specification
+         15 |!
+         16 |! !INTERFACE:
+         17 |module gswp_module
+         18 |
+         19 |contains
+         20 |  subroutine getgswp_monindex(yr,mo,index)
+         21 |    integer, intent(out) :: index
+         22 |    integer, intent(in) :: yr, mo
+         23 |    integer :: k
+         24 |    logical :: leap
+         25 |    index = 0
+         26 |    index = index + (yr-1982)*12 + mo
+         27 |  end subroutine getgswp_monindex
+         28 |
+         29 |  subroutine getgswp_timeindex(yr,mo,da,hr,index)
+         30 |
+         31 |    implicit none
+         32 |    integer, intent(in)  :: yr, mo, da, hr
+         33 |    integer, intent(out) :: index
+         34 |    integer :: ryr, rmo, rda, rhr, days1(12),days2(12),yrs(13)
+         35 |    integer :: k
+         36 |    data yrs /184,365,366,365,365,365,366,365,365,365,366,365,365/ !from 1983-94
+         37 |    data days1 /31,28,31,30,31,30,31,31,30,31,30,31/
+         38 |    data days2 /31,29,31,30,31,30,31,31,30,31,30,31/
+         39 |    logical :: leap
+         40 |    ryr = 1982
+         41 |    rmo = 7
+         42 |    rda = 1
+         43 |    rhr = 0
+         44 |
+         45 |    index = 0
+         46 |    if(yr.gt.1982) then
+         47 |       if((mod(yr,4).eq.0.and.mod(yr,100).ne.0) &     !correct for leap year
+         48 |            .or.(mod(yr,400).eq.0))then             !correct for y2k
+         49 |          leap = .true.
+         50 |       else
+         51 |          leap = .false.
+         52 |       endif
+         53 |       k = mo
+         54 |       index = index + hr+ (da-1)*24
+         55 |       do while(k.gt.1)
+         56 |          if(leap) then
+         57 |             index = index + days2(k-1) *24  !current year's
+         58 |          else
+         59 |             index = index + days1(k-1) *24  !current year's
+         60 |          endif
+         61 |          k = k-1
+         62 |       enddo
+         63 |       ! now add the missing years..
+         64 |       k = yr-1982
+         65 |       do while(k.ge.1)
+         66 |          index = index + yrs(k)*24
+         67 |          k = k-1
+         68 |       enddo
+         69 |       index = index/3
+         70 |    else
+         71 |       if(mo.gt.7) then
+         72 |          k=mo
+         73 |          index = index+hr+(da-1)*24
+         74 |          do while(k .gt.7)
+         75 |             index = index + days1(k-1)*24
+         76 |             k = k-1
+         77 |          end do
+         78 |       else
+         79 |          index = hr+(da-1)*24
+         80 |       endif
+         81 |       index = index/3
+         82 |    endif
+         83 |    index = index+1
+         84 |    !convert times to 3 hour index
+         85 |
+         86 |  end subroutine getgswp_timeindex
+         87 |
+         88 |end module gswp_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+da                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-32.37$  0-29.38  0-54.29  0-73.29  0-79.23
+ 
+days1                            Static, Integer(4) (1:12), Offset: 0, Alignment: full word
+                                 0-34.36$  0-37.10*  0-59.30  0-75.30
+ 
+days2                            Static, Integer(4) (1:12), Offset: 0, Alignment: full word
+                                 0-34.46$  0-38.10*  0-57.30
+ 
+getgswp_monindex                 Public, Module Subroutine
+                                 0-20.14$
+ 
+getgswp_timeindex                Public, Module Subroutine
+                                 0-29.14$
+ 
+gswp_module                      Nonintrinsic Module
+                                 0-17.8$
+ 
+hr                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-32.41$  0-29.41  0-54.24  0-73.25  0-79.19
+ 
+index                            Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-33.29$  0-29.44  0-45.5@  0-54.8@  0-54.16  0-57.14@  0-57.22  0-59.14@  0-59.22  0-66.11@
+                                 0-66.19  0-69.8@  0-69.16  0-73.11@  0-73.19  0-75.14@  0-75.22  0-79.11@  0-81.8@  0-81.16
+                                 0-83.5@  0-83.13
+ 
+index                            Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-21.29$  0-20.37  0-25.5@  0-26.5@  0-26.13
+ 
+k                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-23.16$
+ 
+k                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-35.16$  0-53.8@  0-55.17  0-57.36  0-59.36  0-61.11@  0-61.15  0-64.8@  0-65.17  0-66.31
+                                 0-67.11@  0-67.15  0-72.11@  0-74.20  0-75.36  0-76.14@  0-76.18
+ 
+leap                             Automatic, Logical(4), Offset: 0, Alignment: full word
+                                 0-39.16$  0-49.11@  0-51.11@  0-56.14
+ 
+leap                             Automatic, Logical(4), Offset: 0, Alignment: full word
+                                 0-24.16$
+ 
+mo                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-32.33$  0-29.35  0-53.12  0-71.11  0-72.13
+ 
+mo                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-22.32$  0-20.34  0-26.36
+ 
+mod                              Pure Intrinsic
+                                 0-47.12  0-47.31  0-48.18
+ 
+rda                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-34.26$  0-42.5@
+ 
+rhr                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-34.31$  0-43.5@
+ 
+rmo                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-34.21$  0-41.5@
+ 
+ryr                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-34.16$  0-40.5@
+ 
+yr                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-22.28$  0-20.31  0-26.22
+ 
+yr                               Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-32.29$  0-29.32  0-46.8  0-47.16  0-47.35  0-48.22  0-64.12
+ 
+yrs                              Static, Integer(4) (1:13), Offset: 0, Alignment: full word
+                                 0-34.56$  0-36.10*  0-66.27
+ 
+** gswp_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/gswp_module.F       03/09/11   11:04:03
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      89
+1501-510  Compilation successful for file gswp_module.F.
+1501-543  Object file created.

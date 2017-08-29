@@ -1,0 +1,105 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../domains/maketiles_gds1km.F 03/09/11 11:04:17
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../domains/maketiles_gds1km.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: maketiles_gds1km()
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  This primary goal of this routine is to determine tile space for GDS
+         27 |!  based I/O
+         28 |!
+         29 |! !REVISION HISTORY:
+         30 |!  1  Oct 1999: Jared Entin; Initial code
+         31 |!  15 Oct 1999: Paul Houser; Major F90 and major structure revision
+         32 |!  3  Jan 2000: Minor T=0 bug fix, should have no effect on output
+         33 |!  8  Mar 2000: Brian Cosgrove; Initialized FGRD to 0 For Dec Alpha Runs
+         34 |! 22  Aug 2000: Brian Cosgrove; Altered code for US/Mexico/Canada Mask
+         35 |! 04  Feb 2001: Jon Gottschalck; Added option to read and use Koster tile space
+         36 |!
+         37 |! !INTERFACE:
+         38 |subroutine maketiles_gds1km()
+         39 |#line 573
+        573 |  return
+        574 |!EOC
+        575 |end subroutine maketiles_gds1km
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+maketiles_gds1km                 Subroutine
+                                 0-38.12$
+ 
+** maketiles_gds1km   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../domains/maketiles_gds1km.F
+                                      03/09/11   11:04:17
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      43
+1501-510  Compilation successful for file maketiles_gds1km.F.
+1501-543  Object file created.

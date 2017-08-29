@@ -1,0 +1,9 @@
+SRCS=    duprep.f
+OBJS=    duprep.o
+LIBS= 	 $(LIBJW) 
+FC=      ifort
+FFLAGS = -O3 -traceback -g  
+CMD=      cfs_duprep    
+all:      $(CMD)
+$(CMD):   $(SRCS)
+	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 

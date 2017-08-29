@@ -1,0 +1,94 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/check_error.F 03/09/11 11:03:44
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../core/check_error.F"
+          1 |!BOP
+          2 |! !ROUTINE: check_error
+          3 |!
+          4 |! !DESCRIPTION:
+          5 |! Error check; Program exits in case of error
+          6 |!
+          7 |! !INTERFACE:
+          8 |subroutine check_error(ierr,msg,iam)
+          9 |!EOP
+         10 |  implicit none
+         11 |
+         12 |  integer :: ierr, iam
+         13 |  character*40 :: msg
+         14 |!BOC
+         15 |  if ( ierr /= 0 ) then
+         16 |     print*,'ERR: ',msg,' Stopping.',' (',iam,')'
+         17 |     call endrun
+         18 |  endif
+         19 |!EOC
+         20 |end subroutine check_error
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+check_error                      Subroutine
+                                 0-8.12$
+ 
+endrun                           External Subroutine
+                                 0-17.11
+ 
+iam                              Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-12.20$  0-8.33  0-16.43
+ 
+ierr                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-12.14$  0-8.24  0-15.8
+ 
+msg                              Reference argument, Character(40), Offset: 0, Alignment: byte
+                                 0-13.19$  0-8.29  0-16.21
+ 
+** check_error   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/check_error.F       03/09/11   11:03:44
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      21
+1501-510  Compilation successful for file check_error.F.
+1501-543  Object file created.

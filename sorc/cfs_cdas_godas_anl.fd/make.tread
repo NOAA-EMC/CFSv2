@@ -1,0 +1,7 @@
+#
+FC = ifort
+FFLAGS = -O3 -convert big_endian -traceback
+
+tread : tread.F90
+	$(FC) $(FFLAGS) -o tread tread.F90
+

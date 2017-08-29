@@ -1,0 +1,123 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../baseforcing/gdas.20070502/gdasdrv_module.F 03/09/11 11:03:40
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../baseforcing/gdas.20070502/gdasdrv_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |!     NASA GSFC Land Information Systems LIS 2.3                         !
+          3 |!-------------------------------------------------------------------------
+          4 |!BOP
+          5 |!
+          6 |! !MODULE: gdasdrv_module.F90
+          7 |!
+          8 |! !DESCRIPTION:
+          9 |!  Module containing runtime specific GDAS variables
+         10 |!
+         11 |! !REVISION HISTORY:
+         12 |!
+         13 |! 11 Dec 2003; Sujay Kumar, Initial Version
+         14 |!
+         15 |! !INTERFACE:
+         16 |module gdasdrv_module
+         17 |! !ARGUMENTS:
+         18 |  type gdasdrvdec
+         19 |     integer :: ncold, nrold   !AWIPS 212 dimensions
+         20 |     integer :: nmif
+         21 |     character*40 :: gdasdir   !GDAS Forcing Directory
+         22 |     real*8 :: gdastime1,gdastime2
+         23 |     real*8 :: griduptime1,griduptime2
+         24 |     logical :: gridchange1, gridchange2
+         25 |  end type gdasdrvdec
+         26 |!EOC
+         27 |end module gdasdrv_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+gdasdir                          Character(40), Component of Derived type definition: gdasdrvdec, Offset: 12, Alignment: byte
+                                 0-21.22$
+ 
+gdasdrv_module                   Nonintrinsic Module
+                                 0-16.8$
+ 
+gdasdrvdec                       Public, Derived type definition
+                                 0-18.8$
+ 
+gdastime1                        Real(8), Component of Derived type definition: gdasdrvdec, Offset: 56, Alignment: double word
+                                 0-22.16$
+ 
+gdastime2                        Real(8), Component of Derived type definition: gdasdrvdec, Offset: 64, Alignment: double word
+                                 0-22.26$
+ 
+gridchange1                      Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 88, Alignment: full word
+                                 0-24.17$
+ 
+gridchange2                      Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 92, Alignment: full word
+                                 0-24.30$
+ 
+griduptime1                      Real(8), Component of Derived type definition: gdasdrvdec, Offset: 72, Alignment: double word
+                                 0-23.16$
+ 
+griduptime2                      Real(8), Component of Derived type definition: gdasdrvdec, Offset: 80, Alignment: double word
+                                 0-23.28$
+ 
+ncold                            Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 0, Alignment: full word
+                                 0-19.17$
+ 
+nmif                             Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 8, Alignment: full word
+                                 0-20.17$
+ 
+nrold                            Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 4, Alignment: full word
+                                 0-19.24$
+ 
+** gdasdrv_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../baseforcing/gdas.20070502/gdasdrv_module.F
+                                      03/09/11   11:03:40
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      28
+1501-510  Compilation successful for file gdasdrv_module.F.
+1501-543  Object file created.

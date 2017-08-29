@@ -1,0 +1,315 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/bilinear_interpMod.F 03/09/11 11:03:41
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/bilinear_interpMod.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |!  !MODULE: bilinear_interpMod.F90
+         24 |!
+         25 |!  !DESCRIPTION:
+         26 |!   This module contains routines that precomputes weights and
+         27 |!   other parameters required for spatial interpolation of model
+         28 |!   forcing
+         29 |!
+         30 |!  !REVISION HISTORY:
+         31 |!  14Nov02    Sujay Kumar  Initial Specification
+         32 |!
+         33 |! !INTERFACE:
+         34 |module bilinear_interpMod
+         35 |
+         36 |  implicit none
+         37 |  ! !ARGUMENTS:
+         38 |  real, allocatable      :: rlat0(:)
+         39 |  real, allocatable      :: rlon0(:)
+         40 |  integer, allocatable   :: n110(:)
+         41 |  integer, allocatable   :: n120(:)
+         42 |  integer, allocatable   :: n210(:)
+         43 |  integer, allocatable   :: n220(:)
+         44 |  real, allocatable      :: w110(:),w120(:)
+         45 |  real, allocatable      :: w210(:),w220(:)
+         46 |  !EOP
+         47 |contains
+         48 |  !BOP
+         49 |  ! !ROUTINE: allocate_bilinear_interp
+         50 |  !
+         51 |  ! !DESCRIPTION:
+         52 |  !
+         53 |  ! Allocates memory for interpolation of model forcing data (GEOS and GDAS)
+         54 |  !
+         55 |  ! !INTERFACE:
+         56 |  subroutine allocate_bilinear_interp(n)
+         57 |    ! !ARGUMENTS:
+         58 |    integer, intent(in) :: n
+         59 |    !EOP
+         60 |    !BOC
+         61 |    allocate(rlat0(n))
+         62 |    allocate(rlon0(n))
+         63 |    allocate(n110(n))
+         64 |    allocate(n120(n))
+         65 |    allocate(n210(n))
+         66 |    allocate(n220(n))
+         67 |    allocate(w110(n))
+         68 |    allocate(w120(n))
+         69 |    allocate(w210(n))
+         70 |    allocate(w220(n))
+         71 |!    mo = n
+         72 |!    nn = n
+         73 |
+         74 |    w110 = 0.0
+         75 |    w120 = 0.0
+         76 |    w210 = 0.0
+         77 |    w220 = 0.0
+         78 |  end subroutine allocate_bilinear_interp
+         79 |
+         80 |  !BOP
+         81 |  ! !ROUTINE: bilinear_interp_input
+         82 |  !
+         83 |  ! !DESCRIPTION:
+         84 |  !
+         85 |  ! Calculates spatial variables required for interpolation of GEOS/GDAS
+         86 |  ! model forcing
+         87 |  !
+         88 |  ! !INTERFACE:
+         89 |  subroutine bilinear_interp_input (gridDesci,gridDesco,npts)
+         90 |    ! !INPUT ARGUMENTS:
+         91 |    real, intent(in) :: gridDesci(50)
+         92 |    integer          :: npts
+         93 |    !EOP
+         94 |    integer             :: n
+         95 |    integer             :: mo, nv
+         96 |    real, parameter     :: fill = -9999.0
+         97 |    real                :: xpts(npts), ypts(npts)
+         98 |    real                :: gridDesco(50)
+         99 |    integer             :: i1, i2, j1, j2
+        100 |    real                :: xi, xf, yi, yf
+        101 |    integer             :: get_fieldpos
+        102 |    !BOC
+        103 |    mo = npts
+        104 |    !------------------------------------------------------------------------
+        105 |    !  Calls the routines to decode the grid description and
+        106 |    !  calculates the weights and neighbor information to perform
+        107 |    !  spatial interpolation. This routine eliminates the need to
+        108 |    !  compute these weights repeatedly during interpolation.
+        109 |    !------------------------------------------------------------------------
+        110 |    if(gridDesco(1).ge.0) then
+        111 |       call compute_coord(gridDesco, 0,mo,fill,xpts,ypts,rlon0,rlat0,nv,0)
+        112 |    endif
+        113 |    call compute_coord(gridDesci,-1,mo,fill,xpts,ypts,rlon0,rlat0,nv,0)
+        114 |    do n=1,mo
+        115 |       xi=xpts(n)
+        116 |       yi=ypts(n)
+        117 |       if(xi.ne.fill.and.yi.ne.fill) then
+        118 |          i1=xi
+        119 |          i2=i1+1
+        120 |          j1=yi
+        121 |          j2=j1+1
+        122 |          xf=xi-i1
+        123 |          yf=yi-j1
+        124 |          n110(n)=get_fieldpos(i1,j1,gridDesci)
+        125 |          n210(n)=get_fieldpos(i2,j1,gridDesci)
+        126 |          n120(n)=get_fieldpos(i1,j2,gridDesci)
+        127 |          n220(n)=get_fieldpos(i2,j2,gridDesci)
+        128 |          if(min(n110(n),n210(n),n120(n),n220(n)).gt.0) then
+        129 |             w110(n)=(1-xf)*(1-yf)
+        130 |             w210(n)=xf*(1-yf)
+        131 |             w120(n)=(1-xf)*yf
+        132 |             w220(n)=xf*yf
+        133 |          else
+        134 |             n110(n)=0
+        135 |             n210(n)=0
+        136 |             n120(n)=0
+        137 |             n220(n)=0
+        138 |          endif
+        139 |       else
+        140 |          n110(n)=0
+        141 |          n210(n)=0
+        142 |          n120(n)=0
+        143 |          n220(n)=0
+        144 |       endif
+        145 |    enddo
+        146 |
+        147 |    !EOC
+        148 |  end subroutine bilinear_interp_input
+        149 |
+        150 |end module bilinear_interpMod
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+allocate_bilinear_interp         Public, Module Subroutine
+                                 0-56.14$
+ 
+bilinear_interp_input            Public, Module Subroutine
+                                 0-89.14$
+ 
+bilinear_interpmod               Nonintrinsic Module
+                                 0-34.8$
+ 
+compute_coord                    External Subroutine
+                                 0-111.13  0-113.10
+ 
+fill                             Parameter, Real(4)
+                                 0-96.28$  0-111.43  0-113.40  0-117.17  0-117.32
+ 
+get_fieldpos                     External Function Integer(4)
+                                 0-101.28$  0-124.19  0-125.19  0-126.19  0-127.19
+ 
+griddesci                        Reference argument, Intent (IN), Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-91.25$  0-89.37  0-113.24  0-124.38  0-125.38  0-126.38  0-127.38
+ 
+griddesco                        Reference argument, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-98.28$  0-89.47  0-110.8  0-111.27
+ 
+i1                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-99.28$  0-118.11@  0-119.14  0-122.17  0-124.32  0-126.32
+ 
+i2                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-99.32$  0-119.11@  0-125.32  0-127.32
+ 
+j1                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-99.36$  0-120.11@  0-121.14  0-123.17  0-124.35  0-125.35
+ 
+j2                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-99.40$  0-121.11@  0-126.35  0-127.35
+ 
+min                              Pure Intrinsic
+                                 0-128.14
+ 
+mo                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-95.28$  0-103.5@  0-111.40  0-113.37  0-114.12
+ 
+n                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-94.28$  0-114.8@  0-115.16  0-116.16  0-124.16  0-125.16  0-126.16  0-127.16  0-128.23  0-128.31
+                                 0-128.39  0-128.47  0-129.19  0-130.19  0-131.19  0-132.19  0-134.19  0-135.19  0-136.19  0-137.19
+                                 0-140.16  0-141.16  0-142.16  0-143.16
+ 
+n                                Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-58.28$  0-56.39  0-61.20  0-62.20  0-63.19  0-64.19  0-65.19  0-66.19  0-67.19  0-68.19  0-69.19
+                                 0-70.19
+ 
+n110                             Allocatable, Public, Controlled, Integer(4) (:), Offset: 0, Alignment: full word
+                                 0-40.29$  0-63.14  0-124.11@  0-128.18  0-134.14@  0-140.11@
+ 
+n120                             Allocatable, Public, Controlled, Integer(4) (:), Offset: 0, Alignment: full word
+                                 0-41.29$  0-64.14  0-126.11@  0-128.34  0-136.14@  0-142.11@
+ 
+n210                             Allocatable, Public, Controlled, Integer(4) (:), Offset: 0, Alignment: full word
+                                 0-42.29$  0-65.14  0-125.11@  0-128.26  0-135.14@  0-141.11@
+ 
+n220                             Allocatable, Public, Controlled, Integer(4) (:), Offset: 0, Alignment: full word
+                                 0-43.29$  0-66.14  0-127.11@  0-128.42  0-137.14@  0-143.11@
+ 
+npts                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-92.25$  0-89.57  0-97.33  0-97.33  0-97.45  0-97.45  0-103.10
+ 
+nv                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-95.32$  0-111.70  0-113.67
+ 
+rlat0                            Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-38.29$  0-61.14  0-111.64  0-113.61
+ 
+rlon0                            Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-39.29$  0-62.14  0-111.58  0-113.55
+ 
+w110                             Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-44.29$  0-67.14  0-74.5@  0-129.14@
+ 
+w120                             Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-44.37$  0-68.14  0-75.5@  0-131.14@
+ 
+w210                             Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-45.29$  0-69.14  0-76.5@  0-130.14@
+ 
+w220                             Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-45.37$  0-70.14  0-77.5@  0-132.14@
+ 
+xf                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-100.32$  0-122.11@  0-129.25  0-130.22  0-131.25  0-132.22
+ 
+xi                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-100.28$  0-115.8@  0-117.11  0-118.14  0-122.14
+ 
+xpts                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-97.28$  0-111.48  0-113.45  0-115.11
+ 
+yf                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-100.40$  0-123.11@  0-129.32  0-130.28  0-131.29  0-132.25
+ 
+yi                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-100.36$  0-116.8@  0-117.26  0-120.14  0-123.14
+ 
+ypts                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-97.40$  0-111.53  0-113.50  0-116.11
+ 
+** bilinear_interpmod   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/bilinear_interpMod.F
+                                      03/09/11   11:03:41
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     151
+1501-510  Compilation successful for file bilinear_interpMod.F.
+1501-543  Object file created.

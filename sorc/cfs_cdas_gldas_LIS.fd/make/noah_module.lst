@@ -1,0 +1,336 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../lsms/noah.20071219/noah_module.F 03/09/11 11:04:08
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../lsms/noah.20071219/noah_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !MODULE: noah_module.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  Module for 1-D NOAH land model driver variable specification.
+         27 |!
+         28 |! !REVISION HISTORY:
+         29 |!
+         30 |! 28 Apr 2002: K. Arsenault added NOAH LSM 2.5 code to LDAS.
+         31 |! 14 Nov 2002: Sujay Kumar Optimized version for LIS
+         32 |! 12 Apr 2006: Jesse Meng Added Z0, FORCING(11:16)
+         33 |!              When changing number of variables, MUST
+         34 |!              modify noah_blkcnts=(/I,J/) in noahpardef_module.F
+         35 |!              I = number of integer; J = number of real
+         36 |!
+         37 |! !INTERFACE:
+         38 |module noah_module
+         39 |!EOP
+         40 |  implicit none
+         41 |  public noahdec
+         42 |!BOC
+         43 |  type noahdec
+         44 |
+         45 |     INTEGER :: ts                 !Timestep (seconds)
+         46 |     INTEGER :: maxt               !Maximum tiles per grid
+         47 |     INTEGER :: SIBVEG             !UMD to SIB Vegetation Class Index value
+         48 |     INTEGER :: NSLAY              !Number of NOAH soil layers (4)
+         49 |     INTEGER :: COUNT
+         50 |     INTEGER :: ZOBSOIL(1)  !Zobler Soil Classes (LIS%NCH)
+         51 |
+         52 |     REAL:: VEGP(7)      !Static vegetation parameter values, dim(NOAH_NVEGP)
+         53 |     REAL:: VEGIP        !Interpolated Green Fraction from monthly parameters
+         54 |     REAL:: VEGMP1       !Month 1 Greenness Fraction Value
+         55 |     REAL:: VEGMP2       !Month 2 Greenness Fraction Value
+         56 |     REAL:: ALBSF1       !Date 1 Snow-Free Albedo Value
+         57 |     REAL:: ALBSF2       !Date 2 Snow-Free Albedo Value
+         58 |     REAL:: SOILP(10)    !Static soil parameter values, dim(NOAH_NSOILP)
+         59 |     REAL:: ALBSF        !Quarterly Snow-Free Albedo dataset
+         60 |     REAL:: MXSNALB      !Maximum snow albedo dataset
+         61 |     REAL:: TEMPBOT      !Bottom boundary temperature
+         62 |     REAL:: Z0           !Surface roughness [m]
+         63 |!-------------------------------------------------------------------------
+         64 |! NOAH-State Variables
+         65 |!-------------------------------------------------------------------------
+         66 |     REAL :: T1          !NOAH Skin Temperature (K)
+         67 |     REAL :: CMC         !NOAH Canopy Water Content
+         68 |     REAL :: SNOWH       !NOAH Actual Snow depth (m)
+         69 |     REAL :: SNEQV       !NOAH Water Equivalent Snow Depth (m)
+         70 |     REAL :: STC(4)      !NOAH Soil Temperaure (4 layers)
+         71 |     REAL :: SMC(4)      !NOAH Soil (4 layers)
+         72 |     REAL :: SH2O(4)     !NOAH Liquid-only soil moisture (4 layers)
+         73 |     REAL :: CH          !NOAH Heat/moisture exchange coef.
+         74 |     REAL :: CM          !NOAH Momentum exchange coef.
+         75 |     REAL :: FORCING(16) !TILE FORCING..
+         76 |     REAL :: VEGT        !Vegetation type of tile
+         77 |!-----------------------------------------------------------------------
+         78 |!  NOAH-Output variables
+         79 |!-----------------------------------------------------------------------
+         80 |     REAL :: swnet
+         81 |     REAL :: lwnet
+         82 |     REAL :: qle
+         83 |     REAL :: qh
+         84 |     REAL :: qg
+         85 |     REAL :: snowf
+         86 |     REAL :: rainf
+         87 |     REAL :: evap
+         88 |     REAL :: qs
+         89 |     REAL :: qsb
+         90 |     REAL :: qsm
+         91 |     REAL :: avgsurft
+         92 |     REAL :: albedo
+         93 |     REAL :: swe
+         94 |     REAL :: soilmoist1
+         95 |     REAL :: soilmoist2
+         96 |     REAL :: soilmoist3
+         97 |     REAL :: soilmoist4
+         98 |     REAL :: soilwet
+         99 |     REAL :: ecanop
+        100 |     REAL :: canopint
+        101 |     REAL :: tveg
+        102 |     REAL :: esoil
+        103 |     REAL :: rootmoist
+        104 |     REAL :: soilm_prev
+        105 |     REAL :: swe_prev
+        106 |  end type noahdec
+        107 |!EOC
+        108 | end module noah_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+albedo                           Real(4), Component of Derived type definition: noahdec, Offset: 316, Alignment: full word
+                                 0-92.14$
+ 
+albsf                            Real(4), Component of Derived type definition: noahdec, Offset: 112, Alignment: full word
+                                 0-59.13$
+ 
+albsf1                           Real(4), Component of Derived type definition: noahdec, Offset: 64, Alignment: full word
+                                 0-56.13$
+ 
+albsf2                           Real(4), Component of Derived type definition: noahdec, Offset: 68, Alignment: full word
+                                 0-57.13$
+ 
+avgsurft                         Real(4), Component of Derived type definition: noahdec, Offset: 312, Alignment: full word
+                                 0-91.14$
+ 
+canopint                         Real(4), Component of Derived type definition: noahdec, Offset: 348, Alignment: full word
+                                 0-100.14$
+ 
+ch                               Real(4), Component of Derived type definition: noahdec, Offset: 192, Alignment: full word
+                                 0-73.14$
+ 
+cm                               Real(4), Component of Derived type definition: noahdec, Offset: 196, Alignment: full word
+                                 0-74.14$
+ 
+cmc                              Real(4), Component of Derived type definition: noahdec, Offset: 132, Alignment: full word
+                                 0-67.14$
+ 
+count                            Integer(4), Component of Derived type definition: noahdec, Offset: 16, Alignment: full word
+                                 0-49.17$
+ 
+ecanop                           Real(4), Component of Derived type definition: noahdec, Offset: 344, Alignment: full word
+                                 0-99.14$
+ 
+esoil                            Real(4), Component of Derived type definition: noahdec, Offset: 356, Alignment: full word
+                                 0-102.14$
+ 
+evap                             Real(4), Component of Derived type definition: noahdec, Offset: 296, Alignment: full word
+                                 0-87.14$
+ 
+forcing                          Real(4) (1:16), Component of Derived type definition: noahdec, Offset: 200, Alignment: full word
+                                 0-75.14$
+ 
+lwnet                            Real(4), Component of Derived type definition: noahdec, Offset: 272, Alignment: full word
+                                 0-81.14$
+ 
+maxt                             Integer(4), Component of Derived type definition: noahdec, Offset: 4, Alignment: full word
+                                 0-46.17$
+ 
+mxsnalb                          Real(4), Component of Derived type definition: noahdec, Offset: 116, Alignment: full word
+                                 0-60.13$
+ 
+noah_module                      Nonintrinsic Module
+                                 0-38.8$
+ 
+noahdec                          Public, Derived type definition
+                                 0-41.10$  0-43.8$
+ 
+nslay                            Integer(4), Component of Derived type definition: noahdec, Offset: 12, Alignment: full word
+                                 0-48.17$
+ 
+qg                               Real(4), Component of Derived type definition: noahdec, Offset: 284, Alignment: full word
+                                 0-84.14$
+ 
+qh                               Real(4), Component of Derived type definition: noahdec, Offset: 280, Alignment: full word
+                                 0-83.14$
+ 
+qle                              Real(4), Component of Derived type definition: noahdec, Offset: 276, Alignment: full word
+                                 0-82.14$
+ 
+qs                               Real(4), Component of Derived type definition: noahdec, Offset: 300, Alignment: full word
+                                 0-88.14$
+ 
+qsb                              Real(4), Component of Derived type definition: noahdec, Offset: 304, Alignment: full word
+                                 0-89.14$
+ 
+qsm                              Real(4), Component of Derived type definition: noahdec, Offset: 308, Alignment: full word
+                                 0-90.14$
+ 
+rainf                            Real(4), Component of Derived type definition: noahdec, Offset: 292, Alignment: full word
+                                 0-86.14$
+ 
+rootmoist                        Real(4), Component of Derived type definition: noahdec, Offset: 360, Alignment: full word
+                                 0-103.14$
+ 
+sh2o                             Real(4) (1:4), Component of Derived type definition: noahdec, Offset: 176, Alignment: full word
+                                 0-72.14$
+ 
+sibveg                           Integer(4), Component of Derived type definition: noahdec, Offset: 8, Alignment: full word
+                                 0-47.17$
+ 
+smc                              Real(4) (1:4), Component of Derived type definition: noahdec, Offset: 160, Alignment: full word
+                                 0-71.14$
+ 
+sneqv                            Real(4), Component of Derived type definition: noahdec, Offset: 140, Alignment: full word
+                                 0-69.14$
+ 
+snowf                            Real(4), Component of Derived type definition: noahdec, Offset: 288, Alignment: full word
+                                 0-85.14$
+ 
+snowh                            Real(4), Component of Derived type definition: noahdec, Offset: 136, Alignment: full word
+                                 0-68.14$
+ 
+soilm_prev                       Real(4), Component of Derived type definition: noahdec, Offset: 364, Alignment: full word
+                                 0-104.14$
+ 
+soilmoist1                       Real(4), Component of Derived type definition: noahdec, Offset: 324, Alignment: full word
+                                 0-94.14$
+ 
+soilmoist2                       Real(4), Component of Derived type definition: noahdec, Offset: 328, Alignment: full word
+                                 0-95.14$
+ 
+soilmoist3                       Real(4), Component of Derived type definition: noahdec, Offset: 332, Alignment: full word
+                                 0-96.14$
+ 
+soilmoist4                       Real(4), Component of Derived type definition: noahdec, Offset: 336, Alignment: full word
+                                 0-97.14$
+ 
+soilp                            Real(4) (1:10), Component of Derived type definition: noahdec, Offset: 72, Alignment: full word
+                                 0-58.13$
+ 
+soilwet                          Real(4), Component of Derived type definition: noahdec, Offset: 340, Alignment: full word
+                                 0-98.14$
+ 
+stc                              Real(4) (1:4), Component of Derived type definition: noahdec, Offset: 144, Alignment: full word
+                                 0-70.14$
+ 
+swe                              Real(4), Component of Derived type definition: noahdec, Offset: 320, Alignment: full word
+                                 0-93.14$
+ 
+swe_prev                         Real(4), Component of Derived type definition: noahdec, Offset: 368, Alignment: full word
+                                 0-105.14$
+ 
+swnet                            Real(4), Component of Derived type definition: noahdec, Offset: 268, Alignment: full word
+                                 0-80.14$
+ 
+t1                               Real(4), Component of Derived type definition: noahdec, Offset: 128, Alignment: full word
+                                 0-66.14$
+ 
+tempbot                          Real(4), Component of Derived type definition: noahdec, Offset: 120, Alignment: full word
+                                 0-61.13$
+ 
+ts                               Integer(4), Component of Derived type definition: noahdec, Offset: 0, Alignment: full word
+                                 0-45.17$
+ 
+tveg                             Real(4), Component of Derived type definition: noahdec, Offset: 352, Alignment: full word
+                                 0-101.14$
+ 
+vegip                            Real(4), Component of Derived type definition: noahdec, Offset: 52, Alignment: full word
+                                 0-53.13$
+ 
+vegmp1                           Real(4), Component of Derived type definition: noahdec, Offset: 56, Alignment: full word
+                                 0-54.13$
+ 
+vegmp2                           Real(4), Component of Derived type definition: noahdec, Offset: 60, Alignment: full word
+                                 0-55.13$
+ 
+vegp                             Real(4) (1:7), Component of Derived type definition: noahdec, Offset: 24, Alignment: full word
+                                 0-52.13$
+ 
+vegt                             Real(4), Component of Derived type definition: noahdec, Offset: 264, Alignment: full word
+                                 0-76.14$
+ 
+z0                               Real(4), Component of Derived type definition: noahdec, Offset: 124, Alignment: full word
+                                 0-62.13$
+ 
+zobsoil                          Integer(4) (1:1), Component of Derived type definition: noahdec, Offset: 20, Alignment: full word
+                                 0-50.17$
+ 
+** noah_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../lsms/noah.20071219/noah_module.F
+                                      03/09/11   11:04:08
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     109
+1501-510  Compilation successful for file noah_module.F.
+1501-543  Object file created.

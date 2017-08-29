@@ -1,0 +1,154 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../core/grid_module.F 03/09/11 11:03:29
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../core/grid_module.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !MODULE: grid_module.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  LIS non-model-specific grid variables only.
+         27 |!
+         28 |!  FORCING() ARRAY: \\
+         29 |!  1. T 2m    Temperature interpolated to 2 metres [$K$] \\
+         30 |!  2. q 2m    Instantaneous specific humidity interpolated to 2 metres[$kg/kg$] \\
+         31 |!  3. radswg  Downward shortwave flux at the ground [$W/m^2$] \\
+         32 |!  4. lwgdwn  Downward longwave radiation at the ground [$W/m^2$] \\
+         33 |!  5. u 10m   Instantaneous zonal wind interpolated to 10 metres [$m/s$] \\
+         34 |!  6. v 10m   Instantaneous meridional wind interpolated to 10 metres[$m/s$] \\
+         35 |!  7. ps      Instantaneous Surface Pressure [$Pa$] \\
+         36 |!  8. preacc  Total precipitation [$mm/s$] \\
+         37 |!!  9. precon  Convective precipatation [$mm/s$] \\
+         38 |!  9. gfrac   Greenness fraction (0-1)
+         39 |! 10. albedo  Surface albedo (0-1)
+         40 |! 11. zlvl    Height of atmospheric forcing [m]
+         41 |! 12. z0      Surface roughness [m]
+         42 |! 13. ch      Surface exchange coefficient [m/s]
+         43 |! 14. t1      Skin Temperature [K]
+         44 |! 15. sneqv   SWE [m]
+         45 |! 16. snowh   Snow Depth [m]
+         46 |!
+         47 |! !REVISION HISTORY:
+         48 |!  15 Oct 1999: Paul Houser; Initial code
+         49 |!  11 Apr 2000: Brian Cosgrove; Added Forcing Mask variables
+         50 |!  23 Feb 2001: Urszula Jambor; Added GEOS & GDAS forcing variables
+         51 |!  27 Feb 2001: Brian Cosgrove; Added Catchment forcing data variables
+         52 |!  23 Mar 2001: Jon Radakovich; Added variables for PSAS assimilation
+         53 |!  04 Sep 2001: Brian Cosgrove; Added variabes for humidity, precip,par
+         54 |!               brightness temp,precip mask, removed awips2lis and
+         55 |!               pinker2lis variables, GRIB interp. package used now
+         56 |!  15 Oct 2001: Jesse Meng; Revised doc block with forcing array definition
+         57 |!  15 Oct 2001: Jesse Meng; Added oblwdata1 and oblwdata2
+         58 |!  14 Nov 2002: Sujay Kumar; Optimized version of grid_module
+         59 |!  01 May 2007: Jesse Meng; Added zlvl, z0, ch, t1
+         60 |!  19 Nov 2007: Jesse Meng; Added gfrac, sneqv, snowh
+         61 |!              When changing number of variables, MUST
+         62 |!              modify grid_blkcnts = (/J/) in driverpardef_module.F
+         63 |!              J = number of real
+         64 |!
+         65 |! !INTERFACE:
+         66 |module grid_module
+         67 |  implicit none
+         68 |  public griddec
+         69 |! !ARGUMENTS:
+         70 |  type griddec
+         71 |     real    :: lat            !latitude of grid point
+         72 |     real    :: lon            !longitude of grid point
+         73 |     real    :: forcing(16)    !interpolated LIS forcing array
+         74 |     real    :: fgrd(13)  !fraction of vegetation class in grid
+         75 |  end type griddec
+         76 |!EOP
+         77 |end module grid_module
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+fgrd                             Real(4) (1:13), Component of Derived type definition: griddec, Offset: 72, Alignment: full word
+                                 0-74.17$
+ 
+forcing                          Real(4) (1:16), Component of Derived type definition: griddec, Offset: 8, Alignment: full word
+                                 0-73.17$
+ 
+grid_module                      Nonintrinsic Module
+                                 0-66.8$
+ 
+griddec                          Public, Derived type definition
+                                 0-68.10$  0-70.8$
+ 
+lat                              Real(4), Component of Derived type definition: griddec, Offset: 0, Alignment: full word
+                                 0-71.17$
+ 
+lon                              Real(4), Component of Derived type definition: griddec, Offset: 4, Alignment: full word
+                                 0-72.17$
+ 
+** grid_module   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../core/grid_module.F       03/09/11   11:03:29
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      78
+1501-510  Compilation successful for file grid_module.F.
+1501-543  Object file created.

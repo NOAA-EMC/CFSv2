@@ -1,0 +1,162 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../obsrads/agrmet/readagrmetcrd.F 03/09/11 11:04:48
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../obsrads/agrmet/readagrmetcrd.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: readagrmetcrd.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  Routine to read AGRMET specific parameters from the card file.
+         27 |!
+         28 |! !REVISION HISTORY:
+         29 |! 11 Dec 2003; Sujay Kumar, Initial Code
+         30 |!
+         31 |! !INTERFACE:
+         32 |subroutine readagrmetcrd(agrmetdrv)
+         33 |! !USES:
+         34 |  use agrmetdrv_module
+         35 |#line 38
+         38 |!EOP
+         39 |  implicit none
+         40 |  type(agrmetdrvdec) :: agrmetdrv
+         41 |  namelist /agrmet/agrmetdrv
+         42 |!BOC
+         43 |  open(11,file='lis.crd',form='formatted',status='old')
+         44 |  read(unit=11,NML=agrmet)
+         45 |  print*,'Using AGRMET forcing'
+         46 |  print*, 'AGRMET forcing directory :',agrmetdrv%AGRMETDIR
+         47 |  agrmetdrv%AGRMTIME1  = 3000.0
+         48 |  agrmetdrv%AGRMTIME2  = 0.0
+         49 |
+         50 |  close(11)
+         51 |#line 54
+         54 |!EOC
+         55 |end subroutine readagrmetcrd
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+agrmet                           Namelist
+                                 0-41.13$  0-44.20
+ 
+agrmetdir                        Use associated, Character(40), Component of Derived type definition: agrmetdrvdec, Offset: 12, Alignment: byte
+                                 0-34.7$
+ 
+agrmetdrv                        Reference argument, Derived type: agrmetdrvdec, Offset: 0, Alignment: double word
+                                 0-40.25$  0-32.26  0-41.20
+ 
+agrmetdrv%agrmetdir              Reference argument, Character(40), Offset: 12, Alignment: full word
+                                 0-40.25$  0-46.40
+ 
+agrmetdrv%agrmtime1              Reference argument, Real(8), Offset: 56, Alignment: double word
+                                 0-40.25$  0-47.3@
+ 
+agrmetdrv%agrmtime2              Reference argument, Real(8), Offset: 64, Alignment: quadruple word
+                                 0-40.25$  0-48.3@
+ 
+agrmetdrv%ncold                  Reference argument, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-40.25$
+ 
+agrmetdrv%nmif                   Reference argument, Integer(4), Offset: 8, Alignment: double word
+                                 0-40.25$
+ 
+agrmetdrv%nrold                  Reference argument, Integer(4), Offset: 4, Alignment: full word
+                                 0-40.25$
+ 
+agrmetdrv_module                 Use associated, Nonintrinsic Module
+                                 0-34.7$  0-34.7
+ 
+agrmetdrvdec                     Use associated, Derived type definition
+                                 0-34.7$  0-40.8
+ 
+agrmtime1                        Use associated, Real(8), Component of Derived type definition: agrmetdrvdec, Offset: 56, Alignment: double word
+                                 0-34.7$
+ 
+agrmtime2                        Use associated, Real(8), Component of Derived type definition: agrmetdrvdec, Offset: 64, Alignment: double word
+                                 0-34.7$
+ 
+ncold                            Use associated, Integer(4), Component of Derived type definition: agrmetdrvdec, Offset: 0, Alignment: full word
+                                 0-34.7$
+ 
+nmif                             Use associated, Integer(4), Component of Derived type definition: agrmetdrvdec, Offset: 8, Alignment: full word
+                                 0-34.7$
+ 
+nrold                            Use associated, Integer(4), Component of Derived type definition: agrmetdrvdec, Offset: 4, Alignment: full word
+                                 0-34.7$
+ 
+readagrmetcrd                    Subroutine
+                                 0-32.12@
+ 
+** readagrmetcrd   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../obsrads/agrmet/readagrmetcrd.F
+                                      03/09/11   11:04:48
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      52
+1501-510  Compilation successful for file readagrmetcrd.F.
+1501-543  Object file created.

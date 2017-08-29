@@ -1,0 +1,328 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/conserv_interp.F 03/09/11 11:03:47
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/conserv_interp.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: conserv_interp.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  This subprogram performs budget interpolation
+         27 |!  from any grid to any grid for scalar fields. The routine is based
+         28 |!  on the spatial interpolation package ipolates from NCEP.
+         29 |!
+         30 |!  The algorithm simply computes (weighted) averages
+         31 |!  of bilinearly interpolated points arranged in a square box
+         32 |!  centered around each output grid point and stretching
+         33 |!  nearly halfway to each of the neighboring grid points.
+         34 |!  options allow choices of number of points in each radius
+         35 |!  from the center point (ipopt(1)) which defaults to 2
+         36 |!  (if ipopt(1)=-1) meaning that 25 points will be averaged;
+         37 |!  further options are the respective weights for the radius
+         38 |!  points starting at the center point (ipopt(2:2+ipopt(1))
+         39 |!  which defaults to all 1 (if ipopt(2)=-1.).
+         40 |!  only horizontal interpolation is performed.
+         41 |!  the grids are defined by their grid description sections
+         42 |!
+         43 |!  The grid description arrays are based on the decoding
+         44 |!  schemes used by NCEP. However, in order to remove the integer
+         45 |!  arithmetic employed in the original ipolates, the routines
+         46 |!  are rewritten using real number manipulations. The general
+         47 |!  structure remains the same.
+         48 |!
+         49 |!  The current code recognizes the following projections:
+         50 |!             (gridDesc(1)=0) equidistant cylindrical
+         51 |!             (gridDesc(1)=1) mercator cylindrical
+         52 |!             (gridDesc(1)=3) lambert conformal conical
+         53 |!             (gridDesc(1)=4) gaussian cylindrical (spectral native)
+         54 |!             (gridDesc(1)=5) polar stereographic azimuthal
+         55 |!             (gridDesc(1)=202) rotated equidistant cylindrical (eta native)
+         56 |!  where gridDesc could be either input gridDesci or output gridDesco.
+         57 |!  as an added bonus the number of output grid points
+         58 |!  and their latitudes and longitudes are also returned.
+         59 |!  input bitmaps will be interpolated to output bitmaps.
+         60 |!  output bitmaps will also be created when the output grid
+         61 |!  extends outside of the domain of the input grid.
+         62 |!  the output field is set to 0 where the output bitmap is off.
+         63 |!   INPUT ARGUMENT LIST:
+         64 |!     ipopt    - integer (20) interpolation options
+         65 |!                ipopt(1) is number of radius points
+         66 |!                (defaults to 2 if ipopt(1)=-1);
+         67 |!                ipopt(2:2+ipopt(1)) are respective weights
+         68 |!                (defaults to all 1 if ipopt(2)=-1).
+         69 |!     gridDesci    - real(200) input domain description parameters
+         70 |!     gridDesco    - integer (200) output domain description parameters
+         71 |!     mi       - integer dimension of input grid fields
+         72 |!     mo       - integer dimension of output grid fields
+         73 |!     ibi      - integer input bitmap flags
+         74 |!     li       - logical*1 (mi) input bitmaps (if some ibi(k)=1)
+         75 |!     gi       - real (mi) input fields to interpolate
+         76 |!
+         77 |!   OUTPUT ARGUMENT LIST:
+         78 |!     no       - integer number of output points
+         79 |!     rlat     - real (mo) output latitudes in degrees
+         80 |!     rlon     - real (mo) output longitudes in degrees
+         81 |!     ibo      - integer (km) output bitmap flags
+         82 |!     lo       - logical*1 (mo) output bitmaps (always output)
+         83 |!     go       - real (mo) output fields interpolated
+         84 |!     iret     - integer return code
+         85 |!                0    successful interpolation
+         86 |!                2    unrecognized input grid or no grid overlap
+         87 |!                3    unrecognized output grid
+         88 |!                31   invalid undefined output grid
+         89 |!                32   invalid budget method parameters
+         90 |!
+         91 |! !REVISION HISTORY:
+         92 |!   04-10-96  Mark Iredell; Initial Specification
+         93 |!   05-27-04  Sujay Kumar : Modified verision with floating point arithmetic,
+         94 |!
+         95 |!
+         96 |!
+         97 |! !INTERFACE:
+         98 |subroutine conserv_interp(gridDesco,ibi,li,gi,ibo,lo,go,mi,mo,&
+         99 |     rlat,rlon,w11,w12,w21,w22,n11,n12,n21,n22,iret)
+        100 |! !USES:
+        101 |  use conserv_interpMod, only :nb3,nb4
+        102 |!EOP
+        103 |  implicit none
+        104 |  real, parameter:: fill=-9999.
+        105 |  integer    :: iret,ibi,ibo,wb
+        106 |  integer    :: mi, mo
+        107 |  logical*1  :: li(mi),lo(mo)
+        108 |  real       :: gi(mi),go(mo)
+        109 |  real       :: rlat(mo),rlon(mo)
+        110 |  integer    :: n11(mo,nb4),n21(mo,nb4),n12(mo,nb4),n22(mo,nb4)
+        111 |  real       :: w11(mo,nb4),w21(mo,nb4),w12(mo,nb4),w22(mo,nb4)
+        112 |  real       :: wo(mo)
+        113 |  real       ::  gridDesco(50)
+        114 |  integer    :: n,nb
+        115 |  real       :: gb
+        116 |  wb = 1
+        117 |  do n=1,mo
+        118 |     go(n)=0.
+        119 |     wo(n)=0.
+        120 |  enddo
+        121 |
+        122 |  do nb = 1,nb3
+        123 |     do n=1,mo
+        124 |        if(n11(n,nb).gt.0) then
+        125 |           if(ibi.eq.0) then
+        126 |              gb=w11(n,nb)*gi(n11(n,nb))+w21(n,nb)*gi(n21(n,nb)) &
+        127 |                   +w12(n,nb)*gi(n12(n,nb))+w22(n,nb)*gi(n22(n,nb))
+        128 |              go(n)=go(n)+wb*gb
+        129 |              wo(n)=wo(n)+wb
+        130 |           else
+        131 |              if(li(n11(n,nb))) then
+        132 |                 go(n)=go(n)+wb*w11(n,nb)*gi(n11(n,nb))
+        133 |                 wo(n)=wo(n)+wb*w11(n,nb)
+        134 |              endif
+        135 |              if(li(n21(n,nb))) then
+        136 |                 go(n)=go(n)+wb*w21(n,nb)*gi(n21(n,nb))
+        137 |                 wo(n)=wo(n)+wb*w21(n,nb)
+        138 |              endif
+        139 |              if(li(n12(n,nb))) then
+        140 |                 go(n)=go(n)+wb*w12(n,nb)*gi(n12(n,nb))
+        141 |                 wo(n)=wo(n)+wb*w12(n,nb)
+        142 |              endif
+        143 |              if(li(n22(n,nb))) then
+        144 |                 go(n)=go(n)+wb*w22(n,nb)*gi(n22(n,nb))
+        145 |                 wo(n)=wo(n)+wb*w22(n,nb)
+        146 |              endif
+        147 |           endif
+        148 |        endif
+        149 |     enddo
+        150 |  enddo
+        151 |  ibo=ibi
+        152 |  do n=1,mo
+        153 |     lo(n)=wo(n).ge.0.5*nb4
+        154 |     if(lo(n)) then
+        155 |        go(n)=go(n)/wo(n)
+        156 |     else
+        157 |        ibo=1
+        158 |        go(n)=0.
+        159 |     endif
+        160 |  enddo
+        161 |  if(gridDesco(1).eq.0) call polfixs(mo,mo,1,rlat,rlon,ibo,lo,go)
+        162 |end subroutine conserv_interp
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+conserv_interp                   Subroutine
+                                 0-98.12$
+ 
+conserv_interpmod                Use associated, Nonintrinsic Module
+                                 0-101.7$  0-101.7
+ 
+fill                             Parameter, Real(4)
+                                 0-104.21$
+ 
+gb                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.17$  0-126.15@  0-128.30
+ 
+gi                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-108.17$  0-98.44  0-126.28  0-126.52  0-127.31  0-127.55  0-132.43  0-136.43  0-140.43  0-144.43
+ 
+go                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-108.24$  0-98.54  0-118.6@  0-128.15@  0-128.21  0-132.18@  0-132.24  0-136.18@  0-136.24
+                                 0-140.18@  0-140.24  0-144.18@  0-144.24  0-155.9@  0-155.15  0-158.9@  0-161.63
+ 
+griddesco                        Reference argument, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-113.18$  0-98.27  0-161.6
+ 
+ibi                              Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-105.22$  0-98.37  0-125.15  0-151.7
+ 
+ibo                              Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-105.26$  0-98.47  0-151.3@  0-157.9@  0-161.56
+ 
+iret                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-105.17$  0-99.48
+ 
+li                               Reference argument, Logical(1) (1:?), Offset: 0, Alignment: byte
+                                 0-107.17$  0-98.41  0-131.18  0-135.18  0-139.18  0-143.18
+ 
+lo                               Reference argument, Logical(1) (1:?), Offset: 0, Alignment: byte
+                                 0-107.24$  0-98.51  0-153.6@  0-154.9  0-161.60
+ 
+mi                               Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-106.17$  0-98.57  0-107.20  0-107.20  0-108.20  0-108.20
+ 
+mo                               Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-106.21$  0-98.60  0-107.27  0-107.27  0-108.27  0-108.27  0-109.22  0-109.22  0-109.31  0-109.31
+                                 0-110.21  0-110.21  0-110.33  0-110.33  0-110.45  0-110.45  0-110.57  0-110.57  0-111.21  0-111.21
+                                 0-111.33  0-111.33  0-111.45  0-111.45  0-111.57  0-111.57  0-112.20  0-112.20  0-117.10  0-123.13
+                                 0-152.10  0-161.38  0-161.41
+ 
+n                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-114.17$  0-117.6@  0-118.9  0-119.9  0-123.9@  0-124.16  0-126.22  0-126.35  0-126.46  0-126.59
+                                 0-127.25  0-127.38  0-127.49  0-127.62  0-128.18  0-128.24  0-129.18  0-129.24  0-131.25  0-132.21
+                                 0-132.27  0-132.37  0-132.50  0-133.21  0-133.27  0-133.37  0-135.25  0-136.21  0-136.27  0-136.37
+                                 0-136.50  0-137.21  0-137.27  0-137.37  0-139.25  0-140.21  0-140.27  0-140.37  0-140.50  0-141.21
+                                 0-141.27  0-141.37  0-143.25  0-144.21  0-144.27  0-144.37  0-144.50  0-145.21  0-145.27  0-145.37
+                                 0-152.6@  0-153.9  0-153.15  0-154.12  0-155.12  0-155.18  0-155.24  0-158.12
+ 
+n11                              Reference argument, Integer(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-110.17$  0-99.32  0-124.12  0-126.31  0-131.21  0-132.46
+ 
+n12                              Reference argument, Integer(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-110.41$  0-99.36  0-127.34  0-139.21  0-140.46
+ 
+n21                              Reference argument, Integer(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-110.29$  0-99.40  0-126.55  0-135.21  0-136.46
+ 
+n22                              Reference argument, Integer(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-110.53$  0-99.44  0-127.58  0-143.21  0-144.46
+ 
+nb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-114.19$  0-122.6@  0-124.18  0-126.24  0-126.37  0-126.48  0-126.61  0-127.27  0-127.40  0-127.51
+                                 0-127.64  0-131.27  0-132.39  0-132.52  0-133.39  0-135.27  0-136.39  0-136.52  0-137.39  0-139.27
+                                 0-140.39  0-140.52  0-141.39  0-143.27  0-144.39  0-144.52  0-145.39
+ 
+nb3                              Use associated, Static, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-101.32$  0-122.13
+ 
+nb4                              Use associated, Static, Integer(4), Offset: 4, Alignment: full word
+                                 0-101.36$  0-110.24  0-110.24  0-110.36  0-110.36  0-110.48  0-110.48  0-110.60  0-110.60  0-111.24
+                                 0-111.24  0-111.36  0-111.36  0-111.48  0-111.48  0-111.60  0-111.60  0-153.25
+ 
+polfixs                          External Subroutine
+                                 0-161.30
+ 
+rlat                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-109.17$  0-99.6  0-161.46
+ 
+rlon                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-109.26$  0-99.11  0-161.51
+ 
+w11                              Reference argument, Real(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-111.17$  0-99.16  0-126.18  0-132.33  0-133.33
+ 
+w12                              Reference argument, Real(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-111.41$  0-99.20  0-127.21  0-140.33  0-141.33
+ 
+w21                              Reference argument, Real(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-111.29$  0-99.24  0-126.42  0-136.33  0-137.33
+ 
+w22                              Reference argument, Real(4) (1:?, 1:?), Offset: 0, Alignment: full word
+                                 0-111.53$  0-99.28  0-127.45  0-144.33  0-145.33
+ 
+wb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-105.30$  0-116.3@  0-128.27  0-129.27  0-132.30  0-133.30  0-136.30  0-137.30  0-140.30  0-141.30
+                                 0-144.30  0-145.30
+ 
+wo                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-112.17$  0-119.6@  0-129.15@  0-129.21  0-133.18@  0-133.24  0-137.18@  0-137.24  0-141.18@
+                                 0-141.24  0-145.18@  0-145.24  0-153.12  0-155.21
+ 
+** conserv_interp   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/conserv_interp.F  03/09/11   11:03:47
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     163
+1501-510  Compilation successful for file conserv_interp.F.
+1501-543  Object file created.

@@ -1,0 +1,15 @@
+12/4/2007
+Add additional field to match operation, change vertical level to match operation
+
+12/21/2007
+Change vertical level to match GODAS
+
+01/22/2009
+Add MOC
+
+11/06/2010
+Add option "mfcstcpl=1" equivalent to "climate=.true."
+
+11/17/2010
+Add option "IGEN_OCNP" for kpds(2) - IGEN
+

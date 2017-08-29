@@ -1,0 +1,92 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../lsms/noah.20071219/machine.F 03/09/11 11:03:54
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../lsms/noah.20071219/machine.F"
+          1 |      MODULE MACHINE
+          2 |
+          3 |      IMPLICIT NONE
+          4 |      SAVE
+          5 |!  Machine dependant constants
+          6 |      integer kind_io4,kind_io8,kind_phys,kind_rad
+          7 |      parameter (kind_rad = selected_real_kind(13,60)) ! the '60' maps to 64-bit real
+          8 |      parameter (kind_phys = selected_real_kind(13,60)) ! the '60' maps to 64-bit real
+          9 |      parameter (kind_io4 = 4)
+         10 |      parameter (kind_io8 = 8)
+         11 |      integer kint_mpi
+         12 |      parameter (kint_mpi = 4)
+         13 |
+         14 |      END MODULE MACHINE
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+kind_io4                         Public, Parameter, Integer(4)
+                                 0-6.15$  0-9.18$
+ 
+kind_io8                         Public, Parameter, Integer(4)
+                                 0-6.24$  0-10.18$
+ 
+kind_phys                        Public, Parameter, Integer(4)
+                                 0-6.33$  0-8.18$
+ 
+kind_rad                         Public, Parameter, Integer(4)
+                                 0-6.43$  0-7.18$
+ 
+kint_mpi                         Public, Parameter, Integer(4)
+                                 0-11.15$  0-12.18$
+ 
+machine                          Nonintrinsic Module
+                                 0-1.14$
+ 
+** machine   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../lsms/noah.20071219/machine.F
+                                      03/09/11   11:03:53
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      15
+1501-510  Compilation successful for file machine.F.
+1501-543  Object file created.

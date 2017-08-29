@@ -1,0 +1,466 @@
+Building dependency file zterp.d
+Building dependency file time_manager.d
+Building dependency file time_interp_gdas.d
+Building dependency file time_interp_cmap.d
+Building dependency file time_interp_agrmet.d
+Building dependency file tile_spmdMod.d
+Building dependency file tile_module.d
+Building dependency file string_utils.d
+Building dependency file stats.d
+Building dependency file spmdMod.d
+Building dependency file soils_pluginMod.d
+Building dependency file sh2o_init.d
+Building dependency file setnoahp.d
+Building dependency file retglbSW.d
+Building dependency file retgdas.d
+Building dependency file retagrlw.d
+Building dependency file readnoahcrd.d
+Building dependency file readkpds.d
+Building dependency file readgdascrd.d
+Building dependency file readdomain_default.d
+Building dependency file readcmapcrd.d
+Building dependency file readcard.d
+Building dependency file readagrmetcrd.d
+Building dependency file read_umdavhrr_mask.d
+Building dependency file read_umdavhrr_lc.d
+Building dependency file read_statsgosilt.d
+Building dependency file read_statsgosand.d
+Building dependency file read_statsgoclay.d
+Building dependency file read_faosilt.d
+Building dependency file read_faosand.d
+Building dependency file read_faoclay.d
+Building dependency file read_elevdiff_gtopo30.d
+Building dependency file read_avhrrsai.d
+Building dependency file read_avhrrlai.d
+Building dependency file radforcing_pluginMod.d
+Building dependency file precision.d
+Building dependency file precipforcing_pluginMod.d
+Building dependency file polfixs.d
+Building dependency file physcons.d
+Building dependency file opendap_module.d
+Building dependency file obsradforcing_module.d
+Building dependency file obsprecipforcing_module.d
+Building dependency file noahrst.d
+Building dependency file noahpardef_module.d
+Building dependency file noahdrv_module.d
+Building dependency file noah_writestats.d
+Building dependency file noah_writerst.d
+Building dependency file noah_varder.d
+Building dependency file noah_totinit.d
+Building dependency file noah_tileout.d
+Building dependency file noah_soil_typ.d
+Building dependency file noah_snowupdate.d
+Building dependency file noah_singleout.d
+Building dependency file noah_singlegather.d
+Building dependency file noah_setup.d
+Building dependency file noah_scatter.d
+Building dependency file noah_physics.d
+Building dependency file noah_output.d
+Building dependency file noah_module.d
+Building dependency file noah_main.d
+Building dependency file noah_gribout.d
+Building dependency file noah_gfrac.d
+Building dependency file noah_gather.d
+Building dependency file noah_dynsetup.d
+Building dependency file noah_coldstart.d
+Building dependency file noah_binout.d
+Building dependency file noah_atmdrv.d
+Building dependency file noah_almaout.d
+Building dependency file noah_alb.d
+Building dependency file mpishorthand.d
+Building dependency file mapvegc.d
+Building dependency file maketiles_nongds_1km.d
+Building dependency file maketiles_nongds.d
+Building dependency file maketiles_gswp.d
+Building dependency file maketiles_gds1km.d
+Building dependency file maketiles_gds.d
+Building dependency file maketiles_gaussian.d
+Building dependency file makepdsn.d
+Building dependency file machine.d
+Building dependency file lsm_pluginMod.d
+Building dependency file lsm_module.d
+Building dependency file llm.d
+Building dependency file lisdrv_module.d
+Building dependency file lisdrv.d
+Building dependency file lis_openfileMod.d
+Building dependency file lis_module.d
+Building dependency file lis_memory_managementC.d
+Building dependency file lis_log_msgC.d
+Building dependency file lis_log_msg.d
+Building dependency file lis_indices_module.d
+Building dependency file landcover_pluginMod.d
+Building dependency file lai_pluginMod.d
+Building dependency file interp_cmap.d
+Building dependency file interp_agrmet_sw.d
+Building dependency file interp_agrmet_lw.d
+Building dependency file gswp_module.d
+Building dependency file grid_spmdMod.d
+Building dependency file grid_module.d
+Building dependency file glbprecip_cmap.d
+Building dependency file gfs_sfc_diff.d
+Building dependency file getgrad.d
+Building dependency file getgdas.d
+Building dependency file getcmap.d
+Building dependency file get_fieldpos.d
+Building dependency file gdasdrv_module.d
+Building dependency file gdasdomain_module.d
+Building dependency file gausslat.d
+Building dependency file funcphys.d
+Building dependency file filename_mod.d
+Building dependency file endrun.d
+Building dependency file elevdiff_pluginMod.d
+Building dependency file elevadjust.d
+Building dependency file drv_output_mod.d
+Building dependency file driverpardef_module.d
+Building dependency file domain_pluginMod.d
+Building dependency file domain_module.d
+Building dependency file define_gds.d
+Building dependency file createtiles_latlon.d
+Building dependency file create_vegtilespace.d
+Building dependency file constantsMod.d
+Building dependency file conserv_interpMod.d
+Building dependency file conserv_interp.d
+Building dependency file compute_coord_latlon.d
+Building dependency file compute_coord_gauss.d
+Building dependency file compute_coord.d
+Building dependency file cmapdrv_module.d
+Building dependency file cmapdomain_module.d
+Building dependency file climatologysairead.d
+Building dependency file climatologylairead.d
+Building dependency file check_error.d
+Building dependency file calculate_domveg.d
+Building dependency file bilinear_interpMod.d
+Building dependency file bilinear_interp.d
+Building dependency file baseforcing_pluginMod.d
+Building dependency file baseforcing_module.d
+Building dependency file agrmetopendap_module.d
+Building dependency file agrmetdrv_module.d
+Building dependency file agrmetdomain_module.d
+Building dependency file agrlwdn.d
+Building dependency file absoft.d
+Building dependency file LIS_soils_FTable.d
+Building dependency file LIS_radforcing_FTable.d
+Building dependency file LIS_pcpforcing_FTable.d
+Building dependency file LIS_lsm_FTable.d
+Building dependency file LIS_landcover_FTable.d
+Building dependency file LIS_lai_FTable.d
+Building dependency file LIS_forcing_FTable.d
+Building dependency file LIS_elevdiff_FTable.d
+Building dependency file LIS_domain_FTable.d
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_domain_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_elevdiff_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_forcing_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_lai_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_landcover_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_lsm_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_pcpforcing_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_radforcing_FTable.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/LIS_soils_FTable.c
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/absoft.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/agrlwdn.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/agrmetdrv_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lis_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/grid_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/mpishorthand.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/spmdMod.F
+../core/spmdMod.F(176): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [NUMTOT]
+  subroutine compute_mpigs_land (nfact, numtot, numperproc, displs)
+----------------------------------------^
+../core/spmdMod.F(140): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [NUMTOT]
+  subroutine compute_mpigs_patch (nfact, numtot, numperproc, displs)
+-----------------------------------------^
+../core/spmdMod.F(176): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [NUMPERPROC]
+  subroutine compute_mpigs_land (nfact, numtot, numperproc, displs)
+------------------------------------------------^
+../core/spmdMod.F(140): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [NUMPERPROC]
+  subroutine compute_mpigs_patch (nfact, numtot, numperproc, displs)
+-------------------------------------------------^
+../core/spmdMod.F(176): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DISPLS]
+  subroutine compute_mpigs_land (nfact, numtot, numperproc, displs)
+------------------------------------------------------------^
+../core/spmdMod.F(140): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DISPLS]
+  subroutine compute_mpigs_patch (nfact, numtot, numperproc, displs)
+-------------------------------------------------------------^
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/precision.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/time_manager.F
+../core/time_manager.F(358): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [YR]
+subroutine get_ref_date(yr, mon, day, tod)
+------------------------^
+../core/time_manager.F(333): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [YR]
+subroutine get_start_date(yr, mon, day, tod)
+--------------------------^
+../core/time_manager.F(308): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [YR]
+subroutine get_prev_date(yr, mon, day, tod)
+-------------------------^
+../core/time_manager.F(384): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DAYS]
+subroutine get_curr_time(days, seconds)
+-------------------------^
+../core/time_manager.F(358): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [MON]
+subroutine get_ref_date(yr, mon, day, tod)
+----------------------------^
+../core/time_manager.F(333): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [MON]
+subroutine get_start_date(yr, mon, day, tod)
+------------------------------^
+../core/time_manager.F(308): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [MON]
+subroutine get_prev_date(yr, mon, day, tod)
+-----------------------------^
+../core/time_manager.F(358): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DAY]
+subroutine get_ref_date(yr, mon, day, tod)
+---------------------------------^
+../core/time_manager.F(333): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DAY]
+subroutine get_start_date(yr, mon, day, tod)
+-----------------------------------^
+../core/time_manager.F(308): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [DAY]
+subroutine get_prev_date(yr, mon, day, tod)
+----------------------------------^
+../core/time_manager.F(358): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [TOD]
+subroutine get_ref_date(yr, mon, day, tod)
+--------------------------------------^
+../core/time_manager.F(333): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [TOD]
+subroutine get_start_date(yr, mon, day, tod)
+----------------------------------------^
+../core/time_manager.F(308): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [TOD]
+subroutine get_prev_date(yr, mon, day, tod)
+---------------------------------------^
+../core/time_manager.F(384): warning #6843: A dummy argument with an explicit INTENT(OUT) declaration is not given an explicit value.   [SECONDS]
+subroutine get_curr_time(days, seconds)
+-------------------------------^
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/tile_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/tile_spmdMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/driverpardef_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/grid_spmdMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domain-plugin/domain_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../param-plugin/landcover_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../param-plugin/elevdiff_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/domain_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lisdrv_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/opendap_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lis_indices_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/agrmetdomain_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/agrmetopendap_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/gdasdrv_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/gdasdomain_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../forcing-plugin/baseforcing_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/bilinear_interpMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/conserv_interpMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/baseforcing_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/bilinear_interp.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/calculate_domveg.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/check_error.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/lai/climatologylairead.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/lai/climatologysairead.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/cmapdrv_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/cmapdomain_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/compute_coord.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/compute_coord_gauss.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/compute_coord_latlon.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/conserv_interp.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/constantsMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/create_vegtilespace.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/createtiles_latlon.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/define_gds.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/drv_output_mod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/elevadjust.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/endrun.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/filename_mod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/machine.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/physcons.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/funcphys.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/gausslat.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/get_fieldpos.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../forcing-plugin/precipforcing_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/obsprecipforcing_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/getcmap.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/getgdas.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../forcing-plugin/radforcing_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/obsradforcing_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/getgrad.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/gfs_sfc_diff.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/glbprecip_cmap.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/gswp_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/interp_agrmet_lw.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lis_openfileMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/interp_agrmet_sw.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/interp_cmap.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../param-plugin/lai_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lis_log_msg.F
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/lis_log_msgC.c
+mpicc -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -I. -I. -I../core -I../lsm-plugin -I../forcing-plugin -I../domain-plugin -I../domains -I../param-plugin -I../params/soils -I../params/landcover -I../params/elev -I../params/lai -I../interp -I../baseforcing/gdas.20070502 -I../obsprecips/cmap_0.5 -I../obsrads/agrmet -I../lsms/noah.20071219 -I/incmod/netcdf-3.5.0  -c -w -O -q64 -qcpluscmt ../core/lis_memory_managementC.c
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noahdrv_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noahpardef_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_varder.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsm-plugin/lsm_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lsm_module.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/lisdrv.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/elev/llm.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/makepdsn.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_gaussian.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_gds.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_gds1km.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_gswp.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_nongds.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/maketiles_nongds_1km.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/mapvegc.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_alb.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_almaout.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_atmdrv.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_binout.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_coldstart.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_dynsetup.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_gather.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_gfrac.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_gribout.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_main.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_output.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_physics.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_scatter.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_setup.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_singlegather.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_singleout.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_snowupdate.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_soil_typ.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_tileout.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_totinit.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_writerst.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noah_writestats.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/noahrst.F
+../lsms/noah.20071219/noahrst.F(39): remark #6536: All symbols from this module are already visible due to another USE; the ONLY clause will have no effect. Rename clauses, if any, will be honored.   [NOAH_VARDER]
+  use noah_varder, only : noahdrv
+------^
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../interp/polfixs.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/lai/read_avhrrlai.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/lai/read_avhrrsai.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/elev/read_elevdiff_gtopo30.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_faoclay.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_faosand.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_faosilt.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_statsgoclay.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_statsgosand.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/soils/read_statsgosilt.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/landcover/read_umdavhrr_lc.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../params/landcover/read_umdavhrr_mask.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/readagrmetcrd.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../param-plugin/soils_pluginMod.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/readcard.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/readcmapcrd.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../domains/readdomain_default.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/readgdascrd.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/readkpds.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/readnoahcrd.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/retagrlw.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/retgdas.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/retglbSW.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/setnoahp.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../lsms/noah.20071219/sh2o_init.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/stats.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/string_utils.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsrads/agrmet/time_interp_agrmet.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../obsprecips/cmap_0.5/time_interp_cmap.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../baseforcing/gdas.20070502/time_interp_gdas.F
+mpif90 -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv ../core/zterp.F
+mpif90 -o cfs_cdas_gldas_LIS LIS_domain_FTable.o LIS_elevdiff_FTable.o LIS_forcing_FTable.o LIS_lai_FTable.o LIS_landcover_FTable.o LIS_lsm_FTable.o LIS_pcpforcing_FTable.o LIS_radforcing_FTable.o LIS_soils_FTable.o absoft.o agrlwdn.o agrmetdomain_module.o agrmetdrv_module.o agrmetopendap_module.o baseforcing_module.o baseforcing_pluginMod.o bilinear_interp.o bilinear_interpMod.o calculate_domveg.o check_error.o climatologylairead.o climatologysairead.o cmapdomain_module.o cmapdrv_module.o compute_coord.o compute_coord_gauss.o compute_coord_latlon.o conserv_interp.o conserv_interpMod.o constantsMod.o create_vegtilespace.o createtiles_latlon.o define_gds.o domain_module.o domain_pluginMod.o driverpardef_module.o drv_output_mod.o elevadjust.o elevdiff_pluginMod.o endrun.o filename_mod.o funcphys.o gausslat.o gdasdomain_module.o gdasdrv_module.o get_fieldpos.o getcmap.o getgdas.o getgrad.o gfs_sfc_diff.o glbprecip_cmap.o grid_module.o grid_spmdMod.o gswp_module.o interp_agrmet_lw.o interp_agrmet_sw.o interp_cmap.o lai_pluginMod.o landcover_pluginMod.o lis_indices_module.o lis_log_msg.o lis_log_msgC.o lis_memory_managementC.o lis_module.o lis_openfileMod.o lisdrv.o lisdrv_module.o llm.o lsm_module.o lsm_pluginMod.o machine.o makepdsn.o maketiles_gaussian.o maketiles_gds.o maketiles_gds1km.o maketiles_gswp.o maketiles_nongds.o maketiles_nongds_1km.o mapvegc.o mpishorthand.o noah_alb.o noah_almaout.o noah_atmdrv.o noah_binout.o noah_coldstart.o noah_dynsetup.o noah_gather.o noah_gfrac.o noah_gribout.o noah_main.o noah_module.o noah_output.o noah_physics.o noah_scatter.o noah_setup.o noah_singlegather.o noah_singleout.o noah_snowupdate.o noah_soil_typ.o noah_tileout.o noah_totinit.o noah_varder.o noah_writerst.o noah_writestats.o noahdrv_module.o noahpardef_module.o noahrst.o obsprecipforcing_module.o obsradforcing_module.o opendap_module.o physcons.o polfixs.o precipforcing_pluginMod.o precision.o radforcing_pluginMod.o read_avhrrlai.o read_avhrrsai.o read_elevdiff_gtopo30.o read_faoclay.o read_faosand.o read_faosilt.o read_statsgoclay.o read_statsgosand.o read_statsgosilt.o read_umdavhrr_lc.o read_umdavhrr_mask.o readagrmetcrd.o readcard.o readcmapcrd.o readdomain_default.o readgdascrd.o readkpds.o readnoahcrd.o retagrlw.o retgdas.o retglbSW.o setnoahp.o sh2o_init.o soils_pluginMod.o spmdMod.o stats.o string_utils.o tile_module.o tile_spmdMod.o time_interp_agrmet.o time_interp_cmap.o time_interp_gdas.o time_manager.o zterp.o  -L -lesmf_3_1_0rp2 -L/scratch2/portfolios/NCEPDEV/global/save/Shrinivas.Moorthi/para/lib -lbacio_4 -lip_4 -lw3_4 -lsp_4 -lmpi
+baseforcing_module.o: In function `init_baseforcing':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/baseforcing_module.F:98: undefined reference to `defnatres_'
+baseforcing_module.o: In function `get':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/baseforcing_module.F:130: undefined reference to `getf_'
+baseforcing_module.o: In function `time_interp':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/baseforcing_module.F:145: undefined reference to `timeinterp_'
+baseforcing_pluginMod.o: In function `baseforcing_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/baseforcing_pluginMod.F:81: undefined reference to `registerget_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/baseforcing_pluginMod.F:88: undefined reference to `registerdefnat_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/baseforcing_pluginMod.F:95: undefined reference to `registertimeinterp_'
+createtiles_latlon.o: In function `createtiles_latlon':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/createtiles_latlon.F:82: undefined reference to `readlandmask_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/createtiles_latlon.F:88: undefined reference to `readelevdiff_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/createtiles_latlon.F:97: undefined reference to `readlandcover_'
+domain_module.o: In function `domain_init':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/domain_module.F:68: undefined reference to `makedomain_'
+domain_module.o: In function `read_domain':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/domain_module.F:85: undefined reference to `readinput_'
+domain_pluginMod.o: In function `domain_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domain-plugin/domain_pluginMod.F:66: undefined reference to `registerdomain_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domain-plugin/domain_pluginMod.F:67: undefined reference to `registerinput_'
+elevdiff_pluginMod.o: In function `elevdiff_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/elevdiff_pluginMod.F:68: undefined reference to `registerreadelevdiff_'
+endrun.o: In function `endrun':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/endrun.F:43: undefined reference to `flush__'
+lai_pluginMod.o: In function `lai_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/lai_pluginMod.F:66: undefined reference to `registerreadlai_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/lai_pluginMod.F:67: undefined reference to `registerreadsai_'
+landcover_pluginMod.o: In function `landcover_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/landcover_pluginMod.F:69: undefined reference to `registerreadlc_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/landcover_pluginMod.F:70: undefined reference to `registerreadmask_'
+lis_log_msgC.o: In function `lis_log_msgC':
+../core/lis_log_msgC.c:(.text+0x2f): undefined reference to `lis_log_msg'
+lis_log_msgC.o: In function `lis_log_blocked_msgC':
+../core/lis_log_msgC.c:(.text+0x6f): undefined reference to `lis_log_blocked_msg'
+lis_memory_managementC.o: In function `lis_calloc':
+../core/lis_memory_managementC.c:(.text+0x81): undefined reference to `endrun'
+../core/lis_memory_managementC.c:(.text+0x8e): undefined reference to `endrun'
+lis_memory_managementC.o: In function `lis_malloc':
+../core/lis_memory_managementC.c:(.text+0x121): undefined reference to `endrun'
+../core/lis_memory_managementC.c:(.text+0x12e): undefined reference to `endrun'
+lsm_module.o: In function `lis_lsm_init':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:127: undefined reference to `lsmini_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:129: undefined reference to `lsmini_'
+lsm_module.o: In function `lsm_setup':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:162: undefined reference to `lsmsetup_'
+lsm_module.o: In function `run_lsm':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:178: undefined reference to `lsmrun_'
+lsm_module.o: In function `lsm_readrestart':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:195: undefined reference to `lsmrestart_'
+lsm_module.o: In function `write_output':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:210: undefined reference to `lsmoutput_'
+lsm_module.o: In function `setdynparams':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:226: undefined reference to `lsmdynsetup_'
+lsm_module.o: In function `lsm_f2t':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:246: undefined reference to `lsmf2t_'
+lsm_module.o: In function `lsm_writerestart':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/lsm_module.F:262: undefined reference to `lsmwrst_'
+lsm_pluginMod.o: In function `lsm_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:149: undefined reference to `registerlsmini_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:157: undefined reference to `registerlsmsetup_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:165: undefined reference to `registerlsmdynsetup_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:173: undefined reference to `registerlsmrun_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:181: undefined reference to `registerlsmrestart_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:189: undefined reference to `registerlsmoutput_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:197: undefined reference to `registerlsmf2t_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsm-plugin/lsm_pluginMod.F:205: undefined reference to `registerlsmwrst_'
+maketiles_nongds.o: In function `maketiles_nongds':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/maketiles_nongds.F:107: undefined reference to `readlandmask_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/maketiles_nongds.F:112: undefined reference to `readelevdiff_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../domains/maketiles_nongds.F:117: undefined reference to `readlandcover_'
+noah_tileout.o: In function `noah_tileout':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:46: undefined reference to `t2gr_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:54: undefined reference to `t2gr_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:63: undefined reference to `t2gr_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:72: undefined reference to `t2gr_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:81: undefined reference to `t2gr_'
+noah_tileout.o:/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../lsms/noah.20071219/noah_tileout.F:92: more undefined references to `t2gr_' follow
+obsprecipforcing_module.o: In function `precip_forcing_init':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsprecipforcing_module.F:78: undefined reference to `defnatrespcp_'
+obsprecipforcing_module.o: In function `get_obsprecip_forcing':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsprecipforcing_module.F:103: undefined reference to `glbprecip_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsprecipforcing_module.F:112: undefined reference to `timeinterppcp_'
+obsradforcing_module.o: In function `rad_forcing_init':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsradforcing_module.F:92: undefined reference to `defnatresrad_'
+obsradforcing_module.o: In function `get_obsrad_forcing':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsradforcing_module.F:137: undefined reference to `getrad_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../core/obsradforcing_module.F:161: undefined reference to `timeinterprad_'
+precipforcing_pluginMod.o: In function `precipforcing_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/precipforcing_pluginMod.F:78: undefined reference to `registerpget_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/precipforcing_pluginMod.F:82: undefined reference to `registerdefnatpcp_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/precipforcing_pluginMod.F:86: undefined reference to `registerpti_'
+radforcing_pluginMod.o: In function `radforcing_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/radforcing_pluginMod.F:70: undefined reference to `registerrget_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/radforcing_pluginMod.F:71: undefined reference to `registerdefnatrad_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../forcing-plugin/radforcing_pluginMod.F:72: undefined reference to `registerrti_'
+soils_pluginMod.o: In function `soils_plugin':
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:67: undefined reference to `registerreadsand_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:68: undefined reference to `registerreadclay_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:69: undefined reference to `registerreadsilt_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:71: undefined reference to `registerreadsand_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:72: undefined reference to `registerreadclay_'
+/scratch1/portfolios/NCEPDEV/land/save/Jesse.Meng/test/cfs_cdas_gldas_LIS.fd/make/../param-plugin/soils_pluginMod.F:73: undefined reference to `registerreadsilt_'
+make: *** [cfs_cdas_gldas_LIS] Error 1

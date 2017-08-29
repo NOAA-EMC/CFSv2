@@ -1,0 +1,418 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/compute_coord_gauss.F 03/09/11 11:03:47
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/compute_coord_gauss.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: compute_coord_gauss
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  This subroutine computes the grid and earth coordinates of
+         27 |!  the specified domain for an gaussian cylindrical projection.
+         28 |!  This routine is based on the grid
+         29 |!  decoding routines in the ipolates interoplation package.
+         30 |!
+         31 |!  The input options include :
+         32 |!  (iopt= 0) grid and earth coordinates of all grid points
+         33 |!  (iopt=+1) earth coordinates of selected grid coordinates
+         34 |!  (iopt=-1) grid coordinates of selected earth coordinates
+         35 |!  The current code recognizes the following projections:
+         36 |!             (gridDesc(1)=000) equidistant cylindrical
+         37 |!             (gridDesc(1)=001) mercator cylindrical
+         38 |!             (gridDesc(1)=003) lambert conformal conical
+         39 |!             (gridDesc(1)=004) gaussian cylindrical
+         40 |!             (gridDesc(1)=005) polar stereographic azimuthal
+         41 |!             (gridDesc(1)=201) staggered rotated equidistant cylindrical
+         42 |!             (gridDesc(1)=202) rotated equidistant cylindrical
+         43 |
+         44 |! !REVISION HISTORY:
+         45 |!   04-10-96 Mark Iredell;  Initial Specification
+         46 |!   05-27-04 Sujay Kumar; Modified verision with floating point arithmetic.
+         47 |!
+         48 |!   input argument list:
+         49 |!     gridDesc     - real (200) domain description parameters
+         50 |!     iopt     - integer option flag
+         51 |!                ( 0 to compute earth coords of all the grid points)
+         52 |!                (+1 to compute earth coords of selected grid coords)
+         53 |!                (-1 to compute grid coords of selected earth coords)
+         54 |!     npts     - integer maximum number of coordinates
+         55 |!     fill     - real fill value to set invalid output data
+         56 |!                (must be impossible value; suggested value: -9999.)
+         57 |!     xpts     - real (npts) grid x point coordinates if iopt>0
+         58 |!     ypts     - real (npts) grid y point coordinates if iopt>0
+         59 |!     rlon     - real (npts) earth longitudes in degrees e if iopt<0
+         60 |!                (acceptable range: -360. to 360.)
+         61 |!     rlat     - real (npts) earth latitudes in degrees n if iopt<0
+         62 |!                (acceptable range: -90. to 90.)
+         63 |!     lrot     - integer flag to return vector rotations if 1
+         64 |!
+         65 |!   output argument list:
+         66 |!     xpts     - real (npts) grid x point coordinates if iopt<=0
+         67 |!     ypts     - real (npts) grid y point coordinates if iopt<=0
+         68 |!     rlon     - real (npts) earth longitudes in degrees e if iopt>=0
+         69 |!     rlat     - real (npts) earth latitudes in degrees n if iopt>=0
+         70 |!     nret     - integer number of valid points computed
+         71 |!                (-1 if projection unrecognized)
+         72 |! !INTERFACE:
+         73 |subroutine compute_coord_gauss(gridDesc,iopt,npts,fill,xpts,ypts,&
+         74 |     rlon,rlat,nret,lrot)
+         75 |!EOP
+         76 |  implicit none
+         77 |  real, parameter :: pi=3.14159265358979
+         78 |  integer, parameter :: jgmax=2000
+         79 |  real :: dpr
+         80 |  real :: gridDesc(50)
+         81 |  integer :: iopt,npts,nret
+         82 |  real :: xpts(npts),ypts(npts),rlon(npts),rlat(npts), rlata,rlatb
+         83 |  real :: fill,lrot
+         84 |  integer :: im,jm, jg, j, ja, n
+         85 |  real :: rlat1,rlon1, rlat2, rlon2
+         86 |  real :: hi, wb
+         87 |  real :: dlon
+         88 |  real :: xmin,xmax,ymin,ymax
+         89 |  real :: alat(0:jgmax+1),blat(jgmax)
+         90 |  integer :: iscan,jscan,nscan, iret
+         91 |  real :: yptsa, yptsb
+         92 |  integer :: jh, j1, j2
+         93 |!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         94 |  dpr =180./pi
+         95 |  if(gridDesc(1).eq.4.and.gridDesc(10)*2.le.jgmax) then
+         96 |     im=gridDesc(2)
+         97 |     jm=gridDesc(3)
+         98 |     rlat1=gridDesc(4)
+         99 |     rlon1=gridDesc(5)
+        100 |     rlat2=gridDesc(7)
+        101 |     rlon2=gridDesc(8)
+        102 |     jg=gridDesc(10)*2
+        103 |     iscan=mod(nint(gridDesc(11))/128,2)
+        104 |     jscan=mod(nint(gridDesc(11))/64,2)
+        105 |     nscan=mod(nint(gridDesc(11))/32,2)
+        106 |     hi=(-1.)**iscan
+        107 |     jh=(-1)**jscan
+        108 |     dlon=hi*(mod(hi*(rlon2-rlon1)-1+3600,360.)+1)/(im-1)
+        109 |     call gausslat(jg,alat(1),blat)
+        110 |     do ja=1,jg
+        111 |        alat(ja)=dpr*asin(alat(ja))
+        112 |     enddo
+        113 |     alat(0)=180.-alat(1)
+        114 |     alat(jg+1)=-alat(0)
+        115 |     j1=1
+        116 |     do while(j1.lt.jg.and.rlat1.lt.(alat(j1)+alat(j1+1))/2)
+        117 |        j1=j1+1
+        118 |     enddo
+        119 |     j2=j1+jh*(jm-1)
+        120 |     xmin=0
+        121 |     xmax=im+1
+        122 |     if(im.eq.nint(360/abs(dlon))) xmax=im+2
+        123 |     ymin=0.5
+        124 |     ymax=jm+0.5
+        125 |     nret=0
+        126 |! translate grid coordinates to earth coordinates
+        127 |     if(iopt.eq.0.or.iopt.eq.1) then
+        128 |        do n=1,npts
+        129 |           if(xpts(n).ge.xmin.and.xpts(n).le.xmax.and. &
+        130 |                ypts(n).ge.ymin.and.ypts(n).le.ymax) then
+        131 |              rlon(n)=mod(rlon1+dlon*(xpts(n)-1)+3600,360.)
+        132 |              j=min(int(ypts(n)),jm)
+        133 |              rlata=alat(j1+jh*(j-1))
+        134 |              rlatb=alat(j1+jh*j)
+        135 |              wb=ypts(n)-j
+        136 |              rlat(n)=rlata+wb*(rlatb-rlata)
+        137 |              nret=nret+1
+        138 |           else
+        139 |              rlon(n)=fill
+        140 |              rlat(n)=fill
+        141 |           endif
+        142 |        enddo
+        143 |! translate earth coordinates to grid coordinates
+        144 |     elseif(iopt.eq.-1) then
+        145 |        if(abs(dlon-gridDesc(9)).gt.0.01) then
+        146 |           print*, 'problem with the domain calculations : gdswiz04'
+        147 |           stop
+        148 |        endif
+        149 |        do n=1,npts
+        150 |           xpts(n)=fill
+        151 |           ypts(n)=fill
+        152 |           if(abs(rlon(n)).le.360.and.abs(rlat(n)).le.90) then
+        153 |              xpts(n)=1+hi*mod(hi*(rlon(n)-rlon1)+3600,360.)/dlon
+        154 |              ja=min(int((jg+1)/180.*(90-rlat(n))),jg)
+        155 |              if(rlat(n).gt.alat(ja)) ja=max(ja-2,0)
+        156 |              if(rlat(n).lt.alat(ja+1)) ja=min(ja+2,jg)
+        157 |              if(rlat(n).gt.alat(ja)) ja=ja-1
+        158 |              if(rlat(n).lt.alat(ja+1)) ja=ja+1
+        159 |              yptsa=1+jh*(ja-j1)
+        160 |              yptsb=1+jh*(ja+1-j1)
+        161 |              wb=(alat(ja)-rlat(n))/(alat(ja)-alat(ja+1))
+        162 |              ypts(n)=yptsa+wb*(yptsb-yptsa)
+        163 |              if(xpts(n).ge.xmin.and.xpts(n).le.xmax.and. &
+        164 |                   ypts(n).ge.ymin.and.ypts(n).le.ymax) then
+        165 |                 nret=nret+1
+        166 |              else
+        167 |                 xpts(n)=fill
+        168 |                 ypts(n)=fill
+        169 |              endif
+        170 |           endif
+        171 |        enddo
+        172 |     endif
+        173 |! projection unrecognized
+        174 |  else
+        175 |     iret=-1
+        176 |     if(iopt.ge.0) then
+        177 |        do n=1,npts
+        178 |           rlon(n)=fill
+        179 |           rlat(n)=fill
+        180 |        enddo
+        181 |     endif
+        182 |     if(iopt.le.0) then
+        183 |        do n=1,npts
+        184 |           xpts(n)=fill
+        185 |           ypts(n)=fill
+        186 |        enddo
+        187 |     endif
+        188 |  endif
+        189 |end subroutine compute_coord_gauss
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+abs                              Pure Intrinsic
+                                 0-122.24  0-145.12  0-152.15  0-152.39
+ 
+alat                             Automatic, Real(4) (0:2001), Offset: 0, Alignment: full word
+                                 0-89.11$  0-109.23  0-111.9@  0-111.27  0-113.6@  0-113.19  0-114.6@  0-114.18  0-116.38  0-116.47
+                                 0-133.21  0-134.21  0-155.29  0-156.29  0-157.29  0-158.29  0-161.19  0-161.38  0-161.47
+ 
+asin                             Pure Intrinsic
+                                 0-111.22
+ 
+blat                             Automatic, Real(4) (1:2000), Offset: 0, Alignment: full word
+                                 0-89.27$  0-109.31
+ 
+compute_coord_gauss              Subroutine
+                                 0-73.12$
+ 
+dlon                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-87.11$  0-108.6@  0-122.28  0-131.33  0-145.16  0-153.62
+ 
+dpr                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-79.11$  0-94.3@  0-111.18
+ 
+fill                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-83.11$  0-73.51  0-139.23  0-140.23  0-150.20  0-151.20  0-167.26  0-168.26  0-178.20  0-179.20
+                                 0-184.20  0-185.20
+ 
+gausslat                         External Subroutine
+                                 0-109.11
+ 
+griddesc                         Reference argument, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-80.11$  0-73.32  0-95.6  0-95.27  0-96.9  0-97.9  0-98.12  0-99.12  0-100.12  0-101.12  0-102.9
+                                 0-103.21  0-104.21  0-105.21  0-145.21
+ 
+hi                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-86.11$  0-106.6@  0-108.11  0-108.19  0-153.25  0-153.32
+ 
+im                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.14$  0-96.6@  0-108.53  0-121.11  0-122.9  0-122.41
+ 
+int                              Pure Intrinsic
+                                 0-132.21  0-154.22
+ 
+iopt                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-81.14$  0-73.41  0-127.9  0-127.22  0-144.13  0-176.9  0-182.9
+ 
+iret                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-90.33$  0-175.6@
+ 
+iscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-90.14$  0-103.6@  0-106.16
+ 
+j                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.25$  0-132.15@  0-133.33  0-134.32  0-135.26
+ 
+j1                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-92.18$  0-115.6@  0-116.15  0-116.43  0-116.52  0-117.9@  0-117.12  0-119.9  0-133.26  0-134.26
+                                 0-159.30  0-160.32
+ 
+j2                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-92.22$  0-119.6@
+ 
+ja                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.28$  0-110.9@  0-111.14  0-111.32  0-154.15@  0-155.34  0-155.39@  0-155.46  0-156.34
+                                 0-156.41@  0-156.48  0-157.34  0-157.39@  0-157.42  0-158.34  0-158.41@  0-158.44  0-159.27
+                                 0-160.27  0-161.24  0-161.43  0-161.52
+ 
+jg                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.21$  0-102.6@  0-109.20  0-110.14  0-114.11  0-116.21  0-154.27  0-154.52  0-156.53
+ 
+jgmax                            Parameter, Integer(4)
+                                 0-78.25$  0-89.18  0-89.32  0-95.45
+ 
+jh                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-92.14$  0-107.6@  0-119.12  0-133.29  0-134.29  0-159.23  0-160.23
+ 
+jm                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.17$  0-97.6@  0-119.16  0-124.11  0-132.34
+ 
+jscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-90.20$  0-104.6@  0-107.15
+ 
+lrot                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-83.16$  0-74.21
+ 
+max                              Pure Intrinsic
+                                 0-155.42
+ 
+min                              Pure Intrinsic
+                                 0-132.17  0-154.18  0-156.44
+ 
+mod                              Pure Intrinsic
+                                 0-103.12  0-104.12  0-105.12  0-108.15  0-131.23  0-153.28
+ 
+n                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-84.32$  0-128.12@  0-129.20  0-129.40  0-130.22  0-130.42  0-131.20  0-131.44  0-132.30  0-135.23
+                                 0-136.20  0-139.20  0-140.20  0-149.12@  0-150.17  0-151.17  0-152.24  0-152.48  0-153.20  0-153.41
+                                 0-154.47  0-155.23  0-156.23  0-157.23  0-158.23  0-161.33  0-162.20  0-163.23  0-163.43  0-164.25
+                                 0-164.45  0-167.23  0-168.23  0-177.12@  0-178.17  0-179.17  0-183.12@  0-184.17  0-185.17
+ 
+nint                             Pure Intrinsic
+                                 0-103.16  0-104.16  0-105.16  0-122.15
+ 
+npts                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-81.19$  0-73.46  0-82.16  0-82.16  0-82.27  0-82.27  0-82.38  0-82.38  0-82.49  0-82.49  0-128.16
+                                 0-149.16  0-177.16  0-183.16
+ 
+nret                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-81.24$  0-74.16  0-125.6@  0-137.15@  0-137.20  0-165.18@  0-165.23
+ 
+nscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-90.26$  0-105.6@
+ 
+pi                               Parameter, Real(4)
+                                 0-77.22$  0-94.13
+ 
+rlat                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.44$  0-74.11  0-136.15@  0-140.15@  0-152.43  0-154.42  0-155.18  0-156.18  0-157.18  0-158.18
+                                 0-161.28  0-179.12@
+ 
+rlat1                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-85.11$  0-98.6@  0-116.28
+ 
+rlat2                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-85.24$  0-100.6@
+ 
+rlata                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-82.56$  0-133.15@  0-136.23  0-136.39
+ 
+rlatb                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-82.62$  0-134.15@  0-136.33
+ 
+rlon                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.33$  0-74.6  0-131.15@  0-139.15@  0-152.19  0-153.36  0-178.12@
+ 
+rlon1                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-85.17$  0-99.6@  0-108.29  0-131.27  0-153.44
+ 
+rlon2                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-85.31$  0-101.6@  0-108.23
+ 
+wb                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-86.15$  0-135.15@  0-136.29  0-161.15@  0-162.29
+ 
+xmax                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-88.16$  0-121.6@  0-122.36@  0-129.46  0-163.49
+ 
+xmin                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-88.11$  0-120.6@  0-129.26  0-163.29
+ 
+xpts                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.11$  0-73.56  0-129.15  0-129.35  0-131.39  0-150.12@  0-153.15@  0-163.18  0-163.38
+                                 0-167.18@  0-184.12@
+ 
+ymax                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-88.26$  0-124.6@  0-130.48  0-164.51
+ 
+ymin                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-88.21$  0-123.6@  0-130.28  0-164.31
+ 
+ypts                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.22$  0-73.61  0-130.17  0-130.37  0-132.25  0-135.18  0-151.12@  0-162.15@  0-164.20  0-164.40
+                                 0-168.18@  0-185.12@
+ 
+yptsa                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-91.11$  0-159.15@  0-162.23  0-162.39
+ 
+yptsb                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-91.18$  0-160.15@  0-162.33
+ 
+** compute_coord_gauss   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/compute_coord_gauss.F
+                                      03/09/11   11:03:47
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     190
+1501-510  Compilation successful for file compute_coord_gauss.F.
+1501-543  Object file created.

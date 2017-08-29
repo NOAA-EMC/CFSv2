@@ -1,0 +1,17 @@
+# Template for Intel compilers on GAEA
+#
+FC = ifort -lmpi -g -traceback
+LD = ifort -lmpi -mkl
+CC = cc
+FFLAGS = -r8 -fpconstant -i4 -FR -auto -save-temps -Wp,-P -align dcommon -O0 -assume byterecl $(INCL)
+CFLAGS =
+LDFLAGS = -r8 -fpconstant -i4 -auto -align dcommon -O0 -assume byterecl $(LIBS)
+
+LIBS = -L/apps/netcdf/3.6.3/lib -lnetcdf -L/apps/udunits/1.12.11/lib -ludunits
+INCL = -I/apps/netcdf/3.6.3/include -I/apps/udunits/1.12.11/include
+
+#LIBS = -L/apps/netcdf4/4.1.3/lib -lnetcdf \
+#       -L/apps/udunits/1.12.11/lib -ludunits
+#INCL = -I/apps/netcdf4/4.1.3/include \
+#       -I/apps/udunits/1.12.11/include
+

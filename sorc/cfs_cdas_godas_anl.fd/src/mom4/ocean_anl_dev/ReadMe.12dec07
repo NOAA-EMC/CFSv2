@@ -1,0 +1,18 @@
+The files here (*.F90) replace the corresponding files in your directory
+/global/save/wx23sm/para_exp/cfs_para/sorc/godas.fd/MOM4/src/mom4/ocean_anl_dev
+
+The files 
+
+godas.F90
+ocean_tracer.F90
+fms_gdsSOLO.x
+
+have been replaced.
+
+This will make sure that an adjustment for partial bottom cells is NOT done.
+This adjustment had introduced a cumulative error in the bottom cell.
+
+The field_table file should be used for both MOM4 and for GODAS
+The namelist.M should be used for MOM4
+The namelist.G should be used for GODAS
+

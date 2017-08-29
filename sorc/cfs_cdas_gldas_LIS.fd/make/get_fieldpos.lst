@@ -1,0 +1,240 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/get_fieldpos.F 03/09/11 11:03:56
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/get_fieldpos.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: get_field_pos.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  This subprogram returns the field position for a given grid point
+         27 |!  based on the input grid definition.
+         28 |!
+         29 |! !REVISION HISTORY:
+         30 |!   04-10-96  Mark Iredell; Initial Specification
+         31 |!   03-11-96  Mark Iredell; Allowed hemispheric grids to wrap over one pole
+         32 |!   05-27-04  Sujay Kumar; Modified code with floating point arithmetic
+         33 |!
+         34 |!   INPUT ARGUMENT LIST:
+         35 |!     i        - integer x grid point
+         36 |!     j        - integer y grid point
+         37 |!     gridDesc     - real (200)  domain description parameters
+         38 |!
+         39 |!   OUTPUT ARGUMENT LIST:
+         40 |!     gridDesc   - integer position in grib field to locate grid point
+         41 |!                (0 if out of bounds)
+         42 |!
+         43 |! !INTERFACE:
+         44 |function get_fieldpos(i,j,gridDesc) result(field_pos)
+         45 |!EOP
+         46 |  integer :: field_pos
+         47 |  real ::  gridDesc(50)
+         48 |!  GET GRID DIMENSIONS
+         49 |  im=gridDesc(2)
+         50 |  jm=gridDesc(3)
+         51 |  kscan=0
+         52 |  is1=0
+         53 |  nscan=mod(nint(gridDesc(11))/32,2)
+         54 |! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         55 |!  ACCOUNT FOR WRAPAROUNDS IN EITHER DIRECTION
+         56 |  ii=i
+         57 |  jj=j
+         58 |  if(gridDesc(1).eq.0.or.gridDesc(1).eq.1.or.gridDesc(1).eq.4) then
+         59 |     rlon1=gridDesc(5)
+         60 |     rlon2=gridDesc(8)
+         61 |     iscan=mod(nint(gridDesc(11))/128,2)
+         62 |     dlon = gridDesc(9)
+         63 |     ig=nint(360/abs(dlon))
+         64 |     if(im.ge.ig) then
+         65 |        ii=mod(i-1+ig,ig)+1
+         66 |        if((j.le.0.or.j.ge.jm+1).and.mod(ig,2).eq.0) then
+         67 |           if(gridDesc(1).eq.0) then
+         68 |              rlat1=gridDesc(4)
+         69 |              rlat2=gridDesc(7)
+         70 |              dlat=abs(rlat2-rlat1)/(jm-1)
+         71 |              if(j.le.0.and.abs(rlat1).gt.90-0.25*dlat) then
+         72 |                 jj=2-j
+         73 |                 ii=mod(ii-1+ig/2,ig)+1
+         74 |              elseif(j.le.0.and.abs(rlat1).gt.90-0.75*dlat) then
+         75 |                 jj=1-j
+         76 |                 ii=mod(ii-1+ig/2,ig)+1
+         77 |              elseif(j.ge.jm+1.and.abs(rlat2).gt.90-0.25*dlat) then
+         78 |                 jj=2*jm-j
+         79 |                 ii=mod(ii-1+ig/2,ig)+1
+         80 |              elseif(j.ge.jm+1.and.abs(rlat2).gt.90-0.75*dlat) then
+         81 |                 jj=2*jm+1-j
+         82 |                 ii=mod(ii-1+ig/2,ig)+1
+         83 |              endif
+         84 |           elseif(gridDesc(1).eq.4) then
+         85 |              jg=gridDesc(10)*2
+         86 |              if(j.le.0.and.jm.eq.jg) then
+         87 |                 jj=1-j
+         88 |                 ii=mod(ii-1+ig/2,ig)+1
+         89 |              elseif(j.ge.jm+1.and.jm.eq.jg) then
+         90 |                 jj=2*jm+1-j
+         91 |                 ii=mod(ii-1+ig/2,ig)+1
+         92 |              endif
+         93 |           endif
+         94 |        endif
+         95 |     endif
+         96 |  endif
+         97 |  if(ii.ge.1.and.ii.le.im.and.jj.ge.1.and.jj.le.jm) then
+         98 |     if(nscan.eq.0) then
+         99 |        field_pos=ii+(jj-1)*im
+        100 |     else
+        101 |        field_pos=jj+(ii-1)*jm
+        102 |     endif
+        103 |  else
+        104 |     field_pos=0
+        105 |  endif
+        106 |end function get_fieldpos
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+abs                              Pure Intrinsic
+                                 0-63.18  0-70.20  0-71.29  0-74.33  0-77.36  0-80.36
+ 
+dlat                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-70.15@  0-71.51  0-74.55  0-77.58  0-80.58
+ 
+dlon                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-62.6@  0-63.22
+ 
+field_pos                        Integer(4)
+                                 0-46.14$  0-44.44  0-99.9@  0-101.9@  0-104.6@
+ 
+griddesc                         Reference argument, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-47.12$  0-44.27  0-49.6  0-50.6  0-53.18  0-58.6  0-58.26  0-58.46  0-59.12  0-60.12  0-61.21
+                                 0-62.13  0-67.15  0-68.21  0-69.21  0-84.19  0-85.18
+ 
+i                                Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-44.23  0-56.6  0-65.16
+ 
+ig                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-63.6@  0-64.15  0-65.20  0-65.23  0-66.42  0-73.30  0-73.35  0-76.30  0-76.35  0-79.30  0-79.35
+                                 0-82.30  0-82.35  0-88.30  0-88.35  0-91.30  0-91.35
+ 
+ii                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-56.3@  0-65.9@  0-73.18@  0-73.25  0-76.18@  0-76.25  0-79.18@  0-79.25  0-82.18@  0-82.25
+                                 0-88.18@  0-88.25  0-91.18@  0-91.25  0-97.6  0-97.18  0-99.19  0-101.23
+ 
+im                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-49.3@  0-64.9  0-97.24  0-99.29
+ 
+is1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-52.3@
+ 
+iscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-61.6@
+ 
+j                                Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-44.25  0-57.6  0-66.13  0-66.23  0-71.18  0-72.23  0-74.22  0-75.23  0-77.22  0-78.26  0-80.22
+                                 0-81.28  0-86.18  0-87.23  0-89.22  0-90.28
+ 
+jg                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-85.15@  0-86.35  0-89.42
+ 
+jj                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-57.3@  0-72.18@  0-75.18@  0-78.18@  0-81.18@  0-87.18@  0-90.18@  0-97.31  0-97.43  0-99.23
+                                 0-101.19
+ 
+jm                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-50.3@  0-66.28  0-70.38  0-77.27  0-78.23  0-80.27  0-81.23  0-86.29  0-89.27  0-89.36  0-90.23
+                                 0-97.49  0-101.29
+ 
+kscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-51.3@
+ 
+mod                              Pure Intrinsic
+                                 0-53.9  0-61.12  0-65.12  0-66.38  0-73.21  0-76.21  0-79.21  0-82.21  0-88.21  0-91.21
+ 
+nint                             Pure Intrinsic
+                                 0-53.13  0-61.16  0-63.9
+ 
+nscan                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-53.3@  0-98.9
+ 
+rlat1                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-68.15@  0-70.30  0-71.33  0-74.37
+ 
+rlat2                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-69.15@  0-70.24  0-77.40  0-80.40
+ 
+rlon1                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-59.6@
+ 
+rlon2                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-60.6@
+ 
+** get_fieldpos   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/get_fieldpos.F    03/09/11   11:03:56
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     107
+1501-510  Compilation successful for file get_fieldpos.F.
+1501-543  Object file created.

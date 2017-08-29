@@ -1,0 +1,1013 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../lsms/noah.20071219/gfs_sfc_diff.F 03/09/11 11:04:02
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../lsms/noah.20071219/gfs_sfc_diff.F"
+          1 |      SUBROUTINE GFSDIF(SFCPRS,SFCSPD,SFCTMP,SFCQ,SKINT,Z0,CM2,CH2)
+          2 |
+          3 |! I/O ARGUMENTS
+          4 |!     SFCPRS = PRESSURE AT LOWEST MODEL LAYER (SIGMA 0.9973)
+          5 |      REAL SFCPRS,SFCSPD,SFCTMP,SFCQ,SKINT,Z0,CM2,CH2
+          6 |
+          7 |! GFS_SFC_DIFF CALL VARIABLES
+          8 |      INTEGER IM
+          9 |      REAL PS,U1,V1,T1,Q1,&
+         10 |           TSKIN,Z0RL,CM,CH,RB,&
+         11 |           RCL,PRSL1,PRSLKI,SLIMSK,&
+         12 |           STRESS,FM,FH,&
+         13 |           USTAR,WIND,DDVEL,FM10,FH2,&
+         14 |           tsurf
+         15 |      LOGICAL flag_iter
+         16 |
+         17 |      IM = 1
+         18 |      PS = SFCPRS / 1000. / 0.9973 !SFCPRS PASSED IN AS PASCAL, BUT GFS_SFC_DIFF MAKES DOUBLE ADJUSTMENT
+         19 |      U1 = SFCSPD
+         20 |      V1 = 0.
+         21 |      T1 = SFCTMP
+         22 |      Q1 = SFCQ
+         23 |      TSKIN = SKINT
+         24 |      Z0RL = Z0 * 100.             !Z0 IN [M], Z0RL IN [CM]
+         25 |      CM = 0.0001
+         26 |      CH = 0.0001
+         27 |      RB = 0.
+         28 |      RCL = 1.
+         29 |      PRSL1  = SFCPRS / 1000.      !SFCPRS PASSED IN AS PASCAL, BUT GFS_SFC_DIFF MAKES DOUBLE ADJUSTMENT
+         30 |      PRSLKI = 1. / 0.9973
+         31 |      SLIMSK = 1.
+         32 |      STRESS = 0.
+         33 |      FM = 0.
+         34 |      FH = 0.
+         35 |      USTAR = 0.
+         36 |      WIND  = 0.
+         37 |      DDVEL = 0.
+         38 |      FM10  = 0.
+         39 |      FH2   = 0.
+         40 |      TSURF = SKINT
+         41 |      FLAG_ITER = .TRUE.
+         42 |
+         43 |      CALL GFS_SFC_DIFF(IM,PS,U1,V1,T1,Q1,&
+         44 |                        TSKIN,Z0RL,CM,CH,RB,&
+         45 |                        RCL,PRSL1,PRSLKI,SLIMSK,&
+         46 |                        STRESS,FM,FH,&
+         47 |                        USTAR,WIND,DDVEL,FM10,FH2,&
+         48 |                        TSURF,FLAG_ITER)
+         49 |      CM2 = CM * SFCSPD
+         50 |      CH2 = CH * SFCSPD
+         51 |
+         52 |      RETURN
+         53 |      END
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+ch                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-10.26$  0-26.7@  0-44.39  0-50.13
+ 
+ch2                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.51$  0-1.64  0-50.7@
+ 
+cm                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-10.23$  0-25.7@  0-44.36  0-49.13
+ 
+cm2                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.47$  0-1.60  0-49.7@
+ 
+ddvel                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-13.23$  0-37.7@  0-47.36
+ 
+fh                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-12.22$  0-34.7@  0-46.35
+ 
+fh2                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-13.34$  0-39.7@  0-47.47
+ 
+flag_iter                        Automatic, Logical(4), Offset: 0, Alignment: full word
+                                 0-15.15$  0-41.7@  0-48.31
+ 
+fm                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-12.19$  0-33.7@  0-46.32
+ 
+fm10                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-13.29$  0-38.7@  0-47.42
+ 
+gfs_sfc_diff                     External Subroutine
+                                 0-43.12
+ 
+gfsdif                           Subroutine
+                                 0-1.18$
+ 
+im                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-8.15$  0-17.7@  0-43.25
+ 
+prsl1                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-11.16$  0-29.7@  0-45.29
+ 
+prslki                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-11.22$  0-30.7@  0-45.35
+ 
+ps                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-9.12$  0-18.7@  0-43.28
+ 
+q1                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-9.24$  0-22.7@  0-43.40
+ 
+rb                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-10.29$  0-27.7@  0-44.42
+ 
+rcl                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-11.12$  0-28.7@  0-45.25
+ 
+sfcprs                           Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.12$  0-1.25  0-18.12  0-29.16
+ 
+sfcq                             Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.33$  0-1.46  0-22.12
+ 
+sfcspd                           Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.19$  0-1.32  0-19.12  0-49.18  0-50.18
+ 
+sfctmp                           Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.26$  0-1.39  0-21.12
+ 
+skint                            Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.38$  0-1.51  0-23.15  0-40.15
+ 
+slimsk                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-11.29$  0-31.7@  0-45.42
+ 
+stress                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-12.12$  0-32.7@  0-46.25
+ 
+t1                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-9.21$  0-21.7@  0-43.37
+ 
+tskin                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-10.12$  0-23.7@  0-44.25
+ 
+tsurf                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-14.12$  0-40.7@  0-48.25
+ 
+u1                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-9.15$  0-19.7@  0-43.31
+ 
+ustar                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-13.12$  0-35.7@  0-47.25
+ 
+v1                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-9.18$  0-20.7@  0-43.34
+ 
+wind                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-13.18$  0-36.7@  0-47.31
+ 
+z0                               Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-5.44$  0-1.57  0-24.14
+ 
+z0rl                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-10.18$  0-24.7@  0-44.31
+ 
+** gfsdif   === End of Compilation 1 ===
+ 
+>>>>> COMPILATION UNIT EPILOGUE SECTION <<<<<
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+         54 |#line 56
+         56 |      SUBROUTINE GFS_SFC_DIFF(IM,PS,U1,V1,T1,Q1,&
+         57 |                         TSKIN,Z0RL,CM,CH,RB,&
+         58 |                         RCL,PRSL1,PRSLKI,SLIMSK,&
+         59 |                         STRESS,FM,FH,&
+         60 |!Clu_q2m_iter [-1L/+2L]: add tsurf, flag_iter
+         61 |!*                       USTAR,WIND,DDVEL,FM10,FH2)
+         62 |                         USTAR,WIND,DDVEL,FM10,FH2,&
+         63 |                         tsurf,flag_iter)
+         64 |!
+         65 |      USE MACHINE , ONLY : kind_phys
+         66 |      USE FUNCPHYS, ONLY : fpvs
+         67 |      USE PHYSCONS, grav => con_g, SBC => con_sbc,&
+         68 |                    CP => con_CP, HFUS => con_HFUS,&
+         69 |                    RVRDM1 => con_FVirt, RD => con_RD,&
+         70 |                    EPS => con_eps, EPSM1 => con_epsm1
+         71 |#line 73
+         73 |      implicit none
+         74 |!
+         75 |!     include 'constant.h'
+         76 |!
+         77 |      integer              IM, km, ipr
+         78 |!
+         79 |!J   real(kind=kind_phys) PS(IM),       U1(IM),      V1(IM),&
+         80 |     real                 PS(IM),       U1(IM),      V1(IM),&
+         81 |                          T1(IM),       Q1(IM),&
+         82 |                          TSKIN(IM),    Z0RL(IM),&
+         83 |                          CM(IM),       CH(IM),      RB(IM),&
+         84 |                          RCL(IM),      PRSL1(IM),   PRSLKI(IM),&
+         85 |                          SLIMSK(IM),   STRESS(IM),&
+         86 |                          FM(IM),       FH(IM),      USTAR(IM),&
+         87 |                          WIND(IM),     DDVEL(IM),&
+         88 |                          FM10(IM),     FH2(IM)
+         89 |
+         90 |!Clu_q2m_iter [+1L]: add flag_iter
+         91 |      logical              flag_iter(im)
+         92 |
+         93 |!
+         94 |!     Locals
+         95 |!
+         96 |      integer              k,i
+         97 |!
+         98 |!J   real(kind=kind_phys) DTV(IM),     HL1(IM),     HL12(IM),&
+         99 |     real                 DTV(IM),     HL1(IM),     HL12(IM),&
+        100 |                          HLINF(IM),   PH(IM),&
+        101 |                          PH2(IM),     PM(IM),      PM10(IM),&
+        102 |                          PSURF(IM),   Q0(IM),      RAT(IM),&
+        103 |                          THETA1(IM),  THV1(IM),&
+        104 |                          TSURF(IM),   TV1(IM),&
+        105 |                          TVS(IM),     XRCL(IM),&
+        106 |                          Z0(IM),      Z0MAX(IM),   Z1(IM),&
+        107 |                          ZTMAX(IM),   PS1(IM),     QS1(IM)
+        108 |
+        109 |!
+        110 |!J   real(kind=kind_phys) a0,    a0p,    a1,    a1p,   aa,   aa0,&
+        111 |     real                 a0,    a0p,    a1,    a1p,   aa,   aa0,&
+        112 |                          aa1,   adtv,   alpha, arnu,  b1,   b1p,&
+        113 |                          b2,    b2p,    bb,    bb0,   bb1,  bb2,&
+        114 |                          ca,    cc,     cc1,   cc2,   charnock, &
+        115 |                          cq,    fms,    fhs,   g,     hl0,  hl0inf,&
+        116 |                          hl110, hlt,    hltinf,OLINF,&
+        117 |                          restar, rnu,   vis
+        118 |!
+        119 |     real(kind=kind_phys) phystmp !J
+        120 |
+        121 |!cc
+        122 |      PARAMETER (CHARNOCK=.014,CA=.4)!C CA IS THE VON KARMAN CONSTANT
+        123 |      PARAMETER (G=grav)
+        124 |      PARAMETER (ALPHA=5.,A0=-3.975,A1=12.32,B1=-7.755,B2=6.041)
+        125 |      PARAMETER (A0P=-7.941,A1P=24.75,B1P=-8.705,B2P=7.899,VIS=1.4E-5)
+        126 |      PARAMETER (AA1=-1.076,BB1=.7045,CC1=-.05808)
+        127 |      PARAMETER (BB2=-.1954,CC2=.009999)
+        128 |      PARAMETER (RNU=1.51E-5,ARNU=.135*RNU)
+        129 |!C
+        130 |!C  INITIALIZE VARIABLES. ALL UNITS ARE SUPPOSEDLY M.K.S. UNLESS SPECIFIED
+        131 |!C  PSURF IS IN PASCALS
+        132 |!C  WIND IS WIND SPEED, THETA1 IS ADIABATIC SURFACE TEMP FROM LEVEL 1
+        133 |!C  SURFACE ROUGHNESS LENGTH IS CONVERTED TO M FROM CM
+        134 |!C
+        135 |      DO I=1,IM
+        136 |        if(flag_iter(i)) then
+        137 |        XRCL(I)  = SQRT(RCL(I))
+        138 |        PSURF(I) = 1000. * PS(I)
+        139 |!**     TSURF(I) = TSKIN(I)                 !! <---- Clu_q2m_iter [-1L]
+        140 |        PS1(I)   = 1000. * PRSL1(I)
+        141 |        WIND(I) = XRCL(I) * SQRT(U1(I) * U1(I) + V1(I) * V1(I)) &
+        142 |                   + MAX(0.0, MIN(DDVEL(I), 30.0))
+        143 |        WIND(I) = MAX(WIND(I),1.)
+        144 |        Q0(I) = MAX(Q1(I),1.E-8)
+        145 |        THETA1(I) = T1(I) * PRSLKI(I)
+        146 |        TV1(I) = T1(I) * (1. + RVRDM1 * Q0(I))
+        147 |        THV1(I) = THETA1(I) * (1. + RVRDM1 * Q0(I))
+        148 |!Clu_q2m_iter[-1L/+2L]: TVS is computed from avg(tsurf,tskin)
+        149 |!**     TVS(I) = TSURF(I) * (1. + RVRDM1 * Q0(I))
+        150 |        TVS(I) = 0.5 * (TSURF(I)+TSKIN(I)) * &
+        151 |                (1. + RVRDM1 * Q0(I))
+        152 |!J        qs1(i) = fpvs(t1(i))
+        153 |        phystmp = t1(i)
+        154 |        qs1(i) = fpvs(phystmp)
+        155 |        QS1(I) = EPS * QS1(I) / (PS1(I) + EPSM1 * QS1(I))
+        156 |        QS1(I) = MAX(QS1(I), 1.E-8)
+        157 |        Q0(I) = min(QS1(I),Q0(I))
+        158 |
+        159 |        Z0(I) = .01 * Z0RL(i)
+        160 |        Z1(I) = -RD * TV1(I) * LOG(PS1(I)/PSURF(I)) / G
+        161 |        endif
+        162 |      ENDDO
+        163 |!!
+        164 |!C
+        165 |!C  COMPUTE STABILITY DEPENDENT EXCHANGE COEFFICIENTS
+        166 |!C
+        167 |!C  THIS PORTION OF THE CODE IS PRESENTLY SUPPRESSED
+        168 |!C
+        169 |      DO I=1,IM
+        170 |       if(flag_iter(i)) then
+        171 |        IF(SLIMSK(I).EQ.0.) THEN
+        172 |          USTAR(I) = SQRT(G * Z0(I) / CHARNOCK)
+        173 |        ENDIF
+        174 |!C
+        175 |!C  COMPUTE STABILITY INDICES (RB AND HLINF)
+        176 |!C
+        177 |        Z0MAX(I) = MIN(Z0(I),1. * Z1(I))
+        178 |        ZTMAX(I) = Z0MAX(I)
+        179 |        IF(SLIMSK(I).EQ.0.) THEN
+        180 |          RESTAR = USTAR(I) * Z0MAX(I) / VIS
+        181 |          RESTAR = MAX(RESTAR,.000001)
+        182 |!c         RESTAR = ALOG(RESTAR)
+        183 |!c         RESTAR = MIN(RESTAR,5.)
+        184 |!c         RESTAR = MAX(RESTAR,-5.)
+        185 |!c         RAT(I) = AA1 + BB1 * RESTAR + CC1 * RESTAR ** 2
+        186 |!c         RAT(I) = RAT(I) / (1. + BB2 * RESTAR
+        187 |!c    &                       + CC2 * RESTAR ** 2)
+        188 |!c  Rat taken from Zeng, Zhao and Dickinson 1997
+        189 |          RAT(I) = 2.67 * restar ** .25 - 2.57
+        190 |          RAT(I) = min(RAT(I),7.)
+        191 |          ZTMAX(I) = Z0MAX(I) * EXP(-RAT(I))
+        192 |        ENDIF
+        193 |       endif
+        194 |      ENDDO
+        195 |!C##DG  IF(LAT.EQ.LATD) THEN
+        196 |!C##DG    PRINT *, ' z0max, ztmax, restar, RAT(I) =',
+        197 |!C##DG &   z0max, ztmax, restar, RAT(I)
+        198 |!C##DG  ENDIF
+        199 |      DO I = 1, IM
+        200 |       if(flag_iter(i)) then
+        201 |        DTV(I) = THV1(I) - TVS(I)
+        202 |        ADTV = ABS(DTV(I))
+        203 |        ADTV = MAX(ADTV,.001)
+        204 |        DTV(I) = SIGN(1.,DTV(I)) * ADTV
+        205 |        RB(I) = G * DTV(I) * Z1(I) / (.5 * (THV1(I) + TVS(I)) &
+        206 |               * WIND(I) * WIND(I))
+        207 |        RB(I) = MAX(RB(I),-5000.)
+        208 |        FM(I) = LOG((Z0MAX(I)+Z1(I)) / Z0MAX(I))
+        209 |        FH(I) = LOG((ZTMAX(I)+Z1(I)) / ZTMAX(I))
+        210 |        HLINF(I) = RB(I) * FM(I) * FM(I) / FH(I)
+        211 |        FM10(I) = LOG((Z0MAX(I)+10.) / Z0MAX(I))
+        212 |        FH2(I) = LOG((ZTMAX(I)+2.) / ZTMAX(I))
+        213 |       endif
+        214 |      ENDDO
+        215 |!C##DG  IF(LAT.EQ.LATD) THEN
+        216 |!C##DG    PRINT *, ' DTV, RB(I), FM(I), FH(I), HLINF =',
+        217 |!C##DG &   dtv, rb, FM(I), FH(I), hlinf
+        218 |!C##DG  ENDIF
+        219 |!C
+        220 |!C  STABLE CASE
+        221 |!C
+        222 |      DO I = 1, IM
+        223 |       if(flag_iter(i)) then
+        224 |        IF(DTV(I).GE.0.) THEN
+        225 |          HL1(I) = HLINF(I)
+        226 |        ENDIF
+        227 |        IF(DTV(I).GE.0..AND.HLINF(I).GT..25) THEN
+        228 |          HL0INF = Z0MAX(I) * HLINF(I) / Z1(I)
+        229 |          HLTINF = ZTMAX(I) * HLINF(I) / Z1(I)
+        230 |          AA = SQRT(1. + 4. * ALPHA * HLINF(I))
+        231 |          AA0 = SQRT(1. + 4. * ALPHA * HL0INF)
+        232 |          BB = AA
+        233 |          BB0 = SQRT(1. + 4. * ALPHA * HLTINF)
+        234 |          PM(I) = AA0 - AA + LOG((AA + 1.) / (AA0 + 1.))
+        235 |          PH(I) = BB0 - BB + LOG((BB + 1.) / (BB0 + 1.))
+        236 |          FMS = FM(I) - PM(I)
+        237 |          FHS = FH(I) - PH(I)
+        238 |          HL1(I) = FMS * FMS * RB(I) / FHS
+        239 |        ENDIF
+        240 |       endif
+        241 |      ENDDO
+        242 |!C
+        243 |!C  SECOND ITERATION
+        244 |!C
+        245 |      DO I = 1, IM
+        246 |       if(flag_iter(i)) then
+        247 |        IF(DTV(I).GE.0.) THEN
+        248 |          HL0 = Z0MAX(I) * HL1(I) / Z1(I)
+        249 |          HLT = ZTMAX(I) * HL1(I) / Z1(I)
+        250 |          AA = SQRT(1. + 4. * ALPHA * HL1(I))
+        251 |          AA0 = SQRT(1. + 4. * ALPHA * HL0)
+        252 |          BB = AA
+        253 |          BB0 = SQRT(1. + 4. * ALPHA * HLT)
+        254 |          PM(I) = AA0 - AA + LOG((AA + 1.) / (AA0 + 1.))
+        255 |          PH(I) = BB0 - BB + LOG((BB + 1.) / (BB0 + 1.))
+        256 |          HL110 = HL1(I) * 10. / Z1(I)
+        257 |          AA = SQRT(1. + 4. * ALPHA * HL110)
+        258 |          PM10(I) = AA0 - AA + LOG((AA + 1.) / (AA0 + 1.))
+        259 |          HL12(I) = HL1(I) * 2. / Z1(I)
+        260 |!C         AA = SQRT(1. + 4. * ALPHA * HL12(I))
+        261 |          BB = SQRT(1. + 4. * ALPHA * HL12(I))
+        262 |          PH2(I) = BB0 - BB + LOG((BB + 1.) / (BB0 + 1.))
+        263 |        ENDIF
+        264 |       endif
+        265 |      ENDDO
+        266 |!!
+        267 |!C##DG  IF(LAT.EQ.LATD) THEN
+        268 |!C##DG    PRINT *, ' HL1(I), PM, PH =',
+        269 |!C##DG &   HL1(I),  pm, ph
+        270 |!C##DG  ENDIF
+        271 |!C
+        272 |!C  UNSTABLE CASE
+        273 |!C
+        274 |!C
+        275 |!C  CHECK FOR UNPHYSICAL OBUKHOV LENGTH
+        276 |!C
+        277 |      DO I=1,IM
+        278 |       if(flag_iter(i)) then
+        279 |        IF(DTV(I).LT.0.) THEN
+        280 |          OLINF = Z1(I) / HLINF(I)
+        281 |          IF(ABS(OLINF).LE.50. * Z0MAX(I)) THEN
+        282 |            HLINF(I) = -Z1(I) / (50. * Z0MAX(I))
+        283 |          ENDIF
+        284 |        ENDIF
+        285 |       endif
+        286 |      ENDDO
+        287 |!C
+        288 |!C  GET PM AND PH
+        289 |!C
+        290 |      DO I = 1, IM
+        291 |       if(flag_iter(i)) then
+        292 |        IF(DTV(I).LT.0..AND.HLINF(I).GE.-.5) THEN
+        293 |          HL1(I) = HLINF(I)
+        294 |          PM(I) = (A0 + A1 * HL1(I)) * HL1(I) &
+        295 |                 / (1. + B1 * HL1(I) + B2 * HL1(I) * HL1(I))
+        296 |          PH(I) = (A0P + A1P * HL1(I)) * HL1(I) &
+        297 |                 / (1. + B1P * HL1(I) + B2P * HL1(I) * HL1(I))
+        298 |          HL110 = HL1(I) * 10. / Z1(I)
+        299 |          PM10(I) = (A0 + A1 * HL110) * HL110 &
+        300 |                 / (1. + B1 * HL110 + B2 * HL110 * HL110)
+        301 |          HL12(I) = HL1(I) * 2. / Z1(I)
+        302 |          PH2(I) = (A0P + A1P * HL12(I)) * HL12(I) &
+        303 |                 / (1. + B1P * HL12(I) + B2P * HL12(I) * HL12(I))
+        304 |        ENDIF
+        305 |        IF(DTV(I).LT.0.AND.HLINF(I).LT.-.5) THEN
+        306 |          HL1(I) = -HLINF(I)
+        307 |          PM(I) = LOG(HL1(I)) + 2. * HL1(I) ** (-.25) - .8776
+        308 |          PH(I) = LOG(HL1(I)) + .5 * HL1(I) ** (-.5) + 1.386
+        309 |          HL110 = HL1(I) * 10. / Z1(I)
+        310 |          PM10(I) = LOG(HL110) + 2. * HL110 ** (-.25) - .8776
+        311 |          HL12(I) = HL1(I) * 2. / Z1(I)
+        312 |          PH2(I) = LOG(HL12(I)) + .5 * HL12(I) ** (-.5) + 1.386
+        313 |        ENDIF
+        314 |       endif
+        315 |      ENDDO
+        316 |!C
+        317 |!C  FINISH THE EXCHANGE COEFFICIENT COMPUTATION TO PROVIDE FM AND FH
+        318 |!C
+        319 |      DO I = 1, IM
+        320 |       if(flag_iter(i)) then
+        321 |        FM(I) = FM(I) - PM(I)
+        322 |        FH(I) = FH(I) - PH(I)
+        323 |        FM10(I) = FM10(I) - PM10(I)
+        324 |        FH2(I) = FH2(I) - PH2(I)
+        325 |        CM(I) = CA * CA / (FM(I) * FM(I))
+        326 |        CH(I) = CA * CA / (FM(I) * FH(I))
+        327 |        CQ = CH(I)
+        328 |        STRESS(I) = CM(I) * WIND(I) * WIND(I)
+        329 |        USTAR(I)  = SQRT(STRESS(I))
+        330 |!       USTAR(I) = SQRT(CM(I) * WIND(I) * WIND(I))
+        331 |       endif
+        332 |      ENDDO
+        333 |!C##DG  IF(LAT.EQ.LATD) THEN
+        334 |!C##DG    PRINT *, ' FM, FH, CM, CH(I), USTAR =',
+        335 |!C##DG &   FM, FH, CM, ch, USTAR
+        336 |!C##DG  ENDIF
+        337 |!C
+        338 |!C  UPDATE Z0 OVER OCEAN
+        339 |!C
+        340 |      DO I = 1, IM
+        341 |       if(flag_iter(i)) then
+        342 |        IF(SLIMSK(I).EQ.0.) THEN
+        343 |          Z0(I) = (CHARNOCK / G) * USTAR(I) ** 2
+        344 |!C  NEW IMPLEMENTATION OF Z0
+        345 |!C         CC = USTAR(I) * Z0 / RNU
+        346 |!C         PP = CC / (1. + CC)
+        347 |!C         FF = G * ARNU / (CHARNOCK * USTAR(I) ** 3)
+        348 |!C         Z0 = ARNU / (USTAR(I) * FF ** PP)
+        349 |          Z0(I) = MIN(Z0(I),.1)
+        350 |          Z0(I) = MAX(Z0(I),1.E-7)
+        351 |          Z0RL(I) = 100. * Z0(I)
+        352 |        ENDIF
+        353 |       endif
+        354 |      ENDDO
+        355 |
+        356 |      RETURN
+        357 |      END
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+a0                               Parameter, Real(4)
+                                 0-111.27$  0-124.27$  0-294.20  0-299.22
+ 
+a0p                              Parameter, Real(4)
+                                 0-111.34$  0-125.18$  0-296.20  0-302.21
+ 
+a1                               Parameter, Real(4)
+                                 0-111.42$  0-124.37$  0-294.25  0-299.27
+ 
+a1p                              Parameter, Real(4)
+                                 0-111.49$  0-125.29$  0-296.26  0-302.27
+ 
+aa                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-111.56$  0-230.11@  0-232.16  0-234.25  0-234.35  0-250.11@  0-252.16  0-254.25  0-254.35
+                                 0-257.11@  0-258.27  0-258.37
+ 
+aa0                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-111.62$  0-231.11@  0-234.19  0-234.47  0-251.11@  0-254.19  0-254.47  0-258.21  0-258.49
+ 
+aa1                              Parameter, Real(4)
+                                 0-112.27$  0-126.18$
+ 
+abs                              Pure Intrinsic
+                                 0-202.16  0-281.14
+ 
+adtv                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-112.34$  0-202.9@  0-203.9@  0-203.20  0-204.36
+ 
+alpha                            Parameter, Real(4)
+                                 0-112.42$  0-124.18$  0-230.31  0-231.32  0-233.32  0-250.31  0-251.32  0-253.32  0-257.31
+                                 0-261.31
+ 
+arnu                             Parameter, Real(4)
+                                 0-112.49$  0-128.30$
+ 
+b1                               Parameter, Real(4)
+                                 0-112.56$  0-124.46$  0-295.26  0-300.26
+ 
+b1p                              Parameter, Real(4)
+                                 0-112.62$  0-125.39$  0-297.26  0-303.26
+ 
+b2                               Parameter, Real(4)
+                                 0-113.27$  0-124.56$  0-295.40  0-300.39
+ 
+b2p                              Parameter, Real(4)
+                                 0-113.34$  0-125.50$  0-297.41  0-303.42
+ 
+bb                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-113.42$  0-232.11@  0-235.25  0-235.35  0-252.11@  0-255.25  0-255.35  0-261.11@  0-262.26
+                                 0-262.36
+ 
+bb0                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-113.49$  0-233.11@  0-235.19  0-235.47  0-253.11@  0-255.19  0-255.47  0-262.20  0-262.48
+ 
+bb1                              Parameter, Real(4)
+                                 0-113.56$  0-126.29$
+ 
+bb2                              Parameter, Real(4)
+                                 0-113.62$  0-127.18$
+ 
+ca                               Parameter, Real(4)
+                                 0-114.27$  0-122.32$  0-325.17  0-325.22  0-326.17  0-326.22
+ 
+cc                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-114.34$
+ 
+cc1                              Parameter, Real(4)
+                                 0-114.42$  0-126.39$
+ 
+cc2                              Parameter, Real(4)
+                                 0-114.49$  0-127.29$
+ 
+ch                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-83.41$  0-57.40  0-326.9@  0-327.14
+ 
+charnock                         Parameter, Real(4)
+                                 0-114.56$  0-122.18$  0-172.39  0-343.20
+ 
+cm                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-83.27$  0-57.37  0-325.9@  0-328.21
+ 
+con_cliq                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_cpor                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_csol                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_cv                           Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_cvap                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_dldt                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_hvap                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_omega                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_pi                           Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_psat                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_rerth                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_rocp                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_rog                          Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_rv                           Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_solr                         Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_sqrt2                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_sqrt3                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_t0c                          Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_ttp                          Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_xpona                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+con_xponb                        Use associated, Parameter, Real(8)
+                                 0-67.11$
+ 
+cp                               Renames con_cp, Use associated, Parameter, Real(8)
+                                 0-68.21$
+ 
+cq                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.27$  0-327.9@
+ 
+ddvel                            Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-87.41$  0-62.37  0-142.35
+ 
+dtv                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-99.27$  0-201.9@  0-202.20  0-204.9@  0-204.26  0-205.21  0-224.12  0-227.12  0-247.12  0-279.12
+                                 0-292.12  0-305.12
+ 
+eps                              Renames con_eps, Use associated, Parameter, Real(8)
+                                 0-70.21$  0-155.18
+ 
+epsm1                            Renames con_epsm1, Use associated, Parameter, Real(8)
+                                 0-70.37$  0-155.43
+ 
+exp                              Pure Intrinsic
+                                 0-191.33
+ 
+fh                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-86.41$  0-59.36  0-209.9@  0-210.44  0-237.17  0-322.9@  0-322.17  0-326.36
+ 
+fh2                              Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-88.41$  0-62.48  0-212.9@  0-324.9@  0-324.18
+ 
+fhs                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.42$  0-237.11@  0-238.40
+ 
+flag_iter                        Reference argument, Logical(4) (1:?), Offset: 0, Alignment: full word
+                                 0-91.28$  0-63.32  0-136.12  0-170.11  0-200.11  0-223.11  0-246.11  0-278.11  0-291.11  0-320.11
+                                 0-341.11
+ 
+fm                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-86.27$  0-59.33  0-208.9@  0-210.28  0-210.36  0-236.17  0-321.9@  0-321.17  0-325.28  0-325.36
+                                 0-326.28
+ 
+fm10                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-88.27$  0-62.43  0-211.9@  0-323.9@  0-323.19
+ 
+fms                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.34$  0-236.11@  0-238.20  0-238.26
+ 
+fpvs                             Use associated, Elemental Pure Module Function Real(8)
+                                 0-66.28$  0-154.18
+ 
+funcphys                         Use associated, Nonintrinsic Module
+                                 0-66.11$  0-66.11
+ 
+g                                Parameter, Real(4)
+                                 0-115.49$  0-123.18$  0-160.55  0-172.27  0-205.17  0-343.31
+ 
+gfs_sfc_diff                     Subroutine
+                                 0-56.18$
+ 
+grav                             Renames con_g, Use associated, Parameter, Real(8)
+                                 0-67.21$  0-123.20
+ 
+hfus                             Renames con_hfus, Use associated, Parameter, Real(8)
+                                 0-68.35$
+ 
+hl0                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.56$  0-248.11@  0-251.40
+ 
+hl0inf                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-115.62$  0-228.11@  0-231.40
+ 
+hl1                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-99.40$  0-225.11@  0-238.11@  0-248.28  0-249.28  0-250.39  0-256.19  0-259.21  0-293.11@
+                                 0-294.30  0-294.40  0-295.31  0-295.45  0-295.54  0-296.32  0-296.42  0-297.32  0-297.47  0-297.56
+                                 0-298.19  0-301.21  0-306.11@  0-307.23  0-307.38  0-308.23  0-308.38  0-309.19  0-311.21
+ 
+hl110                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-116.27$  0-256.11@  0-257.39  0-298.11@  0-299.32  0-299.41  0-300.31  0-300.44  0-300.52
+                                 0-309.11@  0-310.25  0-310.39
+ 
+hl12                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-99.53$  0-259.11@  0-261.39  0-301.11@  0-302.33  0-302.44  0-303.32  0-303.48  0-303.58
+                                 0-311.11@  0-312.24  0-312.40
+ 
+hlinf                            Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-100.27$  0-210.9@  0-225.20  0-227.29  0-228.31  0-229.31  0-230.39  0-280.27  0-282.13@
+                                 0-292.29  0-293.20  0-305.28  0-306.21
+ 
+hlt                              Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-116.34$  0-249.11@  0-253.40
+ 
+hltinf                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-116.42$  0-229.11@  0-233.40
+ 
+i                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-96.30$  0-135.10@  0-136.22  0-137.14  0-137.29  0-138.15  0-138.31  0-140.13  0-140.34  0-141.14
+                                 0-141.24  0-141.37  0-141.45  0-141.53  0-141.61  0-142.41  0-143.14  0-143.28  0-144.12  0-144.24
+                                 0-145.16  0-145.24  0-145.36  0-146.13  0-146.21  0-146.44  0-147.14  0-147.26  0-147.49  0-150.13
+                                 0-150.31  0-150.40  0-151.35  0-153.22  0-154.13  0-155.13  0-155.28  0-155.38  0-155.55  0-156.13
+                                 0-156.26  0-157.12  0-157.25  0-157.31  0-159.12  0-159.28  0-160.12  0-160.27  0-160.40  0-160.49
+                                 0-169.10@  0-170.21  0-171.19  0-172.17  0-172.34  0-177.15  0-177.27  0-177.38  0-178.15  0-178.26
+                                 0-179.19  0-180.26  0-180.37  0-189.15  0-190.15  0-190.28  0-191.17  0-191.28  0-191.42  0-199.10@
+                                 0-200.21  0-201.13  0-201.23  0-201.32  0-202.24  0-204.13  0-204.30  0-205.12  0-205.25  0-205.33
+                                 0-205.50  0-205.59  0-206.23  0-206.33  0-207.12  0-207.24  0-208.12  0-208.28  0-208.34  0-208.46
+                                 0-209.12  0-209.28  0-209.34  0-209.46  0-210.15  0-210.23  0-210.31  0-210.39  0-210.47  0-211.14
+                                 0-211.30  0-211.46  0-212.13  0-212.29  0-212.44  0-222.10@  0-223.21  0-224.16  0-225.15  0-225.26
+                                 0-227.16  0-227.35  0-228.26  0-228.37  0-228.45  0-229.26  0-229.37  0-229.45  0-230.45  0-234.14
+                                 0-235.14  0-236.20  0-236.28  0-237.20  0-237.28  0-238.15  0-238.35  0-245.10@  0-246.21  0-247.16
+                                 0-248.23  0-248.32  0-248.40  0-249.23  0-249.32  0-249.40  0-250.43  0-254.14  0-255.14  0-256.23
+                                 0-256.37  0-258.16  0-259.16  0-259.25  0-259.38  0-261.44  0-262.15  0-277.10@  0-278.21  0-279.16
+                                 0-280.22  0-280.33  0-281.40  0-282.19  0-282.28  0-282.46  0-290.10@  0-291.21  0-292.16  0-292.35
+                                 0-293.15  0-293.26  0-294.14  0-294.34  0-294.44  0-295.35  0-295.49  0-295.58  0-296.14  0-296.36
+                                 0-296.46  0-297.36  0-297.51  0-297.60  0-298.23  0-298.37  0-299.16  0-301.16  0-301.25  0-301.38
+                                 0-302.15  0-302.38  0-302.49  0-303.37  0-303.53  0-303.63  0-305.16  0-305.34  0-306.15  0-306.27
+                                 0-307.14  0-307.27  0-307.42  0-308.14  0-308.27  0-308.42  0-309.23  0-309.37  0-310.16  0-311.16
+                                 0-311.25  0-311.38  0-312.15  0-312.29  0-312.45  0-319.10@  0-320.21  0-321.12  0-321.20  0-321.28
+                                 0-322.12  0-322.20  0-322.28  0-323.14  0-323.24  0-323.34  0-324.13  0-324.22  0-324.31  0-325.12
+                                 0-325.31  0-325.39  0-326.12  0-326.31  0-326.39  0-327.17  0-328.16  0-328.24  0-328.34  0-328.44
+                                 0-329.15  0-329.33  0-340.10@  0-341.21  0-342.19  0-343.14  0-343.42  0-349.14  0-349.26  0-350.14
+                                 0-350.26  0-351.16  0-351.31
+ 
+im                               Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-77.28$  0-56.31  0-80.30  0-80.30  0-80.44  0-80.44  0-80.57  0-80.57  0-81.30  0-81.30  0-81.44
+                                 0-81.44  0-82.33  0-82.33  0-82.46  0-82.46  0-83.30  0-83.30  0-83.44  0-83.44  0-83.57  0-83.57
+                                 0-84.31  0-84.31  0-84.47  0-84.47  0-84.61  0-84.61  0-85.34  0-85.34  0-85.48  0-85.48  0-86.30
+                                 0-86.30  0-86.44  0-86.44  0-86.60  0-86.60  0-87.32  0-87.32  0-87.47  0-87.47  0-88.32  0-88.32
+                                 0-88.45  0-88.45  0-91.38  0-91.38  0-99.31  0-99.31  0-99.44  0-99.44  0-99.58  0-99.58  0-100.33
+                                 0-100.33  0-100.43  0-100.43  0-101.31  0-101.31  0-101.43  0-101.43  0-101.58  0-101.58  0-102.33
+                                 0-102.33  0-102.43  0-102.43  0-102.57  0-102.57  0-103.34  0-103.34  0-103.45  0-103.45  0-104.33
+                                 0-104.33  0-104.44  0-104.44  0-105.31  0-105.31  0-105.45  0-105.45  0-106.30  0-106.30  0-106.46
+                                 0-106.46  0-106.56  0-106.56  0-107.33  0-107.33  0-107.44  0-107.44  0-107.57  0-107.57  0-135.14
+                                 0-169.14  0-199.17  0-222.17  0-245.17  0-277.14  0-290.17  0-319.17  0-340.17
+ 
+ipr                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-77.36$
+ 
+k                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-96.28$
+ 
+kind_phys                        Use associated, Parameter, Integer(4)
+                                 0-65.28$  0-67.11$  0-119.16
+ 
+km                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-77.32$
+ 
+log                              Pure Intrinsic
+                                 0-160.32  0-208.17  0-209.17  0-211.19  0-212.18  0-234.30  0-235.30  0-254.30  0-255.30  0-258.32
+                                 0-262.31  0-307.19  0-308.19  0-310.21  0-312.20
+ 
+machine                          Use associated, Nonintrinsic Module
+                                 0-65.11$  0-65.11  0-67.11$
+ 
+max                              Pure Intrinsic
+                                 0-142.22  0-143.19  0-144.17  0-156.18  0-181.20  0-203.16  0-207.17  0-350.19
+ 
+min                              Pure Intrinsic
+                                 0-142.31  0-157.17  0-177.20  0-190.20  0-349.19
+ 
+olinf                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-116.49$  0-280.11@  0-281.18
+ 
+ph                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-100.40$  0-235.11@  0-237.25  0-255.11@  0-296.11@  0-308.11@  0-322.25
+ 
+ph2                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-101.27$  0-262.11@  0-302.11@  0-312.11@  0-324.27
+ 
+physcons                         Use associated, Nonintrinsic Module
+                                 0-67.11$  0-67.11
+ 
+phystmp                          Automatic, Real(8), Offset: 0, Alignment: double word
+                                 0-119.27$  0-153.9@  0-154.23
+ 
+pm                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-101.40$  0-234.11@  0-236.25  0-254.11@  0-294.11@  0-307.11@  0-321.25
+ 
+pm10                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-101.53$  0-258.11@  0-299.11@  0-310.11@  0-323.29
+ 
+prsl1                            Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-84.41$  0-58.30  0-140.28
+ 
+prslki                           Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-84.54$  0-58.36  0-145.29
+ 
+ps                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-80.27$  0-56.34  0-138.28
+ 
+ps1                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-107.40$  0-140.9@  0-155.34  0-160.36
+ 
+psurf                            Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-102.27$  0-138.9@  0-160.43
+ 
+q0                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-102.40$  0-144.9@  0-146.41  0-147.46  0-151.32  0-157.9@  0-157.28
+ 
+q1                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-81.41$  0-56.46  0-144.21
+ 
+qs1                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-107.53$  0-154.9@  0-155.9@  0-155.24  0-155.51  0-156.9@  0-156.22  0-157.21
+ 
+rat                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-102.53$  0-189.11@  0-190.11@  0-190.24  0-191.38
+ 
+rb                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-83.54$  0-57.43  0-205.9@  0-207.9@  0-207.21  0-210.20  0-238.32
+ 
+rcl                              Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-84.27$  0-58.26  0-137.25
+ 
+rd                               Renames con_rd, Use associated, Parameter, Real(8)
+                                 0-69.42$  0-160.18
+ 
+restar                           Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-117.27$  0-180.11@  0-181.11@  0-181.24  0-189.27
+ 
+rnu                              Parameter, Real(4)
+                                 0-117.35$  0-128.18$  0-128.40
+ 
+rvrdm1                           Renames con_fvirt, Use associated, Parameter, Real(8)
+                                 0-69.21$  0-146.32  0-147.37  0-151.23
+ 
+sbc                              Renames con_sbc, Use associated, Parameter, Real(8)
+                                 0-67.36$
+ 
+sign                             Pure Intrinsic
+                                 0-204.18
+ 
+slimsk                           Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-85.27$  0-58.43  0-171.12  0-179.12  0-342.12
+ 
+sqrt                             Pure Intrinsic
+                                 0-137.20  0-141.29  0-172.22  0-230.16  0-231.17  0-233.17  0-250.16  0-251.17  0-253.17  0-257.16
+                                 0-261.16  0-329.21
+ 
+stress                           Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-85.41$  0-59.26  0-328.9@  0-329.26
+ 
+t                                Use associated, Reference argument, Intent (IN), Real(8), Offset: 0, Alignment: double word
+                                 0-66.11$
+ 
+t1                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-81.27$  0-56.43  0-145.21  0-146.18  0-153.19
+ 
+theta1                           Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-103.27$  0-145.9@  0-147.19
+ 
+thv1                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-103.40$  0-147.9@  0-201.18  0-205.45
+ 
+tskin                            Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.27$  0-57.26  0-150.34
+ 
+tsurf                            Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-104.27$  0-63.26  0-150.25
+ 
+tv1                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-104.40$  0-146.9@  0-160.23
+ 
+tvs                              Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-105.27$  0-150.9@  0-201.28  0-205.55
+ 
+u1                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-80.41$  0-56.37  0-141.34  0-141.42
+ 
+ustar                            Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-86.54$  0-62.26  0-172.11@  0-180.20  0-329.9@  0-343.36
+ 
+v1                               Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-80.54$  0-56.40  0-141.50  0-141.58
+ 
+vis                              Parameter, Real(4)
+                                 0-117.42$  0-125.60$  0-180.42
+ 
+wind                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-87.27$  0-62.32  0-141.9@  0-143.9@  0-143.23  0-206.18  0-206.28  0-328.29  0-328.39
+ 
+xrcl                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-105.40$  0-137.9@  0-141.19
+ 
+z0                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-106.27$  0-159.9@  0-172.31  0-177.24  0-343.11@  0-349.11@  0-349.23  0-350.11@  0-350.23
+                                 0-351.28
+ 
+z0max                            Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-106.40$  0-177.9@  0-178.20  0-180.31  0-191.22  0-208.22  0-208.40  0-211.24  0-211.40  0-228.20
+                                 0-248.17  0-281.34  0-282.40
+ 
+z0rl                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.41$  0-57.32  0-159.23  0-351.11@
+ 
+z1                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-106.53$  0-160.9@  0-177.35  0-205.30  0-208.31  0-209.31  0-228.42  0-229.42  0-248.37  0-249.37
+                                 0-256.34  0-259.35  0-280.19  0-282.25  0-298.34  0-301.35  0-309.34  0-311.35
+ 
+ztmax                            Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-107.27$  0-178.9@  0-191.11@  0-209.22  0-209.40  0-212.23  0-212.38  0-229.20  0-249.17
+ 
+** gfs_sfc_diff   === End of Compilation 2 ===
+ 
+>>>>> COMPILATION UNIT EPILOGUE SECTION <<<<<
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../lsms/noah.20071219/gfs_sfc_diff.F
+                                      03/09/11   11:04:02
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     356
+1501-510  Compilation successful for file gfs_sfc_diff.F.
+1501-543  Object file created.

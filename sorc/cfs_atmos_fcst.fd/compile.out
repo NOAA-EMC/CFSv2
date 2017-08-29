@@ -1,0 +1,436 @@
++ line 3: + line 3: pwd
+sorc_dir=/global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r
++ line 4: + line 4: pwd
+exec_dir=/global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r
++ line 6: mkdir -p /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r
++ line 10: QLW=rrtm1
++ line 18: QSW=rrtm2
++ line 20: + line 20: logname
++ line 20: basename /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r
+make_dir=/ptmp/wx23sm/sorc/global_fcst.fd_ESMF3.1.0r_rrtm1rrtm2_xkzm
++ line 21: mkdir -p /ptmp/wx23sm/sorc/global_fcst.fd_ESMF3.1.0r_rrtm1rrtm2_xkzm
++ line 22: cd /ptmp/wx23sm/sorc/global_fcst.fd_ESMF3.1.0r_rrtm1rrtm2_xkzm
++ line 23: cd /ptmp/wx23sm/sorc/global_fcst.fd_ESMF3.1.0r_rrtm1rrtm2_xkzm
++ line 24: [ 0 -ne 0 ]
++ line 30: export COMPILE_RAD=YES
++ line 33: tar -xf-
++ line 33: tar -cf- -C/global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r .
++ line 36: CP1=cp
++ line 40: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/compns.f_xkzm compns.f
++ line 41: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/namelist_def.f_xkzm namelist_def.f
++ line 42: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/gbphys_call.f_xkzm gbphys_call.f
++ line 43: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/gbphys_v.f_sicefix_xkzm_z0 gbphys_v.f
++ line 45: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/moninp_v.f_xkzm moninp_v.f
++ line 46: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/moninp1_v.f_xkzm moninp1_v.f
++ line 52: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/set_soilveg.f_nroot4_rsm3 set_soilveg.f
++ line 54: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/grrad.f_ictm3 grrad.f
++ line 55: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/atm.comm.f_sicefix atm.comm.f
++ line 56: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/sfc_sice.f_sicefix sfc_sice.f
++ line 57: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/gloopr.f_ictm gloopr.f
++ line 58: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/grrad.f_ictm3 grrad.f
++ line 59: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radiation_gases.f_ictm radiation_gases.f
++ line 60: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radiation_astronomy.f_ictm3 radiation_astronomy.f
++ line 63: export COMPILE_RAD=YES
++ line 64: [ YES = YES ]
++ line 65: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radlw_rrtm1_datatb.f radlw_datatb.f
++ line 66: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radlw_rrtm1_param.f radlw_param.f
++ line 67: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radlw_rrtm1_main.f radlw_main.f
++ line 68: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radsw_rrtm2_datatb.f radsw_datatb.f
++ line 69: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radsw_rrtm2_param.f radsw_param.f
++ line 70: cp /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/radsw_rrtm2_main.f radsw_main.f
++ line 74: export EXEC=/global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/global_fcst_ictm3_sice2_xkzm_nroot4_rsm3_z0
++ line 76: + line 76: cut -d. -f1,1
++ line 76: hostname
+node=c1n6
++ line 77: + line 77: cut -c1-1
++ line 77: echo c1n6
+mac=c
++ line 78: [ c = b -o c = w ]
++ line 83: export F77=mpxlf95_r
++ line 84: export F90=mpxlf95_r
++ line 86: make -f Makefile
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c namelist_def.f 
+** namelist_def   === End of Compilation 1 ===
+1501-510  Compilation successful for file namelist_def.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c atm.comm.f
+** constant_cc   === End of Compilation 1 ===
+** atm_cc   === End of Compilation 2 ===
+** surface_cc   === End of Compilation 3 ===
+** atm_cmp_start   === End of Compilation 4 ===
+** atm_cmp_start1   === End of Compilation 5 ===
+** atm_cmp_start2   === End of Compilation 6 ===
+** atm_tiles_init   === End of Compilation 7 ===
+** atm_surf_init   === End of Compilation 8 ===
+** atm_recvdtc   === End of Compilation 9 ===
+** atm_sendgrid   === End of Compilation 10 ===
+** atm_sendslm   === End of Compilation 11 ===
+** atm_getsstice   === End of Compilation 12 ===
+** atm_announce   === End of Compilation 13 ===
+** atm_dbg1   === End of Compilation 14 ===
+** atm_dbg2   === End of Compilation 15 ===
+** atm_tstep_init   === End of Compilation 16 ===
+** atm_sendfluxes   === End of Compilation 17 ===
+** atm_maxmin   === End of Compilation 18 ===
+** atm_maxmin_int   === End of Compilation 19 ===
+1501-510  Compilation successful for file atm.comm.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c compns.f 
+** compns   === End of Compilation 1 ===
+1501-510  Compilation successful for file compns.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gbphys_v.f
+** gbphys   === End of Compilation 1 ===
+1501-510  Compilation successful for file gbphys_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gbphys_call.f
+** gbphys_call   === End of Compilation 1 ===
+1501-510  Compilation successful for file gbphys_call.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gbphys_adv_hyb_gc.f
+** gbphys_adv   === End of Compilation 1 ===
+1501-510  Compilation successful for file gbphys_adv_hyb_gc.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gbphys_adv_hyb_gc_h-new.f
+** gbphys_adv_h   === End of Compilation 1 ===
+1501-510  Compilation successful for file gbphys_adv_hyb_gc_h-new.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c dcyc2_v.f
+** dcyc2t3   === End of Compilation 1 ===
+1501-510  Compilation successful for file dcyc2_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c dcyc2_v.pre.rad.f
+** dcyc2t3_pre_rad   === End of Compilation 1 ===
+1501-510  Compilation successful for file dcyc2_v.pre.rad.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c set_soilveg.f
+** set_soilveg   === End of Compilation 1 ===
+1501-510  Compilation successful for file set_soilveg.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_drv.f
+** sfc_drv   === End of Compilation 1 ===
+1501-510  Compilation successful for file sfc_drv.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_land.f
+** sfc_land   === End of Compilation 1 ===
+1501-510  Compilation successful for file sfc_land.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c progt2_v.f
+** progt2   === End of Compilation 1 ===
+** ktsoil   === End of Compilation 2 ===
+** funcdf   === End of Compilation 3 ===
+** funckt   === End of Compilation 4 ===
+** thsat   === End of Compilation 5 ===
+** twlt   === End of Compilation 6 ===
+1501-510  Compilation successful for file progt2_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_sice.f
+** sfc_sice   === End of Compilation 1 ===
+** ice3lay   === End of Compilation 2 ===
+1501-510  Compilation successful for file sfc_sice.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_ocean.f
+** sfc_ocean   === End of Compilation 1 ===
+1501-510  Compilation successful for file sfc_ocean.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_diff.f
+** sfc_diff   === End of Compilation 1 ===
+1501-510  Compilation successful for file sfc_diff.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfc_diag.f
+** sfc_diag   === End of Compilation 1 ===
+1501-510  Compilation successful for file sfc_diag.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sflx.f
+** sflx   === End of Compilation 1 ===
+** alcalc   === End of Compilation 2 ===
+** canres   === End of Compilation 3 ===
+** csnow   === End of Compilation 4 ===
+** devap   === End of Compilation 5 ===
+** evapo   === End of Compilation 6 ===
+** frh2o   === End of Compilation 7 ===
+** hrt   === End of Compilation 8 ===
+** hrtice   === End of Compilation 9 ===
+** hstep   === End of Compilation 10 ===
+** nopac   === End of Compilation 11 ===
+** penman   === End of Compilation 12 ===
+** redprm   === End of Compilation 13 ===
+** rosr12   === End of Compilation 14 ===
+** sfcdif   === End of Compilation 15 ===
+** shflx   === End of Compilation 16 ===
+** smflx   === End of Compilation 17 ===
+** snfrac   === End of Compilation 18 ===
+** snksrc   === End of Compilation 19 ===
+** snopac   === End of Compilation 20 ===
+** snowpack   === End of Compilation 21 ===
+** snowz0   === End of Compilation 22 ===
+** snow_new   === End of Compilation 23 ===
+** srt   === End of Compilation 24 ===
+** sstep   === End of Compilation 25 ===
+** tbnd   === End of Compilation 26 ===
+** tdfcnd   === End of Compilation 27 ===
+** tmpavg   === End of Compilation 28 ===
+** transp   === End of Compilation 29 ===
+** wdfcnd   === End of Compilation 30 ===
+1501-510  Compilation successful for file sflx.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c moninp_v.f
+** moninp   === End of Compilation 1 ===
+** tridi2   === End of Compilation 2 ===
+** tridin   === End of Compilation 3 ===
+1501-510  Compilation successful for file moninp_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c moninp1_v.f
+** moninp1   === End of Compilation 1 ===
+1501-510  Compilation successful for file moninp1_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c moninq_v.f
+** moninq   === End of Compilation 1 ===
+1501-510  Compilation successful for file moninq_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c moninq1_v.f
+** moninq1   === End of Compilation 1 ===
+1501-510  Compilation successful for file moninq1_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gwdps_v.f
+** gwdps   === End of Compilation 1 ===
+1501-510  Compilation successful for file gwdps_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gwdc.f
+** gwdc   === End of Compilation 1 ===
+1501-510  Compilation successful for file gwdc.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sascnv_v.f
+** sascnv   === End of Compilation 1 ===
+1501-510  Compilation successful for file sascnv_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sascnvn_v.f
+** sascnvn   === End of Compilation 1 ===
+1501-510  Compilation successful for file sascnvn_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c cnvcld_v.f
+** cnvc90   === End of Compilation 1 ===
+1501-510  Compilation successful for file cnvcld_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c shalcv_v.f
+** shalcv   === End of Compilation 1 ===
+** tridi2t3   === End of Compilation 2 ===
+1501-510  Compilation successful for file shalcv_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c shalcv_v_opr.f
+** shalcvt3   === End of Compilation 1 ===
+** tridi2t3   === End of Compilation 2 ===
+1501-510  Compilation successful for file shalcv_v_opr.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c shalcnv_v.f
+** shalcnv   === End of Compilation 1 ===
+1501-510  Compilation successful for file shalcnv_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c lrgsclr_v.f
+** lrgscl   === End of Compilation 1 ===
+1501-510  Compilation successful for file lrgsclr_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gscond_v.f
+** gscond   === End of Compilation 1 ===
+1501-510  Compilation successful for file gscond_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c precpd_v.f
+** precpd   === End of Compilation 1 ===
+1501-510  Compilation successful for file precpd_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c mstadb_v.f
+** mstadbt3   === End of Compilation 1 ===
+1501-510  Compilation successful for file mstadb_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c mstcnv_v.f
+** mstcnv   === End of Compilation 1 ===
+1501-510  Compilation successful for file mstcnv_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c get_prs_v.f
+** get_prs   === End of Compilation 1 ===
+** get_phi   === End of Compilation 2 ===
+** get_cpr   === End of Compilation 3 ===
+** get_r   === End of Compilation 4 ===
+** get_cp   === End of Compilation 5 ===
+1501-510  Compilation successful for file get_prs_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c gsmddrive_v.f
+** gsmdrive   === End of Compilation 1 ===
+** micro_init   === End of Compilation 2 ===
+** init_micro   === End of Compilation 3 ===
+1501-510  Compilation successful for file gsmddrive_v.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c omegtes.f
+** omegtes   === End of Compilation 1 ===
+1501-510  Compilation successful for file omegtes.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c omegtes_gc.f
+** omegtes_gc   === End of Compilation 1 ===
+1501-510  Compilation successful for file omegtes_gc.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c omegas.f
+** omegast3   === End of Compilation 1 ===
+1501-510  Compilation successful for file omegas.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c hyb2sig.f
+** hyb2sig   === End of Compilation 1 ===
+1501-510  Compilation successful for file hyb2sig.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c hyb2press.f
+** hyb2press   === End of Compilation 1 ===
+1501-510  Compilation successful for file hyb2press.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c hyb2press_gc.f
+** hyb2press_gc   === End of Compilation 1 ===
+** adj_dpp   === End of Compilation 2 ===
+1501-510  Compilation successful for file hyb2press_gc.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sig2press.f
+** sig2press   === End of Compilation 1 ===
+1501-510  Compilation successful for file sig2press.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radlw_param.f
+** module_radlw_cntr_para   === End of Compilation 1 ===
+** module_radlw_parameters   === End of Compilation 2 ===
+1501-510  Compilation successful for file radlw_param.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radlw_datatb.f
+** module_radlw_avplank   === End of Compilation 1 ===
+** module_radlw_cldprlw   === End of Compilation 2 ===
+** module_radlw_kgb01   === End of Compilation 3 ===
+** module_radlw_kgb02   === End of Compilation 4 ===
+** module_radlw_kgb03   === End of Compilation 5 ===
+** module_radlw_kgb04   === End of Compilation 6 ===
+** module_radlw_kgb05   === End of Compilation 7 ===
+** module_radlw_kgb06   === End of Compilation 8 ===
+** module_radlw_kgb07   === End of Compilation 9 ===
+** module_radlw_kgb08   === End of Compilation 10 ===
+** module_radlw_kgb09   === End of Compilation 11 ===
+** module_radlw_kgb10   === End of Compilation 12 ===
+** module_radlw_kgb11   === End of Compilation 13 ===
+** module_radlw_kgb12   === End of Compilation 14 ===
+** module_radlw_kgb13   === End of Compilation 15 ===
+** module_radlw_kgb14   === End of Compilation 16 ===
+** module_radlw_kgb15   === End of Compilation 17 ===
+** module_radlw_kgb16   === End of Compilation 18 ===
+1501-510  Compilation successful for file radlw_datatb.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radlw_main.f
+** module_radlw_main   === End of Compilation 1 ===
+1501-510  Compilation successful for file radlw_main.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radsw_param.f
+** module_radsw_cntr_para   === End of Compilation 1 ===
+** module_radsw_parameters   === End of Compilation 2 ===
+1501-510  Compilation successful for file radsw_param.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radsw_datatb.f
+** module_radsw_cldprtb   === End of Compilation 1 ===
+** module_radsw_sflux   === End of Compilation 2 ===
+** module_radsw_kgb16   === End of Compilation 3 ===
+** module_radsw_kgb17   === End of Compilation 4 ===
+** module_radsw_kgb18   === End of Compilation 5 ===
+** module_radsw_kgb19   === End of Compilation 6 ===
+** module_radsw_kgb20   === End of Compilation 7 ===
+** module_radsw_kgb21   === End of Compilation 8 ===
+** module_radsw_kgb22   === End of Compilation 9 ===
+** module_radsw_kgb23   === End of Compilation 10 ===
+** module_radsw_kgb24   === End of Compilation 11 ===
+** module_radsw_kgb25   === End of Compilation 12 ===
+** module_radsw_kgb26   === End of Compilation 13 ===
+** module_radsw_kgb27   === End of Compilation 14 ===
+** module_radsw_kgb28   === End of Compilation 15 ===
+** module_radsw_kgb29   === End of Compilation 16 ===
+1501-510  Compilation successful for file radsw_datatb.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radsw_main.f
+** module_radsw_main   === End of Compilation 1 ===
+1501-510  Compilation successful for file radsw_main.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radiation_astronomy.f
+** module_radiation_astronomy   === End of Compilation 1 ===
+1501-510  Compilation successful for file radiation_astronomy.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radiation_aerosols.f
+** module_radiation_aerosols   === End of Compilation 1 ===
+1501-510  Compilation successful for file radiation_aerosols.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radiation_gases.f
+** module_radiation_gases   === End of Compilation 1 ===
+1501-510  Compilation successful for file radiation_gases.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radiation_clouds.f
+** module_radiation_clouds   === End of Compilation 1 ===
+1501-510  Compilation successful for file radiation_clouds.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c radiation_surface.f
+** module_radiation_surface   === End of Compilation 1 ===
+1501-510  Compilation successful for file radiation_surface.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c grrad.f
+** module_radiation_driver   === End of Compilation 1 ===
+1501-510  Compilation successful for file grrad.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c gloopr.f
+"f_hpm.h", line 1: 1506-229 (W) File is empty.
+** gloopr   === End of Compilation 1 ===
+1501-510  Compilation successful for file gloopr.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c read_fix.f
+** read_mtn_hprim_oz   === End of Compilation 1 ===
+** read_sfc   === End of Compilation 2 ===
+** interpred   === End of Compilation 3 ===
+** intlon   === End of Compilation 4 ===
+** readoz_disprd   === End of Compilation 5 ===
+** orord   === End of Compilation 6 ===
+** split2d   === End of Compilation 7 ===
+** skip   === End of Compilation 8 ===
+** excha   === End of Compilation 9 ===
+** sumlat   === End of Compilation 10 ===
+** unsplit2d   === End of Compilation 11 ===
+** uninterpred   === End of Compilation 12 ===
+** uninterprez   === End of Compilation 13 ===
+** unsplit2z   === End of Compilation 14 ===
+** unsplit2d_r   === End of Compilation 15 ===
+** split2d_r   === End of Compilation 16 ===
+** read_sfc_r   === End of Compilation 17 ===
+1501-510  Compilation successful for file read_fix.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c gribit.f
+** gribit   === End of Compilation 1 ===
+1501-510  Compilation successful for file gribit.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c wrt3d.f
+** wrt3d   === End of Compilation 1 ===
+1501-510  Compilation successful for file wrt3d.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c wrtsfc.f
+** wrtsfc   === End of Compilation 1 ===
+1501-510  Compilation successful for file wrtsfc.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c para_fixio_w.f
+** para_fixio_w   === End of Compilation 1 ===
+1501-510  Compilation successful for file para_fixio_w.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto -I/global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/mod/modO/AIX.default.64.mpi.default   -NS2048 -qfixed -c sfcsub.f
+** sfccyc_module   === End of Compilation 1 ===
+** sfccycle   === End of Compilation 2 ===
+** count   === End of Compilation 3 ===
+** monitr   === End of Compilation 4 ===
+** dayoyr   === End of Compilation 5 ===
+** hmskrd   === End of Compilation 6 ===
+** fixrdg   === End of Compilation 7 ===
+** getarea   === End of Compilation 8 ===
+** subst   === End of Compilation 9 ===
+** la2ga   === End of Compilation 10 ===
+** maxmin   === End of Compilation 11 ===
+** filanl   === End of Compilation 12 ===
+** analy   === End of Compilation 13 ===
+** filfcs   === End of Compilation 14 ===
+** bktges   === End of Compilation 15 ===
+** rof01   === End of Compilation 16 ===
+** tsfcor   === End of Compilation 17 ===
+** snodpth   === End of Compilation 18 ===
+** merge   === End of Compilation 19 ===
+** newice   === End of Compilation 20 ===
+** qcsnow   === End of Compilation 21 ===
+** qcsice   === End of Compilation 22 ===
+** setlsi   === End of Compilation 23 ===
+** scale   === End of Compilation 24 ===
+** qcmxmn   === End of Compilation 25 ===
+** setzro   === End of Compilation 26 ===
+** getscv   === End of Compilation 27 ===
+** getstc   === End of Compilation 28 ===
+** getsmc   === End of Compilation 29 ===
+** usesgt   === End of Compilation 30 ===
+** snosfc   === End of Compilation 31 ===
+** albocn   === End of Compilation 32 ===
+** qcmxice   === End of Compilation 33 ===
+** qcsli   === End of Compilation 34 ===
+** qcbyfc   === End of Compilation 35 ===
+** setrmsk   === End of Compilation 36 ===
+** ga2la   === End of Compilation 37 ===
+** landtyp   === End of Compilation 38 ===
+** gaulat   === End of Compilation 39 ===
+** anomint   === End of Compilation 40 ===
+** clima   === End of Compilation 41 ===
+** fixrdc   === End of Compilation 42 ===
+** fixrda   === End of Compilation 43 ===
+** splatx   === End of Compilation 44 ===
+** snodpth2   === End of Compilation 45 ===
+1501-510  Compilation successful for file sfcsub.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c treadeo.io.f
+** treadeo   === End of Compilation 1 ===
+1501-510  Compilation successful for file treadeo.io.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c treadeo.gfsio.f
+** treadeo_gfsio   === End of Compilation 1 ===
+1501-510  Compilation successful for file treadeo.gfsio.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c grid_to_spec.f
+** grid_to_spect   === End of Compilation 1 ===
+1501-510  Compilation successful for file grid_to_spec.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c spect_to_grid.f
+** spect_to_grid   === End of Compilation 1 ===
+1501-510  Compilation successful for file spect_to_grid.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c spect_tv_enthalpy_ps.f
+** spect_tv_enthalpy_ps   === End of Compilation 1 ===
+1501-510  Compilation successful for file spect_tv_enthalpy_ps.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c setsig.f 
+** setsig   === End of Compilation 1 ===
+1501-510  Compilation successful for file setsig.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c twriteeo.f
+** twriteeo   === End of Compilation 1 ===
+1501-510  Compilation successful for file twriteeo.f.
+	mpxlf95_r -qnosave -O3 -qfixed -c bafrio.f
+** bafrindex   === End of Compilation 1 ===
+** bafrread   === End of Compilation 2 ===
+** bafrwrite   === End of Compilation 3 ===
+1501-510  Compilation successful for file bafrio.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c spect_send.f
+** spect_send   === End of Compilation 1 ===
+1501-510  Compilation successful for file spect_send.f.
+	mpxlf95_r -g -qsuffix=cpp=f -O3 -qrealsize=8 -qstrict -qxlf77=leadzero -qmaxmem=-1 -qnolm -qsmp=noauto -qnosave -qarch=pwr6 -qtune=pwr6 -qcache=auto  -qfixed -c spect_write.f
+"spect_write.f", line 92.15: 1514-245 (E) Identifier idvm is accessed by use association. It must not be redeclared or initialized.
+** spect_write   === End of Compilation 1 ===
+1501-510  Compilation successful for file spect_write.f.
+	mpxlf95_r -qsmp=noauto  -lessl_r -lmass -qsmp=noauto /global/save/wx23sm/BASELIBS/esmf_3_1_0rp2_src/esmf/lib/libO/AIX.default.64.mpi.default/libesmf.a -bdatapsize:64K -bstackpsize:64K -btextpsize:4K -o /global/save/wx23sm/cfsrr/sorc/global_fcst.fd_ESMF3.1.0r/global_fcst_ictm3_sice2_xkzm_nroot4_rsm3_z0 machine.o              module.o               iounitdef.o            physcons_v.o           funcphys_v.o           progtm_module.o        rascnvv2_v.o           resol_def.o            gg_def.o               vert_def.o             sig_io.o               date_def.o             layout1.o              namelist_def.o         namelist_soilveg.o     coordinate_def.o       tracer_const_h-new.o   reduce_lons_grid_module.o  matrix_sig_def.o       mpi_def.o              semi_lag_def.o         deldifs_def.o          bfilt_def.o            sfcio_module.o         sigio_module.o         sigio_r_module.o       gfsio_module.o         gfsio_def.o            d3d_def.o              module_bfmicrophysics.o mpi_more.o   cmp.comm.o   atm.comm.o   tiles.o NameList_ESMFMod.o           Sfc_Var_ESMFMod.o            GFS_ErrMsgMod.o              GFS_ESMFStateAddGetMod.o     GFS_InternalState_ESMFMod.o  GFS_ESMFStateMod.o           GFS_GetCf_ESMFMod.o          GFS_Initialize_ESMFMod.o     GFS_Run_ESMFMod.o            GFS_Finalize_ESMFMod.o       GFS_GridComp_ESMFMod.o       GFS_Standalone_ESMF_ENS.o    Grid_ESMFCreate.o            StartTimeGet_ESMF.o          Ensemble_sub.o get_cd_hyb.o get_am_bm_hyb.o get_cd_hyb_gc.o get_am_bm_hyb_gc.o wrt3d_hyb.o setlats.o getysk.o getysk_gc.o redist_lats_a.o redist_lats_r_b_fix.o ifshuff.o shuffle_grid.o digifilt.o gcycle_v.o wrtout.o grid_collect.o info.o four2grid_thread.o hpmdummy.o coundummy.o damp_speed.o deldifs.o fix_fields.o spect_fields.o delnpe.o delnpo.o  dezouv.o impadj_sig.locl.o impadj_hyb.locl.o impadj_hyb.locl_gc.o dozeuv.o epslon.o filtr1eo.o  filtr2eo.o get_ls_node.o get_lats_node_shuff_a_fix.o get_lats_node_shuff_r_fix.o getcon.o  gfidi_sig.o gfidi_hyb.o gfidi_hyb_gc.o gfidi_hyb_gc_h-new.o glats.o gloopa_opt.o lon_lat_para.o compns.o gozrineo.o pln2eo.o  rms_spect.o  lats_shuff.o uvoedz.o                      mpi_quit.o                    sicdif_sig.o                  sicdif_hyb.o                  sicdif_hyb_gc.o               dotstep_sicdif.o              gather_times.o                four2fln.o                    four2flnio.o                  sortrx.o                      sumfln.o                      sumder2.o                     triseori.o                    uveodz.o                      ysminv.o                      ver_sig.o        ozinterp.o           ozphys_v.o           gloopb_call.gbphys.o gbphys_v.o           gbphys_call.o        gbphys_adv_hyb_gc.o  gbphys_adv_hyb_gc_h-new.o  dcyc2_v.o            dcyc2_v.pre.rad.o    set_soilveg.o        sfc_drv.o            sfc_land.o           progt2_v.o           sfc_sice.o           sfc_ocean.o          sfc_diff.o           sfc_diag.o           sflx.o               moninp_v.o           moninp1_v.o          moninq_v.o           moninq1_v.o          gwdps_v.o            gwdc.o               sascnv_v.o           sascnvn_v.o          cnvcld_v.o           shalcv_v.o           shalcv_v_opr.o       shalcnv_v.o          lrgsclr_v.o          gscond_v.o           precpd_v.o           mstadb_v.o           mstcnv_v.o           get_prs_v.o          gsmddrive_v.o        omegtes.o            omegtes_gc.o         omegas.o             hyb2sig.o            hyb2press.o          hyb2press_gc.o       sig2press.o  radlw_param.o           radlw_datatb.o          radlw_main.o            radsw_param.o           radsw_datatb.o          radsw_main.o            radiation_astronomy.o   radiation_aerosols.o    radiation_gases.o       radiation_clouds.o      radiation_surface.o     grrad.o                 gloopr.o read_fix.o          gribit.o            wrt3d.o             wrtsfc.o            para_fixio_w.o      sfcsub.o            treadeo.io.o        treadeo.gfsio.o     grid_to_spec.o      spect_to_grid.o     spect_tv_enthalpy_ps.o setsig.o            twriteeo.o          bafrio.o            spect_send.o        spect_write.o -lC -L /nwprod/lib/ -l w3_d -l bacio_4 -lsp_d
+ld: 0711-224 WARNING: Duplicate symbol: .tridi2t3
+ld: 0711-345 Use the -bloadmap or -bnoquiet option to obtain more information.
+Target "all" is up to date.

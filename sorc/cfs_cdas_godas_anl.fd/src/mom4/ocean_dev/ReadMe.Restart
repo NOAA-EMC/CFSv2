@@ -1,0 +1,28 @@
+Initial Conditions:
+Once begun all the restarts listed below will be created and used for subsequent initial
+conditions.
+
+For a cold start, it looks like ocean_temp_salt.res.nc could be used and no others would
+be necessary. For a cold start Time%init=.true. which can be accomplished by having the
+run start time equal to the experiment initial time. To do this set the date_init in the
+ocean_solo_nml namelist and do NOT provide a ocean_solo.res file. Both the experiment
+initial time and the run start time will be set by date_init.  -OR-  Provide an
+ocean_solo.res file with the two dates set the same, the first will be the experiment
+initial time and the second will be the run start time. The ocean_solo.res file
+overrides the namelist.
+
+ASCII restarts:
+ocean_solo.res                    - not necessary, but simple to set up
+ocean_tracer.res                  - not necessary, written at end, does not affect start
+
+netCDF restarts:
+ocean_temp_salt.res.nc            - necessary
+ocean_velocity.res.nc             - not necessary, if absent, velocities set to 0.0
+ocean_velocity_advection.res.nc   - not necessary, only read if ocean_velocity.res.nc present
+                                     and Time%init=.false.
+ocean_sbc.res.nc                  - not necessary, contains T,S,U,V,ETA,Frazil surface values
+ocean_freesurf.res.nc             - necessary, set to 0.0 may be OK 
+                                    (see Time%init=.true. & namelist: zero_eta_ic=.true.)
+ocean_neutral.res.nc              - necessary if agm_closure=.true. & Time%init=.false.
+ocean_frazil.res.nc               - necessary ?, seems OK filled with 0.0
+ocean_density.res.nc              - not necessary, if absent, computed from T, S

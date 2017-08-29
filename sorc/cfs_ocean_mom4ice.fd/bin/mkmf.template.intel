@@ -1,0 +1,18 @@
+# Template for Intel compilers on GAEA
+#
+FC = ftn
+LD = ftn
+CC = cc
+FFLAGS = -r8 -fpconstant -i4 -FR -auto -save-temps -Wp,-P -align dcommon -O2 -assume byterecl $(INCL)
+CFLAGS =
+LDFLAGS = -r8 -fpconstant -i4 -auto -align dcommon -O2 -assume byterecl $(LIBS)
+
+LIBS = -L/opt/cray/netcdf/4.1.1.0/netcdf-intel/lib \
+        -L/sw/xt6/udunits/2.1.18/sles11.0_pgi10.6.0/lib -lnetcdf -ludunits2
+INCL = -I/opt/cray/netcdf/4.1.1.0/netcdf-intel/include \
+        -I/sw/xt6/udunits/2.1.18/sles11.0_pgi10.6.0/include
+
+LIBS = $(NETCDF_LDFLAGS) 
+
+INCL = $(NETCDF_FFLAGS) 
+

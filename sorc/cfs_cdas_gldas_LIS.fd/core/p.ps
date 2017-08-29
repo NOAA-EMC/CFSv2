@@ -1,0 +1,258 @@
+%!PS-Adobe-1.0
+%%Creator: s1n1:wx22mj (Jesse Meng)
+%%Title: grid_module.F
+%%CreationDate: Fri Feb 25 13:10:18 2005
+%%DocumentFonts: Courier-Bold Courier Times-Roman Times-Bold Helvetica-Bold
+/NLSvec [
+    8#241 /exclamdown
+    8#242 /cent
+    8#243 /sterling
+    8#250 /currency
+    8#245 /yen
+    8#246 /brokenbar
+    8#247 /section
+    8#310 /dieresis
+    8#200 /copyright
+    8#343 /ordfeminine
+    8#253 /guillemotleft
+    8#201 /logicalnot
+    8#255 /hyphen
+    8#202 /registered
+    8#305 /macron
+    8#312 /degree
+    8#203 /plusminus
+    8#262 /twosuperior
+    8#263 /threesuperior
+    8#302 /acute
+    8#204 /mu
+    8#266 /paragraph
+    8#264 /periodcentered
+    8#313 /cedilla
+    8#271 /onesuperior
+    8#353 /ordmasculine
+    8#273 /guillemotright
+    8#205 /onequarter
+    8#206 /onehalf
+    8#207 /threequarters
+    8#277 /questiondown
+    8#210 /Agrave
+    8#211 /Aacute
+    8#212 /Acircumflex
+    8#213 /Atilde
+    8#214 /Adieresis
+    8#215 /Aring
+    8#341 /AE
+    8#216 /Ccedilla
+    8#217 /Egrave
+    8#220 /Eacute
+    8#221 /Ecircumflex
+    8#222 /Edieresis
+    8#223 /Igrave
+    8#224 /Iacute
+    8#225 /Icircumflex
+    8#226 /Idieresis
+    8#227 /Eth
+    8#230 /Ntilde
+    8#231 /Ograve
+    8#232 /Oacute
+    8#233 /Ocircumflex
+    8#234 /Otilde
+    8#235 /Odieresis
+    8#236 /multiply
+    8#351 /Oslash
+    8#237 /Ugrave
+    8#240 /Uacute
+    8#321 /Ucircumflex
+    8#322 /Udieresis
+    8#323 /Yacute
+    8#324 /Thorn
+    8#373 /germandbls
+    8#325 /agrave
+    8#326 /aacute
+    8#327 /acircumflex
+    8#330 /atilde
+    8#331 /adieresis
+    8#332 /aring
+    8#361 /ae
+    8#333 /ccedilla
+    8#334 /egrave
+    8#335 /eacute
+    8#336 /ecircumflex
+    8#337 /edieresis
+    8#340 /igrave
+    8#354 /iacute
+    8#355 /icircumflex
+    8#356 /idieresis
+    8#357 /eth
+    8#360 /ntilde
+    8#265 /ograve
+    8#276 /oacute
+    8#300 /ocircumflex
+    8#311 /otilde
+    8#314 /odieresis
+    8#342 /divide
+    8#371 /oslash
+    8#362 /ugrave
+    8#363 /uacute
+    8#364 /ucircumflex
+    8#374 /udieresis
+    8#375 /yacute
+    8#376 /thorn
+    8#377 /ydieresis
+  ] def
+%!
+% Start of enscript.pro -- prolog for text file translator
+% Copyright (c) 1984,1985,1987 Adobe Systems Incorporated. All Rights Reserved. 
+% GOVERNMENT END USERS: See Notice file in TranScript library directory
+% -- probably /usr/lib/ps/Notice
+% RCSID: $Header: enscript.pro,v 2.2 87/11/17 16:39:56 byron Rel $
+/reencsmalldict 12 dict def
+/ReEncodeSmall
+  { reencsmalldict begin
+    /newcodesandnames exch def
+    /newfontname exch def
+    /basefontname exch def
+    /basefontdict basefontname findfont def
+    /newfont basefontdict maxlength dict def
+    basefontdict
+      { exch dup /FID ne
+	  { dup /Encoding eq
+	    { exch dup length array copy
+		newfont 3 1 roll put }
+	    { exch newfont 3 1 roll put }
+	    ifelse }
+	  { pop pop }
+	  ifelse
+       } forall
+    newfont /FontName newfontname put
+    newcodesandnames aload pop
+    newcodesandnames length 2 idiv
+      { newfont /Encoding get 3 1 roll put}
+      repeat
+    newfontname newfont definefont pop
+    end
+   } def
+save/EnscriptJob exch def
+/StartEnscriptDoc{$enscript begin}def
+/$enscript 50 dict def $enscript begin
+/EndEnscriptDoc{end}def
+/S/show load def
+/X{exch 0 rmoveto S}def
+/Y{exch 0 exch rmoveto S}def
+/B{3 1 roll moveto S}def
+/F{$fd exch get setfont}def
+/StartPage{/svpg save def .05 dup scale 0 60 translate}def
+/EndPage{svpg restore showpage}def
+/DoPreFeed{/statusdict where{pop
+ statusdict/prefeed known{statusdict exch/prefeed exch put 0}if}if pop}def
+/SetUpFonts
+ {dup/$fd exch array def
+  {/$x exch def $x NLSvec ReEncodeSmall
+   $x findfont exch scalefont $fd 3 1 roll put}repeat}def
+/InitGaudy{/TwoColumn exch def /BarLength exch def
+ /Times-Bold /Times-Bold-NLS NLSvec ReEncodeSmall
+ /ftD /Times-Bold-NLS findfont 12 UP scalefont def
+ /Times-Roman /Times-Roman-NLS NLSvec ReEncodeSmall
+ /ftF /Times-Roman-NLS findfont 14 UP scalefont def
+ /Helvetica-Bold /Helvetica-Bold-NLS NLSvec ReEncodeSmall
+ /ftP /Helvetica-Bold-NLS findfont 30 UP scalefont def}def
+/U{1440 mul}def
+/UP{U 72 div}def
+/LB{/pts exch UP def /charcolor exch def /boxcolor exch def /font exch def
+ /label exch def /dy exch def /dx exch def /lly exch def /llx exch def
+ gsave boxcolor setgray
+ llx lly moveto dx 0 rlineto 0 dy rlineto dx neg 0 rlineto closepath fill
+ /lines label length def
+ /yp lly dy add dy lines pts mul sub 2 div sub pts .85 mul sub def
+ font setfont charcolor setgray
+ label {dup stringwidth pop 2 div llx dx 2 div add exch sub yp moveto show
+   /yp yp pts sub def}forall grestore}def
+end
+StartEnscriptDoc % end fixed prolog
+1 200 /Courier-Bold /NLS1Couri
+0 140 /Courier /NLS0Couri
+2 SetUpFonts
+10.500000 true InitGaudy
+/Landscape{90 rotate 0 -12240 translate}def
+/Gaudy{/Page exch def /Date exch def /File exch def /Comment exch def
+.25 U 11088 BarLength .1 sub U .25 U [File] ftF .97 0 14 LB
+.25 U 11448 BarLength .1 sub U .25 U [Comment] ftF 1 0 14 LB
+.25 U 11088 1 U .5 U Date ftD .7 0 12 LB
+BarLength .75 sub U 11088 1 U .5 U [Page] ftP .7 1 30 LB
+TwoColumn{BarLength 2 div .19 add U 11088 moveto 0 -10800 rlineto stroke}if
+}def
+%%EndProlog
+%%Page: ? 1
+StartPage
+Landscape
+()(grid_module.F)[(11/15/04)(15:09:44)](1)Gaudy
+0 F
+360 10870(!-------------------------------------------------------------------------)B
+360 10710(! NASA Goddard Space Flight Center Land Information System \(LIS\) V3.0)B
+360 10550(! Released May 2004)B
+360 10390(!)B
+360 10230(! See SOFTWARE DISTRIBUTION POLICY for software distribution policies)B
+360 10070(!)B
+360 9910(! The LIS source code and documentation are in the public domain,)B
+360 9750(! available without fee for educational, research, non-commercial and)B
+360 9590(! commercial purposes.  Users may distribute the binary or source)B
+360 9430(! code to third parties provided this statement appears on all copies and)B
+360 9270(! that no charge is made for such copies.)B
+360 9110(!)B
+360 8950(! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE)B
+360 8790(! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR)B
+360 8630(! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE)B
+360 8470(! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.)B
+360 8310(!)B
+360 8150(! See COPYRIGHT.TXT for copyright details.)B
+360 7990(!)B
+360 7830(!-------------------------------------------------------------------------)B
+360 7670(!BOP)B
+360 7510(!)B
+360 7350(! !MODULE: grid_module.F90)B
+360 7190(!)B
+360 7030(! !DESCRIPTION:)B
+360 6870(!  LIS non-model-specific grid variables only.)B
+360 6710(!)B
+360 6550(!  FORCING\(\) ARRAY: \\\\)B
+360 6390(!  1. T 2m    Temperature interpolated to 2 metres [$K$] \\\\)B
+360 6230(!  2. q 2m    Instantaneous specific humidity interpolated to 2 metres[$kg/kg$] \\\\)B
+360 6070(!  3. radswg  Downward shortwave flux at the ground [$W/m^2$] \\\\)B
+360 5910(!  4. lwgdwn  Downward longwave radiation at the ground [$W/m^2$] \\\\)B
+360 5750(!  5. u 10m   Instantaneous zonal wind interpolated to 10 metres [$m/s$] \\\\)B
+360 5590(!  6. v 10m   Instantaneous meridional wind interpolated to 10 metres[$m/s$] \\\\)B
+360 5430(!  7. ps      Instantaneous Surface Pressure [$Pa$] \\\\)B
+360 5270(!  8. preacc  Total precipitation [$mm/s$] \\\\)B
+360 5110(!  9. precon  Convective precipatation [$mm/s$] \\\\)B
+360 4950(! 10. albedo  Surface albedo \(0-1\))B
+360 4790(!)B
+360 4630(! !REVISION HISTORY:)B
+360 4470(!  15 Oct 1999: Paul Houser; Initial code)B
+360 4310(!  11 Apr 2000: Brian Cosgrove; Added Forcing Mask variables)B
+360 4150(!  23 Feb 2001: Urszula Jambor; Added GEOS & GDAS forcing variables)B
+360 3990(!  27 Feb 2001: Brian Cosgrove; Added Catchment forcing data variables)B
+360 3830(!  23 Mar 2001: Jon Radakovich; Added variables for PSAS assimilation)B
+360 3670(!  04 Sep 2001: Brian Cosgrove; Added variabes for humidity, precip,par)B
+360 3510(!               brightness temp,precip mask, removed awips2lis and )B
+360 3350(!               pinker2lis variables, GRIB interp. package used now)B
+360 3190(!  15 Oct 2001: Jesse Meng; Revised doc block with forcing array definition)B
+360 3030(!  15 Oct 2001: Jesse Meng; Added oblwdata1 and oblwdata2)B
+360 2870(!  14 Nov 2002: Sujay Kumar; Optimized version of grid_module)B
+360 2710(!)B
+360 2550(! !INTERFACE:)B
+360 2390(module grid_module )B
+528 2230(implicit none)B
+528 2070(public griddec)B
+360 1910(! !ARGUMENTS:  )B
+528 1750(type griddec)B
+780 1590(real    :: lat            !latitude of grid point)B
+780 1430(real    :: lon            !longitude of grid point )B
+780 1270(real    :: forcing\(10\)    !interpolated LIS forcing array)B
+780 1110(real    :: fgrd\(13\)  !fraction of vegetation class in grid     )B
+528 950(end type griddec)B
+360 790(!EOP)B
+360 630(end module grid_module)B
+EndPage
+%%Trailer
+EndEnscriptDoc
+EnscriptJob restore

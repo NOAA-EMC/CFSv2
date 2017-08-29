@@ -1,0 +1,19 @@
+# Template for INTEL
+#
+FC = ftn    
+LD = ftn    
+CC = cc
+
+# Opt 0 for gdsSOLO on the cray
+
+FFLAGS= -real-size 64 -integer-size 32 -O0 -convert big_endian -align dcommons -traceback $(INCL)
+F0FLAGS= -real-size 64 -integer-size 32 -O0 -xHost -convert big_endian -traceback $(INCL)
+CFLAGS =
+LDFLAGS = $(LIBS)
+
+#LIBS = /usrx/local/NetCDF/3.6.3/lib/libnetcdf.a 
+#INCL = -I/usrx/local/NetCDF/3.6.3/include
+
+LIBS=$(NETCDF_LDFLAGS)
+INCL=$(NETCDF_INCLUDE)
+

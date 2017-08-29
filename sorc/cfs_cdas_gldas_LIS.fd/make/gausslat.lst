@@ -1,0 +1,231 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/gausslat.F 03/09/11 11:03:55
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/gausslat.F"
+          1 |!BOP
+          2 |!
+          3 |! !ROUTINE : gausslat
+          4 |!
+          5 |! !DESCRIPTION:
+          6 |!   This subroutine computes gaussian latitudes
+          7 |!   Computes cosines of colatitude and gaussian weights
+          8 |!   on the gaussian latitudes.  the gaussian latitudes are at
+          9 |!   the zeroes of the legendre polynomial of the given order.
+         10 |!
+         11 |! !REVISION HISTORY:
+         12 |!   04-16-92 Mark Iredell; Initial Specification
+         13 |!   10-20-97 Mark Iredell; Increased precision
+         14 |!   05-14-02 Urzula Jambor; Reduced limit of eps from e-12 to e-7
+         15 |!
+         16 |!   INPUT ARGUMENT LIST:
+         17 |!     jmax     - input number of latitudes.
+         18 |!
+         19 |!   OUTPUT ARGUMENT LIST:
+         20 |!     slat     - real (k) cosines of colatitude.
+         21 |!     wlat     - real (k) gaussian weights.
+         22 |!
+         23 |! !INTERFACE:
+         24 |subroutine gausslat(jmax,slat,wlat)
+         25 |!EOP
+         26 |  implicit none
+         27 |  real, parameter :: pi=3.14159265358979
+         28 |  real, parameter :: eps=1.e-7
+         29 |  integer, parameter :: jz=50
+         30 |  real :: c
+         31 |  integer:: jmax, jh, jhe, n, j
+         32 |  real :: spmax, sp, r
+         33 |  real :: slat(jmax),wlat(jmax)
+         34 |  real :: pk(jmax/2),pkm1(jmax/2),pkm2(jmax/2)
+         35 |  real :: bz(jz)
+         36 |  data bz        / 2.4048255577,  5.5200781103, &
+         37 |       8.6537279129, 11.7915344391, 14.9309177086, 18.0710639679, &
+         38 |       21.2116366299, 24.3524715308, 27.4934791320, 30.6346064684, &
+         39 |       33.7758202136, 36.9170983537, 40.0584257646, 43.1997917132, &
+         40 |       46.3411883717, 49.4826098974, 52.6240518411, 55.7655107550, &
+         41 |       58.9069839261, 62.0484691902, 65.1899648002, 68.3314693299, &
+         42 |       71.4729816036, 74.6145006437, 77.7560256304, 80.8975558711, &
+         43 |       84.0390907769, 87.1806298436, 90.3221726372, 93.4637187819, &
+         44 |       96.6052679510, 99.7468198587, 102.888374254, 106.029930916, &
+         45 |       109.171489649, 112.313050280, 115.454612653, 118.596176630, &
+         46 |       121.737742088, 124.879308913, 128.020877005, 131.162446275, &
+         47 |       134.304016638, 137.445588020, 140.587160352, 143.728733573, &
+         48 |       146.870307625, 150.011882457, 153.153458019, 156.295034268 /
+         49 |
+         50 |  c=(1.-(2./pi)**2)*0.25
+         51 |  ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         52 |  jh=jmax/2
+         53 |  jhe=(jmax+1)/2
+         54 |  r=1./sqrt((jmax+0.5)**2+c)
+         55 |  do j=1,min(jh,jz)
+         56 |     slat(j)=cos(bz(j)*r)
+         57 |  enddo
+         58 |  do j=jz+1,jh
+         59 |     slat(j)=cos((bz(jz)+(j-jz)*pi)*r)
+         60 |  enddo
+         61 |  spmax=1.
+         62 |  do while(spmax.gt.eps)
+         63 |     spmax=0.
+         64 |     do j=1,jh
+         65 |        pkm1(j)=1.
+         66 |        pk(j)=slat(j)
+         67 |     enddo
+         68 |     do n=2,jmax
+         69 |        do j=1,jh
+         70 |           pkm2(j)=pkm1(j)
+         71 |           pkm1(j)=pk(j)
+         72 |           pk(j)=((2*n-1)*slat(j)*pkm1(j)-(n-1)*pkm2(j))/n
+         73 |        enddo
+         74 |     enddo
+         75 |     do j=1,jh
+         76 |        sp=pk(j)*(1.-slat(j)**2)/(jmax*(pkm1(j)-slat(j)*pk(j)))
+         77 |        slat(j)=slat(j)-sp
+         78 |        spmax=max(spmax,abs(sp))
+         79 |     enddo
+         80 |  enddo
+         81 |  do j=1,jh
+         82 |     wlat(j)=(2.*(1.-slat(j)**2))/(jmax*pkm1(j))**2
+         83 |     slat(jmax+1-j)=-slat(j)
+         84 |     wlat(jmax+1-j)=wlat(j)
+         85 |  enddo
+         86 |  if(jhe.gt.jh) then
+         87 |     slat(jhe)=0.
+         88 |     wlat(jhe)=2./jmax**2
+         89 |     do n=2,jmax,2
+         90 |        wlat(jhe)=wlat(jhe)*n**2/(n-1)**2
+         91 |     enddo
+         92 |  endif
+         93 |  ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         94 |  return
+         95 |end subroutine gausslat
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+abs                              Pure Intrinsic
+                                 0-78.25
+ 
+bz                               Static, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-35.11$  0-36.8*  0-56.18  0-59.19
+ 
+c                                Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-30.11$  0-50.3@  0-54.27
+ 
+cos                              Pure Intrinsic
+                                 0-56.14  0-59.14
+ 
+eps                              Parameter, Real(4)
+                                 0-28.22$  0-62.21
+ 
+gausslat                         Subroutine
+                                 0-24.12$
+ 
+j                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-31.31$  0-55.6@  0-56.11  0-56.21  0-58.6@  0-59.11  0-59.27  0-64.9@  0-65.14  0-66.12  0-66.20
+                                 0-69.12@  0-70.17  0-70.25  0-71.17  0-71.23  0-72.15  0-72.32  0-72.40  0-72.54  0-75.9@  0-76.15
+                                 0-76.27  0-76.46  0-76.54  0-76.60  0-77.14  0-77.22  0-81.6@  0-82.11  0-82.27  0-82.46  0-83.18
+                                 0-83.27  0-84.18  0-84.26
+ 
+jh                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-31.19$  0-52.3@  0-55.14  0-58.13  0-64.13  0-69.16  0-75.13  0-81.10  0-86.13
+ 
+jhe                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-31.23$  0-53.3@  0-86.6  0-87.11  0-88.11  0-90.14  0-90.24
+ 
+jmax                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-31.13$  0-24.21  0-33.16  0-33.16  0-33.27  0-33.27  0-34.14  0-34.14  0-34.27  0-34.27  0-34.40
+                                 0-34.40  0-52.6  0-53.8  0-54.14  0-68.13  0-76.35  0-82.36  0-83.11  0-84.11  0-88.19  0-89.13
+ 
+jz                               Parameter, Integer(4)
+                                 0-29.25$  0-35.14  0-55.17  0-58.8  0-59.22  0-59.29
+ 
+max                              Pure Intrinsic
+                                 0-78.15
+ 
+min                              Pure Intrinsic
+                                 0-55.10
+ 
+n                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-31.28$  0-68.9@  0-72.22  0-72.44  0-72.58  0-89.9@  0-90.29  0-90.35
+ 
+pi                               Parameter, Real(4)
+                                 0-27.22$  0-50.13  0-59.33
+ 
+pk                               Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-34.11$  0-66.9@  0-71.20  0-72.12@  0-76.12  0-76.57
+ 
+pkm1                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-34.22$  0-65.9@  0-70.20  0-71.12@  0-72.35  0-76.41  0-82.41
+ 
+pkm2                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-34.35$  0-70.12@  0-72.49
+ 
+r                                Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-32.22$  0-54.3@  0-56.24  0-59.37
+ 
+slat                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-33.11$  0-24.26  0-56.6@  0-59.6@  0-66.15  0-72.27  0-76.22  0-76.49  0-77.9@  0-77.17  0-82.22
+                                 0-83.6@  0-83.22  0-87.6@
+ 
+sp                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-32.18$  0-76.9@  0-77.25  0-78.29
+ 
+spmax                            Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-32.11$  0-61.3@  0-62.12  0-63.6@  0-78.9@  0-78.19
+ 
+sqrt                             Pure Intrinsic
+                                 0-54.8
+ 
+wlat                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-33.22$  0-24.31  0-82.6@  0-84.6@  0-84.21  0-88.6@  0-90.9@  0-90.19
+ 
+** gausslat   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/gausslat.F        03/09/11   11:03:55
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      96
+1501-510  Compilation successful for file gausslat.F.
+1501-543  Object file created.

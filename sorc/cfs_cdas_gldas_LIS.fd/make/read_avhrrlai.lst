@@ -1,0 +1,1471 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../params/lai/read_avhrrlai.F 03/09/11 11:04:43
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../params/lai/read_avhrrlai.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !ROUTINE: read_avhrrlai
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!  This program reads in AVHRR LAI data
+         27 |!
+         28 |! !REVISION HISTORY:
+         29 |!  27 Nov 2001: Jon Gottschalck; Initial code
+         30 |!  20 Feb 2002: Jon Gottschalck; Modified to use for 1/4 and 2x2.5 using 1/8 degree monthly data
+         31 |!  10 Sept 2004: Sujay Kumar, Initial Specification
+         32 |!
+         33 |! !INTERFACE:
+         34 |subroutine read_avhrrlai(lai1, lai2, wt1, wt2)
+         35 |! !USES:
+         36 |  use time_manager
+         37 |  use lisdrv_module, only : grid,lis
+         38 |  use filename_mod
+         39 |  use precision
+         40 |!EOP
+         41 |  implicit none
+         42 |
+         43 |!=== Arguments ===========================================================
+         44 |  integer :: domain
+         45 |  integer :: cindex, rindex
+         46 |  logical :: laifile1,laifile2
+         47 |  real*8             :: time1,time2                              ! Temporary Time variables
+         48 |  integer            :: yr1,mo1,yr2,mo2                          ! Temporary Time variables
+         49 |  integer            :: doy1,doy2                                ! Temporary Time variables
+         50 |  real               :: gmt1,gmt2                        ! Interpolation weights
+         51 |  integer            :: zeroi,numi                               ! Integer Number Holders
+         52 |  character (len=4)  :: cyr1,cyr2                                ! Filename variables
+         53 |  character (len=2)  :: cmo1,cmo2                                ! Filename variables
+         54 |  character (len=80) :: name, avhrrdir
+         55 |  character(len=80)  :: name9,  name10, name11, name12
+         56 |  character(len=80)  :: name13, name14, name15, name16
+         57 |  character(len=80)  :: ntop1, ntop2, nbot1, nbot2
+         58 |  character(len=100) :: temp
+         59 |  real(r8) :: lai1(lis%d%nch), lai2(lis%d%nch)
+         60 |  real :: wt1, wt2
+         61 |!=== End Local variable list
+         62 |!BOC
+         63 |!------------------------------------------------------------------------
+         64 |! Determine current time to find correct LAI files
+         65 |!------------------------------------------------------------------------
+         66 |  if (lis%t%tscount .eq. 0) then
+         67 |   lis%t%yr = lis%t%syr
+         68 |   lis%t%mo = lis%t%smo
+         69 |   lis%t%da = lis%t%sda
+         70 |   lis%t%mn = lis%t%smn
+         71 |   lis%t%ss = lis%t%sss
+         72 |  else
+         73 |   lis%t%yr = lis%t%yr
+         74 |   lis%t%mo = lis%t%mo
+         75 |   lis%t%da = lis%t%da
+         76 |   lis%t%mn = lis%t%mn
+         77 |   lis%t%ss = lis%t%ss
+         78 |  endif
+         79 |
+         80 |  call date2time(lis%t%time,lis%t%doy,lis%t%gmt,lis%t%yr, &
+         81 |       lis%t%mo,lis%t%da,lis%t%hr,lis%t%mn,lis%t%ss)
+         82 |!------------------------------------------------------------------------
+         83 |! Initialize LAI flag varaible
+         84 |!------------------------------------------------------------------------
+         85 |   lis%p%laiflag = 0
+         86 |
+         87 |   zeroi=0
+         88 |   numi=16
+         89 |!------------------------------------------------------------------------
+         90 |! Determine Monthly data Times (Assume Monthly
+         91 |! value valid at DA=16 HR=00Z)
+         92 |!------------------------------------------------------------------------
+         93 |   if (lis%t%da .lt. 16) then
+         94 |      mo1 = lis%t%mo-1
+         95 |      yr1 = lis%t%yr
+         96 |      if (mo1 .eq. 0) then
+         97 |         mo1 = 12
+         98 |         yr1 = lis%t%yr - 1
+         99 |      endif
+        100 |      mo2 = lis%t%mo
+        101 |      yr2 = lis%t%yr
+        102 |   else
+        103 |      mo1 = lis%t%mo
+        104 |      yr1 = lis%t%yr
+        105 |      mo2 = lis%t%mo+1
+        106 |      yr2 = lis%t%yr
+        107 |      if (mo2 .eq. 13) then
+        108 |         mo2 = 1
+        109 |         yr2 = lis%t%yr + 1
+        110 |      endif
+        111 |   endif
+        112 |
+        113 |   call date2time(time1,doy1,gmt1,yr1,mo1,numi,zeroi,zeroi,zeroi)
+        114 |   call date2time(time2,doy2,gmt2,yr2,mo2,numi,zeroi,zeroi,zeroi)
+        115 |!------------------------------------------------------------------------
+        116 |! Check to see if need new LAI data
+        117 |!------------------------------------------------------------------------
+        118 |   if (time2 .gt. lis%p%laitime) then
+        119 |      lis%p%laiflag = 1
+        120 |   else
+        121 |      lis%p%laiflag = 0
+        122 |   endif
+        123 |
+        124 |   avhrrdir = lis%p%avhrrdir
+        125 |!------------------------------------------------------------------------
+        126 |! Determine weights between months
+        127 |!------------------------------------------------------------------------
+        128 |   wt1 = (time2-lis%t%time)/(time2-time1)
+        129 |   wt2 = (lis%t%time-time1)/(time2-time1)
+        130 |
+        131 |!------------------------------------------------------------------------
+        132 |! Get new LAI data if required
+        133 |!------------------------------------------------------------------------
+        134 |  if (lis%p%laiflag .eq. 1) then
+        135 |     print*, 'in avhrr lai read.'
+        136 |     write(unit=temp,fmt='(i4,i2.2)') yr1, mo1
+        137 |     read (unit=temp,fmt='(a4,a2)') cyr1, cmo1
+        138 |     write(unit=temp,fmt='(i4,i2.2)') yr2,  mo2
+        139 |     read (unit=temp,fmt='(a4,a2)') cyr2, cmo2
+        140 |
+        141 |   lis%p%laitime = time2
+        142 |   if(lis%d%gridDesc(9).eq.0.01) then
+        143 |      domain = 8
+        144 |   else if(lis%d%gridDesc(9).eq.0.05) then
+        145 |      domain = 7
+        146 |   endif
+        147 |   if(domain ==8)  then
+        148 |      call avhrr_laifile_1km(name9,name10,name11,name12,&
+        149 |           lis%p%avhrrdir,cyr1,cyr2,cmo1,cmo2)
+        150 |   else if(domain ==7)  then
+        151 |      call avhrr_laifile_5km( &
+        152 |           name9,name10,name11,name12,&
+        153 |           lis%p%avhrrdir,cyr1,cyr2,cmo1,cmo2)
+        154 |   else
+        155 |      call avhrr_laifilename(name9,name10,name11,name12, &
+        156 |           lis%p%avhrrdir,cyr1,cyr2,cmo1,cmo2)
+        157 |   endif
+        158 |!------------------------------------------------------------------------
+        159 |! Open AVHRR LAI files (assumes realtime monthly files are present first
+        160 |! then uses climatology files)
+        161 |! Assume realtime monthly files are present as default
+        162 |!------------------------------------------------------------------------
+        163 |   print*, 'name9  ',name9
+        164 |   print*, 'name10 ',name10
+        165 |   inquire(file=name9,exist=laifile1)
+        166 |   inquire(file=name10,exist=laifile2)
+        167 |   call climatologylairead(name11, name12, lai1, lai2)
+        168 |end if
+        169 |end subroutine read_avhrrlai
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+a                                Use associated, Derived type: lisassimil, Component of Derived type definition: lisdec, Offset: 1276, Alignment: full word
+                                 0-36.7$
+ 
+advance_timestep                 Use associated, Module Subroutine
+                                 0-36.7$
+ 
+avhrr_g_file                     Use associated, Module Subroutine
+                                 0-38.7$
+ 
+avhrr_laifile_1km                Use associated, Module Subroutine
+                                 0-38.7$  0-148.12
+ 
+avhrr_laifile_5km                Use associated, Module Subroutine
+                                 0-38.7$  0-151.12
+ 
+avhrr_laifilename                Use associated, Module Subroutine
+                                 0-38.7$  0-155.12
+ 
+avhrr_saifile_1km                Use associated, Module Subroutine
+                                 0-38.7$
+ 
+avhrr_saifile_5km                Use associated, Module Subroutine
+                                 0-38.7$
+ 
+avhrr_saifilename                Use associated, Module Subroutine
+                                 0-38.7$
+ 
+avhrrdir                         Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-54.31$  0-124.4@
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+avhrrdir                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 400, Alignment: byte
+                                 0-36.7$
+ 
+cindex                           Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-45.14$
+ 
+clfile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 160, Alignment: byte
+                                 0-36.7$
+ 
+climatologylairead               External Subroutine
+                                 0-167.9
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Automatic, Character(2), Offset: 0, Alignment: full word
+                                 0-53.25$  0-137.43@  0-149.37  0-153.37  0-156.37
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo1                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Use associated, Reference argument, Intent (IN), Character(2), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cmo2                             Automatic, Character(2), Offset: 0, Alignment: full word
+                                 0-53.30$  0-139.43@  0-149.42  0-153.42  0-156.42
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Automatic, Character(4), Offset: 0, Alignment: full word
+                                 0-52.25$  0-137.37@  0-149.27  0-153.27  0-156.27
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr1                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+cyr2                             Automatic, Character(4), Offset: 0, Alignment: full word
+                                 0-52.30$  0-139.37@  0-149.32  0-153.32  0-156.32
+ 
+cyr2                             Use associated, Reference argument, Intent (IN), Character(4), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+d                                Use associated, Derived type: lisdomain, Component of Derived type definition: lisdec, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+da                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+da                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+da                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+da                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 88, Alignment: full word
+                                 0-36.7$
+ 
+date2time                        Use associated, Module Subroutine
+                                 0-36.7$  0-80.8  0-113.9  0-114.9
+ 
+day                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+day                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+day                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+day                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+days                             Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+dfile                            Use associated, Character(40), Component of Derived type definition: lisoutput, Offset: 92, Alignment: byte
+                                 0-36.7$
+ 
+domain                           Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 28, Alignment: full word
+                                 0-36.7$
+ 
+domain                           Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-44.14$  0-143.7@  0-145.7@  0-147.7  0-150.12
+ 
+doy                              Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+doy                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 76, Alignment: full word
+                                 0-36.7$
+ 
+doy                              Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+doy                              Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+doy1                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-49.25$  0-113.25
+ 
+doy2                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-49.30$  0-114.25
+ 
+ecor                             Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+eda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 48, Alignment: full word
+                                 0-36.7$
+ 
+edoy                             Use associated, Integer(4), Component of Derived type definition: listime, Offset: 40, Alignment: full word
+                                 0-36.7$
+ 
+egmt                             Use associated, Real(4), Component of Derived type definition: listime, Offset: 132, Alignment: full word
+                                 0-36.7$
+ 
+ehr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 44, Alignment: full word
+                                 0-36.7$
+ 
+elev                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+elev_griddesc                    Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 296, Alignment: full word
+                                 0-36.7$
+ 
+elevfile                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 520, Alignment: byte
+                                 0-36.7$
+ 
+emn                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 36, Alignment: full word
+                                 0-36.7$
+ 
+emo                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 52, Alignment: full word
+                                 0-36.7$
+ 
+endcode                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 28, Alignment: full word
+                                 0-36.7$
+ 
+endtime                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 104, Alignment: full word
+                                 0-36.7$
+ 
+ess                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 32, Alignment: full word
+                                 0-36.7$
+ 
+etime                            Use associated, Real(8), Component of Derived type definition: listime, Offset: 120, Alignment: double word
+                                 0-36.7$
+ 
+expcode                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 20, Alignment: full word
+                                 0-36.7$
+ 
+eyr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 56, Alignment: full word
+                                 0-36.7$
+ 
+f                                Use associated, Derived type: lisforcing, Component of Derived type definition: lisdec, Offset: 344, Alignment: full word
+                                 0-36.7$
+ 
+f00_flag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 60, Alignment: full word
+                                 0-36.7$
+ 
+f06_flag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 64, Alignment: full word
+                                 0-36.7$
+ 
+fgrd                             Use associated, Real(4) (1:13), Component of Derived type definition: griddec, Offset: 72, Alignment: full word
+                                 0-37.7$
+ 
+fidgm                            Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 36, Alignment: full word
+                                 0-36.7$
+ 
+fidtm                            Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 44, Alignment: full word
+                                 0-36.7$
+ 
+filename_mod                     Use associated, Nonintrinsic Module
+                                 0-38.7$  0-38.7
+ 
+findagrtime1                     Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 52, Alignment: full word
+                                 0-36.7$
+ 
+findagrtime2                     Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 56, Alignment: full word
+                                 0-36.7$
+ 
+findtime1                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 44, Alignment: full word
+                                 0-36.7$
+ 
+findtime2                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 48, Alignment: full word
+                                 0-36.7$
+ 
+force                            Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+forcing                          Use associated, Real(4) (1:16), Component of Derived type definition: griddec, Offset: 8, Alignment: full word
+                                 0-37.7$
+ 
+foropen                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 28, Alignment: full word
+                                 0-36.7$
+ 
+ftn_unit                         Use associated, Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+ftn_unit                         Use associated, Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+get_curr_calday                  Use associated, Module Function Real(4)
+                                 0-36.7$
+ 
+get_curr_date                    Use associated, Module Subroutine
+                                 0-36.7$
+ 
+get_curr_time                    Use associated, Module Subroutine
+                                 0-36.7$
+ 
+get_nstep                        Use associated, Module Function Integer(4)
+                                 0-36.7$
+ 
+get_prev_date                    Use associated, Module Subroutine
+                                 0-36.7$
+ 
+get_ref_date                     Use associated, Module Subroutine
+                                 0-36.7$
+ 
+get_start_date                   Use associated, Module Subroutine
+                                 0-36.7$
+ 
+get_step_size                    Use associated, Module Function Integer(4)
+                                 0-36.7$
+ 
+glbnch                           Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+glbngrid                         Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 24, Alignment: full word
+                                 0-36.7$
+ 
+gmt                              Use associated, Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+gmt                              Use associated, Real(4), Component of Derived type definition: listime, Offset: 128, Alignment: full word
+                                 0-36.7$
+ 
+gmt                              Use associated, Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+gmt                              Use associated, Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+gmt1                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-50.25$  0-113.30
+ 
+gmt2                             Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-50.30$  0-114.30
+ 
+gnc                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 36, Alignment: full word
+                                 0-36.7$
+ 
+gnr                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 40, Alignment: full word
+                                 0-36.7$
+ 
+gpcpsrc                          Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 68, Alignment: full word
+                                 0-36.7$
+ 
+grid                             Pointer, Use associated, Static, Derived type: griddec (:), Offset: 0, Alignment: quadruple word
+                                 0-37.29$
+ 
+grid_module                      Use associated, Nonintrinsic Module
+                                 0-37.7$
+ 
+gridchange                       Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 24, Alignment: full word
+                                 0-36.7$
+ 
+griddesc                         Use associated, Real(4) (1:50), Component of Derived type definition: lisdomain, Offset: 72, Alignment: full word
+                                 0-36.7$
+ 
+hhmmss                           Use associated, Integer(4), Component of Derived type definition: listime, Offset: 72, Alignment: full word
+                                 0-36.7$
+ 
+hr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+hr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+hr                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 92, Alignment: full word
+                                 0-36.7$
+ 
+hr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+i8                               Use associated, Parameter, Integer(4)
+                                 0-36.7$  0-39.7$
+ 
+ic                               Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 52, Alignment: full word
+                                 0-36.7$
+ 
+interp                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 28, Alignment: full word
+                                 0-36.7$
+ 
+ir                               Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 56, Alignment: full word
+                                 0-36.7$
+ 
+is_last_step                     Use associated, Module Function Logical(4)
+                                 0-36.7$
+ 
+iscfile                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 480, Alignment: byte
+                                 0-36.7$
+ 
+lai                              Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+lai1                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-59.15$  0-34.26  0-167.44
+ 
+lai2                             Reference argument, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-59.32$  0-34.32  0-167.50
+ 
+laifile1                         Automatic, Logical(4), Offset: 0, Alignment: full word
+                                 0-46.14$  0-165.29
+ 
+laifile2                         Automatic, Logical(4), Offset: 0, Alignment: full word
+                                 0-46.23$  0-166.30
+ 
+laiflag                          Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+laitime                          Use associated, Real(8), Component of Derived type definition: lisparameters, Offset: 560, Alignment: double word
+                                 0-36.7$
+ 
+landcover                        Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 32, Alignment: full word
+                                 0-36.7$
+ 
+lat                              Use associated, Real(4), Component of Derived type definition: griddec, Offset: 0, Alignment: full word
+                                 0-37.7$
+ 
+latmax                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 32, Alignment: full word
+                                 0-36.7$
+ 
+lc_griddesc                      Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 320, Alignment: full word
+                                 0-36.7$
+ 
+lis                              Use associated, Static, Derived type: lisdec, Offset: 0, Alignment: quadruple word
+                                 0-37.34$
+ 
+lis%d%griddesc                   Use associated, Static, Real(4) (1:50), Offset: 72, Alignment: double word
+                                 0-142.7  0-144.12
+ 
+lis%d%nch                        Use associated, Static, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-59.20  0-59.20  0-59.37  0-59.37
+ 
+lis%p%avhrrdir                   Use associated, Static, Character(40), Offset: 824, Alignment: double word
+                                 0-124.15  0-149.12  0-153.12  0-156.12
+ 
+lis%p%laiflag                    Use associated, Static, Integer(4), Offset: 436, Alignment: full word
+                                 0-85.4@  0-119.7@  0-121.7@  0-134.7
+ 
+lis%p%laitime                    Use associated, Static, Real(8), Offset: 984, Alignment: double word
+                                 0-118.19  0-141.4@
+ 
+lis%t%da                         Use associated, Static, Integer(4), Offset: 1088, Alignment: quadruple word
+                                 0-69.4@  0-75.4@  0-75.15  0-81.17  0-93.8
+ 
+lis%t%doy                        Use associated, Static, Integer(4), Offset: 1076, Alignment: full word
+                                 0-80.29
+ 
+lis%t%gmt                        Use associated, Static, Real(4), Offset: 1128, Alignment: double word
+                                 0-80.39
+ 
+lis%t%hr                         Use associated, Static, Integer(4), Offset: 1092, Alignment: full word
+                                 0-81.26
+ 
+lis%t%mn                         Use associated, Static, Integer(4), Offset: 1096, Alignment: double word
+                                 0-70.4@  0-76.4@  0-76.15  0-81.35
+ 
+lis%t%mo                         Use associated, Static, Integer(4), Offset: 1084, Alignment: full word
+                                 0-68.4@  0-74.4@  0-74.15  0-81.8  0-94.13  0-100.13  0-103.13  0-105.13
+ 
+lis%t%sda                        Use associated, Static, Integer(4), Offset: 1016, Alignment: double word
+                                 0-69.15
+ 
+lis%t%smn                        Use associated, Static, Integer(4), Offset: 1008, Alignment: quadruple word
+                                 0-70.15
+ 
+lis%t%smo                        Use associated, Static, Integer(4), Offset: 1020, Alignment: full word
+                                 0-68.15
+ 
+lis%t%ss                         Use associated, Static, Integer(4), Offset: 1100, Alignment: full word
+                                 0-71.4@  0-77.4@  0-77.15  0-81.44
+ 
+lis%t%sss                        Use associated, Static, Integer(4), Offset: 1000, Alignment: double word
+                                 0-71.15
+ 
+lis%t%syr                        Use associated, Static, Integer(4), Offset: 1024, Alignment: quadruple word
+                                 0-67.15
+ 
+lis%t%time                       Use associated, Static, Real(8), Offset: 1112, Alignment: double word
+                                 0-80.18  0-128.17  0-129.11
+ 
+lis%t%tscount                    Use associated, Static, Integer(4), Offset: 1064, Alignment: double word
+                                 0-66.7
+ 
+lis%t%yr                         Use associated, Static, Integer(4), Offset: 1080, Alignment: double word
+                                 0-67.4@  0-73.4@  0-73.15  0-80.49  0-95.13  0-98.16  0-101.13  0-104.13  0-106.13  0-109.16
+ 
+lis_module                       Use associated, Nonintrinsic Module
+                                 0-36.7$  0-37.7$
+ 
+lisassimil                       Use associated, Derived type definition
+                                 0-36.7$
+ 
+lisdec                           Use associated, Derived type definition
+                                 0-36.7$
+ 
+lisdomain                        Use associated, Derived type definition
+                                 0-36.7$
+ 
+lisdrv_module                    Use associated, Nonintrinsic Module
+                                 0-37.7$  0-37.7
+ 
+lisforcing                       Use associated, Derived type definition
+                                 0-36.7$
+ 
+lisoutput                        Use associated, Derived type definition
+                                 0-36.7$
+ 
+lisparameters                    Use associated, Derived type definition
+                                 0-36.7$
+ 
+listime                          Use associated, Derived type definition
+                                 0-36.7$
+ 
+lnc                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 44, Alignment: full word
+                                 0-36.7$
+ 
+lnr                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 48, Alignment: full word
+                                 0-36.7$
+ 
+lon                              Use associated, Real(4), Component of Derived type definition: griddec, Offset: 4, Alignment: full word
+                                 0-37.7$
+ 
+longflag                         Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 40, Alignment: full word
+                                 0-36.7$
+ 
+lsm                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+lt                               Use associated, Reference argument, Derived type: listime, Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+masterproc                       Use associated, Static, Logical(4), Offset: 8, Alignment: double word
+                                 0-36.7$
+ 
+maxt                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 60, Alignment: full word
+                                 0-36.7$
+ 
+mfile                            Use associated, Character(50), Component of Derived type definition: lisparameters, Offset: 20, Alignment: byte
+                                 0-36.7$
+ 
+mina                             Use associated, Real(4), Component of Derived type definition: lisdomain, Offset: 64, Alignment: full word
+                                 0-36.7$
+ 
+mn                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 96, Alignment: full word
+                                 0-36.7$
+ 
+mn                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mn                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mn                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mo                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 84, Alignment: full word
+                                 0-36.7$
+ 
+mo                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mo                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mo                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mo1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-48.29$  0-94.7@  0-96.11  0-97.10@  0-103.7@  0-113.39  0-136.44
+ 
+mo2                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-48.37$  0-100.7@  0-105.7@  0-107.11  0-108.10@  0-114.39  0-138.45
+ 
+modis_file_1km                   Use associated, Module Subroutine
+                                 0-38.7$
+ 
+modis_file_2                     Use associated, Module Subroutine
+                                 0-38.7$
+ 
+modis_file_5km                   Use associated, Module Subroutine
+                                 0-38.7$
+ 
+modis_g_file                     Use associated, Module Subroutine
+                                 0-38.7$
+ 
+modisdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+modisdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+modisdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+modisdir                         Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 440, Alignment: byte
+                                 0-36.7$
+ 
+modisdir                         Use associated, Reference argument, Intent (IN), Character(40), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+mon                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mon                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mon                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+mon                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+name                             Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-54.25$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-55.33$  0-148.36  0-152.18  0-155.36  0-164.22  0-166.17
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name10                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-55.41$  0-148.43  0-152.25  0-155.43  0-167.28
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name11                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-55.49$  0-148.50  0-152.32  0-155.50  0-167.36
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name12                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-56.25$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name13                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-56.33$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name14                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name15                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-56.41$
+ 
+name15                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-56.49$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name16                           Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-55.25$  0-148.30  0-152.12  0-155.30  0-163.22  0-165.17
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+name9                            Use associated, Reference argument, Intent (OUT), Character(80), Offset: 0, Alignment: byte
+                                 0-38.7$
+ 
+nbot1                            Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-57.39$
+ 
+nbot2                            Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-57.46$
+ 
+nch                              Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+nf                               Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+nforce                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+ngrid                            Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 20, Alignment: full word
+                                 0-36.7$
+ 
+nmif                             Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+nt                               Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+ntop1                            Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-57.25$
+ 
+ntop2                            Automatic, Character(80), Offset: 0, Alignment: full word
+                                 0-57.32$
+ 
+numi                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-51.31$  0-88.4@  0-113.43  0-114.43
+ 
+numoutf                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 32, Alignment: full word
+                                 0-36.7$
+ 
+o                                Use associated, Derived type: lisoutput, Component of Derived type definition: lisdec, Offset: 1144, Alignment: full word
+                                 0-36.7$
+ 
+odir                             Use associated, Character(40), Component of Derived type definition: lisoutput, Offset: 52, Alignment: byte
+                                 0-36.7$
+ 
+offset                           Use associated, Reference argument, Optional, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+offset                           Use associated, Reference argument, Optional, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+p                                Use associated, Derived type: lisparameters, Component of Derived type definition: lisdec, Offset: 424, Alignment: double word
+                                 0-36.7$
+ 
+pda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 108, Alignment: full word
+                                 0-36.7$
+ 
+po1file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 200, Alignment: byte
+                                 0-36.7$
+ 
+po2file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 240, Alignment: byte
+                                 0-36.7$
+ 
+po3file                          Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 280, Alignment: byte
+                                 0-36.7$
+ 
+precision                        Use associated, Nonintrinsic Module
+                                 0-36.7$  0-39.7  0-39.7$
+ 
+r4                               Use associated, Parameter, Integer(4)
+                                 0-36.7$  0-39.7$
+ 
+r8                               Use associated, Parameter, Integer(4)
+                                 0-36.7$  0-39.7$  0-59.8
+ 
+radsrc                           Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 72, Alignment: full word
+                                 0-36.7$
+ 
+rbias                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+rcgm                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 40, Alignment: full word
+                                 0-36.7$
+ 
+rctm                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 48, Alignment: full word
+                                 0-36.7$
+ 
+rdbc                             Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+read_avhrrlai                    Subroutine
+                                 0-34.12$
+ 
+ribc                             Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+rindex                           Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-45.22$
+ 
+rpsas                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+rsdbc                            Use associated, Integer(4), Component of Derived type definition: lisassimil, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+rstflag                          Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 20, Alignment: full word
+                                 0-36.7$
+ 
+safile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 120, Alignment: byte
+                                 0-36.7$
+ 
+saiflag                          Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+saitime                          Use associated, Real(8), Component of Derived type definition: lisparameters, Offset: 568, Alignment: double word
+                                 0-36.7$
+ 
+sda                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+sdoy                             Use associated, Integer(4), Component of Derived type definition: listime, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+seconds                          Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+selected_int_kind                Use associated, Pure Intrinsic
+                                 0-36.7$  0-39.7$
+ 
+selected_real_kind               Use associated, Pure Intrinsic
+                                 0-36.7$  0-39.7$
+ 
+sgmt                             Use associated, Real(4), Component of Derived type definition: listime, Offset: 136, Alignment: full word
+                                 0-36.7$
+ 
+shortflag                        Use associated, Integer(4), Component of Derived type definition: lisforcing, Offset: 36, Alignment: full word
+                                 0-36.7$
+ 
+shr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+sifile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 360, Alignment: byte
+                                 0-36.7$
+ 
+slfile                           Use associated, Character(40), Component of Derived type definition: lisparameters, Offset: 320, Alignment: byte
+                                 0-36.7$
+ 
+smn                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+smo                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 20, Alignment: full word
+                                 0-36.7$
+ 
+soil                             Use associated, Integer(4), Component of Derived type definition: lisdomain, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+soil_griddesc                    Use associated, Real(4) (1:6), Component of Derived type definition: lisdomain, Offset: 272, Alignment: full word
+                                 0-36.7$
+ 
+spmdmod                          Use associated, Nonintrinsic Module
+                                 0-36.7$
+ 
+ss                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+ss                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+ss                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 100, Alignment: full word
+                                 0-36.7$
+ 
+sss                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+startcode                        Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 24, Alignment: full word
+                                 0-36.7$
+ 
+syr                              Use associated, Integer(4), Component of Derived type definition: listime, Offset: 24, Alignment: full word
+                                 0-36.7$
+ 
+t                                Use associated, Derived type: listime, Component of Derived type definition: lisdec, Offset: 1000, Alignment: double word
+                                 0-36.7$
+ 
+temp                             Automatic, Character(100), Offset: 0, Alignment: full word
+                                 0-58.25$  0-136.17  0-137.17  0-138.17  0-139.17
+ 
+tick                             Use associated, Module Subroutine
+                                 0-36.7$
+ 
+tile_spmdmod                     Use associated, Nonintrinsic Module
+                                 0-37.7$
+ 
+time                             Use associated, Reference argument, Real(8), Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+time                             Use associated, Reference argument, Real(8), Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+time                             Use associated, Reference argument, Real(8), Offset: 0, Alignment: double word
+                                 0-36.7$
+ 
+time                             Use associated, Real(8), Component of Derived type definition: listime, Offset: 112, Alignment: double word
+                                 0-36.7$
+ 
+time1                            Automatic, Real(8), Offset: 0, Alignment: double word
+                                 0-47.25$  0-113.19  0-128.36  0-129.22  0-129.36
+ 
+time2                            Automatic, Real(8), Offset: 0, Alignment: double word
+                                 0-47.31$  0-114.19  0-118.8  0-128.11  0-128.30  0-129.30  0-141.20
+ 
+time2date                        Use associated, Module Subroutine
+                                 0-36.7$
+ 
+time_manager                     Use associated, Nonintrinsic Module
+                                 0-36.7$  0-36.7
+ 
+timemgr_init                     Use associated, Module Subroutine
+                                 0-36.7$
+ 
+timemgr_print                    Use associated, Module Subroutine
+                                 0-36.7$
+ 
+timemgr_read_restart             Use associated, Module Subroutine
+                                 0-36.7$
+ 
+timemgr_restart                  Use associated, Module Subroutine
+                                 0-36.7$
+ 
+timemgr_write_restart            Use associated, Module Subroutine
+                                 0-36.7$
+ 
+tod                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+tod                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+tod                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+tod                              Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+ts                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 60, Alignment: full word
+                                 0-36.7$
+ 
+ts                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+tscount                          Use associated, Integer(4), Component of Derived type definition: listime, Offset: 64, Alignment: full word
+                                 0-36.7$
+ 
+udef                             Use associated, Real(4), Component of Derived type definition: lisdomain, Offset: 68, Alignment: full word
+                                 0-36.7$
+ 
+vclass                           Use associated, Integer(4), Component of Derived type definition: lisparameters, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+vfile                            Use associated, Character(50), Component of Derived type definition: lisparameters, Offset: 70, Alignment: byte
+                                 0-36.7$
+ 
+wfor                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+wout                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 8, Alignment: full word
+                                 0-36.7$
+ 
+wparam                           Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 16, Alignment: full word
+                                 0-36.7$
+ 
+wsingle                          Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 12, Alignment: full word
+                                 0-36.7$
+ 
+wt1                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-60.11$  0-34.38  0-128.4@
+ 
+wt2                              Reference argument, Real(4), Offset: 0, Alignment: full word
+                                 0-60.16$  0-34.43  0-129.4@
+ 
+wtil                             Use associated, Integer(4), Component of Derived type definition: lisoutput, Offset: 4, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Integer(4), Component of Derived type definition: listime, Offset: 80, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr                               Use associated, Reference argument, Intent (OUT), Integer(4), Offset: 0, Alignment: full word
+                                 0-36.7$
+ 
+yr1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-48.25$  0-95.7@  0-98.10@  0-104.7@  0-113.35  0-136.39
+ 
+yr2                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-48.33$  0-101.7@  0-106.7@  0-109.10@  0-114.35  0-138.39
+ 
+yyyymmdd                         Use associated, Integer(4), Component of Derived type definition: listime, Offset: 68, Alignment: full word
+                                 0-36.7$
+ 
+zeroi                            Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-51.25$  0-87.4@  0-113.48  0-113.54  0-113.60  0-114.48  0-114.54  0-114.60
+ 
+** read_avhrrlai   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../params/lai/read_avhrrlai.F
+                                      03/09/11   11:04:43
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     170
+1501-510  Compilation successful for file read_avhrrlai.F.
+1501-543  Object file created.

@@ -1,0 +1,171 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../baseforcing/gdas.20070502/readgdascrd.F 03/09/11 11:04:50
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../baseforcing/gdas.20070502/readgdascrd.F"
+          1 |!-------------------------------------------------------------------------
+          2 |!     NASA GSFC Land Information Systems LIS 2.3                         !
+          3 |!-------------------------------------------------------------------------
+          4 |!BOP
+          5 |!
+          6 |! !ROUTINE: readgdascrd.F90
+          7 |!
+          8 |! !DESCRIPTION:
+          9 |!  Routine to read GDAS specific parameters from the card file.
+         10 |!
+         11 |! !REVISION HISTORY:
+         12 |! 11 Dec 2003; Sujay Kumar, Initial Code
+         13 |!
+         14 |! !INTERFACE:
+         15 |subroutine readgdascrd(gdasdrv)
+         16 |! !USES:
+         17 |  use gdasdrv_module
+         18 |!EOP
+         19 |  implicit none
+         20 |  integer :: lsm
+         21 |  type(gdasdrvdec) :: gdasdrv
+         22 |  namelist /gdas/gdasdrv
+         23 |!BOC
+         24 |  open(11,file='lis.crd',form='formatted',status='old')
+         25 |  read(unit=11,NML=gdas)
+         26 |  print*,'Using GDAS forcing'
+         27 |  print*, 'GDAS forcing directory :',gdasdrv%GDASDIR
+         28 |  gdasdrv%GDASTIME1  = 3000.0
+         29 |  gdasdrv%GDASTIME2  = 0.0
+         30 |
+         31 |  close(11)
+         32 |!EOC
+         33 |end subroutine readgdascrd
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+gdas                             Namelist
+                                 0-22.13$  0-25.20
+ 
+gdasdir                          Use associated, Character(40), Component of Derived type definition: gdasdrvdec, Offset: 12, Alignment: byte
+                                 0-17.7$
+ 
+gdasdrv                          Reference argument, Derived type: gdasdrvdec, Offset: 0, Alignment: double word
+                                 0-21.23$  0-15.24  0-22.18
+ 
+gdasdrv%gdasdir                  Reference argument, Character(40), Offset: 12, Alignment: full word
+                                 0-21.23$  0-27.38
+ 
+gdasdrv%gdastime1                Reference argument, Real(8), Offset: 56, Alignment: double word
+                                 0-21.23$  0-28.3@
+ 
+gdasdrv%gdastime2                Reference argument, Real(8), Offset: 64, Alignment: quadruple word
+                                 0-21.23$  0-29.3@
+ 
+gdasdrv%gridchange1              Reference argument, Logical(4), Offset: 88, Alignment: double word
+                                 0-21.23$
+ 
+gdasdrv%gridchange2              Reference argument, Logical(4), Offset: 92, Alignment: full word
+                                 0-21.23$
+ 
+gdasdrv%griduptime1              Reference argument, Real(8), Offset: 72, Alignment: double word
+                                 0-21.23$
+ 
+gdasdrv%griduptime2              Reference argument, Real(8), Offset: 80, Alignment: quadruple word
+                                 0-21.23$
+ 
+gdasdrv%ncold                    Reference argument, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-21.23$
+ 
+gdasdrv%nmif                     Reference argument, Integer(4), Offset: 8, Alignment: double word
+                                 0-21.23$
+ 
+gdasdrv%nrold                    Reference argument, Integer(4), Offset: 4, Alignment: full word
+                                 0-21.23$
+ 
+gdasdrv_module                   Use associated, Nonintrinsic Module
+                                 0-17.7$  0-17.7
+ 
+gdasdrvdec                       Use associated, Derived type definition
+                                 0-17.7$  0-21.8
+ 
+gdastime1                        Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 56, Alignment: double word
+                                 0-17.7$
+ 
+gdastime2                        Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 64, Alignment: double word
+                                 0-17.7$
+ 
+gridchange1                      Use associated, Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 88, Alignment: full word
+                                 0-17.7$
+ 
+gridchange2                      Use associated, Logical(4), Component of Derived type definition: gdasdrvdec, Offset: 92, Alignment: full word
+                                 0-17.7$
+ 
+griduptime1                      Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 72, Alignment: double word
+                                 0-17.7$
+ 
+griduptime2                      Use associated, Real(8), Component of Derived type definition: gdasdrvdec, Offset: 80, Alignment: double word
+                                 0-17.7$
+ 
+lsm                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-20.14$
+ 
+ncold                            Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 0, Alignment: full word
+                                 0-17.7$
+ 
+nmif                             Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 8, Alignment: full word
+                                 0-17.7$
+ 
+nrold                            Use associated, Integer(4), Component of Derived type definition: gdasdrvdec, Offset: 4, Alignment: full word
+                                 0-17.7$
+ 
+readgdascrd                      Subroutine
+                                 0-15.12@
+ 
+** readgdascrd   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../baseforcing/gdas.20070502/readgdascrd.F
+                                      03/09/11   11:04:50
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................      34
+1501-510  Compilation successful for file readgdascrd.F.
+1501-543  Object file created.

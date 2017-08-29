@@ -1,0 +1,216 @@
+(ld): setopt 64
+(ld): halt 4
+(ld): setfflag 4
+(ld): savename ../../cfs_cdas_gldas_LIS
+(ld): filelist 166 1
+(ld): i /lib/crt0_64.o
+(ld): i LIS_domain_FTable.o
+(ld): i LIS_elevdiff_FTable.o
+(ld): i LIS_forcing_FTable.o
+(ld): i LIS_lai_FTable.o
+(ld): i LIS_landcover_FTable.o
+(ld): i LIS_lsm_FTable.o
+(ld): i LIS_pcpforcing_FTable.o
+(ld): i LIS_radforcing_FTable.o
+(ld): i LIS_soils_FTable.o
+(ld): i absoft.o
+(ld): i agrlwdn.o
+(ld): i agrmetdomain_module.o
+(ld): i agrmetdrv_module.o
+(ld): i agrmetopendap_module.o
+(ld): i baseforcing_module.o
+(ld): i baseforcing_pluginMod.o
+(ld): i bilinear_interp.o
+(ld): i bilinear_interpMod.o
+(ld): i calculate_domveg.o
+(ld): i check_error.o
+(ld): i climatologylairead.o
+(ld): i climatologysairead.o
+(ld): i cmapdomain_module.o
+(ld): i cmapdrv_module.o
+(ld): i compute_coord.o
+(ld): i compute_coord_gauss.o
+(ld): i compute_coord_latlon.o
+(ld): i conserv_interp.o
+(ld): i conserv_interpMod.o
+(ld): i constantsMod.o
+(ld): i create_vegtilespace.o
+(ld): i createtiles_latlon.o
+(ld): i define_gds.o
+(ld): i domain_module.o
+(ld): i domain_pluginMod.o
+(ld): i driverpardef_module.o
+(ld): i drv_output_mod.o
+(ld): i elevadjust.o
+(ld): i elevdiff_pluginMod.o
+(ld): i endrun.o
+(ld): i filename_mod.o
+(ld): i funcphys.o
+(ld): i gausslat.o
+(ld): i gdasdomain_module.o
+(ld): i gdasdrv_module.o
+(ld): i get_fieldpos.o
+(ld): i getcmap.o
+(ld): i getgdas.o
+(ld): i getgrad.o
+(ld): i gfs_sfc_diff.o
+(ld): i glbprecip_cmap.o
+(ld): i grid_module.o
+(ld): i grid_spmdMod.o
+(ld): i gswp_module.o
+(ld): i interp_agrmet_lw.o
+(ld): i interp_agrmet_sw.o
+(ld): i interp_cmap.o
+(ld): i lai_pluginMod.o
+(ld): i landcover_pluginMod.o
+(ld): i lis_indices_module.o
+(ld): i lis_log_msg.o
+(ld): i lis_log_msgC.o
+(ld): i lis_memory_managementC.o
+(ld): i lis_module.o
+(ld): i lis_openfileMod.o
+(ld): i lisdrv.o
+(ld): i lisdrv_module.o
+(ld): i llm.o
+(ld): i lsm_module.o
+(ld): i lsm_pluginMod.o
+(ld): i machine.o
+(ld): i makepdsn.o
+(ld): i maketiles_gaussian.o
+(ld): i maketiles_gds.o
+(ld): i maketiles_gds1km.o
+(ld): i maketiles_gswp.o
+(ld): i maketiles_nongds.o
+(ld): i maketiles_nongds_1km.o
+(ld): i mapvegc.o
+(ld): i mpishorthand.o
+(ld): i noah_alb.o
+(ld): i noah_almaout.o
+(ld): i noah_atmdrv.o
+(ld): i noah_binout.o
+(ld): i noah_coldstart.o
+(ld): i noah_dynsetup.o
+(ld): i noah_gather.o
+(ld): i noah_gfrac.o
+(ld): i noah_gribout.o
+(ld): i noah_main.o
+(ld): i noah_module.o
+(ld): i noah_output.o
+(ld): i noah_physics.o
+(ld): i noah_scatter.o
+(ld): i noah_setup.o
+(ld): i noah_singlegather.o
+(ld): i noah_singleout.o
+(ld): i noah_snowupdate.o
+(ld): i noah_soil_typ.o
+(ld): i noah_tileout.o
+(ld): i noah_totinit.o
+(ld): i noah_varder.o
+(ld): i noah_writerst.o
+(ld): i noah_writestats.o
+(ld): i noahdrv_module.o
+(ld): i noahpardef_module.o
+(ld): i noahrst.o
+(ld): i obsprecipforcing_module.o
+(ld): i obsradforcing_module.o
+(ld): i opendap_module.o
+(ld): i physcons.o
+(ld): i polfixs.o
+(ld): i precipforcing_pluginMod.o
+(ld): i precision.o
+(ld): i radforcing_pluginMod.o
+(ld): i read_avhrrlai.o
+(ld): i read_avhrrsai.o
+(ld): i read_elevdiff_gtopo30.o
+(ld): i read_faoclay.o
+(ld): i read_faosand.o
+(ld): i read_faosilt.o
+(ld): i read_statsgoclay.o
+(ld): i read_statsgosand.o
+(ld): i read_statsgosilt.o
+(ld): i read_umdavhrr_lc.o
+(ld): i read_umdavhrr_mask.o
+(ld): i readagrmetcrd.o
+(ld): i readcard.o
+(ld): i readcmapcrd.o
+(ld): i readdomain_default.o
+(ld): i readgdascrd.o
+(ld): i readkpds.o
+(ld): i readnoahcrd.o
+(ld): i retagrlw.o
+(ld): i retgdas.o
+(ld): i retglbSW.o
+(ld): i setnoahp.o
+(ld): i sh2o_init.o
+(ld): i soils_pluginMod.o
+(ld): i spmdMod.o
+(ld): i stats.o
+(ld): i string_utils.o
+(ld): i tile_module.o
+(ld): i tile_spmdMod.o
+(ld): i time_interp_agrmet.o
+(ld): i time_interp_cmap.o
+(ld): i time_interp_gdas.o
+(ld): i time_manager.o
+(ld): i zterp.o
+(ld): lib /usr/lib/libmass.a
+(ld): lib ../../../../lib/libesmf_3_1_0rp2.a
+(ld): lib ../../../../lib/libbacio_4.a
+(ld): lib ../../../../lib/libip_4.a
+(ld): lib ../../../../lib/libw3_4.a
+(ld): lib ../../../../lib/libsp_4.a
+(ld): lib /usr/lib/libessl.a
+(ld): lib /usr/lib/liblapi_r.a
+(ld): lib /usr/lpp/ppe.poe/lib/libmpi_r.a
+(ld): lib /lib/threads/libxlf90.a
+(ld): lib /usr/lpp/xlf/lib/libxlopt.a
+(ld): lib /usr/lpp/xlf/lib/libxlf.a
+(ld): lib /usr/lib/libxlsmp.a
+(ld): lib /usr/lib/libpthreads.a
+(ld): lib /usr/lib/libm.a
+(ld): lib /usr/lpp/ppe.poe/lib/threads/libc.a
+LIBRARY: Shared object libessl.a[essl_64.o]: 1772 symbols imported.
+LIBRARY: Shared object liblapi_r.a[liblapi64_r.o]: 345 symbols imported.
+LIBRARY: Shared object liblapi_r.a[liblapirdma64_r.o]: 3 symbols imported.
+LIBRARY: Shared object liblapi_r.a[liblapishm64_r.o]: 8 symbols imported.
+LIBRARY: Shared object liblapi_r.a[liblapiudp64_r.o]: 6 symbols imported.
+LIBRARY: Shared object libmpi_r.a[mpicore64_r.o]: 651 symbols imported.
+LIBRARY: Shared object libmpi_r.a[mpifort64_r.o]: 1595 symbols imported.
+LIBRARY: Shared object libmpi_r.a[mpipoe64_r.o]: 98 symbols imported.
+LIBRARY: Shared object libmpi_r.a[mpicpp64_r.o]: 24 symbols imported.
+LIBRARY: Shared object libmpi_r.a[dynamic64_r.o]: 22 symbols imported.
+LIBRARY: Shared object libmpi_r.a[pm_chkrst64_r.o]: 3 symbols imported.
+LIBRARY: Shared object libxlf90.a[io_64.o]: 94 symbols imported.
+LIBRARY: Shared object libxlf90.a[math_64.o]: 352 symbols imported.
+LIBRARY: Shared object libxlf90.a[xlfsys_64.o]: 34 symbols imported.
+LIBRARY: Symbols imported from import file /lib/threads/libxlf90.a[_xlf_aio.imp]: 10
+LIBRARY: Shared object libxlf90.a[_xlf_posix_64.o]: 88 symbols imported.
+LIBRARY: Shared object libxlsmp.a[smprt_64.o]: 156 symbols imported.
+LIBRARY: Shared object libpthreads.a[shr_xpg5_64.o]: 332 symbols imported.
+LIBRARY: Shared object libc.a[shr_64.o]: 2669 symbols imported.
+LIBRARY: Shared object libc.a[posix_aio_64.o]: 20 symbols imported.
+LIBRARY: Shared object libc.a[aio_64.o]: 18 symbols imported.
+LIBRARY: Shared object libc.a[pse_64.o]: 5 symbols imported.
+LIBRARY: Shared object libc.a[dl_64.o]: 4 symbols imported.
+LIBRARY: Shared object libc.a[pty_64.o]: 1 symbols imported.
+FILELIST: Number of previously inserted files processed: 166
+(ld): initfini poe_remote_main 
+(ld): resolve
+RESOLVE: 1540 of 31840 symbols were kept.
+(ld): addgl /usr/lib/glink64.o
+ADDGL: Glink code added for 153 symbols.
+(ld): er full
+ER: There are no unresolved symbols.
+(ld): mismatch
+MISMATCH: No type mismatches exist.
+(ld): comprld
+COMPRLD: Kept 12864 of 12864 relocation entries.
+(ld): origin page 0x100000000 0x110000000
+(ld): libpath ../../../../lib:/usr/lpp/ppe.poe/lib/threads:/usr/lpp/ppe.poe/lib:/lib/threads:/usr/lpp/xlf/lib:/usr/lib:/lib
+LIBPATH: Library path set to ../../../../lib:/usr/lpp/ppe.poe/lib/threads:/usr/lpp/ppe.poe/lib:/lib/threads:/usr/lpp/xlf/lib:/usr/lib:/lib
+(ld): save 1L .
+SAVE: Section sizes = 780590+139442+1416936 (0xBE92E+0x220B2+0x159EE8 hex)
+SAVE: Size of TOC: 4480 (0x1180 hex)
+(ld): gen map map
+(ld): rc
+RC: Highest return code was 0.

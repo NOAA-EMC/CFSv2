@@ -1,0 +1,37 @@
+0021	<P> : original PENTAD, 2.5 deg, 5 days
+----
+0091	<WD>: distance from weighting pointer to real grid
+----
+1000	<B> : 5 day sum of <A>, 2.5 deg
+----
+1001	<A> : ipolate GDAS TO 2.5 deg, 6 hr
+  :     
+  :
+1020	(1024 for leap year pentad 12)
+----
+3001	<Q> : = <P> * <A> / <B>
+  :	temporally disaggregated <P> to 2.5 deg, 6 hr
+  :
+3020    (3024 for leap year pentad 12)
+----
+4001	<G> : spatially disaggregated <Q> TO 0.7 deg, 6 hr
+  :
+  :
+4020    (4024 for leap year pentad 12)
+----
+5001	<QQ> : remap <Q> TO 0.7 deg, 6 hr
+  :
+  :
+5020    (5024 for leap year pentad 12)
+----
+6001	<AA> : remap <A> TO 0.7 deg, 6 hr
+  :
+  :
+6020    (6024 for leap year pentad 12)
+----
+9001    <G> : spatially disaggregated <Q> TO 0.7 deg, 6 hr
+  :           in grib format
+  :
+9020    (9024 for leap year pentad 12)
+----
+SNOW DOES NOT LIKE UNIT 9000, USE 900 INSTEAD

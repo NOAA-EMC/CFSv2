@@ -1,0 +1,354 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../lsm-plugin/lsm_pluginMod.F 03/09/11 11:04:11
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../lsm-plugin/lsm_pluginMod.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |! !MODULE: lsm_pluginMod.F90
+         24 |!
+         25 |! !DESCRIPTION:
+         26 |!   This module contains the definition of the functions used for
+         27 |!   land surface model initialization, execution, reading and
+         28 |!   writing of restart files and other relevant land surface
+         29 |!   model computations, corresponding to each of the LSMs used in LIS.
+         30 |!
+         31 |! !REVISION HISTORY:
+         32 |!  09 Oct 03    Sujay Kumar  Initial Specification
+         33 |!
+         34 |! !INTERFACE:
+         35 |module lsm_pluginMod
+         36 |!EOP
+         37 |  implicit none
+         38 |
+         39 |contains
+         40 |!BOP
+         41 |! !ROUTINE: lsm_plugin
+         42 |!
+         43 |! !DESCRIPTION:
+         44 |!
+         45 |! This is a custom-defined plugin point for introducing a new LSM.
+         46 |! The interface mandates that the following routines be implemented
+         47 |! and registered for each of the LSM that is included in LIS.
+         48 |!
+         49 |!  \begin{description}
+         50 |!  \item[Initialization]
+         51 |!      Definition of LSM variables
+         52 |!      (to be registered using registerlsmini)
+         53 |!  \item[Setup]
+         54 |!      Initialization of parameters
+         55 |!      (to be registered using registerlsmsetup)
+         56 |!  \item[DynamicSetup]
+         57 |!      Routines to setup time dependent parameters
+         58 |!      (to be registered using registerlsmdynsetup)
+         59 |!  \item[Run]
+         60 |!      Routines to execute LSM on a single gridcell for single timestep
+         61 |!      (to be registered using registerlsmrun)
+         62 |!  \item[Read restart]
+         63 |!      Routines to read a restart file for an LSM run
+         64 |!      (to be registered using registerlsmrestart)
+         65 |!  \item[Output]
+         66 |!      Routines to write output
+         67 |!      (to be registered using registerlsmoutput)
+         68 |!  \item[Forcing transfer to model tiles]
+         69 |!      Routines to transfer an array of given forcing to model tiles
+         70 |!      (to be registered using registerlsmf2t)
+         71 |!  \item[Write restart]
+         72 |!      Routines to write a restart file
+         73 |!      (to be registered using registerlsmwrst)
+         74 |!  \end{description}
+         75 |! Multiple LSMs can be
+         76 |! included as well, each distinguished in the function table registry
+         77 |! by the associated LSM index assigned in the card file.
+         78 |!
+         79 |! !INTERFACE:
+         80 |  subroutine lsm_plugin
+         81 |! !USES:
+         82 |!    use template_varder, only : template_varder_ini
+         83 |    use noah_varder, only : noah_varder_ini
+         84 |!    use clm_varder, only : clm_varder_ini
+         85 |!    use vic_varder, only : vic_varder_ini
+         86 |!    use atmdrvMod, only : atmdrv
+         87 |!    use mos_varder, only : mos_varder_ini
+         88 |!    use hyssib_varder, only : hyssib_varder_ini
+         89 |!    use ssib_varder, only : ssib_varder_ini
+         90 |!EOP
+         91 |
+         92 |    external template_main
+         93 |    external template_setup
+         94 |    external templaterst
+         95 |    external template_output
+         96 |    external template_f2t
+         97 |    external template_writerst
+         98 |    external template_dynsetup
+         99 |
+        100 |!    external mos_main
+        101 |!    external mos_setup
+        102 |!    external mosrst
+        103 |!    external mos_output
+        104 |!    external mos_f2t
+        105 |!    external mos_writerst
+        106 |!    external mos_dynsetup
+        107 |
+        108 |!    external hyssib_main
+        109 |!    external hyssib_setup
+        110 |!    external hyssibrst
+        111 |!    external hyssib_output
+        112 |!    external hyssib_f2t
+        113 |!    external hyssib_writerst
+        114 |!    external hyssib_dynsetup
+        115 |
+        116 |!    external ssib_main
+        117 |!    external ssib_setup
+        118 |!    external ssibrst
+        119 |!    external ssib_output
+        120 |!    external ssib_f2t
+        121 |!    external ssib_writerst
+        122 |!    external ssib_dynsetup
+        123 |
+        124 |    external noah_main
+        125 |    external noah_setup
+        126 |    external noahrst
+        127 |    external noah_output
+        128 |    external noah_f2t
+        129 |    external noah_writerst
+        130 |    external noah_dynsetup
+        131 |
+        132 |!    external driver
+        133 |!    external clm2_setup
+        134 |!    external clm2_restart
+        135 |!    external clm2_output
+        136 |!    external clm2wrst
+        137 |!    external clm2_dynsetup
+        138 |
+        139 |!    external vic_main
+        140 |!    external vic_setup
+        141 |!    external vic_readrestart
+        142 |!    external vic_output
+        143 |!    external vic_atmdrv
+        144 |!    external vic_writerestart
+        145 |!    external vic_dynsetup
+        146 |
+        147 |!BOC
+        148 |!    call registerlsmini(0,template_varder_ini)
+        149 |    call registerlsmini(1,noah_varder_ini)
+        150 |!    call registerlsmini(2,clm_varder_ini)
+        151 |!    call registerlsmini(3,vic_varder_ini)
+        152 |!    call registerlsmini(4,mos_varder_ini)
+        153 |!    call registerlsmini(5,hyssib_varder_ini)
+        154 |!    call registerlsmini(6,ssib_varder_ini)
+        155 |
+        156 |!    call registerlsmsetup(0,template_setup)
+        157 |    call registerlsmsetup(1,noah_setup)
+        158 |!    call registerlsmsetup(2,clm2_setup)
+        159 |!    call registerlsmsetup(3,vic_setup)
+        160 |!    call registerlsmsetup(4, mos_setup)
+        161 |!    call registerlsmsetup(5, hyssib_setup)
+        162 |!    call registerlsmsetup(6, ssib_setup)
+        163 |
+        164 |!    call registerlsmdynsetup(0,template_dynsetup)
+        165 |    call registerlsmdynsetup(1,noah_dynsetup)
+        166 |!    call registerlsmdynsetup(2,clm2_dynsetup)
+        167 |!    call registerlsmdynsetup(3,vic_dynsetup)
+        168 |!    call registerlsmdynsetup(4, mos_dynsetup)
+        169 |!    call registerlsmdynsetup(5,hyssib_dynsetup)
+        170 |!    call registerlsmdynsetup(6,ssib_dynsetup)
+        171 |
+        172 |!    call registerlsmrun(0,template_main)
+        173 |    call registerlsmrun(1,noah_main)
+        174 |!    call registerlsmrun(2,driver)
+        175 |!    call registerlsmrun(3,vic_main)
+        176 |!    call registerlsmrun(4, mos_main)
+        177 |!    call registerlsmrun(5, hyssib_main)
+        178 |!    call registerlsmrun(6, ssib_main)
+        179 |
+        180 |!    call registerlsmrestart(0,templaterst)
+        181 |    call registerlsmrestart(1,noahrst)
+        182 |!    call registerlsmrestart(2,clm2_restart)
+        183 |!    call registerlsmrestart(3,vic_readrestart)
+        184 |!    call registerlsmrestart(4, mosrst)
+        185 |!    call registerlsmrestart(5,hyssibrst)
+        186 |!    call registerlsmrestart(6,ssibrst)
+        187 |
+        188 |!    call registerlsmoutput(0,template_output)
+        189 |    call registerlsmoutput(1,noah_output)
+        190 |!    call registerlsmoutput(2,clm2_output)
+        191 |!    call registerlsmoutput(3,vic_output)
+        192 |!    call registerlsmoutput(4, mos_output)
+        193 |!    call registerlsmoutput(5,hyssib_output)
+        194 |!    call registerlsmoutput(6,ssib_output)
+        195 |
+        196 |!    call registerlsmf2t(0,template_f2t)
+        197 |    call registerlsmf2t(1,noah_f2t)
+        198 |!    call registerlsmf2t(2,atmdrv)
+        199 |!    call registerlsmf2t(3,vic_atmdrv)
+        200 |!    call registerlsmf2t(4, mos_f2t)
+        201 |!    call registerlsmf2t(5,hyssib_f2t)
+        202 |!    call registerlsmf2t(6,ssib_f2t)
+        203 |
+        204 |!    call registerlsmwrst(0,template_writerst)
+        205 |    call registerlsmwrst(1,noah_writerst)
+        206 |!    call registerlsmwrst(2,clm2wrst)
+        207 |!    call registerlsmwrst(3,vic_writerestart)
+        208 |!    call registerlsmwrst(4, mos_writerst)
+        209 |!    call registerlsmwrst(5,hyssib_writerst)
+        210 |!    call registerlsmwrst(6,ssib_writerst)
+        211 |!EOC
+        212 |  end subroutine lsm_plugin
+        213 |end module lsm_pluginMod
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+lsm_plugin                       Public, Module Subroutine
+                                 0-80.14$
+ 
+lsm_pluginmod                    Nonintrinsic Module
+                                 0-35.8$
+ 
+nch                              Use associated, Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-83.9$
+ 
+noah_dynsetup                    External Subprogram Unknown type
+                                 0-130.14$  0-165.32
+ 
+noah_f2t                         External Subprogram Unknown type
+                                 0-128.14$  0-197.27
+ 
+noah_main                        External Subprogram Unknown type
+                                 0-124.14$  0-173.27
+ 
+noah_output                      External Subprogram Unknown type
+                                 0-127.14$  0-189.30
+ 
+noah_setup                       External Subprogram Unknown type
+                                 0-125.14$  0-157.29
+ 
+noah_varder                      Use associated, Nonintrinsic Module
+                                 0-83.9$  0-83.9
+ 
+noah_varder_ini                  Use associated, Module Subroutine
+                                 0-83.29$  0-149.27
+ 
+noah_writerst                    External Subprogram Unknown type
+                                 0-129.14$  0-205.28
+ 
+noahrst                          External Subprogram Unknown type
+                                 0-126.14$  0-181.31
+ 
+registerlsmdynsetup              External Subroutine
+                                 0-165.10
+ 
+registerlsmf2t                   External Subroutine
+                                 0-197.10
+ 
+registerlsmini                   External Subroutine
+                                 0-149.10
+ 
+registerlsmoutput                External Subroutine
+                                 0-189.10
+ 
+registerlsmrestart               External Subroutine
+                                 0-181.10
+ 
+registerlsmrun                   External Subroutine
+                                 0-173.10
+ 
+registerlsmsetup                 External Subroutine
+                                 0-157.10
+ 
+registerlsmwrst                  External Subroutine
+                                 0-205.10
+ 
+template_dynsetup                Unknown type
+                                 0-98.14$
+ 
+template_f2t                     Unknown type
+                                 0-96.14$
+ 
+template_main                    Unknown type
+                                 0-92.14$
+ 
+template_output                  Unknown type
+                                 0-95.14$
+ 
+template_setup                   Unknown type
+                                 0-93.14$
+ 
+template_writerst                Unknown type
+                                 0-97.14$
+ 
+templaterst                      Unknown type
+                                 0-94.14$
+ 
+** lsm_pluginmod   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../lsm-plugin/lsm_pluginMod.F
+                                      03/09/11   11:04:11
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     214
+1501-510  Compilation successful for file lsm_pluginMod.F.
+1501-543  Object file created.

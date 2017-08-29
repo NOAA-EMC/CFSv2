@@ -1,0 +1,14 @@
+# Template for Intel compilers on CRAY
+#
+FC = ftn
+LD = ftn
+CC = cc
+
+FFLAGS = -r8 -fpconstant -i4 -FR -auto -save-temps -Wp,-P -align dcommon -O2 -assume byterecl $(INCL)
+CFLAGS = -O3 -save-temps $(INCL)
+LDFLAGS =  $(LIBS) -openmp
+
+LIBS = $(NETCDF_LDFLAGS) 
+
+INCL = $(NETCDF_FFLAGS) 
+

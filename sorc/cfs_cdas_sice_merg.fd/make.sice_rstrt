@@ -1,0 +1,21 @@
+SHELL=  /bin/sh
+LIBS    = ${LIBSM}
+
+FFLAGS=${FFLAGSM}
+
+PROG=sice_rstrt
+SUF=cfs_cdas_
+OBJS=sice_rstrt_io.o ocn_rstrt_io.o $(PROG).o
+
+$(PROG):	${OBJS} 
+	$(FC) -o $(SUF)$(PROG) ${OBJS} ${LIBS} ${NCDF}
+
+sice_rstrt_io.o: sice_rstrt_io.f
+	$(FC) ${FFLAGS} $(INC) -c sice_rstrt_io.f
+
+ocn_rstrt_io.o: ocn_rstrt_io.f
+	$(FC) ${FFLAGS} $(INC) -c ocn_rstrt_io.f
+
+$(PROG).o: $(PROG).f
+	$(FC) ${FFLAGS} $(INC) -c $(PROG).f
+

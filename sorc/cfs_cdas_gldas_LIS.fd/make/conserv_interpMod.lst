@@ -1,0 +1,406 @@
+IBM XL Fortran for AIX, V12.1 (5724-U82) Version 12.01.0000.0001 --- ../interp/conserv_interpMod.F 03/09/11 11:03:41
+ 
+>>>>> OPTIONS SECTION <<<<<
+***   Options In Effect   ***
+  
+         ==  On / Off Options  ==
+         CR              DBG             ESCAPE          FULLPATH
+         I4              INLGLUE         NOLIBESSL       NOLIBPOSIX
+         OBJECT          SOURCE          STRICT          SWAPOMP
+         THREADED        UNWIND          ZEROSIZE
+  
+         ==  Options Of Integer Type ==
+         ALIAS_SIZE(65536)     MAXMEM(-1)            OPTIMIZE(2)
+         SPILLSIZE(2000)       STACKTEMP(0)
+  
+         ==  Options Of Character Type  ==
+         64(LARGETYPE)         ALIAS(STD,NOINTPTR)   ALIGN(BINDC(POWER),STRUCT(NATURAL))
+         ARCH(PWR6)            ATTR(FULL)            AUTODBL(NONE)
+         DESCRIPTOR(V1)        DIRECTIVE(IBM*,IBMT)  ENUM()
+         FLAG(I,I)             FLOAT(RNDSNGL,MAF,FOLD,RNGCHK,SINGLE)
+         FREE(F90)             HALT(S)               IEEE(NEAR)
+         INTSIZE(4)            LANGLVL(EXTENDED)     REALSIZE(4)
+         NOSAVE()              TUNE(PWR6)            UNROLL(AUTO)
+         XREF(FULL)            XLF2003(NOPOLYMORPHIC,NOBOZLITARGS,NOSTOPEXCEPT,NOVOLATILE,NOAUTOREALLOC,OLDNANINF)
+         XLF77(LEADZERO,BLANKPAD)
+         XLF90(NOSIGNEDZERO,NOAUTODEALLOC,OLDPAD)
+  
+>>>>> SOURCE SECTION <<<<<
+          1 |#line 1 "../interp/conserv_interpMod.F"
+          1 |!-------------------------------------------------------------------------
+          2 |! NASA Goddard Space Flight Center Land Information System (LIS) V3.0
+          3 |! Released May 2004
+          4 |!
+          5 |! See SOFTWARE DISTRIBUTION POLICY for software distribution policies
+          6 |!
+          7 |! The LIS source code and documentation are in the public domain,
+          8 |! available without fee for educational, research, non-commercial and
+          9 |! commercial purposes.  Users may distribute the binary or source
+         10 |! code to third parties provided this statement appears on all copies and
+         11 |! that no charge is made for such copies.
+         12 |!
+         13 |! NASA GSFC MAKES NO REPRESENTATIONS ABOUT THE SUITABILITY OF THE
+         14 |! SOFTWARE FOR ANY PURPOSE.  IT IS PROVIDED AS IS WITHOUT EXPRESS OR
+         15 |! IMPLIED WARRANTY.  NEITHER NASA GSFC NOR THE US GOVERNMENT SHALL BE
+         16 |! LIABLE FOR ANY DAMAGES SUFFERED BY THE USER OF THIS SOFTWARE.
+         17 |!
+         18 |! See COPYRIGHT.TXT for copyright details.
+         19 |!
+         20 |!-------------------------------------------------------------------------
+         21 |!BOP
+         22 |!
+         23 |!  !MODULE: conserv_interpMod.F90
+         24 |!
+         25 |!  !DESCRIPTION:
+         26 |!   This module contains routines that precomputes weights and
+         27 |!   other parameters required for spatial interpolation of model
+         28 |!   forcing
+         29 |!
+         30 |!  !REVISION HISTORY:
+         31 |!  14Nov02    Sujay Kumar  Initial Specification
+         32 |!
+         33 |! !INTERFACE:
+         34 |module conserv_interpMod
+         35 |
+         36 |  implicit none
+         37 |  ! !ARGUMENTS:
+         38 |  integer                :: nb3,nb4
+         39 |  real, allocatable      :: rlat3(:)
+         40 |  real, allocatable      :: rlon3(:)
+         41 |  integer, allocatable   :: n113(:,:)
+         42 |  integer, allocatable   :: n123(:,:)
+         43 |  integer, allocatable   :: n213(:,:)
+         44 |  integer, allocatable   :: n223(:,:)
+         45 |  real, allocatable      ::  w113(:,:),w123(:,:)
+         46 |  real, allocatable      ::  w213(:,:),w223(:,:)
+         47 |  !EOP
+         48 |contains
+         49 |  !BOP
+         50 |  ! !ROUTINE: allocate_interp
+         51 |  !
+         52 |  ! !DESCRIPTION:
+         53 |  !
+         54 |  ! Allocates memory for interpolation of model forcing data (GEOS and GDAS)
+         55 |  !
+         56 |  ! !INTERFACE:
+         57 |
+         58 |  subroutine allocate_conserv_interp(n)
+         59 |    ! !ARGUMENTS:
+         60 |    integer, intent(in) :: n
+         61 |    !EOC
+         62 |    allocate(rlat3(n))
+         63 |    allocate(rlon3(n))
+         64 |    allocate(n113(n,25))
+         65 |    allocate(n123(n,25))
+         66 |    allocate(n213(n,25))
+         67 |    allocate(n223(n,25))
+         68 |    allocate(w113(n,25))
+         69 |    allocate(w123(n,25))
+         70 |    allocate(w213(n,25))
+         71 |    allocate(w223(n,25))
+         72 |    w113 = 0.0
+         73 |    w123 = 0.0
+         74 |    w213 = 0.0
+         75 |    w223 = 0.0
+         76 |  end subroutine allocate_conserv_interp
+         77 |
+         78 |  subroutine conserv_interp_input(gridDesci,gridDesco,npts)
+         79 |    real, intent(in) :: gridDesci(50)
+         80 |    real             :: gridDesco(50)
+         81 |    real, parameter     :: fill = -9999.0
+         82 |    real                :: xpts(npts), ypts(npts)
+         83 |    real                :: xptb(npts), yptb(npts)
+         84 |    real                :: rlob(npts), rlab(npts)
+         85 |    integer             :: npts
+         86 |    integer             :: ipopt(20)
+         87 |    integer             :: nb1, nb2, mo
+         88 |    integer             :: i1, i2, j1, j2
+         89 |    real                :: xi, xf, yi, yf
+         90 |    integer             :: get_fieldpos
+         91 |    integer             :: iret,ib,nb,jb,n,nv,lb,wb
+         92 |
+         93 |    !  COMPUTE NUMBER OF OUTPUT POINTS AND THEIR LATITUDES AND LONGITUDES.
+         94 |    mo = npts
+         95 |    iret=0
+         96 |    ipopt = 0
+         97 |    ipopt(1) = -1
+         98 |    ipopt(2) = -1
+         99 |    if(gridDesco(1).ge.0) then
+        100 |       call compute_coord(gridDesco, 0,mo,fill,xpts,ypts,rlon3,rlat3,nv,0)
+        101 |       if(mo.eq.0) iret=3
+        102 |    else
+        103 |       iret=31
+        104 |    endif
+        105 |    ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        106 |    !  SET PARAMETERS
+        107 |    nb1=ipopt(1)
+        108 |    if(nb1.eq.-1) nb1=2
+        109 |    if(iret.eq.0.and.nb1.lt.0.) iret=32
+        110 |    if(iret.eq.0.and.nb1.ge.20.and.ipopt(2).ne.-1) iret=32
+        111 |    if(iret.eq.0) then
+        112 |       nb2=2*nb1+1
+        113 |       nb3=nb2*nb2
+        114 |       nb4=nb3
+        115 |       if(ipopt(2).ne.-1) then
+        116 |          nb4=ipopt(2)
+        117 |          do ib=1,nb1
+        118 |             nb4=nb4+8*ib*ipopt(2+ib)
+        119 |          enddo
+        120 |       endif
+        121 |    else
+        122 |       nb2=0
+        123 |       nb3=0
+        124 |       nb4=0
+        125 |    endif
+        126 |
+        127 |    ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        128 |    !  LOOP OVER SAMPLE POINTS IN OUTPUT GRID BOX
+        129 |    do nb=1,nb3
+        130 |       !  locate input points and compute their weights
+        131 |       jb=(nb-1)/nb2-nb1
+        132 |       ib=nb-(jb+nb1)*nb2-nb1-1
+        133 |       lb=max(abs(ib),abs(jb))
+        134 |       wb=1
+        135 |       if(ipopt(2).ne.-1) wb=ipopt(2+lb)
+        136 |       if(wb.ne.0) then
+        137 |          do n=1,mo
+        138 |             xptb(n)=xpts(n)+ib/real(nb2)
+        139 |             yptb(n)=ypts(n)+jb/real(nb2)
+        140 |          enddo
+        141 |          call compute_coord(gridDesco, 1,mo,fill,xptb,yptb,rlob,rlab,nv,0)
+        142 |          call compute_coord(gridDesci,-1,mo,fill,xptb,yptb,rlob,rlab,nv,0)
+        143 |          if(iret.eq.0.and.nv.eq.0.and.lb.eq.0) iret=2
+        144 |          do n=1,mo
+        145 |             xi=xptb(n)
+        146 |             yi=yptb(n)
+        147 |             if(xi.ne.fill.and.yi.ne.fill) then
+        148 |                i1=xi
+        149 |                i2=i1+1
+        150 |                j1=yi
+        151 |                j2=j1+1
+        152 |                xf=xi-i1
+        153 |                yf=yi-j1
+        154 |                n113(n,nb)=get_fieldpos(i1,j1,gridDesci)
+        155 |                n213(n,nb)=get_fieldpos(i2,j1,gridDesci)
+        156 |                n123(n,nb)=get_fieldpos(i1,j2,gridDesci)
+        157 |                n223(n,nb)=get_fieldpos(i2,j2,gridDesci)
+        158 |                if(min(n113(n,nb),n213(n,nb),n123(n,nb),n223(n,nb)).gt.0) then
+        159 |                   w113(n,nb)=(1-xf)*(1-yf)
+        160 |                   w213(n,nb)=xf*(1-yf)
+        161 |                   w123(n,nb)=(1-xf)*yf
+        162 |                   w223(n,nb)=xf*yf
+        163 |                else
+        164 |                   n113(n,nb)=0
+        165 |                   n213(n,nb)=0
+        166 |                   n123(n,nb)=0
+        167 |                   n223(n,nb)=0
+        168 |                endif
+        169 |             else
+        170 |                n113(n,nb)=0
+        171 |                n213(n,nb)=0
+        172 |                n123(n,nb)=0
+        173 |                n223(n,nb)=0
+        174 |             endif
+        175 |!             print*, 'def ',n,nb,n113(n,nb),n213(n,nb)
+        176 |          enddo
+        177 |       endif
+        178 |    enddo
+        179 |  end subroutine conserv_interp_input
+        180 |
+        181 |end module conserv_interpMod
+ 
+>>>>> ATTRIBUTE AND CROSS REFERENCE SECTION <<<<<
+ 
+ 
+ 
+IDENTIFIER NAME                  CROSS REFERENCE AND ATTRIBUTES
+ 
+abs                              Pure Intrinsic
+                                 0-133.15  0-133.23
+ 
+allocate_conserv_interp          Public, Module Subroutine
+                                 0-58.14$
+ 
+compute_coord                    External Subroutine
+                                 0-100.13  0-141.16  0-142.16
+ 
+conserv_interp_input             Public, Module Subroutine
+                                 0-78.14$
+ 
+conserv_interpmod                Nonintrinsic Module
+                                 0-34.8$
+ 
+fill                             Parameter, Real(4)
+                                 0-81.28$  0-100.43  0-141.46  0-142.46  0-147.23  0-147.38
+ 
+get_fieldpos                     External Function Integer(4)
+                                 0-90.28$  0-154.28  0-155.28  0-156.28  0-157.28
+ 
+griddesci                        Reference argument, Intent (IN), Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-79.25$  0-78.35  0-142.30  0-154.47  0-155.47  0-156.47  0-157.47
+ 
+griddesco                        Reference argument, Real(4) (1:50), Offset: 0, Alignment: full word
+                                 0-80.25$  0-78.45  0-99.8  0-100.27  0-141.30
+ 
+i1                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-88.28$  0-148.17@  0-149.20  0-152.23  0-154.41  0-156.41
+ 
+i2                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-88.32$  0-149.17@  0-155.41  0-157.41
+ 
+ib                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.33$  0-117.14@  0-118.24  0-118.35  0-132.8@  0-133.19  0-138.30
+ 
+ipopt                            Automatic, Integer(4) (1:20), Offset: 0, Alignment: full word
+                                 0-86.28$  0-96.5@  0-97.5@  0-98.5@  0-107.9  0-110.36  0-115.11  0-116.15  0-118.27  0-135.11
+                                 0-135.30
+ 
+iret                             Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.28$  0-95.5@  0-101.20@  0-103.8@  0-109.8  0-109.33@  0-110.8  0-110.52@  0-111.8  0-143.14
+                                 0-143.49@
+ 
+j1                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-88.36$  0-150.17@  0-151.20  0-153.23  0-154.44  0-155.44
+ 
+j2                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-88.40$  0-151.17@  0-156.44  0-157.44
+ 
+jb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.39$  0-131.8@  0-132.15  0-133.27  0-139.30
+ 
+lb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.47$  0-133.8@  0-135.38  0-143.40
+ 
+max                              Pure Intrinsic
+                                 0-133.11
+ 
+min                              Pure Intrinsic
+                                 0-158.20
+ 
+mo                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-87.38$  0-94.5@  0-100.40  0-101.11  0-137.18  0-141.43  0-142.43  0-144.18
+ 
+n                                Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.42$  0-137.14@  0-138.19  0-138.27  0-139.19  0-139.27  0-144.14@  0-145.22  0-146.22
+                                 0-154.22  0-155.22  0-156.22  0-157.22  0-158.29  0-158.40  0-158.51  0-158.62  0-159.25  0-160.25
+                                 0-161.25  0-162.25  0-164.25  0-165.25  0-166.25  0-167.25  0-170.22  0-171.22  0-172.22  0-173.22
+ 
+n                                Reference argument, Intent (IN), Integer(4), Offset: 0, Alignment: full word
+                                 0-60.28$  0-58.38  0-62.20  0-63.20  0-64.19  0-65.19  0-66.19  0-67.19  0-68.19  0-69.19  0-70.19
+                                 0-71.19
+ 
+n113                             Allocatable, Public, Controlled, Integer(4) (:, :), Offset: 0, Alignment: full word
+                                 0-41.29$  0-64.14  0-154.17@  0-158.24  0-164.20@  0-170.17@
+ 
+n123                             Allocatable, Public, Controlled, Integer(4) (:, :), Offset: 0, Alignment: full word
+                                 0-42.29$  0-65.14  0-156.17@  0-158.46  0-166.20@  0-172.17@
+ 
+n213                             Allocatable, Public, Controlled, Integer(4) (:, :), Offset: 0, Alignment: full word
+                                 0-43.29$  0-66.14  0-155.17@  0-158.35  0-165.20@  0-171.17@
+ 
+n223                             Allocatable, Public, Controlled, Integer(4) (:, :), Offset: 0, Alignment: full word
+                                 0-44.29$  0-67.14  0-157.17@  0-158.57  0-167.20@  0-173.17@
+ 
+nb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.36$  0-129.8@  0-131.12  0-132.11  0-154.24  0-155.24  0-156.24  0-157.24  0-158.31  0-158.42
+                                 0-158.53  0-158.64  0-159.27  0-160.27  0-161.27  0-162.27  0-164.27  0-165.27  0-166.27  0-167.27
+                                 0-170.24  0-171.24  0-172.24  0-173.24
+ 
+nb1                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-87.28$  0-107.5@  0-108.8  0-108.19@  0-109.22  0-110.22  0-112.14  0-117.19  0-131.22  0-132.18
+                                 0-132.27
+ 
+nb2                              Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-87.33$  0-112.8@  0-113.12  0-113.16  0-122.8@  0-131.18  0-132.23  0-138.38  0-139.38
+ 
+nb3                              Public, Static, Integer(4), Offset: 0, Alignment: quadruple word
+                                 0-38.29$  0-113.8@  0-114.12  0-123.8@  0-129.13
+ 
+nb4                              Public, Static, Integer(4), Offset: 4, Alignment: full word
+                                 0-38.33$  0-114.8@  0-116.11@  0-118.14@  0-118.18  0-124.8@
+ 
+npts                             Reference argument, Integer(4), Offset: 0, Alignment: full word
+                                 0-85.28$  0-78.55  0-82.33  0-82.33  0-82.45  0-82.45  0-83.33  0-83.33  0-83.45  0-83.45  0-84.33
+                                 0-84.33  0-84.45  0-84.45  0-94.10
+ 
+nv                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.44$  0-100.70  0-141.71  0-142.71  0-143.28
+ 
+real                             Pure Intrinsic
+                                 0-138.33  0-139.33
+ 
+rlab                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-84.40$  0-141.66  0-142.66
+ 
+rlat3                            Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-39.29$  0-62.14  0-100.64
+ 
+rlob                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-84.28$  0-141.61  0-142.61
+ 
+rlon3                            Allocatable, Public, Controlled, Real(4) (:), Offset: 0, Alignment: full word
+                                 0-40.29$  0-63.14  0-100.58
+ 
+w113                             Allocatable, Public, Controlled, Real(4) (:, :), Offset: 0, Alignment: full word
+                                 0-45.30$  0-68.14  0-72.5@  0-159.20@
+ 
+w123                             Allocatable, Public, Controlled, Real(4) (:, :), Offset: 0, Alignment: full word
+                                 0-45.40$  0-69.14  0-73.5@  0-161.20@
+ 
+w213                             Allocatable, Public, Controlled, Real(4) (:, :), Offset: 0, Alignment: full word
+                                 0-46.30$  0-70.14  0-74.5@  0-160.20@
+ 
+w223                             Allocatable, Public, Controlled, Real(4) (:, :), Offset: 0, Alignment: full word
+                                 0-46.40$  0-71.14  0-75.5@  0-162.20@
+ 
+wb                               Automatic, Integer(4), Offset: 0, Alignment: full word
+                                 0-91.50$  0-134.8@  0-135.27@  0-136.11
+ 
+xf                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-89.32$  0-152.17@  0-159.34  0-160.31  0-161.34  0-162.31
+ 
+xi                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-89.28$  0-145.14@  0-147.17  0-148.20  0-152.20
+ 
+xptb                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-83.28$  0-138.14@  0-141.51  0-142.51  0-145.17
+ 
+xpts                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.28$  0-100.48  0-138.22
+ 
+yf                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-89.40$  0-153.17@  0-159.41  0-160.37  0-161.38  0-162.34
+ 
+yi                               Automatic, Real(4), Offset: 0, Alignment: full word
+                                 0-89.36$  0-146.14@  0-147.32  0-150.20  0-153.20
+ 
+yptb                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-83.40$  0-139.14@  0-141.56  0-142.56  0-146.17
+ 
+ypts                             Controlled Automatic, Real(4) (1:?), Offset: 0, Alignment: full word
+                                 0-82.40$  0-100.53  0-139.22
+ 
+** conserv_interpmod   === End of Compilation 1 ===
+ 
+>>>>> FILE TABLE SECTION <<<<<
+ 
+ 
+                                       FILE CREATION        FROM
+FILE NO   FILENAME                    DATE       TIME       FILE    LINE
+     0    ../interp/conserv_interpMod.F
+                                      03/09/11   11:03:41
+ 
+ 
+>>>>> COMPILATION EPILOGUE SECTION <<<<<
+ 
+ 
+FORTRAN Summary of Diagnosed Conditions
+ 
+TOTAL   UNRECOVERABLE  SEVERE       ERROR     WARNING    INFORMATIONAL
+               (U)       (S)         (E)        (W)          (I)
+    0           0         0           0          0            0
+ 
+ 
+    Source records read.......................................     182
+1501-510  Compilation successful for file conserv_interpMod.F.
+1501-543  Object file created.

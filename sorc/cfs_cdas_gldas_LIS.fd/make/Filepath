@@ -1,0 +1,16 @@
+.
+../core
+../lsm-plugin
+../forcing-plugin
+../domain-plugin
+../domains
+../param-plugin
+../params/soils
+../params/landcover
+../params/elev
+../params/lai
+../interp
+../baseforcing/gdas.20070502
+../obsprecips/cmap_0.5
+../obsrads/agrmet
+../lsms/noah.20071219
