@@ -1,0 +1,58 @@
+# @ job_name = jcfs_post_m4_00
+# @ job_type = parallel
+# @ output =  /ptmp/climpara/com/output/prod/today/cfs_post_m4_00.o$(jobid)
+# @ error =  /ptmp/climpara/com/output/prod/today/cfs_post_m4_00.o$(jobid)
+# @ initialdir = /ptmp/climpara/tmpnwprd
+# @ total_tasks = 32
+# @ node = 1
+## @ node_usage = not_shared
+# @ group = devonprod
+# @ network.MPI = csss,shared,us
+# @ class = devhigh
+## @ blocking = unlimited
+# @ shell = /bin/sh
+# @ notification = never
+# @ wall_clock_limit = 06:00:00
+# @ account_no = CFS-T2O
+# @ task_affinity = core(1)
+# @ resources = ConsumableMemory(2000 MB)
+# @ queue
+
+# EXPORT list here
+export MP_SHARED_MEMORY=YES
+export MEMORY_AFFINITY=MCM
+
+set -x
+
+export envir=dev
+export RUN_ENVIR=devpara
+export cyc=00
+export segment=1
+export job=cfs_post_m4_00
+export ENS_MEM=4
+export RTYPE=forepost
+
+SMSNAME=%SMSNAME% export SMSNAME
+SMSNODE=%SMSNODE% export SMSNODE
+SMSPASS=%SMSPASS% export SMSPASS
+SMS_PROG=%SMS_PROG% export SMS_PROG
+
+SMSBIN=/meso/save/wx22yz/sms/bin export SMSBIN
+
+# CALL executable job script here
+/climate/save/climpara/cfsv2/nwprod/jobs/JCFS_POST.sms.$envir
+%manual
+######################################################################
+# Purpose: to run the Coupled Climate Forecast Model
+######################################################################
+
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%include /home/sms/smsnets/include/smsDevelopment.man
+%end

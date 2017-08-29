@@ -1,0 +1,37 @@
+#!/bin/ksh
+#BSUB -J jcfs_cdas_forecast_00
+#BSUB -a poe
+#BSUB -oo /ptmp/Yuqiu.Zhu/com/output/prod/today/cfs_cdas_forecast_00.o%J
+#BSUB -eo /ptmp/Yuqiu.Zhu/com/output/prod/today/cfs_cdas_forecast_00.o%J
+#BSUB -cwd /ptmp/Yuqiu.Zhu/tmpnwprd
+#BSUB -n 128
+#BSUB -R span[ptile=8]
+#BSUB -x
+#BSUB -q "dev"
+#BSUB -W 00:45
+
+export OMP_NUM_THREADS=2
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_TASK_AFFINITY=cpu:2
+export MP_EUIDEVELOP=min
+export KMP_STACKSIZE=1024m
+export F_UFMTENDIAN=big
+export MP_SHARED_MEMORY=no
+export MP_MPILIB=mpich2
+export MP_LABELIO=yes
+export MP_STDOUTMODE=unordered
+
+set -x
+
+export envir=dev
+export RUN_ENVIR=devpara
+export cyc=00
+export job=cfs_cdas_forecast_00
+export tot_fcst_tasks=128
+export NPROCS_o=30
+
+export PDY=20130220
+
+# CALL executable job script here
+/climate/save/Yuqiu.Zhu/CFSV2/jobs/JCFS_CDAS_FORECAST

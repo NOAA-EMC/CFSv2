@@ -1,0 +1,23 @@
+#!/bin/ksh
+#BSUB -J jcfs_cdas_ocnanal_18
+#BSUB -a poe
+#BSUB -oo /ptmp/Yuqiu.Zhu/com/output/prod/today/cfs_cdas_ocnanal_18.o%J
+#BSUB -eo /ptmp/Yuqiu.Zhu/com/output/prod/today/cfs_cdas_ocnanal_18.o%J
+#BSUB -cwd /ptmp/Yuqiu.Zhu/tmpnwprd
+#BSUB -n 16
+#BSUB -R span[ptile=16]
+#BSUB -x
+#BSUB -q "dev"
+#BSUB -W 00:30
+
+export MP_TASK_AFFINITY=core
+export MP_EUILIB=us
+export MP_EUIDEVICE=sn_all
+
+export envir=dev
+export RUN_ENVIR=devpara
+export cyc=18
+export job=jcfs_cdas_ocnanal_18
+
+export PDY=20130220
+/climate/save/Yuqiu.Zhu/CFSV2/jobs/JCFS_CDAS_OCNANAL
