@@ -1,0 +1,26 @@
+# gridname, fieldname_code, fieldname_file, file_name, ongrid, factor
+"OCN", "t_flux", "tflux"  ,"./INPUT/RA2_daily_TFLUX.nc",.false.,1.0
+"OCN", "u_flux", "uflx"   ,"./INPUT/RA2_daily_TAUX.nc",.false.,1.0
+"OCN", "v_flux", "vflx"   ,"./INPUT/RA2_daily_TAUY.nc",.false.,1.0
+"OCN", "q_flux", "qflux"  ,"./INPUT/RA2_daily_QFLUX.nc",.false.,1.0
+"OCN", "lw_flux","longwv" ,"./INPUT/RA2_daily_LONGWV.nc",.false.,1.0
+"OCN", "sw_flux_vis_dir","shrtwv" ,"./INPUT/RA2_daily_SHRTWV.nc",.false.,0.285
+"OCN", "sw_flux_vis_dif","shrtwv" ,"./INPUT/RA2_daily_SHRTWV.nc",.false.,0.285
+"OCN", "sw_flux_nir_dir","shrtwv" ,"./INPUT/RA2_daily_SHRTWV.nc",.false.,0.215
+"OCN", "sw_flux_nir_dif","shrtwv" ,"./INPUT/RA2_daily_SHRTWV.nc",.false.,0.215
+"OCN", "lprec",  "prate"  ,"./INPUT/RA2_daily_PRATE.nc",.false.,1.0
+"OCN", "fprec", "SNOW"   , "./INPUT/ncar_precip_clim.nc"  , .false. ,  1.0
+"OCN", "runoff", "RUNOFF" , "./INPUT/RUNOFF.nc"            , .true.  ,  1.0
+"OCN", "calving", ""      , ""                             , .true.  ,  0.0
+"OCN" , "p", "PRESmsl" , "./INPUT/RA2_daily_pres.nc"       , .false. ,  1.0
+####
+"OBS", "temp", "", "INPUT/tmpa.mom",  .false. ,1.0
+"OBS", "salt", "", "INPUT/sala.mom",  .false. ,1.0
+"OBS", "mdl_tvv", "", "INPUT/tvv.mom", .false. ,1.0
+"OBS", "mdl_svv", "", "INPUT/svv.mom", .false. ,1.0
+####
+"ORS", "temp", "", "INPUT/temp_sfc_restore.nc", .true. ,1.0
+"ORS", "salt", "", "INPUT/salt_sfc_restore.nc", .true. ,1.0
+####
+"CRS", "temp", "", "INPUT/temp_z_restore.nc", .true. ,1.0
+"CRS", "salt", "", "INPUT/salt_z_restore.nc", .true. ,1.0

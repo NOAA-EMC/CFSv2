@@ -1,0 +1,52 @@
+##################################################################################
+#   This config file set up most of the defaults for the cfs_v2 cdas step
+#   and post processing.  Authored by Shrinivas Moorthi - June 2010
+##################################################################################
+set -x
+###############################################
+# Forecast Model Horizontal Resolution
+###############################################
+export CDATE=${CDATE:-${PDY}${cyc}}
+export JCAP=${JCAP:-574}
+
+export FIX_OM=${FIX_OM:-$HOMEcfs/fix/cfs_fix_om}
+export FIX_OCN=${FIX_OCN:-$FIX_OM}
+export PARM_OM=${PARM_OM:-$HOMEcfs/parm/cfs_parm_om}
+export omres=${omres:-05}
+
+export GRIDSPEC=$FIX_OCN/grid_spec_$omres.nc.T$JCAP
+export chl=$FIX_OCN/chl_$omres.nc
+export salt_sfc_restore=$FIX_OM/salt_sfc_restore_$omres.nc
+export temp_sfc_restore=$FIX_OM/temp_sfc_restore_$omres.nc
+export CHLNC=$FIX_OM/chl_$omres.nc
+export RUNOFFNC=$FIX_OCN/runoff_$omres.nc
+export SALTSFCRESTORE=$FIX_OCN/salt_sfc_restore_$omres.nc
+export namelist=$PARM_OM/tbl_nml/namelist_$omres # namelist file
+export ASYM_GODAS=${ASYM_GODAS:-YES}
+export GODAS_WNDO=${GODAS_WNDO:-10}
+export RUN_OPREP=${RUN_OPREP:-YES}
+export RUN_FROM_DCOM=${RUN_FROM_DCOM:-YES}
+export RESDIR=${RESDIR:-$COMDIR/RESTART}
+export COUP_FCST=${COUP_FCST:-YES}
+
+export execdir_godasprep=${execdir_godasprep:-$EXECcfs}
+export fixdir_oprep=${fixdir_oprep:-$FIX_OM}
+
+if [ $ASYM_GODAS = YES ] ; then
+  if [ $GODAS_WNDO -eq 10 -o $GODAS_WNDO -eq 14 ] ; then
+    export GODAS_DATA_DELAY=${GODAS_DATA_DELAY:-""}
+    export namelist=$PARM_OM/tbl_nml/namelist_${omres}_asym_$GODAS_WNDO
+  else
+    echo ' THIS ASYMMETRIC GODAS WINDOW NOT SUPPORTED AT THIS TIME'
+  fi
+fi
+
+if [ $COUP_FCST = YES ] ; then
+  dt_ocean=${dt_ocean:-1800}
+  dt_cpld=${dt_cpld:-$dt_ocean}
+  dt_aocpl=${dt_aocpl:-$dt_ocean}
+  im_mom4=720
+  jm_mom4=410
+  jmtp_mom4=50
+  imos=160
+fi

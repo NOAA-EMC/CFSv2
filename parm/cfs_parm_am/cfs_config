@@ -1,0 +1,428 @@
+#
+#   This config file set up most of the defaults for the cfs_v2 fore(hind)cast
+#   and post processing.  Authored by Shrinivas Moorthi - March/April 2010
+#
+set -x
+POSTTYPE=${POSTTYPE:-$RUN}
+NTHREADS=${NTHREADS:-1}
+machine=${machine:-WCOSS}
+
+####################################
+# Specify Execution Areas
+####################################
+
+cfsp=${cfsp:-cfs_}              # prefix for cfs specific directories
+
+############################################################
+# Set relevant parameters for the coupled  model           #
+############################################################
+#
+#                    AM related parameters
+#                    ---------------------
+JCAP=${JCAP:-126}
+LEVS=${LEVS:-64}
+LSOIL=${LSOIL:-4}
+
+FIX_AM=${FIX_AM:-$FIXcfs/${cfsp}fix_am}
+PARM_AM=${PARM_AM:-$PARMcfs/${cfsp}parm_am}
+
+CO2DIR=${CO2DIR:-$FIX_AM/fix_co2_proj}
+CO2_seasonal_cycle=${CO2_seasonal_cycle:-$FIX_AM/global_co2monthlycyc1976_2009.txt}
+
+if [ $JCAP -eq 1148 ]     ; then          # Linear Grid - SLSI version
+  LONB=${LONB:-2304}     ; LATB=${LATB:-1152}  ; DELTIM=${DELTIM:-600}
+elif [ $JCAP -eq 574 ]     ; then
+  LONB=${LONB:-1760}     ; LATB=${LATB:-880}  ; DELTIM=${DELTIM:-120}
+elif [ $JCAP -eq 382 ]   ; then
+  LONB=${LONB:-1152}     ; LATB=${LATB:-576}  ; DELTIM=${DELTIM:-180}
+elif [ $JCAP -eq 254 ]   ; then
+  LONB=${LONB:-768}      ; LATB=${LATB:-384}  ; DELTIM=${DELTIM:-300}
+elif [ $JCAP -eq 190 ]   ; then
+  LONB=${LONB:-576}      ; LATB=${LATB:-288}  ; DELTIM=${DELTIM:-360}
+elif [ $JCAP -eq 170 ]   ; then
+  LONB=${LONB:-512}      ; LATB=${LATB:-256}  ; DELTIM=${DELTIM:-450}
+elif [ $JCAP -eq 126 ]   ; then
+  LONB=${LONB:-384}      ; LATB=${LATB:-190}  ; DELTIM=${DELTIM:-600}
+elif [ $JCAP -eq 62 ]    ; then
+  LONB=${LONB:-192}      ; LATB=${LATB:-94}   ; DELTIM=${DELTIM:-900}
+fi
+LONR=${LONR:-$LONB}    ; LATR=${LATR:-$LATB}
+LONF=${LONF:-$LONB}    ; LATG=${LATG:-$LATB}
+if [ $LSOIL -eq 2 ] ; then
+  lsm=${lsm:-0}                           # This will run OSU LSM option
+fi
+lsm=${lsm:-1}      ;# lsm=1 is for NOAH land model (=0 for OSU model)
+ntrac=${ntrac:-3}
+varid=${varid:-21}
+numcld=${numcld:-1}
+im=${im:-$LONB}
+jm=${jm:-$LATB}
+iop=${iop:-360}
+jop=${jop:-181}
+kop=${kop:-37}
+KTO=${KTO:-16}
+IGEN=${IGEN:-98}
+IGEN_ANL=${IGEN_ANL:-98}
+IGEN_FCST=${IGEN_FCST:-98}
+IGEN_OCNP=${IGEN_OCNP:-98}
+GENPSICHI=${GENPSICHI:-YES}
+ivssig=${ivssig:-198410}
+#ivssfc=${ivssfc:-NONE}
+ivssfc=${ivssfc:-200509}
+IDVC=${IDVC:-2}
+IDVM=${IDVM:-1}
+IDSL=${IDSL:-1}
+FHLWR=${FHLWR:-1}
+FHSWR=${FHSWR:-1}
+
+if [ $LEVS -gt 99 ] ; then ivssig=200509 ; fi
+THERMODYN_ID=${THERMODYN_ID:-0}
+SFCPRESS_ID=${SFCPRESS_ID:-1}
+#
+if [ $IDVC = 1 ] ; then
+ IDVM=1 ; IDSL=1 ; nvcoord=1
+ SIGLEVEL1=${SIGLEVEL1:-$FIXGLOBAL/global_siglevel.l$LEVS.txt}
+elif [ $IDVC = 2 ] ; then
+  IDVM=1 ; IDSL=1 ; nvcoord=2
+  SIGLEVEL2=${SIGLEVEL2:-$FIXGLOBAL/global_hyblev.l$LEVS.txt}
+elif [ $IDVC = 3 ] ; then
+ ivssig=200509
+#Apercent=${Apercent:-050}
+ Apercent=${Apercent:-100}
+ if [ $Apercent -lt 100 ] ; then
+   SIGLEVEL3=${SIGLEVEL3:-$FIXGLOBAL/global_hyblev3.ipa$Apercent.txt}
+ else
+   SIGLEVEL3=${SIGLEVEL3:-$FIXGLOBAL/global_hyblev3.l$LEVS.txt}
+ fi
+fi
+#
+gfsio_in=${gfsio_in:-.false.}
+gfsio_out=${gfsio_out:-.false.}
+LANDICE_OPT=${LANDICE_OPT:-2}
+CLIMO_FIELDS_OPT=${CLIMO_FIELDS_OPT:-2}
+if [ $lsm -eq 0 ] ; then # all climo/static fields interpolated from input grid
+  CLIMO_FIELDS_OPT=${CLIMO_FIELDS_OPT:-1}
+else                     # Interpolate veg type, soil type and slope type from input grid, all others from sfcsub.f
+  CLIMO_FIELDS_OPT=${CLIMO_FIELDS_OPT:-2}
+fi
+
+ccnorm=${ccnorm:-.true.}
+climate=${climate:-.true.}
+mfcstcpl=${mfcstcpl:-1}
+cnvgwd=${cnvgwd:-${CNVGWD:-.true.}}
+crtrh=${crtrh:-'0.85,0.85,0.85'}
+ctei_rm=${ctei_rm:-0.5}
+
+flgmin=${flgmin:-'0.200,0.300'}
+
+IAER=${IAER:-${iaer:-111}}
+ialb=${ialb:-${IALB:-0}}
+ICO2=${ICO2:-${ico2:-2}}
+ictm=${ictm:-${ICTM:--2}}
+IEMS=${IEMS:-${iems:-1}}
+ISOL=${ISOL:-${isol:-1}}
+
+IOVR_LW=${IOVR_LW:-1}
+IOVR_SW=${IOVR_SW:-1}
+ISUBC_LW=${ISUBC_LW:-2}
+ISUBC_SW=${ISUBC_SW:-2}
+
+ldiag3d=${ldiag3d:-.false.}
+lgoc3d=${lgoc3d:-.false.}
+liope=${liope:-.true.}
+mstrat=${mstrat:-.false.}
+ncw=${ncw:-'20,120'}
+nsout=${nsout:-0}
+old_monin=${old_monin:-.true.}
+OUT_VIRTTEMP=${OUT_VIRTTEMP:-.true.}
+ras=${ras:-.false.}
+RUN_ENTHALPY=${RUN_ENTHALPY:-.false.}
+tfiltc=${tfiltc:-0.85}
+zflxtvd=${zflxtvd:-.false.}
+zhao_mic=${zhao_mic:-.true.}
+
+CHGRESVARS="IALB=$ialb,ntrac=3,idvc=2,idvt=21,idsl=1,IDVM=1,IGEN=$IGEN"
+
+#
+FCSTVARS=${FCSTVARS:-NULL}
+
+if [ $FCSTVARS = NULL ] ; then
+ FCSTVARS="ccnorm=$ccnorm,climate=$climate,cnvgwd=$cnvgwd,crtrh=$crtrh,   \
+           flgmin=$flgmin,ictm=$ictm,IALB=$ialb,iovr_lw=$IOVR_LW,          \
+           iovr_sw=$IOVR_SW,isubc_lw=$ISUBC_LW,isubc_sw=$ISUBC_SW,lsm=$lsm,\
+           liope=$liope,mstrat=$mstrat,ncw=$ncw,nsout=$nsout,              \
+           old_monin=$old_monin,OUT_VIRTTEMP=$OUT_VIRTTEMP,ras=$ras,       \
+           RUN_ENTHALPY=$RUN_ENTHALPY,zflxtvd=$zflxtvd,zhao_mic=$zhao_mic"
+fi
+
+if [ $ldiag3d = .true. ] ; then FCSTVARS="LDIAG3D=$ldiag3d,$FCSTVARS" ; fi
+if [ $lgoc3d = .true. ]  ; then
+  FHGOC3D=${FHGOC3D:-72}
+  FCSTVARS="LGOC3D=$LGOC3D,FHGOC3D=$FHGOC3D,$FCSTVARS"
+fi
+if [ $RUN_ENTHALPY = .true. ] ; then
+  RIlist=${RIlist:-"   287.05, 461.50, 173.2247,    0.0"}
+  CPIlist=${CPIlist:-" 1004.6, 1846.0, 820.2391,    0.0"}
+  TRACERVARS="RI=$RIlist,CPI=$CPIlist,"
+# FCSTVARS="RUN_ENTHALPY=$RUN_ENTHALPY,$FCSTVARS"
+  IDVM=${THERMODYN_ID}${SFCPRESS_ID}
+  IDSL=2 ; nvcoord=3 ; LATCH=${LATCH:-8}
+fi
+export SIGLEVEL=$(eval echo \${SIGLEVEL$IDVC})
+
+COUP_FCST=${COUP_FCST:-YES}
+if [ $RTYPE = hindpost -o $RTYPE = forepost ] ; then
+ tasks=${tot_post_tasks:-32}
+else
+ tasks=${tot_fcst_tasks:-128}
+fi
+
+#                    OM related parameters
+#                    ---------------------
+if [ $COUP_FCST = YES ] ; then
+  dt_ocean=${dt_ocean:-1800}
+  dt_cpld=${dt_cpld:-$dt_ocean}
+  dt_aocpl=${dt_aocpl:-$dt_ocean}
+  im_mom4=720
+  jm_mom4=410
+  jmtp_mom4=50
+  imos=160
+  omres=${omres:-05}
+  
+  NPROCS_o=${NPROCS_o:-60}
+  NPROCS_c=1
+  NPROCS_a=$((tasks-NPROCS_o-NPROCS_c))
+  CouplingPeriod=${CouplingPeriod:-$DELTIM}
+  FSICL=${FSICL:-99999}
+#
+#          Fix files and parm files for OM
+#          -------------------------------
+
+  FIX_OM=${FIX_OM:-$HOMEcfs/fix/${cfsp}fix_om}
+  FIX_OCN=${FIX_OCN:-$FIX_OM}
+  PARM_OM=${PARM_OM:-$HOMEcfs/parm/${cfsp}parm_om}
+  SNOWNC=${SNOWNC:-$FIX_OCN/SNOW.nc}
+  SSTICECLIM=${SSTICECLIM:-$FIX_OCN/sst_ice_clim.nc}
+  diagtable=${diagtable:-$PARM_OM/diag_table.hrs}   # Hourly output
+  diagtable_long=${diagtable_long:-$diagtable}      # Hourly output
+  datatable=${datatable:-$PARM_OM/data_override}    # data override table
+  fieldtable=${fieldtable:-$PARM_OM/field_table}    # field table
+  namelist=${namelist:-$PARM_OM/namelist}           # namelist file
+
+  do_irestart=${do_irestart:-.false.}
+  grid_mom4ice=${grid_mom4ice:-$FIX_OM/grid_spec_$omres.nc.T$JCAP}
+  chl=${chl:-$FIX_OM/chl_$omres.nc}
+  salt_sfc_restore=${salt_sfc_restore:-$FIX_OM/salt_sfc_restore_$omres.nc}
+  SALTSFCRESTORE=$salt_sfc_restore
+  temp_sfc_restore=${temp_sfc_restore:-$FIX_OM/temp_sfc_restore_$omres.nc}
+  runoff=${runoff:-$FIX_OM/runoff_$omres.nc}
+  ohf_sice=${ohf_sice:-$FIX_OM/ohf_sice.nc}
+
+# diagtable_1dy=$PARM_OM/parm_om/diag_table
+# diagtable_3hr=$PARM_OM/diag_table.3hr
+# diagtable_6hr=$PARM_OM/diag_table.6hr
+# diagtable_1hr=$PARM_OM/diag_table.hr
+# diagtable=$diagtable_1hr
+# diagtable_long=$PARM_OM/diag_table.hrs
+
+  GODAS_FREQ=${GODAS_FREQ:-0}
+else
+  NPROCS_a=$tasks
+  NPROCS_o=0
+  NPROCS_c=0
+fi
+
+ENS_NUM=${ENS_NUM:-1}    # This is for uncoupled ensemble runs
+task_mem=$((NPROCS_a/ENS_NUM))
+c=1
+while [ $c -le $ENS_NUM ] ; do
+ eval PE$c=$task_mem
+ c=$((c+1))
+done
+
+#######################################################################
+
+IC_FROM_HPSS=${IC_FROM_HPSS:-NO}
+if [ $IC_FROM_HPSS = YES ] ; then IC_FROM_DISK=NO ; fi
+IC_FROM_DISK=${IC_FROM_DISK:-YES}
+gespath=${gespath:-$GESROOT/${envir}}
+INI_DIR=${INI_DIR:-$gespath/cdas.$PDY}
+
+ENS_MEM=$((ENS_MEM+0))
+PERTURB_IC=${PERTURB_IC:-YES}
+if [ $PERTURB_IC = YES ] ; then
+ wt1_02=0.85 ; wt2_02=0.15               # for second member
+ wt1_03=1.0 ; wt2_03=0.5  ; wt3_03=-0.5  # for third  member
+ wt1_04=1.0 ; wt2_04=-0.5 ; wt3_04=0.5   # for fourth member
+fi
+############################################
+# Define the forecast length
+############################################
+if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+  if [ $ENS_MEM -eq 1 ] ; then
+    CDATEP5=$($NDATE +120 $CDATE |cut -c7-8)
+#   if [ $(echo $CDATE |cut -c7-8) -lt 8 ] ; then
+    if [ $CDATEP5 -le 5 ]; then
+      LENMON=${LENMON:-10}
+    else
+      LENMON=${LENMON:-9}
+    fi
+  else
+    if [ $(echo $CDATE |cut -c9-10) -eq 00 ] ; then
+      LENMON=${LENMON:-3}
+    else
+      LENMON=0
+      LENDAY=${LENDAY:-45}
+      AVG_GRB=${AVG_GRB:-NO}
+    fi
+  fi
+fi
+
+AVG_GRB=${AVG_GRB:-YES}
+
+if [ $ENS_MEM -lt 10 ] ; then ENS_MEM=0$ENS_MEM ; fi
+
+LENMON=${LENMON:-0}                         #  Length of forecast in months
+LENDAY=${LENDAY:-0}                         #  Length of forecast in days
+LENHR=${LENHR:-0}                           #  Length of forecast in hours
+                                                                            
+#######################################################
+# Specify the year of the start and end of the hindcast
+#######################################################
+if [ $RUN = hindcast -o $RUN = hindpost ] ; then
+   START_YEAR=${STARTYEAR:-1981}
+   END_YEAR=${END_YEAR:-2010}
+fi
+                                                                            
+##########################
+# Define the leap day
+##########################
+LEAPDAY=0229
+
+# #############################################
+# SETUP CLIM FCST PROCESSING VARIABLES
+# #############################################
+#
+# Replacing some initial surface fileds (if SFC0=YES)
+#
+SFC0=NO
+
+CTLFILE=${CTLFILE:-$HOMEcfs/parm/${cfsp}parm_am/am_cntrl.parm_5}
+LONSPERLAT=${LONSPERLAT:-$FIXcfs/${cfsp}fix_am/global_lonsperlat.t$JCAP.txt}
+
+#  These are for the new GFS - already in /nwpara/fix
+
+OROGRAPHY=${OROGRAPHY:-$FIX_AM/global_orography.t$JCAP.grb}
+SLMASK=${SLMASK:-$FIX_AM/global_slmask.t$JCAP.grb}
+MTNVAR=${MTNVAR:-$FIX_AM/global_mtnvar.t$JCAP.f77}
+FNOROG=${FNOROG:-$FIX_AM/global_orography.t$JCAP.grb}
+FNMASK=${FNMASK:-$FIX_AM/global_slmask.t$JCAP.grb}
+FNMSKH=${FNMSKH:-$FIX_AM/seaice_newland.grb}
+FNTG3C=${FNTG3C:-$FIX_AM/global_tg3clim.2.6x1.5.grb}
+O3FORC=${O3FORC:-$FIX_AM/global_o3prdlos.f77}
+
+###################################
+# Define forecast output variables
+###################################
+
+FHOUT=${FHOUT:-6}          # Forecast Hour Output Frequency
+FHRES=${FHRES:-120}        # Forecast Hour Restart Frequency
+FHZER=${FHZER:-6}          # Interval to Zero the bucket - must be >= FHOUT
+FHCYC=${FHCYC:-24}         # Surface boundary condition update interval in hours
+FHDFI=${FHDFI:-3}          # Half of the digital filter initialization hours
+FHDFI_INIT=${FHDFI_INIT:-3}  # Same but for cold start
+RUN_NAME=${RUN_NAME:-cfs_run}
+
+
+###########################################
+# Define integration parameter and hours  #
+###########################################
+FCST_RESTART=YES
+RESTART_SUBMIT=YES
+INC_HOUR=${INC_HOUR:-360}
+INC_HOUR_FST=${INC_HOUR_FST:-24}
+if [ $INC_HOUR -lt $FHRES ] ; then
+  FHRES=$INC_HOUR
+fi
+if [[ $RUN_ENVIR = nco || $RUN_ENVIR = devpara ]] ; then
+ if [ $ENS_MEM -gt 2 ] ; then
+   INC_HOUR_FST=$INC_HOUR
+ fi
+fi
+
+##########################################################
+# Define the max number of days the perturbation members
+# could look back for the sigma and ocean IC files
+##########################################################
+export ndays_back_pert=${ndays_back_pert:-3}
+
+#
+#############################################
+# Define file for kept, avearged and send
+#############################################
+#
+if [ $ldiag3d = .true. ] ; then
+ LIST_OF_FILES='sig sfc flx pgb ocn d3d'
+ FILES_TO_BE_KEPT='sig sfc flx pgb avrg ocn d3d'
+ FILES_TO_BE_AVERAGED='flx pgb ocn ipv d3d'
+ FILES_TO_SEND_COM='sig sfc flx pgb avrg ocn d3d'
+ HRLY_FILES_TO_BE_KEPT='flxf pgbf ocnf ipvf sigf sfcf d3df'
+#HRLY_FILES_TO_BE_KEPT='flxf pgbf ocnh ipvf sigf sfcf d3df'
+else
+ LIST_OF_FILES='sig sfc flx pgb ocn'
+ FILES_TO_BE_KEPT='sig sfc flx pgb avrg ocn'
+ FILES_TO_BE_AVERAGED='flx pgb ocn ipv'
+ FILES_TO_SEND_COM='sig sfc flx pgb avrg ocn'
+ HRLY_FILES_TO_BE_KEPT='flxf pgbf ocnf ipvf sigf sfcf'
+#HRLY_FILES_TO_BE_KEPT='flxf pgbf ocnh ipvf sigf sfcf'
+fi
+DAY_TO_KEEP=${DAY_TO_KEEP:-45}
+MON_TO_KEEP=${MON_TO_KEEP:-6}
+if [ $ENS_MEM -le 2 ]; then
+  if [ $cyc -eq 00 -a $ENS_MEM -eq 1 ]; then
+    HOUR_TO_KEEP_SIG=${HOUR_TO_KEEP_SIG:-120}
+  else
+    HOUR_TO_KEEP_SIG=${HOUR_TO_KEEP_SIG:-48}
+  fi
+else
+  HOUR_TO_KEEP_SIG=${HOUR_TO_KEEP_SIG:-6}
+fi
+HOUR_TO_KEEP_SFC=${HOUR_TO_KEEP_SFC:-${HOUR_TO_KEEP_SIG:-6}}
+
+######################################################################
+## Define whether to save the first 45-day of the time series files
+#######################################################################
+if [ $ENS_MEM -eq 1 -o $cyc -eq 00 ] ; then
+  export SAVE_TIME_45DAYS=${SAVE_TIME_45DAYS:-YES}
+  export FH_45DAYS=${FH_45DAYS:-1080}
+else
+  export SAVE_TIME_45DAYS=${SAVE_TIME_45DAYS:-NO}
+fi
+
+#
+####################################
+# Specify Special Fcst times
+####################################
+#
+CURRENT_YEAR=$(echo $CDATE | cut -c1-4)
+CURRENT_MONTH=$(echo $CDATE | cut -c5-6)
+CURRENT_DAY=$(echo $CDATE | cut -c7-8)
+CURRENT_HOUR=$(echo $CDATE | cut -c9-10)
+#
+####################################
+# Number of members in an ensemble
+####################################
+if [ $RUN = forecast ] ; then
+#NUM_ENS=1
+ NUM_ENS=10
+ NENS_BREAK=1
+ INCHOUR_ENS=24        # Ensemble time interval for forecast
+else
+#NUM_ENS=1
+#NENS_BREAK=1
+ NUM_ENS=10
+ NENS_BREAK=3
+ INCHOUR_ENS=24        # Ensemble time interval for hindcast
+fi
+
+

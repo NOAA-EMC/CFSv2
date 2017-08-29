@@ -1,0 +1,56 @@
+ &fms_io_nml
+         threading_read='multi'
+         threading_write='single'
+         fileset_write='single'
+/
+
+ &fms_nml
+       clock_grain='COMPONENT'
+/
+
+ &ocean_context_nml
+
+/
+
+ &ocean_grids_nml
+      debug_this_module=.false.
+/
+
+ &ocean_topog_nml
+      min_thickness=5.0
+/
+
+ &godas_nml
+      gds_step=21600
+      num_cor_tracers=2
+      kass=30
+      nsgobs=1
+      nsgsobs=1
+      npits=500
+      tovrf=0.10
+      tbvrf=0.10
+      sovrf=0.10
+      sbvrf=0.10
+      vcvn=1.00
+      vsclf=0.5
+      asm_ts_seq=.false.
+      tz_wndw_fwd=0
+      tz_wndw_bwd=10
+      sz_wndw_fwd=0
+      sz_wndw_bwd=10
+      t0_wndw_fwd=0
+      t0_wndw_bwd=10
+      s0_wndw_fwd=0
+      s0_wndw_bwd=10
+      save_all_inv=.true.
+      ext_wghts=.false.
+      no_lat_mx=65.0
+      restore_sfc=.true.
+      num_rstr_tracers=2
+      restore_clim=.true.
+      num_c_rstr_tracers=2
+      tz_c_damp=0.001
+      sz_c_damp=0.001
+      debug_godas=.false.
+/
+
