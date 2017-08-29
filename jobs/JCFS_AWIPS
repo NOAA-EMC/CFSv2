@@ -1,0 +1,87 @@
+#!/bin/sh
+
+########################################
+# CFS AWIPS PRODUCT GENERATION
+########################################
+
+set -xa
+# ###################################
+# SET SHELL PROCESSING VARIABLES
+# ###################################
+export PS4='$SECONDS + ' 
+date
+export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=$DATAROOT/$job.$pid
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+export cycle=t${cyc}z 
+
+#################################
+# Set up the NET and RUN
+#################################
+export NET=cfs
+export RUN=cfs
+
+###################################
+# Run setpdy and initialize PDY variables
+###################################
+setpdy.sh
+. PDY
+
+# Input file size to check, usually file size with full records is around 38000KB to 49000KB
+MINIMUM_SIZE=30000
+
+# Check for the latest data to use 
+if [ $cyc -eq 00 -o $cyc -eq 12 ]; then
+  cfs_day=$PDY
+else
+  cfs_day=$PDYm1
+fi
+  
+##########################################################
+# define cfs directories/scripts/executables            
+##########################################################
+
+export EXECcfs=$HOMEcfs/exec
+export PARMcfs=$HOMEcfs/parm 
+export USHcfs=$HOMEcfs/ush  
+export FIXcfs=$HOMEcfs/fix  
+
+########################################
+# Set up the com directory
+########################################
+export COMROT=$COMROOT/${NET}/${envir}
+export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+mkdir -m755 -p $COMOUT
+
+export COMINm1=$com/${NET}/${envir}/${RUN}.${PDYm1}
+export pcom=${pcom:-$PCOMROOT/${envir}/cfs}
+
+mkdir -p $COMOUT $pcom
+
+env
+
+########################################
+# Run the script 
+########################################
+$HOMEcfs/scripts/excfs_grib_awips.sh.ecf 
+export err=$?;err_chk
+
+########################################
+# Remove the Temporary working directory
+########################################
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
+
+date

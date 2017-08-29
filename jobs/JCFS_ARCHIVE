@@ -1,0 +1,83 @@
+#!/bin/ksh
+set -xa
+
+####################################
+# Specify NET and RUN Name and model
+####################################
+export NET=cfs
+export RUN=cfs
+
+export host=${host:-`hostname | cut -c1`}
+
+###############################################
+# SETUP CDAS POST PROCESSING VARIABLES
+###############################################
+export PS4='$SECONDS + '
+date
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=$DATAROOT/$job.$pid
+mkdir -p $DATA
+cd $DATA
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+export pgmerr=errfile
+export cycle=t${cyc}z
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+sh setpdy.sh
+. ./PDY
+
+##########################################################
+# define cfs directories/scripts/executables            
+##########################################################
+
+export EXECcfs=$HOMEcfs/exec
+export PARMcfs=$HOMEcfs/parm 
+export USHcfs=$HOMEcfs/ush  
+export FIXcfs=$HOMEcfs/fix  
+export hpsstar=$USHcfs/cfs_hpsstar
+
+###############################
+# Execute the Script
+###############################
+rm -f $DATA/poescript
+for mem in 01 02 03 04
+do
+  mkdir -p $DATA/$mem
+  echo "${CFSARCHIVESH:-$HOMEcfs/ush/cfs_archive.sh} $PDYm1$cyc $mem $DATA/$mem" >>$DATA/poescript
+done
+
+chmod 775 $DATA/poescript
+export MP_PGMMODEL=mpmd
+export MP_CMDFILE=$DATA/poescript
+export MP_TASK_AFFINITY=cpu
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+#
+# Execute the script.
+#
+mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+export err=$?; err_chk
+
+cd $DATA
+cat $pgmout
+
+msg="ENDED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+########################################
+# Remove the Temporary working directory
+########################################
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
+
+date

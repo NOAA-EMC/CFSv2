@@ -1,0 +1,132 @@
+#!/bin/ksh
+set -xa
+
+# #### 06/12/2006 ##############################################
+# SETUP CDAS TROPICAL CYCLONE QC/RELOCATION PROCESSING VARIABLES
+# ##############################################################
+
+export PS4='$SECONDS + '
+date
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=$DATAROOT/$job.$pid
+mkdir -p $DATA
+cd $DATA
+
+export cycle=t${cyc}z
+export tmmark=tm00
+
+##########################
+# Specify NET and RUN Name
+##########################
+export NET=cfs
+export RUN=cdas
+export RUN1=cdas1
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+
+##########################################################
+# define cfs directories/scripts/executables            
+##########################################################
+
+export EXECcfs=$HOMEcfs/exec
+export PARMcfs=$HOMEcfs/parm 
+export USHcfs=$HOMEcfs/ush  
+export FIXcfs=$HOMEcfs/fix  
+
+####################################
+# Specify Execution Data Areas
+####################################
+
+export HOMESYND=${HOMESYND:-$HOMEtropcy}
+export EXECSYND=${HOMESYND}/exec
+export FIXSYND=${HOMESYND}/fix
+export PARMSYND=${HOMESYND}/parm
+export USHSYND=${HOMESYND}/ush
+
+export HOMERELO=${HOMERELO:-$HOMEtropcy}
+export EXECRELO=${HOMERELO}/exec
+export FIXRELO=${HOMERELO}/fix
+export USHRELO=${HOMERELO}/ush
+export utilexec=$(dirname $NDATE)
+export utilscript=$(dirname $(which finddate.sh))
+
+export USHRELO=$USHcfs # bypass for vertical structure error
+
+export HOMEarch=${HOMEarch:-${COMROOT}/arch/${envir}}
+export ARCHSYND=${HOMEarch}/syndat
+mkdir -p $ARCHSYND
+mkdir -p $ARCHSYND
+
+#  path to tropical cyclone record database (used by qctropcy processing)
+export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/us007003}   
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+sh setpdy.sh
+. ./PDY
+
+##############################################
+# Define COM directories
+##############################################
+export COMROT=$COMROOT/${NET}/${envir}
+export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+mkdir -m775 -p $COMOUT
+export COMINcfs_cdas=$COMIN
+
+##############################################
+# Specify varaibles specific to this execution of script
+##############################################
+
+# VARIABLES THAT CONTROL PROCESSING OF INDIVIDUAL PROGRAMS
+# --------------------------------------------------------
+
+#  Normally both PROCESS_TROPCY and DO_RELOCATE should be set to YES
+
+export PROCESS_TROPCY=YES  # Turn on tropical cyclone tcvitals QC proc. if YES
+export DO_RELOCATE=YES     # Turn on tropical cyclone relocation proc. if YES
+
+export LONB=1760 # sigma guess parm needed by tropical cyclone reloc. processing
+export LATB=880  # sigma guess parm needed by tropical cyclone reloc. processing
+
+#############################################################
+# Specify ndate/nhour used by getges.sh
+#############################################################
+export ndate=$NDATE
+export nhour=$NHOUR
+export network_getges=cfs-cdas 
+export USHGETGES=$HOMEtropcy/ush  
+export USHGETGES=$HOMEcfs/ush  
+export GRIBVERSION=grib1
+export BKGFREQ=3
+export quiet=NO
+
+export NET=gdas ## relocte script ignores NET=cdas !!!
+
+#############################################################
+# execute the script
+#############################################################
+export RUN=$RUN1 # needed for vertical structure
+$HOMERELO/scripts/extropcy_qc_reloc.sh.ecf
+export err=$?; err_chk
+
+#############################################################
+msg="ENDED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+########################################
+# Remove the Temporary working directory
+########################################
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
+
+date
+

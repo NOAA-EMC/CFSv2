@@ -1,0 +1,166 @@
+#!/bin/ksh
+set -xue
+
+export PS4='$SECONDS + '
+date
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=$DATAROOT/$job.$pid
+mkdir -p $DATA
+cd $DATA
+
+##/nwprod/util/ush/setup.sh   # need to call this becasue the obsproc VS is not NCO stanards complliant.
+cp $(which postmsg) $DATA   # need to call this becasue the obsproc VS is not NCO stanards complliant.
+
+export tmmark=tm00
+
+##########################
+# Specify NET and RUN Name
+##########################
+export NET=cfs
+export RUN=cdas
+export RUN1=cdas1
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# GET_IOPROFILE - Run I/O statistics
+####################################
+export GET_IOPROFILE=${GET_IOPROFILE:-NO}
+
+####################################
+# Specify Execution Areas
+####################################
+
+##########################################################
+# define cfs directories/scripts/executables            
+##########################################################
+
+export EXECcfs=$HOMEcfs/exec
+export PARMcfs=$HOMEcfs/parm 
+export USHcfs=$HOMEcfs/ush  
+export FIXcfs=$HOMEcfs/fix  
+
+export PARMPREP=$HOMEobsproc_network/parm
+export ushscript_prep=$HOMEobsproc_prep/ush                  
+export envir_getges=prod
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+sh setpdy.sh
+. ./PDY
+
+##############################################
+# Define COM directories
+##############################################
+export COMROT=$COMROOT/${NET}/${envir}
+export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+mkdir -m775 -p $COMOUT
+
+##############################################
+# Specify varaibles specific to this execution of script
+##############################################
+
+export POE=YES
+#  NPROCS indicates the number of POE tasks
+#   {Applies only when PREPDATA=YES below and POE=YES (default)}
+
+set +u
+if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+   NPROCS=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+   NPROCS=$LSB_DJOB_NUMPROC
+else
+   NPROCS=1
+fi
+set -u
+
+#  NSPLIT indicates the number of tasks for running PREPDATA
+#   (PREPDATA processing will be split into this many parts)
+#   {Applies only when PREPDATA=YES below and POE=YES (default)}
+#   (must be .le. $NPROCS)
+
+export NSPLIT=$NPROCS
+
+#  BUFRLIST indicates the list of BUFR data dump file names to process
+
+export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc \
+ sfcshp vadwnd wdsatr ascatw rassda gpsipw"}
+
+# VARIABLES THAT CONTROL PROCESSING OF INDIVIDUAL PROGRAMS
+# --------------------------------------------------------
+
+#  -- These can individually be switched to NO without affecting the
+#      success of other programs and the success of the complete job
+#      (all should normally be set to YES unless otherwise specified;
+#       if job fails in one of these programs, set offending program
+#       to NO and resubmit to "work-around" problem)
+
+export SYNDATA=YES     # Execute program SYNDAT_SYNDATA   if YES
+export PREPACQC=YES    # Execute PREPACQC script processing
+export PROCESS_ACQC=YES # Run program PREPOBS_PREPACQC
+export PROCESS_ACPF=NO  # Do not run program PREPOBS_PREPACPF (profiles are not generated in CFS)
+export PROFCQC=YES     # Execute program PREPOBS_PROFCQC  if YES
+export CQCVAD=YES      # Execute program PREPOBS_CQCVAD   if YES
+export CQCBUFR=YES     # Execute program PREPOBS_CQCBUFR  if YES
+export OIQCBUFR=YES    # Execute program PREPOBS_OIQCBUFR if YES
+
+
+#  -- If any of these are switched to NO it will affect the success of
+#      other programs and the success of the complete job
+#      (these are set-up only for CHECKOUT runs - they should always
+#       be set to YES for operational runs)
+
+export PREPDATA=YES   # Execute programs PREPOBS_MPCOPYBUFR, PREPOBS_PREPDATA,
+                      # PREPOBS_LISTHEADERS and PREPOBS_MONOPREPBUFR if YES
+
+export GETGUESS=YES   # Encode first guess (background) values interpolated to
+                      # observation locations in the PREPBUFR file for use by
+                      # the q.c. programs.  This guess is always from a global
+                      # sigma guess file valid at the center PREPBUFR
+                      # processing date/time.
+
+export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
+                      # PREPOBS_PROFCQC, PREPOBS_CQCVAD, PREPOBS_CQCBUFR and
+                      # PREPOBS_OIQCBUFR will NEVER execute regardless of
+                      # switches above -
+                      # should be set to NO only as a last resort!!!
+
+export OIQCX=${OIQCX:-$HOMEobsproc_prep/exec/prepobs_oiqcbufr} ## uses shared libs
+export OIQCX=$EXECcfs/prepobs_oiqcbufr
+export USHOIQC=$USHcfs
+
+export GETGES_COM=$COMROOT
+export NET=gdas
+
+#############################################################
+# execute the script
+#############################################################
+#export machine=WCOSS
+export RUN=$RUN1 # for the obsproc script
+export GETGES_COM=$COMROOT
+export network_getges=cfs-cdas
+${PREPSH:-$HOMEobsproc_network/scripts/exglobal_makeprepbufr.sh.ecf} 
+export err=$?; err_chk
+
+cat $pgmout
+msg="ENDED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+
+########################################
+# Remove the Temporary working directory
+########################################
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
+
+date
+

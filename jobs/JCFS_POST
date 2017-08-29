@@ -1,0 +1,218 @@
+#!/bin/ksh 
+
+set -x
+
+if [ $# -ne 2 ] ; then
+#    echo "Usage: $0 fore/hind cfs.config"
+#    exit 1
+     echo " No argument passed - forepost with default config file will be done"
+fi
+
+export MP_DEBUG_NOTIMEOUT=no
+export MP_SINGLE_THREAD=no  
+export MP_USE_BULK_XFER=no  
+export MP_COLLECTIVE_OFFLOAD=no  
+
+####################################################
+# Runs POSTPROCESSOR FOR CFS HIND(FORE)CASTS
+#  Written by Shrinivas Moorthi - March 2004
+#  Updated for NCEP post by S. Moorthi - March 2010
+# original SFM post processor script written by Hann-Ming Henry Juang
+####################################################
+
+set -xa
+                                                                       
+
+####################################
+# Specify NET and RUN Name and model
+####################################
+export NET=cfs
+export RTYPE=${1:-${RTYPE:-forepost}}
+export RUN=${RUN:-cfs}
+
+export host=${host:-`hostname | cut -c1`}
+
+###############################################
+# SETUP CLIMATE FOREFCST PROCESSING VARIABLES
+###############################################
+###############################################
+export PS4='$SECONDS + '
+date
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=$DATAROOT/$job.$pid
+mkdir -p $DATA
+cd $DATA
+
+export POSTTYPE=${POSTTYPE:-$RUN}
+export ENS_MEM=${ENS_MEM:-1}
+ENS_MEM=$((ENS_MEM+0))
+if [ $ENS_MEM -lt 10 ] ; then export ENS_MEM=0$ENS_MEM ; fi
+
+# Specify the year of the start and end of the hindcast
+
+if [ $RUN = hindpost ] ; then
+ export START_YEAR=${STARTYEAR:-1981}
+ export END_YEAR=${END_YEAR:-2010}
+fi
+
+##########################################################
+# define cfs directories/scripts/executables            
+##########################################################
+
+export EXECcfs=$HOMEcfs/exec
+export PARMcfs=$HOMEcfs/parm 
+export USHcfs=$HOMEcfs/ush  
+export FIXcfs=$HOMEcfs/fix  
+
+export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
+
+export POSTGPSH=${POSTGPSH:-$HOMEpost/ush/global_nceppost.sh}
+export POSTGPEXEC=${POSTGPEXEC:-$HOMEpost/exec/ncep_post}
+export POST_SCRIPT=${POST_SCRIPT:-$HOMEcfs/scripts/excfs_post.sh.ecf}
+export OCN2GRIBEXEC=${OCN2GRIBEXEC:-$EXECcfs/cfs_tripo2reg}
+
+export cfs_pgbscript=${cfs_pgbscript:-$USHcfs/cfs_pgb.sh}
+export cfs_ocnscript=${cfs_ocnscript:-$USHcfs/cfs_ocn.sh}
+export cfs_postscript=${cfs_postscript:-$USHcfs/cfs_post.sh}
+export cfs_glbtsersh=${cfs_glbtsersh:-$USHcfs/cfs_glbtser.sh}
+export timeavgexec=${timeavgexec:-$EXECcfs/cfs_mpi_timavg_3d}
+export GENPSICHIEXE=${GENPSICHIEXE:-$EXECcfs/cfs_genpsiandchi}
+export OVERPARMEXEC=${OVERPARMEXEC:-$EXECcfs/cfs_overparm_grib}
+export cfs_endfhrs_sh=${cfs_endfhrs_sh:-$USHcfs/cfs_endfhrs.sh}
+export cfs_timeavgsh=${cfs_timeavgsh:-$USHcfs/cfs_timavg_fcst.sh}
+export cfs_gribchksh=${cfs_gribchksh:-$USHcfs/cfs_grib_checkf.sh}
+
+export SIGHDR=${SIGHDR:-$EXECcfs/cfs_sighdr}
+export sigavg=${sigavg:-$EXECcfs/cfs_sigavg}
+export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
+export NCP=${NCP:-/bin/cp}
+
+#############################################
+# Specify the recovery and postjob directries
+#############################################
+export COMROT=${COMROOT}/$RUN/${envir}/$RUN
+export YYYYMMDD=$(echo $start_date |cut -c1-8)
+export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
+export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
+mkdir -p $RECOVERY $POSTDEFS
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.${pid}"
+export pgmerr=errfile
+export cycle=t${cyc}z
+
+####################################
+# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# RERUN    - Rerun fcst from beginning (default no)
+# VERBOSE  - Specify Verbose Output 
+####################################
+export SAVEGES=${SAVEGES:-YES}
+export RERUN=${RERUN:-NO}
+export VERBOSE=${VERBOSE:-YES}
+export BATCH_POST=${BATCH_POST:-NO}
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+sh setpdy.sh
+. ./PDY
+                                                                                       
+export CDATE=${CDATE:-${PDY}$cyc}
+
+#############################################
+# Get the variables setup from config script
+#############################################
+
+set -a;. $CONFIG_FILE;set +a
+
+env
+
+export MP_SHARED_MEMORY=no
+
+####################################
+# Specify Special Running Time Vars
+####################################
+
+msg="HAS BEGUN on `hostname`"
+postmsg "$jlogfile" "$msg"
+
+############################################
+# determine  the current day of the forecast
+############################################
+#
+export YEAR=`  echo $CDATE | cut -c1-4 `
+export MONTH=` echo $CDATE | cut -c5-6 `
+export DAY=`   echo $CDATE | cut -c7-8 `
+export HOUR=$cyc
+
+#######################################
+# Determine the day for forecast start
+#######################################
+#
+#
+export start_date=${start_date:-$(echo $($NDATE -$GODAS_FREQ $CDATE))}
+export YYYYSTART=$(echo $start_date | cut -c1-4)
+export MMSTART=$(echo $start_date | cut -c5-6)
+export DDSTART=$(echo $start_date | cut -c7-8)
+export HHSTART=$(echo $start_date | cut -c9-10)
+#
+export ocnic_date=${ocnic_date:-$start_date}
+export MMSS_OCN=$(echo $ocnic_date | cut -c5-6)
+export DDSS_OCN=$(echo $ocnic_date | cut -c7-8)
+#
+if [[ $RTYPE = forepost ]] ; then
+  export YYYYEND=$YYYYSTART
+else        # This is for hindpost
+  export YYYYSTART=${YYYYSTART:-$START_YEAR}
+  export YYYYEND=$END_YEAR
+fi
+YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
+
+export NTHSTACK=102400000
+
+export machine=${machine:-WCOSS}
+
+if [ $machine = IBM ]; then
+  APRUNCY=""
+elif [ $machine = WCOSS ]; then
+  APRUNCY=mpirun.lsf
+else
+  echo "APRUNCY not defined for this platform"
+fi
+
+##############################################
+# Define COM directories
+##############################################
+  YYYYMMDD=$(echo $start_date |cut -c1-8)
+  HH=$(echo $start_date |cut -c9-10)
+  export COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
+  export CLIMCOM=$COMIN  
+  mkdir -m 775 -p $COMIN 
+
+##############################################
+# Define forecast output/post input dirs
+##############################################
+  export COMOUT=$COMIN/${start_date}_${ENS_MEM}/daily_grib
+  export COM_YMDH=$COMIN/${start_date}_${ENS_MEM}
+  mkdir -m 775 -p $COMOUT  $COM_YMDH
+
+#############################################################
+# Execute the script
+#############################################################
+if [[ $YYYY_NOW -le $YYYYEND ]] ; then
+  $POST_SCRIPT
+fi
+
+########################################
+# Remove the Temporary working directory
+########################################
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
+
+date
