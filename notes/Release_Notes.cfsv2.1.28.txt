@@ -1,0 +1,43 @@
+RELEASE NOTES cfsv2.1.21   - released 09/09/2016
+
+Include data from new bufr tank b031/xx005 into ocean DA data flow
+Include bug fixes to bufr_dumpmb and nufr_prepmods into CFS vertical structure
+
+FILE CHANGES
+
+ush/bufr_dumparte
+ush/bufr_dumpmb
+sorc/bufr_argodump.fd/
+sorc/bufr_argodump.fd/Makefile
+sorc/bufr_argodump.fd/bufr_argodump.f
+sorc/bufr_argodump.fd/makefile.sh
+sorc/bufr_prepmods.fd/
+sorc/bufr_prepmods.fd/bufr_prepmods.f
+sorc/bufr_prepmods.fd/clonlat.f
+sorc/bufr_prepmods.fd/makefile.sh
+sorc/bufr_prepmods.fd/mnemonics.f
+sorc/bufr_prepmods.fd/obname.f
+sorc/bufr_prepmods.fd/raddate.f
+sorc/bufr_prepmods.fd/ssmipn.f
+sorc/bufr_prepmods.fd/tideg.f
+sorc/bufr_prepmods.fd/Makefile
+scripts/excfs_cdas_dump.sh.ecf
+
+
+RUN TIME DIFFERENCES
+
+Note: all resources are the same for the new version. The time differences are shown below.
+The ratio of wall/cpu time is given to in part account for the difference running prod vs dev.
+Clearly the ocnanal will take longer; how much longer will need to be seen. This is due to
+the additional data being delivered to the ocean process, some significant amount being 
+dupilcates, at least for the time being.
+
+cfs_cdas_dump     v27      v28  
+wall              150      240
+cpu               123      203
+w/c               1.2      1.2
+
+cfs_cdas_ocnanal  v27      v28 
+wall              300      1700
+cpu               692      3546
+w/c               .43      .48

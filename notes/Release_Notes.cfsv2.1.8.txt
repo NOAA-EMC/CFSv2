@@ -1,0 +1,107 @@
+RELEASE NOTES cfsv2.1.8  (Prepared by Jack Woollen)
+
+
+FILE CHANGES
+
+* exec/cfs_cdas_gsi 
+* exec/cfs_cdas_mkEvNc4r  
+* fix/cfs_fix_om/TanF_WOA09_M4.nc 
+* jobs/JCFS_CDAS_DUMP  
+* jobs/JCFS_CDAS_FORECAST  
+* parm/cfs_parm_am/cfs_cdas_config   
+* parm/cfs_parm_om/namelist  
+* parm/cfs_parm_om/tbl_nml/namelist_05_asym_10  
++ parm/cfs_parm_prep 
++ parm/cfs_parm_prep/prepobs_cqcbufr.gdas.parm 
++ parm/cfs_parm_prep/prepobs_prepacqc.gdas.parm 
++ parm/cfs_parm_prep/prepobs_prepdata.gdas.parm 
++ parm/cfs_parm_prep/prepobs_prepssmi.gdas.parm 
++ parm/cfs_parm_prep/prepobs_profcqc.gdas.parm 
+* scripts/excfs_cdas_dump.sh.ecf  
+* sorc/cfs_cdas_gds_obs.fd/mkEvNc4r.f  
+* sorc/cfs_cdas_gsi.fd/read_iasi.f90  
+* ush/cfs_cdas_mEN4.sh 
+
+(*  changed)
+(+  added)
+
+
+JOB SCRIPT CHANGES
+
+JCFS_CDAS_DUMP  
+	-SST and ICE from $TANK_GRIBFLGS  (now:/com/gfs/prod/gdas.$pdy)
+JCFS_CDAS_FORECAST  
+	-remove hardwired reference to $gespath and $jlogfile
+	
+USH SCRIPT CHANGES
+
+cfs_cdas_mEN4.sh 
+	-add new boundary condition file for exec/cfs_cdas_mkEvNc4r 
+	
+FIX and PARM FIELDS CHANGES
+ 
+cfs_parm_am/cfs_cdas_config   
+	-define DUMP_FROM_PROD variable
+	-point to parm/cfs_parm_prep for prepobs parm files
+cfs_parm_om/namelist  
+	-set convective_adjust_on = .false.
+cfs_parm_om/tbl_nml/namelist_05_asym_10  
+	-set acoef = 0.01
+cfs_parm_prep 
+   -move prepobs parm files from /nwprod/parm into cfs vertical structure
+cfs_parm_prep/prepobs_cqcbufr.gdas.parm 
+cfs_parm_prep/prepobs_prepacqc.gdas.parm 
+cfs_parm_prep/prepobs_prepdata.gdas.parm 
+	-set GOES satwnd window to +/- 1 hour to control quantity in prepbufr file
+cfs_parm_prep/prepobs_prepssmi.gdas.parm 
+cfs_parm_prep/prepobs_profcqc.gdas.parm 
+		
+
+SOURCE CODE CHANGES
+
+cfs_cdas_gds_obs.fd/mkEvNc4r.f  
+	-add constraint on initial estimate of backfound error covariance
+cfs_cdas_gsi.fd/read_iasi.f90  
+	-screen metop-b data from read_iasi.f90
+
+COMPUTING RESOURCE INFORMATION
+
+     No change
+
+VERSIONS OF LIBRARIES, COMPILERS AND SHARED CODE BEING USED
+
+     No change
+
+PRE-IMPLEMENTATION TESTING REQUIREMENTS
+
+* which production jobs should be tested as part of this implementation?
+	CFSv2.1.8  all 
+* does this change require a 30-day evaluation?
+	No 
+* suggested evaluators
+	Suru Saha, Jack Woollen, Dave Behringer
+
+DISSEMINATION INFORMATION
+
+     No change
+
+HPSS ARCHIVE
+
+     No change
+
+
+IMPLEMENTATION INSTRUCTIONS
+
+	https://svnemc.ncep.noaa.gov/projects/cfs/branches/woollen/cfsv2 (release notes incl.)
+	Begin at the forecast step using initial conditions from the parallel run
+
+JOB DEPENDENCIES
+
+       No change
+
+
+
+
+
+
+

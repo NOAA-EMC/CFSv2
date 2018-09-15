@@ -1,0 +1,15 @@
+
+RELEASE NOTES cfsv2.1.15  (Prepared by Jack Woollen)
+
+Update the gsi satinfo file to monitor airs ch221 and iasi ch269 because of Asian forest fires
+
+FILE CHANGES
+
+* fix/cfs_fix_cdas/global_satinfo.txt
+
+(*  changed)
+(+  added)
+
+
+
+

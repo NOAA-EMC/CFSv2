@@ -1,0 +1,15 @@
+
+RELEASE NOTES cfsv2.1.14  (Prepared by Jack Woollen)
+
+Update the gsi satinfo file to monitor unstable amsua-n18 ch5 and ch8
+
+FILE CHANGES
+
+* fix/cfs_fix_cdas/global_satinfo.txt
+
+(*  changed)
+(+  added)
+
+
+
+
