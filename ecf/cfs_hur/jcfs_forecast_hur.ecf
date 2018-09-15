@@ -1,0 +1,71 @@
+#BSUB -J %E%cfs_forecast_hur_%FCST_START_DATE%
+#BSUB -o /com/output/%ENVIR%/today/cfs_forecast_hur_%FCST_START_DATE%.o%J
+#BSUB -q %QUEUE%
+#BSUB -L /bin/sh
+#BSUB -cwd /tmpnwprd2
+#BSUB -P CFS-T2O
+#BSUB -n 144
+#BSUB -R span[ptile=16]
+#BSUB -R "affinity[core]"
+#BSUB -x
+#BSUB -a poe
+
+## Approximateoly 9 hours per forecast month (through November)
+## walltime_hours=$( expr \( 12 - $( echo "%FCST_START_DATE%" | cut -c5-6 ) \) \* 9 )
+#BSUB -W 76:00
+
+%include <head.h>
+
+ecflow_client --alter add variable FCST_START_DATE "%FCST_START_DATE%" /%SUITE%/%FAMILY%
+
+# EXPORT list here
+
+export OMP_NUM_THREADS=1
+export MP_EUIDEVELOP=min
+export KMP_STACKSIZE=1024m
+export F_UFMTENDIAN=big
+export MP_SHARED_MEMORY=no
+export MP_MPILIB=mpich2
+export MP_LABELIO=yes
+export MP_STDOUTMODE=unordered
+
+export envir=%ENVIR%
+export job=cfs_fcst_hur_%FCST_START_DATE%
+export NET=cfs
+export RUN=cfs_hur
+export PDY=%FCST_START_DATE%
+export cyc=00
+export SENDECF=NO
+
+# versions file for cfs sets $model_ver
+VERSION_FILE=/nw${envir}/versions/${RUN}.ver
+if [ -f $VERSION_FILE ]; then
+   . $VERSION_FILE
+else
+   ecflow_client --msg="*** ${ECF_NAME} ERROR: $VERSION_FILE does not exist ***"
+   ecflow_client --abort
+   exit
+fi
+
+export CONFIG_FILE=/nw${envir}/${NET}.${model_ver}/parm/cfs_parm_am/${RUN}_config
+
+# CALL executable job script here
+/nw${envir}/${NET}.${model_ver}/jobs/JCFS_FORECAST
+
+%include <tail.h>
+
+%manual
+######################################################################
+# Purpose: to run the Coupled Climate Forecast Model
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+To begin a forecast from a specific date, set the FCST_START_DATE
+variable for the family (ie. cfs_day01) to the PDY of the date you
+wish to start from (ie. 20140713).
+%end

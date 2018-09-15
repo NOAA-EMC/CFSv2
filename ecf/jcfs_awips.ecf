@@ -1,0 +1,67 @@
+#BSUB -J %E%cfs_awips_%FAMILY1%_%CYC%
+#BSUB -o /com/output/%ENVIR%/today/cfs_awips_%FAMILY1%_%CYC%.o%J
+#BSUB -e /com/output/%ENVIR%/today/cfs_awips_%FAMILY1%_%CYC%.o%J
+#BSUB -cwd /tmpnwprd1
+#BSUB -q %QUEUE%
+#BSUB -L /bin/sh
+#BSUB -P %PROJ%
+#BSUB -n 1
+#BSUB -W 01:00
+#BSUB -R rusage[mem=1700]
+#BSUB -R affinity[core]
+#BSUB -a poe
+
+%include <head.h>
+
+# EXPORT list here
+
+export MP_SHARED_MEMORY=yes
+export MP_EAGER_LIMIT=65535
+export MP_EUIDEVELOP=min
+export MP_MPILIB=mpich2
+export MP_COREFILE_FORMAT=core.txt
+export MP_USE_BULK_XFER=yes
+export MPICH_ALLTOALL_THROTTLE=0
+
+export OMP_STACKSIZE=256000
+export OMP_NUM_THREADS=1
+
+export envir=%ENVIR%
+export cyc=%CYC%
+export job=cfs_awips_m1_${cyc}
+
+# versions file for cfs sets $model_ver
+VERSION_FILE=/nw${envir}/versions/cfs.ver
+if [ -f $VERSION_FILE ]; then
+   . $VERSION_FILE
+else
+   ecflow_client --msg="***JOB ${SMSNAME} ERROR: Version File $VERSION_FILE does not exist ***"
+   ecflow_client --abort
+   exit
+fi
+
+# CALL executable job script here
+/nw${envir}/cfs.${model_ver}/jobs/JCFS_AWIPS
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+
+%manual
+######################################################################
+# Purpose: to run the Coupled Climate Forecast Model
+######################################################################
+
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+%manual
+######################################################################
+# Purpose: To prevent the suite from getting requeued until 1/2 hour
+#          before thr first job in the suites is scheduled to run.
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+
+ECF_NAME=%ECF_NAME% export ECF_NAME
+ECF_NODE=%ECF_NODE% export ECF_NODE
+ECF_PASS=%ECF_PASS% export ECF_PASS
+ECF_PORT=%ECF_PORT% export ECF_PORT
+export ECF_RID=$$
+
+ERROR() { echo ERROR ; trap 0; exit; }
+trap '{ echo "Killed by a signal"; ERROR ; }' 1 2 3 4 5 6 7 8 9 10 12 13 15
+
+ecflow_client --init=${ECF_RID}
+
+echo
+echo "THIS TASK HAS BEEN SUBMITTED TO A WORKSTATION"
+echo
+
+echo "date/time is " `date -u`
+sleep 60
+echo "date/time is " `date -u`
+
+ecflow_client --complete

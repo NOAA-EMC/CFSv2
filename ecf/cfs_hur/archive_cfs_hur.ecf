@@ -1,0 +1,63 @@
+#BSUB -J %E%archive_cfs_hur_para_%FCST_START_DATE%
+#BSUB -o /com/output/%ENVIR%/today/archive_cfs_hur_para_%FCST_START_DATE%.o%J
+#BSUB -q prod_serv
+#BSUB -L /bin/sh
+#BSUB -cwd /tmpnwprd2
+#BSUB -W 01:00
+#BSUB -R rusage[mem=500]
+#BSUB -R affinity[core]
+#BSUB -P CFS-T2O
+
+%include <head.h>
+
+export envir=%ENVIR%
+export job=%TASK%_para
+export NET=cfs
+export RUN=cfs_hur
+export PDY=%FCST_START_DATE%
+export cyc=00
+
+# versions file for cfs sets $model_ver
+VERSION_FILE=/nw${envir}/versions/${RUN}.ver
+if [ -f $VERSION_FILE ]; then
+   . $VERSION_FILE
+else
+   ecflow_client --msg="*** ${ECF_NAME} ERROR: $VERSION_FILE does not exist ***"
+   ecflow_client --abort
+   exit
+fi
+
+export CONFIG_FILE=/nw${envir}/${NET}.${model_ver}/parm/cfs_parm_am/${RUN}_config
+
+# CALL executable job script here
+/nw${envir}/${NET}.${model_ver}/jobs/JCFS_ARCHIVE
+
+ecflow_client --alter delete variable "FCST_START_DATE" /%SUITE%/%FAMILY% ||:
+
+%include <tail.h>
+
+%manual
+###############################################################################
+#PURPOSE:  This job transfers the following model data from the primary to the
+#          backup IBM-SP: CFSV2
+#
+#RUNTIME: 
+#
+#TRANSFER: /com/cfs/ENVIR/cfs_hur/cfs._PDY_/6hrly_grib_01
+#          /com/cfs/ENVIR/cfs_hur/cfs._PDY_/monthly_grib_01
+#          /com/cfs/ENVIR/cfs_hur/cfs._PDY_/time_grib_01
+#
+################################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+To begin a forecast from a specific date, set the FCST_START_DATE
+variable for the family (ie. cfs_day01) to the PDY of the date you
+wish to start from (ie. 20140713).
+
+%end
+
