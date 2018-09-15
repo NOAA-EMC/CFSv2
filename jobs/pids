@@ -1,5 +1,0 @@
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
-mkdir -p $DATA
-cd $DATA
-
