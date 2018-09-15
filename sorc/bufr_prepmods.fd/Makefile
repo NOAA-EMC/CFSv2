@@ -15,10 +15,6 @@ SRCS	= bufr_prepmods.f clonlat.f mnemonics.f obname.f raddate.f ssmipn.f tideg.f
 OBJS	= $(SRCS:.f=.o) 
 
 
-FC =            ifort
-LIBS=           -L/nwprod/lib -lw3nco_4 -lw3emc_4 -lbufr_v10.2.3_4_64   
-#LIBS=           -L/nwprod/lib -lw3nco_4 -lw3emc_4 -lbufr_v10.2.5_s_64
-#CHKOUT = 	-ftrapuv  -check all  -fp-stack-check  -fstack-protector
 DEBUG = 	-g -traceback
 FFLAGS =        -O2 $(DEBUG) $(CHKOUT)
 LDFLAGS=

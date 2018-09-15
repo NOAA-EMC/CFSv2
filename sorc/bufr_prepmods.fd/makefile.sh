@@ -1,6 +1,15 @@
-set -euax
+#!/bin/bash
+set -eua
 
-make clean
-make
-make install
-make clean
+export FC=ifort
+
+export LIBS="$W3NCO_LIB4 $W3EMC_LIB4 $BUFR_LIB4"
+
+echo; make=`basename $PWD`
+echo make-ing ${make%.*}
+echo
+
+make -f Makefile
+mv ${make%.*} ../../exec
+rm -f *.o *.mod
+
