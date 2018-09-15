@@ -1,0 +1,8 @@
+set -euax
+
+make; cd ..
+
+HOMEcfs=/nwpara/cfs*28
+ARGODUMP=bufr_argodump.fd/bufr_argodump
+
+bufr_dumparte 2018062212 11.59 tesac
