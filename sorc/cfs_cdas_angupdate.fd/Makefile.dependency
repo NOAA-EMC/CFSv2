@@ -1,0 +1,3 @@
+determine_time_levels.o : determine_time_levels.f90
+main.o : main.f90 read_diag.o
+read_diag.o : read_diag.f90

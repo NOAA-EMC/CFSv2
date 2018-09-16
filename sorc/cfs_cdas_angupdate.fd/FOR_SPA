@@ -1,0 +1,4 @@
+How to compile this code:
+1. Type ./configure wcoss”.   This soft links Makefile.conf to Makefile.conf.wcoss.
+
+2. Type make -f Makefile
