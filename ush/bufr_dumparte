@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -uxa
+
+export DUMPOPS=${DUMPOPS:-/nwprod/ush/dumpjb}
+
+if [[ $3 = tesac && $# -eq 3 ]]; then
+
+  # make argo dump look like tesacs and cat with other tesacs
+
+  export DUPC=OFF
+  export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
+  export ARGOTANK=${ARGOTANK:-/dcom/us007003} 
+  export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
+
+  rm -f tesac.ibm tesac.org argomods
+
+  $DUMPOPS $1 $2 tesac   >/dev/null 2>&1     # tesac
+  TANK=$ARGOTANK
+  $DUMPOPS $1 $2 031 005 >/dev/null 2>&1     # argos
+
+  unset FORT20 FORT21 FORT50; rm -rf fort.*
+  ln -sf 031.ibm   fort.20
+  ln -sf argomods  fort.50
+  $ARGODUMP >/dev/null 2>&1
+
+  [[ -s tesac.ibm ]] && cp  tesac.ibm tesac.org
+  [[ -s argomods  ]] && cat argomods >> tesac.ibm
+
+  echo
+  ls -l tesac.org 
+  ls -l argomods 
+  ls -l tesac.ibm
+  echo
+
+else
+  $DUMPOPS $*
+fi
+
+
+
