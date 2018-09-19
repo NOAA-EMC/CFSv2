@@ -12,8 +12,7 @@ export DATA=$DATAROOT/$job.$pid
 mkdir -p $DATA
 cd $DATA
 
-##/nwprod/util/ush/setup.sh   # need to call this becasue the obsproc VS is not NCO stanards complliant.
-cp $(which postmsg) $DATA   # need to call this becasue the obsproc VS is not NCO stanards complliant.
+cp $(which postmsg) $DATA   # need to call this because the obsproc VS is not NCO stanards complliant.
 
 export tmmark=tm00
 
