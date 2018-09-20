@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uxa
 
-export DUMPOPS=${DUMPOPS:-/nwprod/ush/dumpjb}
+export DUMPOPS=${DUMPOPS:-$HOMEdump/ush/dumpjb}
 
 if [[ $3 = tesac && $# -eq 3 ]]; then
 

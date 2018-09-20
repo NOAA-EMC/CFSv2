@@ -1,0 +1,51 @@
+#!/bin/ksh
+##########################################################################
+echo "--------------------------------------------------------------------"
+echo "excfs_cdas_dump.sh.sms - CFS network"
+echo "                       data dump processing"
+echo "--------------------------------------------------------------------"
+echo "History: Aug 31 2010 - Original script."
+###########################################################################
+#
+#     COMSP       - string indicating the final directory/filename path to
+#                   output data destination
+#                   (e.g., "/com/cfs/prod/cdas1.20000102/cdas1.t12z.")
+#                   {NOTE: If the imported variable "SENDCOM" (see below)
+#                          is "NO", then COMSP is hardwired to the string
+#                          "$DATA/"}
+#     SENDCOM     - string: if = 'NO' will redefine "COMSP" variable to be
+#                   "$DATA/", regardless of its imported value - this has
+#                   the effect of preventing any files from going to an
+#                   operational /com directory path, and instead sending
+#                   them to the "DATA" directory
+#                   Default is "YES"
+###########################################################################
+
+set -ua
+
+# Make sure we are in the $DATA directory
+
+cd $DATA||exit 99  
+
+msg="$NET ANALYSIS TIME IS $PDY$cyc"
+postmsg "$jlogfile" "$msg"
+
+# copy the cdas dump from history
+
+CDATE=$PDY$cyc
+
+year=$(echo $CDATE|cut -c 1-4)
+mnth=$(echo $CDATE|cut -c 5-6)
+days=$(echo $CDATE|cut -c 7-8)
+hour=$(echo $CDATE|cut -c 9-10)
+txxz=t${hour}z
+
+cd $COMOUT ||exit 99
+htar -xvf /NCEPPROD/hpssprod/runhistory/cfs$year/$year$mnth/$year$mnth$days/Analysis/cfs.dumps.$PDY.tar  \*$txxz\*
+rm -f cdas1.$txxz.cmapgrb
+cd $DATA   ||exit 99
+
+msg='ENDED NORMALLY.'
+postmsg "$jlogfile" "$msg"
+
+################## END OF SCRIPT #######################

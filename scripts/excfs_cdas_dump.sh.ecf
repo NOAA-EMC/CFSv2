@@ -9,7 +9,7 @@ echo "History: Aug 31 2010 - Original script."
 #
 #     COMSP       - string indicating the final directory/filename path to
 #                   output data destination
-#                   (e.g., "$COMROOT/cfs/prod/cdas1.20000102/cdas1.t12z.")
+#                   (e.g., "/com/cfs/prod/cdas1.20000102/cdas1.t12z.")
 #                   {NOTE: If the imported variable "SENDCOM" (see below)
 #                          is "NO", then COMSP is hardwired to the string
 #                          "$DATA/"}
@@ -26,6 +26,8 @@ set -x
 # Make sure we are in the $DATA directory
 cd $DATA
 
+gdas1=gdas
+
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
 
@@ -34,18 +36,19 @@ cat break > $pgmout
 export machine=${machine:-WCOSS}
 export NET_uc=$(echo $NET | tr [a-z] [A-Z])
 export tmmark_uc=$(echo $tmmark | tr [a-z] [A-Z])
+export SENDCOM=${SENDCOM:-YES}
 export PROCESS_GRIBFLDS=${PROCESS_GRIBFLDS:-YES}
 export PROCESS_GDAS_DUMP=${PROCESS_GDAS_DUMP:-YES}
 export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
-export COMSP=${COMSP:-$COMOUT/${RUN1}.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
-export COMGDAS=${COMGDAS:-$COMROOT/gfs/prod/gdas.$PDY} # GDAS file directory
-export EXECbufr=${EXECbufr:-$HOME_obsproc_dump/exec}
-
+export COMSP=${COMSP:-$COMOUT/${RUN}.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
+export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY} # GDAS file directory
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
 postmsg "$jlogfile" "$msg"
 
+# 
 [ "$SENDCOM" = 'NO' ]  &&  COMSP=$DATA/
+
 
 # get grib fields
 if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
@@ -69,8 +72,8 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       cp $snoold ${COMSP}snogrb
       msg="**todays 0.5 degree snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
-   elif [ -s  $COMGDAS/gdas1.t${cyc}z.snogrb ]; then
-      cp $COMGDAS/gdas1.t${cyc}z.snogrb $COMOUT/${RUN1}.t${cyc}z.snogrb
+   elif [ -s  $COMGDAS/$gdas1.t${cyc}z.snogrb ]; then
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb $COMOUT/${RUN}.t${cyc}z.snogrb
    else
       set +x
       echo " "
@@ -95,8 +98,8 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       cp $snoold_t574 ${COMSP}snogrb_t574
       msg="**todays T574 snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
-   elif [ -s $COMGDAS/gdas1.t${cyc}z.snogrb_t574 ]; then
-      cp $COMGDAS/gdas1.t${cyc}z.snogrb_t574 $COMOUT/${RUN1}.t${cyc}z.snogrb_t574
+   elif [ -s $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ]; then
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 $COMOUT/${RUN}.t${cyc}z.snogrb_t574
    else
       set +x
       echo " "
@@ -121,8 +124,8 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       cp $engiceold ${COMSP}engicegrb
       msg="**todays engice grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
-   elif [ -s $COMGDAS/gdas1.t${cyc}z.engicegrb ]; then
-      cp $COMGDAS/gdas1.t${cyc}z.engicegrb $COMOUT/${RUN1}.t${cyc}z.engicegrb
+   elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
+      cp $COMGDAS/$gdas1.t${cyc}z.engicegrb $COMOUT/${RUN}.t${cyc}z.engicegrb
    else
       set +x
       echo " "
@@ -185,33 +188,21 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 #              and rename them to cdas1 files to be saved in the CDAS directory
   
   # bufr_d files
-  for gdasfile in `ls $COMGDAS/gdas1.t${cyc}z.*bufr_d |awk ' BEGIN { FS="/"} { print $NF }'`
+  for gdasfile in `ls $COMGDAS/$gdas1.t${cyc}z.*bufr_d |awk ' BEGIN { FS="/"} { print $NF }'`
   do
-    cdasfile=`echo $gdasfile |sed -e "s/gdas1/cdas1/g"`
-    cp $COMGDAS/$gdasfile $COMOUT/$cdasfile
+    cdasfile=`echo $gdasfile |sed -e "s/$gdas1/cdas1/g"`
+    cp --preserv=mode,ownership $COMGDAS/$gdasfile $COMOUT/$cdasfile
   done
-
-  # Change the group ID to rstprod for the following files:
-  rst_group_list="adpsfc aircar aircft sfcshp"
-  for fname in $rst_group_list
-  do
-    chgrp rstprod $COMOUT/${RUN1}.t${cyc}z.${fname}.tm00.bufr_d
-  done
- 
-  # snow and icegrb files
-  #cp $COMGDAS/gdas1.t${cyc}z.snogrb_t574 $COMOUT/${RUN1}.t${cyc}z.snogrb_t574
-  #cp $COMGDAS/gdas1.t${cyc}z.snogrb $COMOUT/${RUN1}.t${cyc}z.snogrb
-  #cp $COMGDAS/gdas1.t${cyc}z.engicegrb $COMOUT/${RUN1}.t${cyc}z.engicegrb
 
   # tcvital files
-  cp $COMGDAS/gdas1.t${cyc}z.syndata.tcvitals.tm00 $COMOUT/${RUN1}.t${cyc}z.syndata.tcvitals.tm00
-  cp $COMGDAS/gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 $COMOUT/${RUN1}.t${cyc}z.jtwc-fnoc.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 $COMOUT/${RUN}.t${cyc}z.syndata.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 $COMOUT/${RUN}.t${cyc}z.jtwc-fnoc.tcvitals.tm00
 
   # RFC #1550 Update WCOSS to send more CDAS data to NOMADS -20151211
   if [ $SENDDBN = YES ]; then
      fname=ascatw
      alerttype=CDAS1_BUFR_${fname}
-     file=$COMOUT/${RUN1}.t${cyc}z.${fname}.tm00.bufr_d
+     file=$COMOUT/${RUN}.t${cyc}z.${fname}.tm00.bufr_d
      if [ -s ${file} ]; then
        $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
      else
@@ -220,7 +211,7 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 
      for fname in omi ascatt ; do
        alerttype=CDAS1_MSC_${fname}
-       file=$COMOUT/${RUN1}.t${cyc}z.${fname}.tm00.bufr_d
+       file=$COMOUT/${RUN}.t${cyc}z.${fname}.tm00.bufr_d
        if [ -s ${file} ]; then
          $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
        else
@@ -237,7 +228,7 @@ fi  #  endif $PROCESS_GDAS_DUMP
 if [ "$PROCESS_OCN_DUMP" = 'YES' ]; then
 
 ### dump ocean data
-DUMPMB=${DUMPMB:-$NWROOT/ush/dumpmb}
+DUMPMB=${DUMPMB:-$HOMEcfs/ush/bufr_dumpmb}
 DUMP_LIST="dbuoy bathy tesac"
 LOUD=${LOUD:-off}
 GODAS_WNDO=${GODAS_WNDO:-10}
@@ -250,7 +241,7 @@ START_DATE=`finddate.sh $PDY d-$GODAS_WNDO`
 END_DATE=$PDY
 
 for CTYPE in $DUMP_LIST; do
-  $DUMPMB  $START_DATE  $END_DATE  $CTYPE      > dumpmb.output 2>dumpmb.errfile
+  $DUMPMB  $START_DATE  $END_DATE  $CTYPE  ###> dumpmb.$CTYPE.output 2>dumpmb.$CTYPE.errfile
 
 #  dumpstat=$?
 #  echo status from dump is $dumpstat
@@ -270,30 +261,18 @@ for CTYPE in $DUMP_LIST; do
   else
     msg="Warning:  NO $CTYPE DUMP FOR ${DATE}"
       postmsg "$jlogfile" "$msg"
-    fi
-    DATE=`sh finddate.sh $DATE d+1`
+  fi
+  DATE=`finddate.sh $DATE d+1`
   done
 
   if [ -s $flist ]; then
     sort $flist > $flist.sort
-    if [ $machine = IBM ]; then
-      export XLFUNITS=0
-      unset `env | grep XLFUNIT | awk -F= '{print $1}'`
-      export XLFUNIT_50="$CTYPE.all"
-    else
-      if [ -s $DATA/prep_step ];then
-         set +u
-         . $DATA/prep_step
-         set -u
-      else
-         [ -f errfile ] && rm errfile
-         export FORT01=0
-         unset `env | grep "^FORT[0-9]\{1,\}=" | awk -F= '{print $1}'`
-      fi
-      ln -sf $CTYPE.all fort.50
-    fi
+    set +u
+    . prep_step
+    set -u
+    ln -sf $CTYPE.all fort.50
 
-    $EXECbufr/bufr_combfr < $flist.sort >> $pgmout
+    $HOMEdump/exec/bufr_combfr < $flist.sort >> $pgmout
     export err=$?; err_chk
 
     msg="Done processing $CTYPE for ${START_DATE} to ${END_DATE}"
@@ -339,11 +318,10 @@ set -x
 
 # save standard output
 cat  break $pgmout break > allout
-cat allout
+# cat allout
 # rm allout
 
 sleep 10
-
 msg='ENDED NORMALLY.'
 postmsg "$jlogfile" "$msg"
 

@@ -21,7 +21,7 @@
 #                 added RC_ARG error return processing.
 #   5/06/05 JAW - default MODX set to chkout/exec.jifs/ version (temporary)
 #   7/27/05 JAW - upgraded for operational use: TMPDIR=$DATA, etc
-#   8/04/05 JAW - default BTAB=/nwprod/fix/bufrtab.mods
+#   8/04/05 JAW - default BTAB=$HOMEdump/fix/bufrtab.mods
 #  10/12/06 JAW - reset TMPDIR logic: now checks for /stmp availability
 #   6/28/07 JAW - enabled non-MODS-supported dtype dumping w/o conversion
 #   8/01/07 JAW - new non-MODS types added: sstnvp sstnsp envsal
@@ -61,12 +61,12 @@ vertxt=' '
 #
 #
 # Environment variables ( [ default value] ):
-#  TANK - directory path to online data       [ /dcom/us007003 ]    
-#  BTAB - path to MODS bufrtable              [ /nwprod/fix/bufrtab.mods ]
 #  DATA - directory path for MODS output      [ pwd ]
-#  MODX - path to bufr_prepmods exec          [ /nwprod/exec/bufr_prepmods ]
-#  DUMP - path to general dump script         [ /nwprod/ush/dumpjb ]
-#  LIST - path to dumplist file               [ /nwprod/fix/bufr_dumplist ]
+#  TANK - directory path to online data       [ /dcom/us007003 ]    
+#  MODX - path to bufr_prepmods exec          [ $HOMEcfs/exec/bufr_prepmods ]
+#  DUMP - path to general dump script         [ $HOMEdump/ush/dumpjb ]
+#  LIST - path to dumplist file               [ $HOMEdump/fix/bufr_dumplist ]
+#  BTAB - path to MODS bufrtable              [ $HOMEdump/fix/bufrtab.mods ]
 #
 #
 # Exit conditions:
@@ -87,13 +87,13 @@ vertxt=' '
 # Modules and files referenced:
 #  user scripts: dumpjb
 #  fixed fields: bufr_dumplist  bufrtab.mods
-#  executables : bufr_prepmods  /nwprod/util/exec/ndate
+#  executables : bufr_prepmods  $NDATE 
 #
 #
 # Issues/caveats:
 # - Subsetting by time (less than the default 24-hour dump) is done via 
 #    environment vars TIME_CENTER & TIME_RADIUS;  These are passed as 
-#    arguments to the DUMPJB call.  See usage of /nwprod/ush/dumpjb script 
+#    arguments to the DUMPJB call.  See usage of $HOMEdump/ush/dumpjb script 
 #    for details.  NOTE: script will not subset files that are not dumped 
 #    via DUMPJB (eg, files later than ten days ago).
 # - No geographic subsetting is supported.
@@ -129,7 +129,7 @@ cymd2=${2:?"$usage"}
 
 #echo "debug: $# args='$*'"
 #---
-set -a     # auto export variables
+set -a    # auto export variables
 
 
 # Parse args for valid dates 
@@ -245,13 +245,14 @@ if [ $RC_ARG -eq 0 ] ; then
 # ---set default values
   userTANK=''
   [ -n "$TANK" ] && userTANK=$TANK
-  BTAB=${BTAB:-"/nwprod/fix/bufrtab.mods"}
   userDATA="`pwd`"
   [ -n "$DATA" ] && userDATA="$DATA"
   DATA=${DATA:-"`pwd`"}
+
   DUMP=${DUMP:-"$HOMEcfs/ush/bufr_dumparte"}
   MODX=${MODX:-"$HOMEcfs/exec/bufr_prepmods"}
-  LIST=${LIST:-"/nwprod/fix/bufr_dumplist"}
+  BTAB=${BTAB:-"$HOMEdump/fix/bufrtab.mods"}
+  LIST=${LIST:-"$HOMEdump/fix/bufr_dumplist"}
 
   TIME_CENTER=${TIME_CENTER:-"12"}
   TIME_RADIUS=${TIME_RADIUS:-"11.999"}
@@ -571,8 +572,6 @@ while [ $cymd -le $cymd2 ] ; do
 #d fi # skip it
 
   cymd=`$NDATE 24 ${cymd}12 | cut -c1-8`
-# cymd=`$FDATE ${cymd}12 P+1`
-# sh /nwprod/util/ush/finddate.sh `today` P+1 
 done # while in date range
 
 
