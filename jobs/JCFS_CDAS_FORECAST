@@ -4,7 +4,7 @@ if [ $# -ne 1 ] ; then
      echo " No argument passed - forecast with default config file will be done"
 fi
 
-set -x
+set -euax
 
 export MP_IOAGENT_CNT=all
 export MP_IO_BUFFER_SIZE=8M
@@ -90,7 +90,9 @@ export CDATE=${CDATE:-${PDY}$cyc}
 # Get the variables setup from config script
 #############################################
 export CDAS_CONFIG_FILE=${CDAS_CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_cdas_config}
+set +u
 set -a; . $CDAS_CONFIG_FILE; set +a
+set -u
 
 env
 
@@ -204,7 +206,7 @@ fi
 # Execute the script
 #############################################################
 
-export NTHREADS=${NTHREADS:-3}
+export NTHREADS=${NTHREADS:-2}
 export SUFOUT=${SUFOUT:-".gdas.$start_date"}
 
 export FHINI=0
@@ -243,7 +245,7 @@ fi
 ###################################################
 # msg end of job and clean up temperary directory
 ###################################################
-cat $pgmout
+cat $DATA/$pgmout
 msg="ENDED NORMALLY."
 postmsg "$jlogfile" "$msg"
 
