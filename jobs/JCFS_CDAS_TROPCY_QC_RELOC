@@ -44,22 +44,20 @@ export FIXcfs=$HOMEcfs/fix
 # Specify Execution Data Areas
 ####################################
 
-export HOMESYND=${HOMESYND:-$HOMEtropcy}
+export HOMESYND=${HOMESYND:-$HOMEglob}
 export EXECSYND=${HOMESYND}/exec
 export FIXSYND=${HOMESYND}/fix
 export PARMSYND=${HOMESYND}/parm
 export USHSYND=${HOMESYND}/ush
 
-export HOMERELO=${HOMERELO:-$HOMEtropcy}
+export HOMERELO=${HOMERELO:-$HOMEglob}
 export EXECRELO=${HOMERELO}/exec
 export FIXRELO=${HOMERELO}/fix
 export USHRELO=${HOMERELO}/ush
 export utilexec=$(dirname $NDATE)
 export utilscript=$(dirname $(which finddate.sh))
 
-export USHRELO=$USHcfs # bypass for vertical structure error
-
-export HOMEarch=${HOMEarch:-${COMROOT}/arch/${envir}}
+export HOMEarch=${HOMEarch:-${COMROOTp1}/arch/${envir}}
 export ARCHSYND=${HOMEarch}/syndat
 mkdir -p $ARCHSYND
 mkdir -p $ARCHSYND
@@ -91,7 +89,7 @@ export COMINcfs_cdas=$COMIN
 
 #  Normally both PROCESS_TROPCY and DO_RELOCATE should be set to YES
 
-export PROCESS_TROPCY=YES  # Turn on tropical cyclone tcvitals QC proc. if YES
+export PROCESS_TROPCY=NO   # Turn on tropical cyclone tcvitals QC proc. if YES
 export DO_RELOCATE=YES     # Turn on tropical cyclone relocation proc. if YES
 
 export LONB=1760 # sigma guess parm needed by tropical cyclone reloc. processing
@@ -103,8 +101,7 @@ export LATB=880  # sigma guess parm needed by tropical cyclone reloc. processing
 export ndate=$NDATE
 export nhour=$NHOUR
 export network_getges=cfs-cdas 
-export USHGETGES=$HOMEtropcy/ush  
-export USHGETGES=$HOMEcfs/ush  
+export USHGETGES=$HOMEglob/ush  
 export GRIBVERSION=grib1
 export BKGFREQ=3
 export quiet=NO

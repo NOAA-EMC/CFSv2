@@ -46,8 +46,10 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
 
-export PARMPREP=$HOMEobsproc_network/parm
-export ushscript_prep=$HOMEobsproc_prep/ush                  
+export HOMEobsproc_prep=$HOMEprep
+
+export PARMPREP=$PARMcfs/cfs_parm_prep
+export PARMSYND=$PARMcfs/cfs_parm_prep
 export envir_getges=prod
 
 ##############################
@@ -60,7 +62,7 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export  COMIN=${COMIN:-$COMROOT/${NET}/${envir}/${RUN}.${PDY}}
 export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m775 -p $COMOUT
 
@@ -133,21 +135,20 @@ export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
                       # switches above -
                       # should be set to NO only as a last resort!!!
 
-export OIQCX=${OIQCX:-$HOMEobsproc_prep/exec/prepobs_oiqcbufr} ## uses shared libs
-export OIQCX=$EXECcfs/prepobs_oiqcbufr
-export USHOIQC=$USHcfs
-
+export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
+export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     
+export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
 export GETGES_COM=$COMROOT
+##export USHOIQC=$USHcfs
+
 export NET=gdas
+export RUN=$RUN1 # for the obsproc script
+export network_getges=cfs-cdas
 
 #############################################################
 # execute the script
 #############################################################
-#export machine=WCOSS
-export RUN=$RUN1 # for the obsproc script
-export GETGES_COM=$COMROOT
-export network_getges=cfs-cdas
-${PREPSH:-$HOMEobsproc_network/scripts/exglobal_makeprepbufr.sh.ecf} 
+${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh.ecf} 
 export err=$?; err_chk
 
 cat $pgmout
