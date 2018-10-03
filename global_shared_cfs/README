@@ -1,0 +1,27 @@
+
+Origin and contents of cfs frozen model global_shared_cfs
+---------------------------------------------------------
+
+This set of scripts and codes is based on /nwprod2/global_shared.v13.0.7 vertical structure model with the following changes:
+
+1) /nwprod/fix/crtm_2.0.5 is included in the model root.
+
+2) the tropcy scripts and codes from the /nwprod horizontal structure are substituted for the ones native to this model.
+
+   These include:
+
+   scripts/extropcy_qc_reloc.sh.ecf
+   ush/tropcy_relocate.sh
+   ush/tropcy_relocate_extrkr.sh
+   sorc/relocate_mv_nvortex.fd
+   sorc/supvit.fd
+   sorc/gettrk.fd
+
+These changes were made to create identical results with cfs.v2.1.28. 
+
+This model is included in the portable standardized cfs vertical strucutre which will port to the dell wcoss 3 platform.
+It will also provide frozen versions of the global_chgres.fd, global_cycle.fd, global_sfchdr.fd, global_sighdr.fd needed by the cfs model.
+Additionally included is a newer version of gsi.fd for possible expansion of the observing systems which can be assimilated in the cdas analysis.
+
+	
+

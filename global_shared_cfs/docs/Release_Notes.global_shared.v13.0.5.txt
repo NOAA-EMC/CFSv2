@@ -1,0 +1,84 @@
+﻿RELEASE NOTESgfs.v13.0.5
+
+v13.0.5 - released December 1, 2016
+
+Added new CO2 global distribution data processed from most recent station measurements. 
+Data are added into the sub-directories under ../gfs/para/fix/fix_am.
+
+1) In the sub-directory "co2dat_4a", where contains the compete list of all co2 data, new additions are:
+
+    global_co2historicaldata_2015.txt -from latest obsv data
+    global_co2historicaldata_2016.txt_proj_u -updated 2016 projection
+    global_co2historicaldata_2017.txt_proj -projection for 2017 opr
+
+2) In the sub-directory "fix_co2_proj", where contains all projected data for operational access, the new addition is:
+    global_co2historicaldata_2017.txt -projection for 2017 opr
+
+3) In the sub-directory "fix_co2_update", where contains all updated projections for the current year 
+(although not actually be used by the operation models), the new additions is:
+    global_co2historicaldata_2016.txt -updated 2016 projection
+
+
+Implementation
+
+Check out https://svnemc.ncep.noaa.gov/projects/gfs/branches/global_shared.v13.0.5 or copy Tide:/global/save/Fanglin.Yang/nwpara/global_shared.v13.0.5  into /nwprod2/global_shared.v13.0.5 and follow standard GFS implementation procedures.  
+
+For operation, starting from cycle 2017010100, in /gpfs/tp2/nco/ops/nwprod/versions/gfs.ver,
+change "export global_shared_ver=v13.0.4" to "export global_shared_ver=v13.0.5"
+
+Testing
+No code changes.  Forecast model should pick up the 2017 CO2 data automatically. Nevertheless, the code has been compiled on WCOSS Phase-II.  
+
+It is suggested that NCO run one GFS and one GDAS forecast to assume the changes have been implemented correctly.  These changes do not require a full parallel production test.  Testing the GFS and GDAS forecast is sufficient.  Forecasts for any cycle of 2016 should reproudce current operation.
+
+
+------------------------------------
+RELEASE NOTESgfs.v13.0.2
+
+v13.0.2 - released August 24, 2016
+
+Dropsonde bug fix:
+This fix address a known bug in global_gsi. When in the cycle has drops, this new fix will pickup the drop data. 
+
+Code change:
+/nwprod2/global_shared.v13.0.2/sorc/gsi.fd/read_prepbufr.f90
+
+v13.0.3 - released 09/09/2016
+Switch off Metop-A HIRS 
+
+fix file change:
+/nwprod2/global_shared.v13.0.3/fix/global_satinfo.txt
+
+v13.0.4 - Released 10/27/2016
+Release notes for AMSU-A bug fix
+
+Background
+
+Channel 15 on MetOp-B AMSU-A failed on 2016101703.  This resulted in the rejection of all data from this instrument by the GSI including the ability to monitor the data.  This CDF is a request for a minor GSI code change (small changes to four subroutines) to allow MetOp-B AMSU-A channels to be monitored and to restore to active assimilation channels 7-13 where quality control and emissivity estimated using channel 15 is not required.  Note that this is not the addition of extra data but the reinstatement of data that was being used prior to 2016101703.
+
+The changes to the code were originally developed on top of the GSI trunk and are documented in the GSI ticket 612:
+https://svnemc.ncep.noaa.gov/trac/gsi/ticket/612
+
+Location of changes
+
+The operational GFS (/nwprod2/global_shared.v13.0.3) was copied into the GFS branch https://svnemc.ncep.noaa.gov/trac/gfs/browser/branches/global_shared.v13.0.4.  The required changes were then applied to this branch and committed.
+
+Only five files are changed:
+sorc/gsi.fd/read_atms.f90
+sorc/gsi.fd/read_bufrtovs.f90
+sorc/gsi.fd/qcmod.f90
+sorc/gsi.fd/setuprad.f90
+fix/global_satinfo.txt
+
+These same changes are also on WCOSS in:
+/sss/emc/da/save/Andrew.Collard/RFC/AMSUA/global_shared.v13.0.4
+
+Implementation
+
+Copy the global_shared.v13.0.4 branch into /nwprod2/global_shared.v13.0.4 and follow standard GFS implementation procedures.
+
+Testing
+The code has been compiled and run and the expected behaviour was seen: channels 1-6 and 14-15 are monitored while 7-13 are assimilated.
+
+It is suggested that NCO run two full GFS and GDAS cycles to assume the changes have been implemented correctly before assimilation.  These changes do not require a full parallel production test.  Testing the GFS and GDAS is sufficient.
+
