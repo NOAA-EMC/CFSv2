@@ -93,18 +93,16 @@ fi
 ####################################
 # Specify Execution Areas
 ####################################
-export HOMEGLOBAL=${HOMEGLOBAL:-$NWROOT}  
+export HOMEGLOBAL=$HOMEglob 
 export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
-export FIXGLOBAL=${FIXGLOBAL:-$HOMEGLOBAL/fix}
+export FIXGLOBAL=${FIXGLOBAL:-$HOMEGLOBAL/fix/fix_am}
 export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
 export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
 
-export HOMEcfs=${HOMEcfs:-$NWROOT/${NET}.${model_ver}}
 export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-export FIXcfs=${FIXcfs:-$HOMEcfs/fix}
-export USHcfs=${USHcfs:-$HOMEcfs/ush}
 export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 export FIXcfs=${FIXcfs:-$HOMEcfs/fix/cfs_fix_cdas}
+export USHcfs=${USHcfs:-$HOMEcfs/ush}
 
 err_chk=err_chk
 startmsg=startmsg
@@ -118,15 +116,6 @@ export FILESTYLE='C'
 
 setpdy.sh
 . ./PDY
-
-#####################################
-# specify user and local directories if "dev" queue
-#####################################
-if [ $RUN_ENVIR != prod ] ; then
- export usergroup=${usergroup:-g01}
- export userid=${userid:-$LOGNAME}
- export userdir=${userdir:-public_release/cfs_v2}
-fi
 
 ##############################################
 # Define COM directories
@@ -179,7 +168,7 @@ export RADSTAT=${RADSTAT:-${COMIN}/${PREINP}radstat}
 export SATANGO=${SATANGO:-$DATA/${RUN}.${cycle}.satang}
 
 msg="HAS BEGUN on `hostname`"
-$DATA/postmsg "$jlogfile" "$msg"
+postmsg "$jlogfile" "$msg"
 
 ####################################
 # Check if this is a restart
@@ -187,12 +176,12 @@ $DATA/postmsg "$jlogfile" "$msg"
 # Define Previous Guess File Names
 ####################################
 if [ $RUN_GETGES = YES ] ; then
-  export GETGESSH=$HOMEcfs/ush/cfs_cdas_getges.sh
   gesenvir=${envir}
+  export GETGESSH=$HOMEcfs/ush/global_getges.sh
   $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
   err1=$?
   $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
-else                         # For developers who do not run "getges.sh"
+else                         
   export SFCGES=$DATA/bges               
   export GSATANG=$DATA/gsatang
 fi
@@ -236,7 +225,7 @@ export MP_SHARED_MEMORY=yes
 export machine=WCOSS
 export APRUN='mpirun.lsf'
 
-env
+##env
 
 #############################################################
 # Execute the script

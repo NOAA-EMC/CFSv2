@@ -57,12 +57,11 @@ export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 export CHGRESSH=${CHGRESSH:-$HOMEgsm/ush/global_chgres.sh}
 export SIGHDR=${SIGHDR:-$HOMEgsm/exec/global_sighdr}
 
+export NWPROD=$HOMEpost
 export POSTGPSH=${POSTGPSH:-$HOMEpost/ush/global_nceppost.sh}
+export POSTGPEXEC=${POSTGPEXEC:-$HOMEpost/exec/ncep_post}
 export GENPSICHIEXE=${GENPSICHIEXE:-$HOMEcfs/exec/cfs_genpsiandchi}
 export OVERPARMEXEC=${OVERPARMEXEC:-$HOMEcfs/exec/cfs_overparm_grib}
-
-export REDOUT='1>>'
-export REDERR='2>'
 
 #########################################
 # Run setpdy and initialize PDY variables
@@ -141,18 +140,22 @@ export SLEEP_INT=${SLEEP_INT:-5}
 ##env
 
 ###############################
-# Post Hours
+# Various script parmeters
 ###############################
-# Execute the Script
 
 export COPYGBAP=$COPYGB # save the copygb app name for mpmd scripts
 [[ $machine = WCRAY ]] && export COPYGB="aprun -n1 $COPYGB"
 [[ $machine = WCRAY ]] && export APRUN="aprun -n24 -d1 -cc depth" ||  export APRUN=""
 
-#export POSTGPSH=$HOMEpost/ush/global_nceppost.sh
-#export POSTGPEXEC=$HOMEpost/exec/ncep_post
 export GRIBVERSION=grib1
 export OCNDIR=$COMOUT
+
+export REDOUT='1>>'
+export REDERR='2>'
+
+###############################
+# Execute the Script
+###############################
 
 ${CFSNCEPPOSTSH:-$HOMEcfs/scripts/excfs_cdas_nceppost.sh.ecf}
 err=$?; err_chk

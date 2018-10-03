@@ -105,14 +105,14 @@ export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc \
 #       if job fails in one of these programs, set offending program
 #       to NO and resubmit to "work-around" problem)
 
-export SYNDATA=YES     # Execute program SYNDAT_SYNDATA   if YES
-export PREPACQC=YES    # Execute PREPACQC script processing
-export PROCESS_ACQC=YES # Run program PREPOBS_PREPACQC
-export PROCESS_ACPF=NO  # Do not run program PREPOBS_PREPACPF (profiles are not generated in CFS)
-export PROFCQC=YES     # Execute program PREPOBS_PROFCQC  if YES
-export CQCVAD=YES      # Execute program PREPOBS_CQCVAD   if YES
-export CQCBUFR=YES     # Execute program PREPOBS_CQCBUFR  if YES
-export OIQCBUFR=YES    # Execute program PREPOBS_OIQCBUFR if YES
+export SYNDATA=${SYNDATA:-YES}     # Execute program SYNDAT_SYNDATA   if YES
+export PREPACQC=${PREPACQC:-YES}   # Execute PREPACQC script processing
+export   PROCESS_ACQC=YES            # Run program PREPOBS_PREPACQC
+export   PROCESS_ACPF=NO             # Do not run program PREPOBS_PREPACPF (profiles are not generated in CFS)
+export PROFCQC=${PROFCQC:-YES}     # Execute program PREPOBS_PROFCQC  if YES
+export CQCVAD=${CQCVAD:-YES}       # Execute program PREPOBS_CQCVAD   if YES
+export CQCBUFR=${CQCBUFR:-YES}     # Execute program PREPOBS_CQCBUFR  if YES
+export OIQCBUFR=${OIQCBUFR:-YES}   # Execute program PREPOBS_OIQCBUFR if YES
 
 
 #  -- If any of these are switched to NO it will affect the success of
