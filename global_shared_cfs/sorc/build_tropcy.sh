@@ -41,39 +41,47 @@ cd relocate_mv_nvortex.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd vint.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd tave.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd syndat_qctropcy.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd syndat_maksynrc.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd syndat_getjtbul.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd supvit.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../
 cd gettrk.fd
    make clean
    make -f makefile
    make install
+   make clean
    cd ../

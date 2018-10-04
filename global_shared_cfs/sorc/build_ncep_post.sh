@@ -22,4 +22,4 @@ cd ncep_post.fd
 make -f makefile_wcoss_module clean
 make -f makefile_wcoss_module 
 
-cp ncep_post ../../exec/
+mv ncep_post ../../exec/
