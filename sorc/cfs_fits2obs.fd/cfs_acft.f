@@ -5,7 +5,7 @@ C-----------------------------------------------------------------------
 c   make sure when you change levels, you check pmandt and pmandb
 C-----------------------------------------------------------------------
       PROGRAM SURUFIT
-c
+
       PARAMETER (IDBUG=0,IPR=1)
       PARAMETER (NSTC=9)
       PARAMETER (NPLV=3)
@@ -16,20 +16,23 @@ c
  
       CHARACTER*80 HDSTR,OBSTR,FCSTR,ANSTR,QMSTR,PSTR
       CHARACTER*8  SUBSET
-c
-       real(8)    HDR(14)
-       real(8)    PSOB(4),PSPR(4)
-       real(8)    BAK(10,255,NBAK)
-       real(8)    OBS(10,255),QMS(10,255)
-c
-      DIMENSION    SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
-      DIMENSION    PMANDB(NPLV),PMANDT(NPLV)
-      DIMENSION    FCS(10,255),ANS(10,255)
-      DIMENSION    STC(NSTC,5,NBAK)
-      DIMENSION    GDATA(NREG,NSUB)
-      LOGICAL      MANDONLY,REGION
-      INTEGER      INDEXV(NVAR)
-c
+
+      real(8)    HDR(14)
+      real(8)    PSOB(4),PSPR(4)
+      real(8)    BAK(10,255,NBAK)
+      real(8)    OBS(10,255),QMS(10,255)
+
+      real(8)    SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
+      real(8)    CNTO,CNTN,RAT1,RAT2,WT1,WT2
+      real(8)    PMANDB(NPLV),PMANDT(NPLV)
+      real(8)    STC(NSTC,5,NBAK)
+
+      real(4)    GDATA(NREG,NSUB)
+
+      LOGICAL    MANDONLY,REGION
+      INTEGER    INDEXV(NVAR)
+
+
       DATA HDSTR
      ./'SID XOB YOB DHR ELV TYP T29 ITP SQN RQM DUP PRG SRC RUD'/
       DATA PSTR /'POB PAN PFC PQM CAT=0'/
@@ -38,7 +41,8 @@ c
       DATA ANSTR/'PAN QAN TAN ZAN UAN VAN'/
       DATA QMSTR/'PQM QQM TQM ZQM WQM CAT'/
  
-      DATA BMISS /  10E10 /
+      real(8) BMISS /10E10/
+
       DATA RMISS / -9.99E+33 /
       DATA LUBFR/11/
       data indexv/2,3,4,1/
@@ -62,8 +66,9 @@ C  ZERO THE FIT ARRAYS
 C  -------------------
  
       SPRS = 0.
-C  --------------------------------------
- 
+      
+      bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+
 C  READ AND "SURU-FIT" THE PREPDA/BUFR RECORDS
 C  -------------------------------------------
  

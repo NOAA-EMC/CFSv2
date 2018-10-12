@@ -15,20 +15,22 @@ C-----------------------------------------------------------------------
  
       CHARACTER*80 HDSTR,OBSTR,FCSTR,ANSTR,QMSTR,PSTR
       CHARACTER*8  SUBSET
-c
-       real(8)    HDR(14)
-       real(8)    PSOB(4),PSPR(4)
-       real(8)    BAK(10,255,NBAK)
-       real(8)    OBS(10,255),QMS(10,255)
-c
-      DIMENSION    SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
-      DIMENSION    PMAND(NPLV),PMID(NPLV),LEVP(1200)
-      DIMENSION    FCS(10,255),ANS(10,255)
-      DIMENSION    STC(NSTC,5,NBAK)
-      DIMENSION    GDATA(NREG,NSUB)
-      LOGICAL      MANDONLY,REGION
-      INTEGER      INDEXV(NVAR)
- 
+
+      real(8)    HDR(14)
+      real(8)    PSOB(4),PSPR(4)
+      real(8)    BAK(10,255,NBAK)
+      real(8)    OBS(10,255),QMS(10,255)
+
+      real(8)    SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
+      real(8)    CNTO,CNTN,RAT1,RAT2,WT1,WT2
+      real(8)    PMAND(NPLV),PMID(NPLV)
+      real(8)    STC(NSTC,5,NBAK)
+
+      real(4)    GDATA(NREG,NSUB)
+
+      INTEGER    INDEXV(NVAR),LEVP(1200)
+      LOGICAL    MANDONLY,REGION
+
       DATA PMAND / 1000, 925, 850, 700, 500, 400, 300,
      .              250, 200, 150, 100,  70,  50,  30,
      .               20,  10,   7,   5,   3,   2,   1/
@@ -41,7 +43,8 @@ c
       DATA ANSTR/'PAN QAN TAN ZAN UAN VAN'/
       DATA QMSTR/'PQM QQM TQM ZQM WQM CAT'/
  
-      DATA BMISS /  10E10 /
+      real(8) BMISS /10E10/
+
       DATA RMISS / -9.99E+33 /
       DATA LUBFR/11/
       data indexv/3,4,5,2,1/
@@ -55,10 +58,12 @@ C  ZERO THE FIT ARRAYS
 C  -------------------
  
       SPRS = 0.
+      bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+
 C  --------------------------------------
  
-      MANDONLY = .FALSE.
-C     MANDONLY = .TRUE.
+      MANDONLY = .TRUE.     ! don't use sig levels in averages
+      MANDONLY = .FALSE.    ! use sig levels in averages
  
       DO I=1,1200
       LEVP(I) = 0

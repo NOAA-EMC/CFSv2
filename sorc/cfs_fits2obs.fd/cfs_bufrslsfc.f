@@ -9,7 +9,10 @@ c---------------------------------------------------------------------------
        CHARACTER*6   catname
        CHARACTER*8   klonw,klone,klatn,klats,kdhr
        CHARACTER*2   kchr
-c
+       real(8) bmiss
+
+       bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+
        call getenv("idbug",kdbug)
        read(kdbug,'(i1)') idbug
        write(*,*) "idbug= ",idbug

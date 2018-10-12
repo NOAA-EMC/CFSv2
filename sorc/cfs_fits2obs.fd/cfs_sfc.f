@@ -14,12 +14,16 @@ C-----------------------------------------------------------------------
  
       CHARACTER*80 HDSTR,PSTR
       CHARACTER*8  SUBSET
-c
+
       real(8)    HDR(14)
       real(8)    POB(4)
-      DIMENSION    SPRS(NSTC,NREG,NSUB,NBAK)
-      DIMENSION    STC(NSTC,NBAK)
-      DIMENSION    GDATA(NREG,NSUB)
+
+      real(8)    CNTO,CNTN,RAT1,RAT2,WT1,WT2
+      real(8)    SPRS(NSTC,NREG,NSUB,NBAK)
+      real(8)    STC(NSTC,NBAK)
+
+      real(4)    GDATA(NREG,NSUB)
+
       LOGICAL      REGION
  
       DATA HDSTR
@@ -27,12 +31,11 @@ c
  
       DATA PSTR /'POB PAN PFC PQM'/
 
-      DATA BMISS /  10E10 /
+      real(8) BMISS /10E10/
+
       DATA RMISS /-9.99E+33/
       DATA LUBFR/11/
-c
-       CALL OPENBF(LUBFR,'IN ',LUBFR)
-c
+
 C-----------------------------------------------------------------------
  
 C  ZERO THE FIT ARRAYS
@@ -41,6 +44,9 @@ C  -------------------
       SPRS = 0.
       STC=0.
  
+      bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+      CALL OPENBF(LUBFR,'IN ',LUBFR)
+
 C  READ AND "SURU-FIT" THE PREPDA/BUFR RECORDS
 C  -------------------------------------------
  

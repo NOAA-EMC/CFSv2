@@ -16,20 +16,22 @@ c
  
       CHARACTER*80 HDSTR,OBSTR,FCSTR,ANSTR,QMSTR,PSTR
       CHARACTER*8  SUBSET
-c
-       real(8)    HDR(14)
-       real(8)    PSOB(4),PSPR(4)
-       real(8)    BAK(10,255,NBAK)
-       real(8)    OBS(10,255),QMS(10,255)
-c
-      DIMENSION    SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
-      DIMENSION    PMANDB(NPLV),PMANDT(NPLV)
-      DIMENSION    FCS(10,255),ANS(10,255)
-      DIMENSION    STC(NSTC,5,NBAK)
-      DIMENSION    GDATA(NREG,NSUB)
-      LOGICAL      MANDONLY,REGION
-      INTEGER      INDEXV(NVAR)
-c
+
+      real(8)   HDR(14)
+      real(8)   PSOB(4),PSPR(4)
+      real(8)   BAK(10,255,NBAK)
+      real(8)   OBS(10,255),QMS(10,255),BMISS
+
+      real(8)   SPRS(NSTC,NPLV,NVAR,NREG,NSUB,NBAK)
+      real(8)   CNTO,CNTN,RAT1,RAT2,WT1,WT2
+      real(8)   PMANDB(NPLV),PMANDT(NPLV)
+      real(8)   STC(NSTC,5,NBAK)
+
+      real(4)   GDATA(NREG,NSUB)
+
+      LOGICAL   MANDONLY,REGION
+      INTEGER   INDEXV(NVAR)
+
       DATA HDSTR
      ./'SID XOB YOB DHR ELV TYP T29 ITP SQN RQM DUP PRG SRC RUD'/
       DATA PSTR /'POB PAN PFC PQM CAT=0'/
@@ -47,6 +49,8 @@ c
       DATA PMANDB / 1000,700,300/
       DATA PMANDT /  700,300,150/
 c
+      bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+
       levt1=pmandt(1)
       levb1=pmandb(1)
       levt2=pmandt(2)
