@@ -230,13 +230,9 @@ export SFCGES=${1:-${SFCGES:?}}
 export SFCANL=${2:-${SFCANL}}
 
 #  Directories.
-export global_shared_ver=${global_shared_ver:-v13.0.0}
-export BASEDIR=${BASEDIR:-${NWROOT:-/nwprod2}}
-export HOMEglobal=${HOMEglobal:-$BASEDIR/global_shared.${global_shared_ver}}
-export EXECgsm=${EXECgsm:-$HOMEglobal/exec}
-export FIXSUBDA=${FIXSUBDA:-fix/fix_am}
-export FIXgsm=${FIXgsm:-$HOMEglobal/$FIXSUBDA}
-export USHgsm=${USHgsm:-$HOMEglobal/ush}
+export EXECgsm=${EXECgsm:-$EXECGLOBAL}
+export USHgsm=${USHgsm:-$USHGLOBAL}
+export FIXgsm=${FIXgsm:-$FIXGLOBAL}
 export DATA=${DATA:-$(pwd)}
 export COMIN=${COMIN:-$(pwd)}
 export COMOUT=${COMOUT:-$(pwd)}

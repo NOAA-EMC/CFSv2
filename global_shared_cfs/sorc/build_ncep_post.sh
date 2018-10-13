@@ -21,5 +21,7 @@ module list
 cd ncep_post.fd
 make -f makefile_wcoss_module clean
 make -f makefile_wcoss_module 
-
 mv ncep_post ../../exec/
+
+make -f makefile_wcoss_module clean
+

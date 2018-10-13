@@ -93,16 +93,16 @@ fi
 ####################################
 # Specify Execution Areas
 ####################################
-export HOMEGLOBAL=$HOMEglob 
-export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
-export FIXGLOBAL=${FIXGLOBAL:-$HOMEGLOBAL/fix/fix_am}
-export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
-export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
-
 export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
 export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 export FIXcfs=${FIXcfs:-$HOMEcfs/fix/cfs_fix_cdas}
 export USHcfs=${USHcfs:-$HOMEcfs/ush}
+
+export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEcfs/global_shared_cfs} 
+export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
+export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
+export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
+export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_fix_am}
 
 err_chk=err_chk
 startmsg=startmsg

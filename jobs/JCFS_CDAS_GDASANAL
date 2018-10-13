@@ -91,20 +91,16 @@ export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 export USHcfs=${USHcfs:-$HOMEcfs/ush}
 export FIXcfs=$HOMEcfs/fix/cfs_fix_cdas
 
-export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEcfs/global_shared.v13.0.7}
-export HOMEglobal=${HOMEglobal:-$HOMEGLOBAL}
+export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEcfs/global_shared_cfs}
 export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
 export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
 export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
 export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_am}
-
 export RTMFIX=${RTMFIX:-${HOMEGLOBAL}/crtm_2.0.5}
 
 ##############################
 # Set up the UTILITIES
 ##############################
-export utilscript=${utilscript:-$HOMEglobal/ush}
-export utilexec=${utilexec:-$HOMEglobal/exec}
 
 err_chk=err_chk  
 startmsg=startmsg

@@ -149,13 +149,6 @@ export GSATANG=${2:-${GSATANG:?}}
 export RADSTAT=${3:-${RADSTAT:?}}
 export SATANGO=${4:-${SATANGO:?}}
 #  Directories.
-
-#export FIXGLOBAL=${FIXGLOBAL:-/nwprod/fix}
-#export FIXcfs=${FIXcfs:-/nwprod/fix/cfs_fix_cdas}
-#export EXECGLOBAL=${EXECGLOBAL:-/nwprod/exec}
-#export USHGLOBAL=${USHGLOBAL:-/nwprod/ush}
-#export utilscript=${utilscript:-/nwprod/util/ush}
-
 export DATA=${DATA:-$(pwd)}
 export COMIN=${COMIN:-$(pwd)}
 export COMOUT=${COMOUT:-$(pwd)}

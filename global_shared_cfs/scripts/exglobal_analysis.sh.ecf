@@ -539,17 +539,14 @@ export ABIASAIR=${13:-${ABIASAIR}}
 export IGEN=${14:-${IGEN:-0}}
 export ABIASe=${15:-${ABIASe:-satbias_int.out}}
 #  Directories.
-export HOMEDIR=${HOMEDIR:-$NWROOT}
-export NWPROD=${NWPROD:-$HOMEDIR}
-export FIXSUBDA=${FIXSUBDA:-fix/fix_am}
-export FIXgsm=${FIXgsm:-$NWPROD/gsm.${gsm_ver}/fix/fix_am}
-export EXECgsm=${EXECgsm:-$NWPROD/gsm.${gsm_ver}/exec}
-export USHgsm=${USHgsm:-$NWPROD/gsm.${gsm_ver}/ush}
-export FIXgsi=${FIXgsi:-$NWPROD/global_shared.${global_shared_ver}/fix}
-export EXECgsi=${EXECgsi:-$NWPROD/global_shared.${global_shared_ver}/exec}
-export DATA=${DATA:-$(pwd)}
-export COMIN=${COMIN:-$(pwd)}
-export COMOUT=${COMOUT:-$(pwd)}
+export FIXgsm=${FIXgsm:-$HOMEgsm/fix/fix_am}
+export EXECgsm=${EXECgsm:-$HOMEgsm/exec}
+export USHgsm=${USHgsm:-$HOMEgsm/ush}
+export FIXgsi=${FIXgsi:-$HOMEgsi/fix}
+export EXECgsi=${EXECgsi:-$HOMEgsi/exec/exec}
+export DATA=${DATA:-/dev/null}
+export COMIN=${COMIN:-/dev/null}
+export COMOUT=${COMOUT:-/dev/null}
 #  Set script / GSI control parameters
 NST_GSI=${NST_GSI:-0}                                # NSST:  indicator to control the Tr Analysis mode
 NST_TZR=${NST_TZR:-0}                                # NSST:  indicator to control the Tzr_QC mode
@@ -831,20 +828,20 @@ export PGM='$APRUN $DATA/$(basename $GSIEXEC)'
 export pgm=$PGM
 $LOGSCRIPT
 
-rm berror_stats satbias_angle satinfo *SpcCoeff.bin *TauCoeff.bin EmisCoeff.bin
-rm AerosolCoeff.bin CloudCoeff.bin anavinfo convinfo ozinfo pcpinfo aeroinfo scaninfo
-rm errtable prepbufr prepbufr_profl gsndrbufr gsnd1bufr hirs2bufr msubufr hirs3bufr hirs4bufr
-rm amsuabufr amsubbufr mhsbufr sbuvbufr gomebufr omibufr mlsbufr ssmirrbufr tmirrbufr ahibufr
-rm airsbufr iasibufr amsrebufr amsr2bufr gmibufr saphirbufr ssmitbufr ssmisbufr gpsrobufr tcvitl hybens_locinfo atms_beamwidth.txt
-rm hirs3bufrears amsuabufrears amsubbufrears seviribufr crisbufr atmsbufr
-rm satbias_in satbias_ang.in satbias_out gsiparm.anl satbias_pc satbias_pc.out satbias_out.int
-rm aircftbias_in aircftbias_out
-rm sfcf03 sfcf04 sfcf05 sfcf06 sfcf07 sfcf08 sfcf09
-rm sigf03 sigf04 sigf05 sigf06 sigf07 sigf08 sigf09
-rm siga03 siga04 siga05 siganl siga07 siga08 siga09
-rm nstf03 nstf04 nstf05 nstf06 nstf07 nstf08 nstf09
-rm                      nstanl
-rm gesfile_in gesfiles_out
+rm -f berror_stats satbias_angle satinfo *SpcCoeff.bin *TauCoeff.bin EmisCoeff.bin
+rm -f AerosolCoeff.bin CloudCoeff.bin anavinfo convinfo ozinfo pcpinfo aeroinfo scaninfo
+rm -f errtable prepbufr prepbufr_profl gsndrbufr gsnd1bufr hirs2bufr msubufr hirs3bufr hirs4bufr
+rm -f amsuabufr amsubbufr mhsbufr sbuvbufr gomebufr omibufr mlsbufr ssmirrbufr tmirrbufr ahibufr
+rm -f airsbufr iasibufr amsrebufr amsr2bufr gmibufr saphirbufr ssmitbufr ssmisbufr gpsrobufr tcvitl hybens_locinfo atms_beamwidth.txt
+rm -f hirs3bufrears amsuabufrears amsubbufrears seviribufr crisbufr atmsbufr
+rm -f satbias_in satbias_ang.in satbias_out gsiparm.anl satbias_pc satbias_pc.out satbias_out.int
+rm -f aircftbias_in aircftbias_out
+rm -f sfcf03 sfcf04 sfcf05 sfcf06 sfcf07 sfcf08 sfcf09
+rm -f sigf03 sigf04 sigf05 sigf06 sigf07 sigf08 sigf09
+rm -f siga03 siga04 siga05 siganl siga07 siga08 siga09
+rm -f nstf03 nstf04 nstf05 nstf06 nstf07 nstf08 nstf09
+rm -f nstanl
+rm -f gesfile_in gesfiles_out
 rm -rf dir*
 
 $NCP $GSIEXEC $DATA
@@ -1130,7 +1127,7 @@ cat <<EOF > gsiparm.anl
    use_gfs_nemsio=${use_gfs_nemsio},lrun_subdirs=${lrun_subdirs},
    crtm_coeffs_path='./crtm_coeffs/',
    newpc4pred=.true.,adp_anglebc=.true.,angord=4,passive_bc=.true.,use_edges=.false.,
-   diag_precon=.true.,step_start=1.e-3,emiss_bc=.true.,thin4d=.true.,cwoption=3,
+   diag_precon=.true.,step_start=1.e-3,emiss_bc=.true.,thin4d=.true.,cwoption=3,USE_PREPB_SATWND=.true.,
    $SETUP
  /
  &GRIDOPTS
@@ -1163,7 +1160,7 @@ cat <<EOF > gsiparm.anl
  &OBSQC
    dfact=0.75,dfact1=3.0,noiqc=.true.,oberrflg=.false.,c_varqc=0.02,
    use_poq7=.true.,qc_noirjaco3_pole=.true.,
-   aircraft_t_bc=.true.,biaspredt=1000.0,upd_aircraft=.true.,
+   aircraft_t_bc=.false.,biaspredt=1000.0,upd_aircraft=.true.,
    $OBSQC
  /
  &OBS_INPUT
@@ -1174,19 +1171,19 @@ OBS_INPUT::
 !  dfile          dtype       dplat       dsis                dval    dthin dsfcalc
    prepbufr       ps          null        ps                  0.0     0     0
    prepbufr       t           null        t                   0.0     0     0
-   prepbufr_profl t           null        t                   0.0     0     0
+!  prepbufr_profl t           null        t                   0.0     0     0
    prepbufr       q           null        q                   0.0     0     0
-   prepbufr_profl q           null        q                   0.0     0     0
+!  prepbufr_profl q           null        q                   0.0     0     0
    prepbufr       pw          null        pw                  0.0     0     0
    prepbufr       uv          null        uv                  0.0     0     0
-   prepbufr_profl uv          null        uv                  0.0     0     0
+!  prepbufr_profl uv          null        uv                  0.0     0     0
    satwndbufr     uv          null        uv                  0.0     0     0
    prepbufr       spd         null        spd                 0.0     0     0
    prepbufr       dw          null        dw                  0.0     0     0
    radarbufr      rw          null        rw                  0.0     0     0
    prepbufr       sst         null        sst                 0.0     0     0
    nsstbufr       sst         nsst        sst                 0.0     0     0
-   gpsrobufr      gps_bnd     null        gps                 0.0     0     0
+   gpsrobufr      gps_ref     null        gps                 0.0     0     0
    ssmirrbufr     pcp_ssmi    dmsp        pcp_ssmi            0.0    -1     0
    tmirrbufr      pcp_tmi     trmm        pcp_tmi             0.0    -1     0
    sbuvbufr       sbuv2       n16         sbuv8_n16           0.0     0     0

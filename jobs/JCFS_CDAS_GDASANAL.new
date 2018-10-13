@@ -38,20 +38,23 @@ export cycle=t${cyc}z
 # Specify Execution Areas
 ####################################
 
-export EXECGLOBAL=$HOMEgsm/exec
-export FIXGLOBAL=$HOMEgsm/fix/fix_am
-export USHGLOBAL=$HOMEgsm/ush  
+export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEglob}
+export EXECGLOBAL=${EXECGLOBAL:-$HOMEglob/exec}
+export USHGLOBAL=${USHGLOBAL:-HOMEglob/ush}
 
-export GETGESSH=$HOMEcfs/ush/cfs_cdas_getges.sh
-export FIXGSM=${FIXGSM:-$HOMEgsm/fix/fix_am}
+export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_am}
+export FIXGSM=${FIXGSM:-$FIXGLOBAL}
+export FIXgsm=${FIXGSM:-$FIXGLOBAL}
+export RTMFIX=${RTMFIX:-$HOMEcrtm/fix}
 
 export HOMEGSI=${HOMEGSI:-$HOMEgsi} 
 export EXECGSI=${EXECGSI:-$HOMEgsi/exec}
-export FIXGSI=${FIXGSI:-$HOMEgsi/fix}
-export USHGSI=${USHGSI:-$HOMEgsi/ush}
-export SCRGSI=${SCRGSI:-$HOMEgsi/scripts}
-export UTILGSI=${UTILGSI:-$HOMEgsi/util}
 export PARMGSI=${PARMGSI:-$HOMEgsi/parm}
+export SCRGSI=${SCRGSI:-$HOMEgsi/scripts}
+export USHGSI=${USHGSI:-$HOMEgsi/ush}
+export FIXGSI=${FIXGSI:-$HOMEgsi/fix}
+
+export GETGESSH=$HOMEcfs/ush/cfs_cdas_getges.sh
 
 ##############################
 # Set up the UTILITIES
@@ -170,17 +173,17 @@ export SLMASK=${SLMASK:-${FIXGSM}/global_slmask.t${JCAP}.$LONB.$LATB.grb}
 
 export BERROR=${BERROR:-${FIXGSI}/Big_Endian/global_berror.l${LEVS}y${NLAT}.f77}
 export SATANGL=${SATANGL:-${FIXGSI}/global_satangbias.txt}
-export SATINFO=${SATINFO:-${FIXGSI}/global_satinfo.txt}
 export ATMSFILTER=${ATMSFILTER:-${FIXGSI}/atms_beamwidth.txt}
 export ANAVINFO=${ANAVINFO:-${FIXGSI}/global_anavinfo.l${LEVS}.txt}
-export CONVINFO=${CONVINFO:-${FIXGSI}/global_convinfo.txt}
 export OZINFO=${OZINFO:-${FIXGSI}/global_ozinfo.txt}
 export PCPINFO=${PCPINFO:-${FIXGSI}/global_pcpinfo.txt}
 export AEROINFO=${AEROINFO:-${FIXGSI}/global_aeroinfo.txt}
 export SCANINFO=${SCANINFO:-${FIXGSI}/global_scaninfo.txt}
 export HYBENSINFO=${HYBENSINFO:-${FIXGSI}/global_hybens_locinfo.l${LEVS}.txt}
 export OBERROR=${OBERROR:-${FIXGSI}/prepobs_errtable.global}
-export RTMFIX=${RTMFIX:-$HOMEglob/fix}
+
+export CONVINFO=${CONVINFO:-${FIXGSI}/global_convinfo.txt.cfs}
+export SATINFO=${SATINFO:-${FIXGSI}/global_satinfo.txt.cfs}
 
 # Analysis Input Fields
 #
@@ -226,6 +229,9 @@ export SIGG05=${SIGG05:-${COMIN}/${PREINP}sgm1prep}
 export SIGG07=${SIGG07:-${COMIN}/${PREINP}sgp1prep}
 export SIGG08=${SIGG08:-${COMIN}/${PREINP}sgp2prep}
 export SIGG09=${SIGG09:-${COMIN}/${PREINP}sgp3prep}
+
+export NSTGES=/dev/null
+export NSTANL=/dev/null
 
 # Set non-assimilated obs fles as /dev/null to prevent reading
 export GSNDBF=${GSNDBF:-/dev/null}
