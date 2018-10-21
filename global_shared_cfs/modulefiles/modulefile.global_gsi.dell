@@ -1,0 +1,66 @@
+#%Module######################################################################
+##                                                       Russ.Treadon@noaa.gov
+##                                                           NOAA/NWS/NCEP/EMC
+## GLOBAL_GSI v6.2.3
+##_____________________________________________________
+proc ModulesHelp { } {
+puts stderr "Set environment veriables for GLOBAL_GSI"
+puts stderr "This module initializes the environment "
+puts stderr "for the Intel Compiler Suite $version\n"
+}
+module-whatis " GLOBAL_GSI whatis description"
+
+set ver v6.2.3
+
+setenv COMP ifort
+setenv COMP_MP  mpiifort
+setenv COMP_MPI mpiifort
+
+setenv C_COMP icc
+setenv C_COMP_MP mpcc
+
+# Known conflicts
+
+# Loading Intel Compiler Suite
+# module load ics/15.0.3
+
+# Loading ibmpe
+# module load ibmpe
+
+# Loading nceplibs modules
+# module load NetCDF/3.6.3
+# module load bufr/v11.0.0
+# module load nemsio/v2.2.1
+# module load sfcio/v1.0.0
+# module load sigio/v2.0.1
+# module load sp/v2.0.2
+# module load w3nco/v2.0.6
+# module load w3emc/v2.2.0
+# module load crtm/v2.2.3
+# module load bacio/v2.0.2
+
+
+# dell modules
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163  impi/18.0.1
+module list
+
+module load ESMF/4_0_0rp2
+module load bacio/2.0.2
+module load nemsio/2.2.3
+module load sp/2.0.2
+module load w3emc/2.3.0
+module load w3nco/2.0.6
+module load NetCDF/3.6.3
+module load bufr/11.2.0
+module load ip/3.0.1
+module load sfcio/1.0.0
+module load sigio/2.0.1
+module load landsfcutil/2.1.0
+module load dev/crtm/2.0.6
+module load gfsio/1.1.0
+
+module list
+
