@@ -72,8 +72,8 @@
 fhbeg=03                         # hour to begin searching backward for guess
 fhinc=03                         # hour to increment backward in search
 fhend=384                        # hour to end searching backward for guess
-ndate=/nwprod/util/exec/ndate
-nhour=/nwprod/util/exec/nhour
+ndate=$NDATE 
+nhour=$NHOUR 
 
 #-------------------------------------------------------------------------------
 # Get options and arguments.

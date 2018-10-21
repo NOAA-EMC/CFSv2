@@ -106,7 +106,7 @@ LIBsys          =
 #------------
 # Include machine dependent compile & load options
 #------------
-  MAKE_CONF = Makefile.conf.wcoss
+  MAKE_CONF = Makefile.conf
 include $(MAKE_CONF)
 
 

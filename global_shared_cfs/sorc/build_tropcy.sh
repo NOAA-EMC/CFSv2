@@ -15,9 +15,10 @@
 #
 set -x -e
 
-. /usrx/local/Modules/3.2.10/init/sh
+###. /usrx/local/Modules/3.2.10/init/sh
 module purge
-module load ../modulefiles/Module_storm_reloc_v5.1.0_WCOSS
+##module load ../modulefiles/Module_storm_reloc_v5.1.0_WCOSS
+source dell-mods.sh
 module list
 
  export INC="${G2_INCd}"
@@ -28,7 +29,7 @@ module list
  export LIBS_SYN_GET="${W3NCO_LIB4}"
  export LIBS_SYN_MAK="${W3NCO_LIB4} ${BACIO_LIB4}"
  export LIBS_SYN_QCT="${W3NCO_LIB8}"
- export FFLAGS="-openmp -O3 -g -traceback -r8 -I ${SIGIO_INC4}"
+ export FFLAGS="-qopenmp -O3 -g -traceback -r8 -I ${SIGIO_INC4}"
 
 #for dir in *.fd; do
 # cd $dir

@@ -49,10 +49,10 @@ if [ $machine = wcoss ] ; then
   export CPPFLAGS="-DLINUX"
   export CC=cc
   if [ $debug = YES ] ; then
-    export OPTS="-O0 -openmp "
+    export OPTS="-O0 -qopenmp "
     export DEBUG="-g -traceback -convert big_endian -ftrapuv -check bounds -check format -check output_conversion -check pointers -check uninit -fp-stack-check"
   else
-    export OPTS="-O3 -convert big_endian -fp-model source -openmp -xAVX"
+    export OPTS="-O3 -convert big_endian -fp-model source -qopenmp -xAVX"
     export DEBUG=""
   fi
   export LIST=""
@@ -65,10 +65,10 @@ elif [ $machine = wcoss_c ] ; then
   export CPPFLAGS="-DLINUX"
   export CC=cc
   if [ $debug = YES ] ; then
-    export OPTS="-O0 -openmp "
+    export OPTS="-O0 -qopenmp "
     export DEBUG="-g -traceback -convert big_endian -ftrapuv -check bounds -check format -check output_conversion -check pointers -check uninit -fp-stack-check"
   else
-    export OPTS="-O3 -convert big_endian -fp-model source -openmp -xAVX"
+    export OPTS="-O3 -convert big_endian -fp-model source -qopenmp -xAVX"
     export DEBUG=""
   fi
   export LIST=""
@@ -91,10 +91,10 @@ elif [ $machine = zeus ] ; then
   export ARCH=""
   export CPPFLAGS="-DLINUX"
   if [ $debug = YES ] ; then
-    export OPTS="-O0 -openmp -g"
+    export OPTS="-O0 -qopenmp -g"
     export DEBUG="-g -check all -ftrapuv -convert big_endian -fp-stack-check -fstack-protector -heap-arrays -recursive -traceback"
   else
-    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -openmp"
+    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -qopenmp"
     export DEBUG=""
   fi
   export LIST=""
@@ -124,10 +124,10 @@ elif [ $machine = theia ] ; then
   export ARCH=""
   export CPPFLAGS="-DLINUX"
   if [ $debug = YES ] ; then
-    export OPTS="-O0 -openmp -g"
+    export OPTS="-O0 -qopenmp -g"
     export DEBUG="-g -check all -ftrapuv -convert big_endian -fp-stack-check -fstack-protector -heap-arrays -recursive -traceback"
   else
-    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -openmp"
+    export export OPTS="-O3 -convert big_endian -traceback -g -fp-model source -qopenmp"
     export DEBUG=""
   fi
   export LIST=""

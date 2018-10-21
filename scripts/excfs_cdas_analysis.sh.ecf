@@ -573,6 +573,7 @@ $ERRSCRIPT||exit 11
 if [ $machine = IBMP6 ] ; then
  export XLSMPOPTS="parthds=$NTHREADS_GSI:stack=$NTHSTACK_GSI"
 fi
+export APRUN="mpirun -n 140"
 export OMP_NUM_THREADS=$NTHREADS_GSI
 export PGM='$APRUN $DATA/$(basename $GSIEXEC)'
 export pgm=$PGM

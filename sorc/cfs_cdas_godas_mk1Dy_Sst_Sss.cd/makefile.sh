@@ -7,12 +7,12 @@ export CC=icc
 export CFLAGSM="-O3"
 export LDFLAGSM=
 
-module unload NetCDF; module load NetCDF/4.2/serial
-export NCDF="-L/usrx/local/NetCDF/4.2/serial/lib -lnetcdf"
-export INC=-I/usrx/local/NetCDF/4.2/serial/include
+module unload NetCDF; module load NetCDF/4.5.0
+export NCDF="$NETCDF_LDFLAGS_C"
+export INC=$NETCDF_INCLUDE 
 
-export NCDF=$NETCDF_LDFLAGS
-export INC=$NETCDF_INCLUDE
+##export NCDF=$NETCDF_LDFLAGS
+##export INC=$NETCDF_INCLUDE
 
 export execs="cfs_cdas_godas_mk1DySss4i  cfs_cdas_godas_mk1DySst4i cfs_cdas_godas_mkDlyTclm"
 

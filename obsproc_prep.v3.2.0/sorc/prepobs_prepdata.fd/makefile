@@ -41,11 +41,11 @@ OBJS =  prepdata.o wordlength.o w3unpkb7.o w3xtovsmnd.o iw3unpbf.o w3cnvxtovs.o 
 # DEBUG         Flags for extra debugging
 # DEBUG2        Flags for even more extra debugging
 
-FC = ifort
+FC = mpiifort
 #LDFLAGS = -Xlinker -t -mkl
 #LDFLAGS = -Xlinker -M -mkl
 LDFLAGS = -mkl
-LIBS = ${W3NCO_LIB4} ${W3EMC_LIB4} ${BUFR_LIB4} ${SIGIO_LIB4} ${SP_LIB4} ${BACIO_LIB4}
+LIBS = ${W3NCO_LIB4} ${W3EMC_LIB4} ${BUFR_LIB4} ${SIGIO_LIB4} ${SP_LIB4} ${BACIO_LIB4} ${NEMSIO_LIB} ${NEMSIOGFS_LIB} ${W3NCO_LIB4} ${W3EMC_LIB4}
 CMD = prepobs_prepdata
 
 DEBUG =                -g -traceback

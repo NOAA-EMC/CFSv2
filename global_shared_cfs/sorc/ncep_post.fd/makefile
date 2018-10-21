@@ -76,12 +76,13 @@ FFLAGS   = $(OPTS) $(FREE) $(TRAPS) $(DEBUG) \
            $(GFSIO_INC) \
            $(SIGIO_INC) \
            $(SFCIO_INC) \
-           $(W3_INC) \
+           $(W3EMC_INC) \
            $(CRTM_INC) \
            $(NETCDF_INC)
 
 LIBS     = $(WRF_LIB) \
            $(XML_LIB) \
+           $(CRTM_LIB) \
            $(G2_LIB) \
            $(NEMSIO_LIB) \
            $(GFSIO_LIB) \
@@ -89,7 +90,8 @@ LIBS     = $(WRF_LIB) \
            $(SFCIO_LIB) \
            $(IP_LIB) \
            $(SP_LIB) \
-           $(W3_LIB) \
+           $(W3NCO_LIB4) \
+           $(W3EMC_LIB4) \
            $(BACIO_LIB) \
            $(CRTM_LIB) \
            $(NETCDF_LIB)
@@ -135,7 +137,7 @@ OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o \
 	$(CPP) $(CPPFLAGS) $< > $*.f
 
 $(TARGET): $(OBJS)
-	$(FC) -openmp -o $@ $(OBJST) $(OBJS) $(LIBS)
+	$(FC) -qopenmp -o $@ $(OBJST) $(OBJS) $(LIBS)
 
 .f.o:
 	$(FC) $(FFLAGS) -c $<

@@ -19,7 +19,7 @@ cat break > $pgmout
 export COMSP=$COMOUT/${RUN}.${cycle}.
 
 tmhr=`echo $tmmark|cut -c3-4`
-cdate10=`/nwprod/util/exec/ndate -$tmhr $PDY$cyc`
+cdate10=`$NDATE -$tmhr $PDY$cyc`
 
 NET_uc=$(echo $NET | tr [a-z] [A-Z])
 tmmark_uc=$(echo $tmmark | tr [a-z] [A-Z])

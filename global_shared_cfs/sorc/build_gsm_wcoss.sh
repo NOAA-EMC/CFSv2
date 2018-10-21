@@ -8,7 +8,8 @@ set -x
 
 set +x
 module purge
-module load ../modulefiles/gfs/gsm_v13.0.0
+#module load ../modulefiles/gfs/gsm_v13.0.0
+source dell-mods.sh
 set -x
 
 curdir=$PWD  

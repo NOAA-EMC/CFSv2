@@ -54,7 +54,7 @@ OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o             
 	$(CPP) $(CPPFLAGS) $< > $*.f
 
 $(TARGET):	$(OBJST) $(OBJS)
-	$(FC) -openmp -o $@ $(OBJST) $(OBJS) $(LIBS)
+	$(FC) -qopenmp -o $@ $(OBJST) $(OBJS) $(LIBS)
 
 .f.o:	
 	$(FC) $(FFLAGS) -c $<

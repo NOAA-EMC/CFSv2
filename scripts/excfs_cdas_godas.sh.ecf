@@ -300,7 +300,7 @@ $mRSTsh
   if [ $machine = IBM ]; then
     poe $pgm > fms.out || BOMB=1
   elif [ $machine = WCOSS ]; then
-    mpirun.lsf $pgm > fms.out || BOMB=1
+    mpirun -n 140 $pgm > fms.out || BOMB=1
   elif [ $machine = WCRAY ]; then
     aprun -n24 -N24  $pgm > fms.out || BOMB=1
   else

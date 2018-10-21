@@ -166,7 +166,7 @@ PSASINC      =
 CFLAGS       = -DIRIX64 -c -O
 FFLAGS       = -free -c -O0 -g -traceback -check all -fpe0 -ftrapuv -CB -convert big_endian
 FFLAGS       = -free -c -O0 -g -traceback                               -convert big_endian
-LDFLAGS      = $(BACIO_LIB4) $(IP_LIB4) $(W3EMC_LIB4) $(W3NCO_LIB4) $(SP_LIB4) -openmp 
+LDFLAGS      = $(BACIO_LIB4) $(IP_LIB4) $(W3EMC_LIB4) $(W3NCO_LIB4) $(SP_LIB4) -qopenmp 
 ifeq ($(SPMD),TRUE)
 #  FFLAGS  -= -mp
 #  #  FFLAGS  += -macro_expand

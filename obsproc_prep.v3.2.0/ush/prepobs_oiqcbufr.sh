@@ -84,7 +84,7 @@ TIMEIT=${TIMEIT:-""}
 [ -s $DATA/time ] && TIMEIT="$DATA/time -p"
 # $TIMEIT mpirun $OIQCX > outout 2> errfile
 #$TIMEIT mpirun -genvall -n $LSB_DJOB_NUMPROC -machinefile $LSB_DJOB_HOSTFILE $OIQCX > outout 2> errfile
-$TIMEIT mpirun.lsf $OIQCX > outout 2> errfile
+$TIMEIT mpirun -n 28 $OIQCX > outout 2> errfile
 
 err=$?
 ###cat errfile

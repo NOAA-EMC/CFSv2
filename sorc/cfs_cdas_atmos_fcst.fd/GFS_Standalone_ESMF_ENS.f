@@ -135,9 +135,9 @@
 ! Set up the user defined Log.
 !-----------------------------
  CALL ESMF_LogSet(log         = logGFS,             &
-                  verbose     = ESMF_TRUE,          &
-                  flush       = ESMF_TRUE,          &
-                  rootOnly    = ESMF_FALSE,         &
+                  verbose     = .true.   ,          &
+                  flush       = .true.   ,          &
+                  rootOnly    = .false.   ,         &
                   halt        = ESMF_LOG_HALTERROR, & ! It means that the job will be stopped
                                                       ! when error happens.
                   maxElements = 10,                 & ! Maximum number of elements in the log

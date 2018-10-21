@@ -1,4 +1,4 @@
-EXEC     = $(EXECM)
+XEC     = $(EXECM)
 F77      = $(F77M)
 F90      = $(F90M)
 CC       = $(FCC)
@@ -7,7 +7,7 @@ ifneq ($(origin ESMFMKFILE), environment)
 $(error Environment variable ESMFMKFILE was not set.)
 endif
 include $(ESMFMKFILE)
-FINCS    = $(ESMF_F90COMPILEPATHS)
+FINCS    = $(ESMF_MOD)  ##$(ESMF_F90COMPILEPATHS)
 
 ARCH     = $(ARCHM)
 PGSZ     = $(PGSZM)
@@ -20,7 +20,7 @@ OPTS90A  = $(OPTS90AM)
 OPTSIO   = $(OPTSIOM)
 FFLAG90  = $(OPTS90) $(FINCS) $(FINCM) $(FRR)
 FFLAG90A = $(OPTS90A) $(FINCS) $(FRR)
-FFLAGS   = $(OPTS) $(TRAPS) $(FXX)
+FFLAGS   = $(OPTS) $(TRAPS) $(FXX) -no-gen-interfaces  ## turn off arg type checking
 FFLAGX   = $(OPTS) $(TRAPS) $(FXX)
 FFLAGIO  = $(OPTSIO) $(TRAPS) $(FXX)
 FFLAGY   = $(OPTS) $(FXX)
@@ -34,9 +34,9 @@ FFLAG_SER = $(OPTS_SER) $(DOUBLEFLAG) $(TRAPS) $(DEBUG) $(FXX)
 FFLAGSC   =
 
 LDR      = $(LDRM)
-ESMFLIB  = $(ESMFLIBM)
+ESMFLIB  = -L$(ESMF_LIB)
 LDFLAGS =  $(LDFLAGSM)
-LIBS =  $(LIBSM) $(ESMF_F90LINKPATHS)
+LIBS =  $(LIBSM) $(ESMF_MOD)
 
 .SUFFIXES: .o .f .F .h
 

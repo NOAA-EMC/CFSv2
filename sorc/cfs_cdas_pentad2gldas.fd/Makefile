@@ -23,7 +23,7 @@ OBJS = pentad2gldas.o \
 	$(FC) -c $<
 
 $(TARGET):	$(OBJS)
-	$(FC) -o $(TARGET) $(OBJS) $(OPTS) $(LIBS) -openmp
+	$(FC) -o $(TARGET) $(OBJS) $(OPTS) $(LIBS) -qopenmp
 
 clean:
 	/bin/rm -f $(TARGET) *.lst *.o *.mod

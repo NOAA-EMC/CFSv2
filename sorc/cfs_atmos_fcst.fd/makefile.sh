@@ -2,7 +2,7 @@
 set -x
 
 machine=wcoss
-ptmp="/ptmpp1/$LOGNAME/makefcst"
+ptmp="/gpfs/dell2/ptmp/$USER/Jack/makefcst"
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian
@@ -52,22 +52,25 @@ export OPTSB="-O3 -convert big_endian -fp-model precise "
 
 export OPTSBT=$OPTSB
 export OPTSIOM="$OPTSBT -r8 "
-export OPTSM="$OPTSBT -r8 -openmp"
+export OPTSM="$OPTSBT -r8 -qopenmp"
 export OPTS_SERM="$OPTSBT -r8 $ARCHM"
 export OPTS90M="$OPTSBT   -r8 "
 export OPTS90AM="$OPTSBT  -r8 "
 export LDFLAGSM=$PGSZM
 
-export F77M=mpfort    
-export F90M=mpfort   
+export F77M=mpiifort    
+export F90M=mpiifort   
 export F77B=$F77M
-export FCC=mpcc
+export FCC=mpicc
 export LDRM=mpiifort
-export LDFLAGSM="$PGSZM -openmp -mkl"
+export LDFLAGSM="$PGSZM -qopenmp -mkl"
 export FINC=   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"
 
-export LIBSM="$BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd  -lrt -lstdc++ -lesmf"
+export ESMF_LIB=/gpfs/tp1/usrx/local/esmf-3.1.0rp5/lib/libO/Linux.intel.64.intelmpi.default/libesmf.a
+export ESMF_MOD=-I/gpfs/tp1/usrx/local/esmf-3.1.0rp5/mod/modO/Linux.intel.64.intelmpi.default
+
+export LIBSM="$ESMF_LIB/libesmf.a  $BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd $ESMF_LIB/libesmf.a"
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}

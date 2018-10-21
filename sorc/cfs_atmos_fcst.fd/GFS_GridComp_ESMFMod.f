@@ -60,6 +60,7 @@
 
  TYPE(ESMF_GridComp), INTENT(inout)  :: gcGFS ! gridded component
  INTEGER,             INTENT(out)    :: rc    ! return code
+ external                            :: initialize,run,finalize
      
 ! !DESCRIPTION: Set services (register) for the GFS Stand Alone
 !               Grid Component.

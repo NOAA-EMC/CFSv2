@@ -19,12 +19,12 @@ ARFLAGS       = ruv
 #
 # CPP, Compiler, and Linker Options
 #
-FC       = mpiifort -O3 -convert big_endian -fp-model source -openmp -xAVX
+FC       = mpiifort -O3 -convert big_endian -fp-model source -qopenmp -xAVX
 CPP      = /lib/cpp -P
 CPPFLAGS = -DLINUX 
 FREE     = -FR
 
-WRFPATH    = /nwprod/sorc/wrf_shared.v1.1.0
+WRFPATH    = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
 WRF_INC    = -I$(WRFPATH)/external/io_quilt -I$(WRFPATH)/frame
 WRF_LIB    = $(WRFPATH)/main/libwrflib.a  \
              $(WRFPATH)/frame/pack_utils.o  \
@@ -41,13 +41,14 @@ CFLAGS   = -DLINUX -Dfunder -DFortranByte=char -DFortranInt=int -DFortranLlong='
 FFLAGS   = $(OPTS) $(FREE) $(DEBUG) \
            -I$(SFCIO_INC4) \
            -I$(NEMSIO_INC) \
-           $(WRF_INC) \
+           -I$(WRF_INC) \
            -I$(SIGIO_INC4) \
            -I$(G2_INC4) \
-           -I$(G2TMPL_INC) \
            -I$(GFSIO_INC4) \
            -I$(W3EMC_INC4) \
+           -I$(G2TMPL_INC) \
            -I$(CRTM_INC) \
+           -I$(LANDSFCUTIL_INC4) \
            $(NETCDF_INCLUDE)
 
 LIBS     = $(WRF_LIB) \
@@ -66,6 +67,8 @@ LIBS     = $(WRF_LIB) \
            $(W3NCO_LIB4) \
            $(BACIO_LIB4) \
            $(CRTM_LIB) \
+           $(GFSIO_LIB4) \
+           $(LANDSFCUTIL_LIB4) \
            $(NETCDF_LDFLAGS)
 
 

@@ -6,7 +6,7 @@ echo; make=`basename $PWD`
 echo make-ing ${make%.*}
 echo
 
-export FC=mpfort
+export FC=mpiifort 
 export CC=icc
 
 here=`pwd`; cd make

@@ -105,7 +105,7 @@ subroutine intt_(thead,rval,sval)
   use constants, only: half,one,zero,izero,tiny_r_kind,cg_term,r3600
   use obsmod, only: t_ob_type,lsaveobsens,l_do_adjoint
   use qcmod, only: nlnqc_iter,varqc_iter
-  use gridmod, only: latlon1n,latlon11,latlon1n1
+  use gridmod, only: latlon1n,latlon11  !!!,latlon1n1
   use jfunc, only: jiter,l_foto,xhat_dt,dhat_dt,pointer_state
   use control_vectors, only: nrf2_sst
   use state_vectors

@@ -15,7 +15,8 @@ SHELL=/bin/sh
 module purge
 
 # Lin Gan modifiy to use NCO vertical structure prefix for NCO deployment - 20160131
-module load ../modulefiles/post/v7.0.0
+#module load ../modulefiles/post/v7.0.0
+source dell-mods.sh
 module list
 
 cd ncep_post.fd

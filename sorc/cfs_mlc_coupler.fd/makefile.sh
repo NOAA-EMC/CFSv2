@@ -2,8 +2,8 @@
 set -x
 
 export machine=wcoss
-export FCMP=mpfort
-export FCMP95=mpfort
+export FCMP=mpiifort
+export FCMP95=mpiifort
 export FFLAGSM="-O3 -r8 -i4 -convert big_endian -FR -assume byterecl -fpconstant"
 
 echo; make=`basename $PWD`
