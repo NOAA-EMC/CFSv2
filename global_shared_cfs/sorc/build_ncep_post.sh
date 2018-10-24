@@ -19,6 +19,9 @@ module purge
 source dell-mods.sh
 module list
 
+CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/libcrtm_v2.0.6.a
+CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/incmod/crtm_v2.0.6
+
 cd ncep_post.fd
 make -f makefile_wcoss_module clean
 make -f makefile_wcoss_module 

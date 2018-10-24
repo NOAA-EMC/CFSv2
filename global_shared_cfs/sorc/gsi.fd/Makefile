@@ -86,6 +86,9 @@ LIBtransf = -L$(CORELIB) -ltransf
 LIBhermes = -L$(CORELIB) -lhermes
 LIBgfio   = -L$(CORELIB) -lgfio
 
+LIBcrtm=$(CRTM_LIB)
+INCcrtm=$(CRTM_INC)
+
 # --------------------------
 # Default Baselibs Libraries
 # --------------------------

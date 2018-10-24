@@ -58,6 +58,10 @@ USE GFS_GridComp_ESMFMod, ONLY: GFS_StandAlone_SetServices => SetServices
 
 IMPLICIT none
 
+interface
+!DEC$ ATTRIBUTES NO_ARG_CHECK :: GFS_StandAlone_SetServices
+end interface
+
 INTEGER, INTENT(in)                                         :: Total_member
 TYPE(ESMF_GridComp), DIMENSION(Total_member), INTENT(inout) :: gcGFS
 INTEGER,                                      INTENT(out)   :: rc
@@ -66,7 +70,7 @@ INTEGER :: i
 rc   = ESMF_SUCCESS
 
 DO i = 1, Total_member
- CALL ESMF_GridCompSetServices(gcGFS(i),  GFS_StandAlone_SetServices, rc)
+ CALL ESMF_GridCompSetServices(gcGFS(i),GFS_StandAlone_SetServices, rc)
 END DO
 
 END SUBROUTINE GFS_SetServices

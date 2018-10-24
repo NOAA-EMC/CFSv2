@@ -29,7 +29,7 @@ module load sfcio/1.0.0
 module load sigio/2.0.1
 module load landsfcutil/2.1.0
 module load gfsio/1.1.0
-#module load dev/crtm/2.0.6
+module load crtm/2.2.5
 
 module list
 set -x
@@ -42,6 +42,9 @@ export C_COMP_MP=mpicc
 
 ##export CF=ifort
 ##export CC=icc   
+
+##CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/libcrtm_v2.0.6.a
+##CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/incmod/crtm_v2.0.6
 
 dlist="gsi.fd"
 for dir in $dlist; do

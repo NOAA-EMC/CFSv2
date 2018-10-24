@@ -86,6 +86,10 @@ LIBtransf = -L$(CORELIB) -ltransf
 LIBhermes = -L$(CORELIB) -lhermes
 LIBgfio   = -L$(CORELIB) -lgfio
 
+LIBcrtm	= /gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/libcrtm_v2.0.6.a
+INCcrtm	= /gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/incmod/crtm_v2.0.6
+
+
 # --------------------------
 # Default Baselibs Libraries
 # --------------------------

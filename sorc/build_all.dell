@@ -6,8 +6,8 @@ module load EnvVars/1.0.2
 module load ips/18.0.1.163  impi/18.0.1
 module list
 
-module load ESMF/7_0_0    
 module load ESMF/4_0_0rp2
+module load ESMF/7_0_0    
 module load bacio/2.0.2
 module load nemsio/2.2.3 
 module load sp/2.0.2
@@ -40,6 +40,9 @@ nwprod=/gpfs/tp1/nco/ops/nwprod
 #export ESMF_LIB=/gpfs/tp1/usrx/local/esmf-3.1.0rp5/lib/libO/Linux.intel.64.intelmpi.default
 #export ESMF_MOD=/gpfs/tp1/usrx/local/esmf-3.1.0rp5/mod/modO/Linux.intel.64.intelmpi.default
 #export ESMF_VER=3_1_0rp5
+
+CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/libcrtm_v2.0.6.a
+CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/incmod/crtm_v2.0.6
 
 
 for make in $makelist; do
