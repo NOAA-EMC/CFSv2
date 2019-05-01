@@ -1,9 +1,0 @@
-RELEASE NOTES cfsv2.1.21   - released 09/09/2016
-
-  Switch off Metop-A HIRS
-
-FILE CHANGES
-  /nwprod/cfs.v2.1.21/fix/cfs_fix_am/global_satinfo.txt
-  /nwprod/cfs.v2.1.21/fix/cfs_fix_cdas/global_satinfo.txt
-
-

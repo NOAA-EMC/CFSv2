@@ -1,3 +1,0 @@
-How to compile this code:
-1. Type "./configure wcoss"
-2. Type "make -f Makefile"

@@ -1,2 +1,0 @@
-This code is an alternative dependency generator to cpp.  Running gnumake
-will create an executable named "makdep" in the current directory. 

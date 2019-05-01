@@ -1,9 +1,0 @@
-SRCS=		convdiag.f90 read_convdiag2.f90 
-OBJS=		convdiag.o read_convdiag2.o 
-LIBS=		$(LIBJW)  
-FC=		ifort 
-FFLAGS=		-O3 -traceback -g -FR -convert big_endian
-CMD=		cfs_post_convdiag    
-all:		$(CMD)
-$(CMD):		$(SRCS)
-	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 
