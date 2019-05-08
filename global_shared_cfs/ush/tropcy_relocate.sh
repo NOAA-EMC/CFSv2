@@ -293,23 +293,11 @@ tmmark=${tmmark:-tm00}
 
 USHRELO=${USHRELO:-${HOMEALL}/ush}
 USHGETGES=${USHGETGES:-/nwprod/util/ush}
-#USHGETGES=${USHGETGES:-${HOMEALL}/util/ush}
-
 EXECRELO=${EXECRELO:-${HOMEALL}/exec}
-
 FIXRELO=${FIXRELO:-${HOMEALL}/fix}
-
 RELOX=${RELOX:-$EXECRELO/relocate_mv_nvortex}
-
-if [ $MACHINE != sgi ]; then
-   EXECUTIL=${EXECUTIL:-/nwprod/util/exec}
-else
-   EXECUTIL=${EXECUTIL:-${HOMEALL}/util/exec}
-fi
-
-SUPVX=${SUPVX:-$EXECUTIL/supvit}
-GETTX=${GETTX:-$EXECUTIL/gettrk}
-NDATE=${NDATE:-$EXECUTIL/ndate}
+SUPVX=${SUPVX:-$EXECRELO/supvit}
+GETTX=${GETTX:-$EXECRELO/gettrk}
 
 ################################################
 # EXECUTE TROPICAL CYCLONE RELOCATION PROCESSING
@@ -320,7 +308,7 @@ NDATE=${NDATE:-$EXECUTIL/ndate}
 
 msg="Attempt to perform tropical cyclone relocation for $CDATE10"
 set +u
-[ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
+[ -n "$jlogfile" ] && postmsg "$jlogfile" "$msg"
 set -u
 
 if [ $modhr -ne 0 ]; then
@@ -519,7 +507,7 @@ if [ $errgrep -ne 0 ] ; then
    msg="NO TCVITAL RECORDS FOUND FOR $CDATE10 - EXIT TROPICAL CYCLONE \
 RELOCATION PROCESSING"
    set +u
-   [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
+   [ -n "$jlogfile" ] && postmsg "$jlogfile" "$msg"
    set -u
 
 # The existence of ${COMSP}tropcy_relocation_status.$tmmark file will tell the
@@ -608,7 +596,7 @@ else
    export OMP_NUM_THREADS=$RELOX_threads        
    export MP_TASK_AFFINITY=core:$RELOX_threads
 
-   time mpirun.lsf $RELOX >stdo.prints
+   time mpirun -n 3 $RELOX >stdo.prints
    errSTATUS=$?
    
 #  copy relocation print output here and there
@@ -690,7 +678,7 @@ else
    msg="TROPICAL CYCLONE RELOCATION PROCESSING SUCCESSFULLY COMPLETED FOR \
 $CDATE10"
    set +u
-   [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
+   [ -n "$jlogfile" ] && postmsg "$jlogfile" "$msg"
    set -u
 
 # end GFDL ges manipulation

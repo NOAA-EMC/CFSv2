@@ -280,7 +280,7 @@ export APRUNC=${APRUNC:-""}
 export SIGINP=${1:-${SIGINP:-NULL}}
 export SFCINP=${2:-${SFCINP:-NULL}}
 export NSTINP=${12:-${NSTINP:-NULL}}
-export OUTTYP=${10:-${OUTTYP:-2}}
+export OUTTYP=2  ###${10:-${OUTTYP:-2}}
 export SIGOUT=${3:-${SIGOUT:-sigout}}
 export GFSOUT=${9:-${GFSOUT:-gfsout}}
 export SFCOUT=${4:-${SFCOUT:-sfcout}}
@@ -293,20 +293,17 @@ export LATB=${8:-${LATB:?}}
 export IDRT=${11:-${IDRT:-4}}
 
 #  Directories.
-export global_shared_ver=${global_shared_ver:-v13.0.0}
-export BASEDIR=${BASEDIR:-${NWROOT:-/nwprod2}}
-export HOMEglobal=${HOMEglobal:-$BASEDIR/global_shared.${global_shared_ver}}
-export FIXSUBDA=${FIXSUBDA:-fix/fix_am}
-export FIXgsm=${FIXgsm:-$HOMEglobal/$FIXSUBDA}
+export BASEDIR=${BASEDIR:-$HOMEcfs}                
+export HOMEglobal=${HOMEglobal:-$BASEDIR/global_shared_cfs} 
 export EXECgsm=${EXECgsm:-$HOMEglobal/exec}
+export FIXgsm=${FIXgsm:-$HOMEcfs/fix/cfs_fix_am}   
 export DATA=${DATA:-$(pwd)}
 #  Filenames.
 export XC=${XC}
 export CHGRESEXEC=${CHGRESEXEC:-${EXECgsm}/global_chgres$XC}
 export OROGRAPHY=${OROGRAPHY:-${FIXgsm}/global_orography.t${JCAP}.${LONB}.${LATB}.grb}
 export OROGRAPHY_UF=${OROGRAPHY_UF:-${FIXgsm}/global_orography_uf.t${JCAP}.$LONB.$LATB.grb}
-#export SIGLEVEL=$SIGLEVEL
-#export SIGLEVEL=${SIGLEVEL:-${FIXgsm}/global_siglevel.l${LEVS}.txt}
+export SIGLEVEL=${FIXgsm}/global_hyblev.l${LEVS}.txt
 export O3CLIM=${O3CLIM:-${FIXgsm}/global_o3clim.txt}
 export SLMASK=${SLMASK:-${FIXgsm}/global_slmask.t${JCAP}.${LONB}.${LATB}.grb}
 export FNGLAC=${FNGLAC:-${FIXgsm}/global_glacier.2x2.grb}
@@ -320,7 +317,8 @@ export FNTG3C=${FNTG3C:-${FIXgsm}/global_tg3clim.2.6x1.5.grb}
 export FNVEGC=${FNVEGC:-${FIXgsm}/global_vegfrac.0.144.decpercent.grb}
 export FNVETC=${FNVETC:-${FIXgsm}/global_vegtype.1x1.grb}
 export FNSOTC=${FNSOTC:-${FIXgsm}/global_soiltype.1x1.grb}
-export FNSMCC=${FNSMCC:-${FIXgsm}/global_soilmgldas.t${JCAP}.${LONB}.${LATB}.grb}
+##export FNSMCC=${FNSMCC:-${FIXgsm}/global_soilmgldas.t${JCAP}.${LONB}.${LATB}.grb}
+export FNSMCC=${FNSMCC:-${FIXgsm}/global_soilmcpc.1x1.grb} 
 export FNVMNC=${FNVMNC:-${FIXgsm}/global_shdmin.0.144x0.144.grb}
 export FNVMXC=${FNVMXC:-${FIXgsm}/global_shdmax.0.144x0.144.grb}
 export FNSLPC=${FNSLPC:-${FIXgsm}/global_slope.1x1.grb}
@@ -466,7 +464,7 @@ export OMP_NUM_THREADS=${OMP_NUM_THREADS_CH:-${CHGRESTHREAD:-1}}
 #if [ $machine = IBM ] ; then
  eval $APRUNC $CHGRESEXEC <<EOF $REDOUT$PGMOUT $REDERR$PGMERR
   &NAMCHG JCAP=$JCAP, LEVS=$LEVS, LONB=$LONB, LATB=$LATB,
-           NTRAC=$NTRAC, IDVC=$IDVC, IDSL=$IDSL,
+           NTRAC=$NTRAC, IDVC=3    , IDSL=$IDSL,
            LSOIL=$LSOIL, IVSSFC=$IVSSFC, OUTTYP=$OUTTYP, IDRT=$IDRT, $CHGRESVARS
  /
 EOF

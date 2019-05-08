@@ -179,23 +179,11 @@ symdh=${YYYYMMDDHH}
 auxtcvit=${AUXTCVIT}
 
 user=$LOGNAME
-#export TMPDIR=/nfstmp/${user}/trak/${RANDOM}
 export TMPDIR=$DATA/trak/${RANDOM}
 if [ ! -d $TMPDIR ]; then mkdir -p $TMPDIR; fi
 if [ -s ${TMPDIR}/tmpsynvit ]; then rm ${TMPDIR}/tmpsynvit; fi
 if [ -s ${TMPDIR}/tmprawvit ]; then rm ${TMPDIR}/tmprawvit; fi
-
-
-if [ -s /nwprod/util/exec/wgrib ]; then
-  wgrib=/nwprod/util/exec/wgrib
-else
-  set +x
-  echo " "
-  echo "!!! ERROR: wgrib is not available, script will crash.  Exiting...."
-  echo " "
-  set -x
-  exit 8
-fi
+wgrib=$WGRIB 
 
 wgrib_parmlist=" HGT:850 HGT:700 UGRD:850 UGRD:700 UGRD:500 VGRD:850 VGRD:700 VGRD:500 SurfaceU SurfaceV ABSV:850 ABSV:700 PRMSL:MSL "
 
@@ -458,14 +446,14 @@ mv ${vdir}/tempvit.nonameless ${vdir}/vitals.${symd}${dishh}
 # tracking program.
 #--------------------------------------------------------------#
 
-ymdh6ago=` /nwprod/util/exec/ndate -6 ${CENT}${symd}${dishh}`
+ymdh6ago=` $NDATE -6 ${CENT}${symd}${dishh}`
 syy6=`echo ${ymdh6ago} | cut -c3-4`
 smm6=`echo ${ymdh6ago} | cut -c5-6`
 sdd6=`echo ${ymdh6ago} | cut -c7-8`
 shh6=`echo ${ymdh6ago} | cut -c9-10`
 symd6=${syy6}${smm6}${sdd6}
 
-ymdh6ahead=` /nwprod/util/exec/ndate 6 ${CENT}${symd}${dishh}`
+ymdh6ahead=` $NDATE 6 ${CENT}${symd}${dishh}`
 syyp6=`echo ${ymdh6ahead} | cut -c3-4`
 smmp6=`echo ${ymdh6ahead} | cut -c5-6`
 sddp6=`echo ${ymdh6ahead} | cut -c7-8`
@@ -685,8 +673,8 @@ echo " -----------------------------------------"
 echo " "
 set -x
 
-gix=/nwprod/util/exec/grbindex
-cgb=/nwprod/util/exec/copygb
+gix=$GRBINDEX
+cgb=$COPYGB
 #grid='255 0 151 71 70000 190000 128 0000 340000 1000 1000 64'
 #grid='255 0 360 181 90000 0000 128 -90000 -1000 1000 1000 64'
 #grid='255 0 360 181 90000 0000 128 -90000 -1000 1000 1000 0'
