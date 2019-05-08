@@ -1,14 +1,12 @@
-SHELL	=/bin/ksh
-INCMOD1	=$(SIGIO_INC4)              
-INCMOD2	=$(SFCIO_INC4)             
-INCMOD3	=$(LANDSFCUTIL_INCd)             
-INCMOD4	=$(GFSIO_INC4)
-LIBS    =$(LIBSM)
+SHELL	=/bin/bash 
+INCMOD1	=$(SIGIO_INC4) 
+INCMOD2	=$(SFCIO_INC4) 
+INCMOD3	=$(LANDSFCUTIL_INCd)  
+INCMOD4	=$(GFSIO_INC4)                         
 
 SRCM	=chgres.f
 SRCS	=
-
-OBJS	=num_parthds.o nstio_module.o nsst_chgres.o gfsio_rst.o funcphys.o physcons.o machine_8.o surface_chgres.o sfcsub.o vintg_idea.o nrlmsise00_sub.o chgres.o
+OBJS	= ll2xy_gaussian_1d.o num_parthds.o nstio_module.o nsst_chgres.o gfsio_rst.o funcphys.o physcons.o machine_8.o surface_chgres.o sfcsub.o vintg_idea.o nrlmsise00_sub.o chgres.o
 FC	=$(FCMP)
 FC90    =$(FCMP95)
 LDR	=$(FCMP)
@@ -22,6 +20,8 @@ CMD	=global_chgres
 $(CMD):	$(OBJS)
 	$(LDR) $(LDFLAGS) $(OBJS) $(LIBS) -o $(CMD)
 
+ll2xy_gaussian_1d.o:  ll2xy_gaussian_1d.f
+	$(FC) -free $(FFLAGS) $(OMPFLAG) -I$(IP_INCd) -c ll2xy_gaussian_1d.f
 num_parthds.o:	num_parthds.f
 	$(FC) $(FFLAGS) $(OMPFLAG) -c num_parthds.f
 nstio_module.o : nstio_module.f
@@ -48,7 +48,7 @@ chgres.o: chgres.f
 	$(FC) $(FFLAGS) $(OMPFLAG) -I $(INCMOD1) -I $(INCMOD2) -I $(INCMOD3) -I $(INCMOD4) -c chgres.f
 clean:
 	-rm -f $(OBJS) *.mod
-install:
-	-cp $(CMD) ../../exec/.
 clobber:        clean
 	-rm -f $(CMD)
+void:   clobber
+	-rm -f $(SRCS) $(SRCM) makefile

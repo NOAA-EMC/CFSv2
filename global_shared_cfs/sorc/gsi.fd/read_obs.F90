@@ -162,7 +162,7 @@ subroutine read_obs_check (lexist,filename,jsatid,dtype,minuse,nread)
 
   integer(i_kind) :: lnbufr,idate,idate2,iret,kidsat
   integer(i_kind) :: ireadsb,ireadmg,kx,nc,said
-  real(r_double) :: satid,rtype
+  real(r_double) :: satid,rtype,bmixx
   character(8) subset
 
   satid=1      ! debug executable wants default value ???
@@ -176,6 +176,7 @@ subroutine read_obs_check (lexist,filename,jsatid,dtype,minuse,nread)
       lnbufr = 15
       open(lnbufr,file=trim(filename),form='unformatted',status ='unknown')
       call openbf(lnbufr,'IN',lnbufr)
+      bmixx=10e10; call setbmiss(bmixx)
       call datelen(10)
       call readmg(lnbufr,subset,idate,iret)
       nread = nread + 1

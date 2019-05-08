@@ -466,7 +466,7 @@
 ! attributes:
 !   langauge: fortran 90
 !
- use ll2xy_utils, only       : ll2xy_gaussian_1d, ll2xy_egrid
+ use ll2xy_utils, only       : ll2xy_egrid   !!!!ll2xy_gaussian_1d, ll2xy_egrid
 
 !use physcons, only          : frz_ice => con_tice, frz_h20 => con_ttp
 !use consts, only            : frz_ice,    &

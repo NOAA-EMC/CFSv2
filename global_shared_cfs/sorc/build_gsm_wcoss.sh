@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-set -x
+set -euax
 
 ##################################################################
 # gsm using module compile standard
@@ -14,11 +14,12 @@ set -x
 
 curdir=$PWD  
 
-#cd ${curdir}/global_fcst.fd 
-#makefile_wcoss.sh                    
-
-#cd ${curdir}/global_chgres.fd
-#makefile_wcoss.sh
+##cd ${curdir}/global_fcst.fd 
+##makefile_wcoss.sh                    
+##
+cd ${curdir}/global_chgres.fd
+makefile.sh
+exit
 
 cd ${curdir}/global_cycle.fd
 makefile_wcoss.sh   

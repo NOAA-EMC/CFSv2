@@ -14,7 +14,8 @@ NETCDF_LDFLAGS_F = -L$(NETCDFPATH)/lib -lnetcdf
 
 
 # WRF locations
-WRFPATH = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.$(WRF_SHARED_VER)
+WRFPATH = /gpfs/gp1/nco/ops/nwprod/sorc/wrf_shared.$(WRF_SHARED_VER)
+WRFPATH = /gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0
 LIBwrfio_int    = $(WRFPATH)/external/io_int/libwrfio_int.a
 LIBwrfio_netcdf = $(WRFPATH)/external/io_netcdf/libwrfio_nf.a
 OBJwrf_frame_pk = $(WRFPATH)/frame/pack_utils.o
@@ -45,18 +46,18 @@ LIBhdf    = #-L$(BASEDIR)/$(ARCH)/lib  -lmfhdf -ldf -lhdfjpeg -lhdfz -lsz
 
 #--- Normal mode options
   PROF= #-pg
-  OMP = -qopenmp
+  OMP =     ####-qopenmp
 
   FFLAGS_F90    = -D_REAL8_ -DWRF
 
   FFLAGS_COM_N  = -I ./ -I $(CRTM_INC) -I $(SFCIO_INC4) -I $(SIGIO_INC4) \
   		-I $(NEMSIO_INC) -I $(NETCDF_INCLUDE) -I $(W3EMC_INCd) -I $(W3NCO_INCd) \
-                -O3 -fp-model source -convert big_endian -assume byterecl \
+                -O3 -fp-model source -convert big_endian -assume byterecl -g -traceback \
                 -implicitnone $(OMP)
 
   FFLAGS_COM_N_NOSWAP  = -I ./ -I $(CRTM_INC) -I $(SFCIO_INC4) -I $(SIGIO_INC4) \
   		       -I $(NEMSIO_INC) -I $(NETCDF_INCLUDE) -I $(W3EMC_INCd) -I $(W3NCO_INCd) \
-                       -O3 -fp-model source -convert big_endian -assume byterecl \
+                       -O3 -fp-model source -convert big_endian -assume byterecl -g -traceback \
                        -implicitnone $(OMP)
 
   FFLAGS_N  = $(FFLAGS_F90) $(FFLAGS_COM_N) $(PROF) 

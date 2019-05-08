@@ -25,6 +25,7 @@ CPPFLAGS = -DLINUX
 FREE     = -FR
 
 WRFPATH    = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
+WRFPATH    = /gpfs/gp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
 WRF_INC    = -I$(WRFPATH)/external/io_quilt -I$(WRFPATH)/frame
 WRF_LIB    = $(WRFPATH)/main/libwrflib.a  \
              $(WRFPATH)/frame/pack_utils.o  \

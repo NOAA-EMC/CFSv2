@@ -203,7 +203,7 @@ CC$$$
       INTEGER JPDS(200),JGDS(200),KPDS(200),KGDS(200),KF,K
       INTEGER IDAT(8),JDAT(8)
       REAL RINC(5)
-      LOGICAL*1,ALLOCATABLE:: BITMAP(:)
+      LOGICAL*1,ALLOCATABLE:: LB(:)
       LOGICAL, PARAMETER    :: MERGE=.FALSE.
       LOGICAL :: DO_NSST
       REAL,ALLOCATABLE:: SLAT(:),WLAT(:),CLAT(:),RLAT(:)
@@ -452,6 +452,7 @@ C - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !  ALLOCATE TEMPORARY SIGIO DATA
+          ALLOCATE(LB(IMO*JMO))
           ALLOCATE(SLAT(JMO))
           ALLOCATE(WLAT(JMO))
           ALLOCATE(CLAT(JMO))
@@ -511,10 +512,8 @@ C - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
           JPDS    = -1
           JPDS(5) = 8
           IF(NORO.NE.0) THEN
-            ALLOCATE(BITMAP(IMO*JMO))
             CALL GETGB(NORO,0,IMO*JMO,0,JPDS,JGDS,
-     &                 KF,K,KPDS,KGDS,BITMAP,OROGO,IOSORO)
-            DEALLOCATE(BITMAP)
+     &                 KF,K,KPDS,KGDS,LB,OROGO,IOSORO)
           ELSE
             IOSORO=9
           ENDIF
@@ -836,6 +835,7 @@ c idea add init condition for temp tracer4-5 ( o o2)
 
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !  DEALLOCATE TEMPORARY DATA
+          DEALLOCATE(LB)
           DEALLOCATE(ZSI)
           DEALLOCATE(PSI)
           DEALLOCATE(PI)
@@ -1508,6 +1508,7 @@ c idea add init condition for temp tracer4-5 ( o o2)
 
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !  ALLOCATE TEMPORARY DATA
+          ALLOCATE(LB(IMO*JMO))
           ALLOCATE(SLAT(JMO))
           ALLOCATE(WLAT(JMO))
           ALLOCATE(CLAT(JMO))
@@ -1548,10 +1549,8 @@ c idea add init condition for temp tracer4-5 ( o o2)
           JPDS=-1
           JPDS(5)=8
           IF(NORO.NE.0) THEN
-            ALLOCATE(BITMAP(IMO*JMO))
             CALL GETGB(NORO,0,IMO*JMO,0,JPDS,JGDS,
-     &                 KF,K,KPDS,KGDS,BITMAP,OROGO,IOSORO)
-            DEALLOCATE(BITMAP)
+     &                 KF,K,KPDS,KGDS,LB,OROGO,IOSORO)
           ELSE
             IOSORO=9
           ENDIF
@@ -1759,6 +1758,7 @@ c idea add init condition for temp tracer4-5 ( o o2)
 
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !  DEALLOCATE TEMPORARY DATA
+          DEALLOCATE(LB)
           DEALLOCATE(ZSI)
           DEALLOCATE(PSI)
           DEALLOCATE(PI)
@@ -2152,13 +2152,13 @@ C  SEPARATELY.
         SLMSKI=SFCDATAI%SLMSK
         WHERE(NINT(SLMSKI).EQ.2) SLMSKI=0.
         ALLOCATE(SLMSKO(IMO,JMO))
+!       ALLOCATE(LB(IMO,JMO))
+        ALLOCATE(LB(IMO*JMO))
         IF(NSLM.GT.0) THEN
           JPDS=-1
           JPDS(5)=81
-          ALLOCATE(BITMAP(IMO*JMO))
           CALL GETGB(NSLM,0,IMO*JMO,0,JPDS,JGDS,
-     &               KF,K,KPDS,KGDS,BITMAP,SLMSKO,IOSLM)
-          DEALLOCATE(BITMAP)
+     &               KF,K,KPDS,KGDS,LB,SLMSKO,IOSLM)
           IF(IOSLM .EQ. 0 .AND. (KGDS(1) .NE. idrt .OR.
      &     KGDS(2) .NE. IMO .OR. KGDS(3) .NE. JMO)) IOSLM=100
         ELSE
@@ -2216,11 +2216,13 @@ C  A SIGMA FILE.
          IF (IRET == 0) THEN  ! orog file exists.
            JPDS=-1
            JPDS(5)=8
+           IF (ALLOCATED(LB)) DEALLOCATE (LB)
+!          ALLOCATE (LB(IMO,JMO))
+           ALLOCATE (LB(IMO*JMO))
            PRINT '("  READ OROGRAPHY ON OUTPUT GRID")'
-           ALLOCATE(BITMAP(IMO*JMO))
            CALL GETGB(NORO,0,IMO*JMO,0,JPDS,JGDS,
-     &                KF,K,KPDS,KGDS,BITMAP,SFCDATAO%OROG,IRET)
-           DEALLOCATE(BITMAP)
+     &                KF,K,KPDS,KGDS,LB,SFCDATAO%OROG,IRET)
+           DEALLOCATE (LB)
            IF (IRET /= 0) THEN  ! bad read. abort here?
              PRINT '("  BAD READ OF OUTPUT GRID OROGRAPHY GRID FILE")'
              PRINT '("  INTERPOLATE OUTPUT OROGRAPHY FROM INPUT GRID")'
@@ -2245,10 +2247,8 @@ C  A SIGMA FILE.
          JPDS    = -1
          JPDS(5) = 8
          if (noro_uf > 0) then
-           ALLOCATE(BITMAP(IMO*JMO))
            CALL GETGB(NORO_uf,0,IMO*JMO,0,JPDS,JGDS,
-     &              KF,K,KPDS,KGDS,BITMAP,OROGO_uf,IOSORO_uf)
-           DEALLOCATE(BITMAP)
+     &              KF,K,KPDS,KGDS,LB,OROGO_uf,IOSORO_uf)
          endif
          IF(IOSORO_uf == 0 .AND. (KGDS(1) /= IDRT .OR.
      &     KGDS(2) /= IMO .OR. KGDS(3) /= JMO)) IOSORO_uf = 100
@@ -2585,6 +2585,7 @@ C - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 C  WRITE THE NEW SURFACE FILE
         DEALLOCATE(SLMSKI)
         DEALLOCATE(SLMSKO)
+        IF (ALLOCATED (LB)) DEALLOCATE(LB)
         CALL SFCIO_SWHEAD(NSFCO,SFCHEADO,IRET)
         CALL SFCIO_SWDBTA(NSFCO,SFCHEADO,SFCDATAO,IRET)
         CALL SFCIO_AXDBTA(SFCDATAO,IRET)

@@ -69,8 +69,8 @@ fi
 
 ##export DEBUG='-ftrapuv -check all -check nooutput_conversion -fp-stack-check -fstack-protector -traceback -g'
 export FFLAGS="-O3 -r8 -convert big_endian -traceback -g"
-export OMPFLAG=-openmp
-export LDFLG=-openmp
+export OMPFLAG=-qopenmp
+export LDFLG=-qopenmp
 export LIBSM="-L${SFCIO_DIR} -l${SFCIO_LIB4} \
               -L${W3EMC_DIR} -l${W3EMC_LIBd} \
               -L${W3NCO_DIR} -l${W3NCO_LIBd} \

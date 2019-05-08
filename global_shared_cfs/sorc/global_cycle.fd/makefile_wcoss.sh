@@ -9,8 +9,8 @@ export FCMP=ifort
 
 ##export DEBUG='-ftrapuv -check all -check nooutput_conversion -fp-stack-check -fstack-protector -traceback -g'
 export FFLAGS="-O3 -r8 -convert big_endian -traceback -g"
-export OMPFLAG=-openmp
-export LDFLG=-openmp
+export OMPFLAG=-qopenmp
+export LDFLG=-qopenmp
 
 export LIBSM="${SFCIO_LIB4} \
               ${W3EMC_LIBd} \

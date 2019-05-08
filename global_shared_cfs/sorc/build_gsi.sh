@@ -38,7 +38,7 @@ set -x
 #./configure clean
 
 export COMP_MP=mpiifort
-export C_COMP_MP=mpicc
+export C_COMP_MP=mpiicc
 
 ##export CF=ifort
 ##export CC=icc   
