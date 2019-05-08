@@ -6,22 +6,24 @@ module load EnvVars/1.0.2
 module load ips/18.0.1.163  impi/18.0.1
 module list
 
+######module load ESMF/7_0_0    
+######module load NetCDF/4.5.0
+
 module load ESMF/4_0_0rp2
-module load ESMF/7_0_0    
+module load NetCDF/3.6.3
+
 module load bacio/2.0.2
 module load nemsio/2.2.3 
 module load sp/2.0.2
 module load w3emc/2.3.0
 module load w3nco/2.0.6
-module load NetCDF/3.6.3
-module load NetCDF/4.5.0
 module load bufr/11.2.0
 module load ip/3.0.1
 module load sfcio/1.0.0
 module load sigio/2.0.1
-module load landsfcutil/2.1.0
 module load gfsio/1.1.0
-module load crtm/2.2.6
+module load landsfcutil/2.1.0
+##module load crtm/2.2.6
 
 module list
 
@@ -29,20 +31,19 @@ module list
 here=$(pwd); exec=$(pwd)/../exec; mkdir -p $exec
 
 
-nwprod=/gpfs/tp1/nco/ops/nwprod
-
+#export nwprod=/gpfs/tp1/nco/ops/nwprod
 #export CRTM_VER=v2.0.6
 #export LIB_NAME=CRTM
 #export CRTM_LIB=$nwprod/lib/crtm/v2.0.6/libcrtm_v2.0.6.a
 #export CRTM_SRC=$nwprod/lib/crtm/v2.0.6/sorc
 #export CRTM_INC=$nwprod/lib/crtm/v2.0.6/incmod/crtm_v2.0.6
 
-#export ESMF_LIB=/gpfs/tp1/usrx/local/esmf-3.1.0rp5/lib/libO/Linux.intel.64.intelmpi.default
-#export ESMF_MOD=/gpfs/tp1/usrx/local/esmf-3.1.0rp5/mod/modO/Linux.intel.64.intelmpi.default
+#export ESMF_LIB=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/lib/libO/Linux.intel.64.intelmpi.default
+#export ESMF_MOD=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/mod/modO/Linux.intel.64.intelmpi.default
 #export ESMF_VER=3_1_0rp5
 
-CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/libcrtm_v2.0.6.a
-CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv206/incmod/crtm_v2.0.6
+CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv205/sorc/libsrc/libCRTM.a
+CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/CRTMv205/sorc/libsrc
 
 
 for make in $makelist; do

@@ -6,7 +6,7 @@
  IMPLICIT none
 
  INTEGER, intent(in) :: Total_Member, pe_member(Total_member)
-!
+ 
  TYPE(ESMF_VM),                                   INTENT(inout) :: vm    ! the ESMF virtual machine.
  TYPE(ESMF_config),                               INTENT(inout) :: Cf    ! ESMF config
  TYPE(ESMF_GridComp),    DIMENSION(Total_member), INTENT(out)   :: gcGFS
@@ -54,13 +54,9 @@ END SUBROUTINE GridCompCreate
 SUBROUTINE GFS_SetServices(gcGFS, Total_Member, rc)
 
 USE ESMF_Mod
-USE GFS_GridComp_ESMFMod, ONLY: GFS_StandAlone_SetServices => SetServices
+USE GFS_GridComp_ESMFMod   , ONLY: GFS_StandAlone_SetServices => SetServices
 
 IMPLICIT none
-
-interface
-!DEC$ ATTRIBUTES NO_ARG_CHECK :: GFS_StandAlone_SetServices
-end interface
 
 INTEGER, INTENT(in)                                         :: Total_member
 TYPE(ESMF_GridComp), DIMENSION(Total_member), INTENT(inout) :: gcGFS
@@ -70,7 +66,7 @@ INTEGER :: i
 rc   = ESMF_SUCCESS
 
 DO i = 1, Total_member
- CALL ESMF_GridCompSetServices(gcGFS(i),GFS_StandAlone_SetServices, rc)
+CALL ESMF_GridCompSetServices(gcGFS(i),GFS_StandAlone_SetServices, rc)
 END DO
 
 END SUBROUTINE GFS_SetServices

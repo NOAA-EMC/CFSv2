@@ -42,8 +42,8 @@ subroutine gesinfo(mype)
   use sigio_module, only: sigio_head,sigio_srhead,sigio_sclose,&
        sigio_sropen
 
-  use gfsio_module
-! use gfsio_module, only: gfsio_gfile,gfsio_open,gfsio_close, gfsio_init,gfsio_finalize,gfsio_getfilehead
+! use gfsio_module
+  use gfsio_module, only: gfsio_gfile,gfsio_open,gfsio_close, gfsio_init,gfsio_finalize,gfsio_getfilehead
 
   use constants, only: izero,ione,zero,h300,r60
 

@@ -92,10 +92,10 @@ subroutine stpt(thead,dval,xval,out,sges,nstep)
   use obsmod, only: t_ob_type
   use qcmod, only: nlnqc_iter,varqc_iter
   use constants, only: zero,half,one,two,tiny_r_kind,cg_term,zero_quad,r3600
-  use gridmod, only: latlon1n,latlon11   !!!,latlon1n1
+  use gridmod, only: latlon1n,latlon11,latlon1n1
   use jfunc, only: l_foto,xhat_dt,dhat_dt,pointer_state
   use control_vectors, only: nrf2_sst
-  use state_vectors
+  use state_vectors, latlon1n1_svec => latlon1n1
   implicit none
 
 ! Declare passed variables

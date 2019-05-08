@@ -116,6 +116,7 @@ program main
   if (mype==mype_out) outask=.true.
   if (outask) call w3tagb('GLOBAL_ANGUPDATE',1999,0232,0055,'NP23')
 
+  write(6,*) npe,mype,mype_out,outask
 
 ! Read and echo namelist input
   read(5,setup)
@@ -457,7 +458,7 @@ program main
 ! Wait for all mpi tasks to finish processing the 
 ! satellite/sensors assigned to them.
 
-  write(6,*)' Wait after satellite/sensor loop'
+  write(6,*)mype,' Wait after satellite/sensor loop'
   call mpi_barrier(mpi_comm_world,ierror)
 
 

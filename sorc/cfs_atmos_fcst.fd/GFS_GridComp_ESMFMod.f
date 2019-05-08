@@ -58,9 +58,8 @@
 ! !ARGUMENTS:
 !------------
 
- TYPE(ESMF_GridComp), INTENT(inout)  :: gcGFS ! gridded component
+ TYPE(ESMF_GridComp)                 :: gcGFS ! gridded component
  INTEGER,             INTENT(out)    :: rc    ! return code
- external                            :: initialize,run,finalize
      
 ! !DESCRIPTION: Set services (register) for the GFS Stand Alone
 !               Grid Component.
@@ -155,10 +154,10 @@
 ! !INPUT/OUTPUT VARIABLES AND PARAMETERS:
 !----------------------------------------
 
- TYPE(ESMF_GridComp), INTENT(inout) :: gcGFS 
- TYPE(ESMF_State),    INTENT(inout) :: impGFS
- TYPE(ESMF_State),    INTENT(inout) :: expGFS
- TYPE(ESMF_Clock),    INTENT(inout) :: clock
+ TYPE(ESMF_GridComp)                :: gcGFS 
+ TYPE(ESMF_State)                   :: impGFS
+ TYPE(ESMF_State)                   :: expGFS
+ TYPE(ESMF_Clock)                   :: clock
 
 !
 ! !OUTPUT VARIABLES AND PARAMETERS:
@@ -479,13 +478,13 @@
 !
 ! !INPUT VARIABLES AND PARAMETERS:
 !---------------------------------
- TYPE(ESMF_GridComp), INTENT(inout) :: gcGFS   
- TYPE(ESMF_State),    INTENT(in)    :: impGFS 
+ TYPE(ESMF_GridComp)                :: gcGFS   
+ TYPE(ESMF_State)                   :: impGFS 
  
 ! !OUTPUT VARIABLES AND PARAMETERS:
 !----------------------------------
- TYPE(ESMF_Clock),    INTENT(inout) :: clock
- TYPE(ESMF_State),    INTENT(inout) :: expGFS
+ TYPE(ESMF_Clock)                   :: clock
+ TYPE(ESMF_State)                   :: expGFS
  INTEGER,             INTENT(out)   :: rc   
 !
 !EOP
@@ -594,10 +593,10 @@
 !
 ! !INPUT VARIABLES AND PARAMETERS:
 !---------------------------------
- TYPE(ESMF_GridComp), INTENT(inout)  :: gcGFS
- TYPE(ESMF_State),    INTENT(inout)  :: impGFS
- TYPE(ESMF_State),    INTENT(inout)  :: expGFS
- TYPE(ESMF_Clock),    INTENT(inout)  :: clock
+ TYPE(ESMF_GridComp)                 :: gcGFS
+ TYPE(ESMF_State)                    :: impGFS
+ TYPE(ESMF_State)                    :: expGFS
+ TYPE(ESMF_Clock)                    :: clock
 
 ! !OUTPUT VARIABLES AND PARAMETERS:
 !----------------------------------

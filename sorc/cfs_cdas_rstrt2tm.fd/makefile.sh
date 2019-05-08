@@ -7,7 +7,7 @@ export CC=icc
 export CFLAGSM="-O3"
 export LDFLAGSM=
  
-module unload NetCDF; module load NetCDF/3.6.3 
+##module unload NetCDF; module load NetCDF/3.6.3 
 export NCDF=$NETCDF_LDFLAGS
 export INC=$NETCDF_INCLUDE
 

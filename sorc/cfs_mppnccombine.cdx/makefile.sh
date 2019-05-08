@@ -7,7 +7,7 @@ export CC=cc
 export CFLAGSM="-O3 -xHost"
 export LDFLAGSM=
  
-module unload NetCDF; module load NetCDF/4.2/serial
+##module unload NetCDF; module load NetCDF/4.2/serial
 export NCDF="-L$NETCDF/lib -lnetcdf_c++ -lnetcdf"
 export INC=$NETCDF_INCLUDE 
 

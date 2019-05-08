@@ -234,6 +234,8 @@ subroutine read_prepbufr(nread,ndata,nodata,infile,obstype,lunout,twindin,sis,&
   real(r_double),dimension(255,20):: tpc
   real(r_double),dimension(2,255,20):: tobaux
 
+  real(8) bmixx
+
 !  equivalence to handle character names
   equivalence(r_prvstg(1,1),c_prvstg) 
   equivalence(r_sprvstg(1,1),c_sprvstg) 
@@ -261,6 +263,7 @@ subroutine read_prepbufr(nread,ndata,nodata,infile,obstype,lunout,twindin,sis,&
   data rmesh / -99.999_r_kind /
   
 ! Initialize variables
+
 
   nreal=izero
   satqc=zero
@@ -308,6 +311,7 @@ subroutine read_prepbufr(nread,ndata,nodata,infile,obstype,lunout,twindin,sis,&
 ! Open, then read date from bufr data
   call closbf(lunin)
   open(lunin,file=infile,form='unformatted')
+  !!bmixx=10e10; call setbmiss(bmixx)
   call openbf(lunin,'IN',lunin)
   call datelen(10)
 

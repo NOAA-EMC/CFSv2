@@ -1,4 +1,4 @@
-XEC     = $(EXECM)
+EXEC     = $(EXECM)
 F77      = $(F77M)
 F90      = $(F90M)
 CC       = $(FCC)
@@ -7,7 +7,7 @@ ifneq ($(origin ESMFMKFILE), environment)
 $(error Environment variable ESMFMKFILE was not set.)
 endif
 include $(ESMFMKFILE)
-FINCS    = $(ESMF_MOD)  ##$(ESMF_F90COMPILEPATHS)
+FINCS    = $(ESMF_F90COMPILEPATHS)
 
 ARCH     = $(ARCHM)
 PGSZ     = $(PGSZM)
@@ -36,7 +36,7 @@ FFLAGSC   =
 LDR      = $(LDRM)
 ESMFLIB  = -L$(ESMF_LIB)
 LDFLAGS =  $(LDFLAGSM)
-LIBS =  $(LIBSM) $(ESMF_MOD)
+LIBS =  $(LIBSM) 
 
 .SUFFIXES: .o .f .F .h
 

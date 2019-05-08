@@ -276,10 +276,16 @@ contains
      tmp = temp(i)-tmin
      ind = int(dtinv*(tmp+teps))
      del = tmp-dtres*real(ind)
-     esat(i) = TABLE(ind+1) + del*(DTABLE(ind+1) + del*D2TABLE(ind+1))
-!!!!!esat(i) = TABLE(ind+1) + del*DTABLE(ind+1)
-     if (ind < 0 .or. ind > nlim) n = n+1
+     if (ind < 0 .or. ind > nlim) then
+        print*,'lookupes1d',i,temp(i),ind
+        n=n+1                           
+     else
+        esat(i) = TABLE(ind+1) + del*(DTABLE(ind+1) + del*D2TABLE(ind+1))
+        !!!!!esat(i) = TABLE(ind+1) + del*DTABLE(ind+1)
+     endif
    enddo
+
+   ! jsw where error is trapped !
 
    if ( n > 0 ) call temp_check ( n, temp )
 
@@ -701,18 +707,20 @@ contains
 !#######################################################################
 !#######################################################################
 
- subroutine error_handler ( n )
+ subroutine error_handlex ( n )
  integer, intent(in) :: n
  character(len=28) :: mesg
 
    write (mesg,'(a21,i7)') 'table overflow, nbad=', n
+
+   call tracebackqq() 
 
    call error_mesg ('sat_vapor_pres_mod', mesg, FATAL)
 
 !  print *, 'ERROR: ' // mesg
 !  stop 111
 
- end subroutine error_handler
+ end subroutine error_handlex
 
 !#######################################################################
 
@@ -725,6 +733,7 @@ contains
    do i = 1, size(temp,1)
      ind = int(dtinv*(temp(i)-tmin+teps))
      if (ind < 0 .or. ind > nlim) nbad = nbad+1
+     if (ind < 0 .or. ind > nlim) print*,'jsw',i,ind,temp(i),tmin,teps,dtinv
    enddo
 
  end function check_1d
@@ -748,7 +757,7 @@ contains
  integer, intent(in) :: nbad
  real   , intent(in) :: temp
 
-   call error_handler (nbad)
+   call error_handlex (nbad)
 
  end subroutine temp_check_0d
 
@@ -760,7 +769,7 @@ contains
  integer :: i
 
    print *, 'Bad temperatures (dimension 1): ', (check_1d(temp(i:i)),i=1,size(temp,1))
-   call error_handler (nbad)
+   call error_handlex (nbad)
 
  end subroutine temp_check_1d
 
@@ -773,7 +782,7 @@ contains
 
    print *, 'Bad temperatures (dimension 1): ', (check_1d(temp(i,:)),i=1,size(temp,1))
    print *, 'Bad temperatures (dimension 2): ', (check_1d(temp(:,j)),j=1,size(temp,2))
-   call error_handler (nbad)
+   call error_handlex (nbad)
 
  end subroutine temp_check_2d
 
@@ -787,7 +796,7 @@ contains
    print *, 'Bad temperatures (dimension 1): ', (check_2d(temp(i,:,:)),i=1,size(temp,1))
    print *, 'Bad temperatures (dimension 2): ', (check_2d(temp(:,j,:)),j=1,size(temp,2))
    print *, 'Bad temperatures (dimension 3): ', (check_2d(temp(:,:,k)),k=1,size(temp,3))
-   call error_handler (nbad)
+   call error_handlex (nbad)
 
  end subroutine temp_check_3d
 

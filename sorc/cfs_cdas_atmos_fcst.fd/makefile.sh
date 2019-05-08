@@ -28,8 +28,8 @@ mkdir -p $make_dir
 cd $make_dir || exit 99
 [ $? -ne 0 ] && exit 8
 
-rm $make_dir/*.o
-rm $make_dir/*.mod
+#rm $make_dir/*.o
+#rm $make_dir/*.mod
 
 tar -cf- -C$sorc_dir .|tar -xf-
 
@@ -67,7 +67,8 @@ export LDFLAGSM="$PGSZM -qopenmp -mkl"
 export FINC=   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"
 
-export LIBSM="$BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd  -lrt -lstdc++ -lesmf"
+export LIBSM="-L$ESMF_LIB  $BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd $NETCDF_LDFLAGS_CXX"
+
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}

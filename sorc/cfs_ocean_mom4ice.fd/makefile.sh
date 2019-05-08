@@ -5,7 +5,7 @@ set -x
 root=`pwd`
 
 export  curdir=$root/compile
-export  platform=intel.WCOSS
+export  platform=intel.DELL 
 
 export  code_dir=$root/src
 export  name=cfs_ocean_mom4ice 

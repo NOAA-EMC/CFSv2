@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "netcdf.h"
-#include "Tm.h"
+#include <netcdf.h>
+#include <Tm.h>
 
 void rwTSFields(), rwUVFields(), usage();
 unsigned int YearDay();

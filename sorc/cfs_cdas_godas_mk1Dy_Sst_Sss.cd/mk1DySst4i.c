@@ -15,7 +15,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "netcdf.h"
+#include <netcdf.h>
 #include "Tm.h"
 
 void getM4Grid(), writeFile(), intrp2d(), intrpTri(), usage();

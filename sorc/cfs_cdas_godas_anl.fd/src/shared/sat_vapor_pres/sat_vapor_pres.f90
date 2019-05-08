@@ -222,9 +222,8 @@ contains
    ind = int(dtinv*(tmp+teps))
    del = tmp-dtres*real(ind)
    esat = TABLE(ind+1) + del*(DTABLE(ind+1) + del*D2TABLE(ind+1))
-!!!esat = TABLE(ind+1) + del*DTABLE(ind+1)
 
-     if (ind < 0 .or. ind > nlim) call temp_check ( 1, temp )
+   if (ind < 0 .or. ind > nlim) call temp_check ( 1, temp )
 
 !-----------------------------------------------
 

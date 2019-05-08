@@ -209,7 +209,7 @@
       integer, intent(in) :: put_len, to_pe
       MPP_TYPE_, intent(in) :: put_data(:,:)
       MPP_TYPE_ :: dummy(1,1)
-      print *,'in MPP_SEND_2D,put_len=',put_len,'to_pe=',to_pe
+      !print *,'in MPP_SEND_2D,put_len=',put_len,'to_pe=',to_pe
       call mpp_transmit( put_data, put_len, to_pe, dummy, 1, NULL_PE )
     end subroutine MPP_SEND_2D_
 

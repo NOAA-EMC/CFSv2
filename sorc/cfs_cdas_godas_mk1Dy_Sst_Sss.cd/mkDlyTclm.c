@@ -7,7 +7,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "netcdf.h"
+#include <netcdf.h>
 #include "Tm.h"
 
 int igx, jgx, kgx, ioff;

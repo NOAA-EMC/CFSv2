@@ -21,7 +21,7 @@ sstavg
 #include <stdlib.h>
 #include <string.h>
 
-#include "netcdf.h"
+#include <netcdf.h>
 
 void sumSST(), wrtOutTar(), usage();
 
