@@ -14,7 +14,7 @@ export GRIDSPEC=${GRIDSPEC:-$HOMEcfs/fix/${cfsp}fix_om/grid_spec.nc}
 #setup the compute node command
 
 export APRUN=${APRUN:-''}
-[[ $machine = WCOSS ]] && export APRUN=mpirun.lsf
+[[ $machine = WCOSS ]] && export APRUN="mpirun -n 28"
 [[ $machine = WCRAY ]] && export APRUN='aprun -n24'
 
 

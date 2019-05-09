@@ -275,6 +275,8 @@ if [ -s $cmd ] ; then
     fi
   elif [ $machine = WCRAY ]; then
        nprocs=24
+  elif [ $machine = DELL  ]; then
+       nprocs=28
   else
     echo "nprocs calculation is not defined here"
   fi
@@ -300,6 +302,9 @@ if [ -s $cmd ] ; then
           export err=$?; err_chk
        elif [[ $machine = WCRAY ]]; then
           aprun -b -j1 -n$nprocs -d1 -cc depth cfp cmdlist.$n
+          export err=$?; err_chk
+       elif [[ $machine = DELL  ]]; then
+          mpirun cfp cmdlist.$n
           export err=$?; err_chk
        fi
    done

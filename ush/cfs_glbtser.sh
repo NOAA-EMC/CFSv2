@@ -128,11 +128,9 @@ for kpd in $kpdlist ; do
  fi
 done
 
-
 rc=0
 
 cd $TIMEDIR
-
 
 SUFIN=${SUFIN:-""}
 #SUFIN=${SUFIN:-.gdas2.$CDATE}
@@ -145,24 +143,25 @@ fi
 echo "SUFIN is $SUFIN"
 echo "SUFOUT is $SUFOUT"
 
-if [ $machine = IBM ]; then
-  nprocs=`poe hostname | wc -w`
-elif [ $machine = WCOSS ]; then
-  set +u
-  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-     nprocs=$LSB_DJOB_NUMPROC
-  else
-     nprocs=1
-  fi
-  set -u
-elif [ $machine = WCRAY ]; then
-     nprocs=24
-else
-  echo "nprocs has not been defined for platform $machine"
-fi
+nprocs=28
 
+#if [ $machine = IBM ]; then
+#  nprocs=`poe hostname | wc -w`
+#elif [ $machine = WCOSS ]; then
+#  set +u
+#  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+#     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+#  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+#     nprocs=$LSB_DJOB_NUMPROC
+#  else
+#     nprocs=1
+#  fi
+#  set -u
+#elif [ $machine = WCRAY ]; then
+#     nprocs=24
+#else
+#  echo "nprocs has not been defined for platform $machine"
+#fi
 
 
 nvar=0
@@ -224,55 +223,59 @@ done
 #echo 'Before poe for invout rc='rc
 date
 
-if [ -s $RUNDIR/cmdfile_0 ] ; then
-  if [ $machine = IBM ]; then
-    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-    # only valid if count .le. 128
-    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-  elif [ $machine = WCOSS ]; then
-    set +u
-    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-      ntasks=$LSB_DJOB_NUMPROC
-    else
-      ntasks=1
-    fi
-    set -u
-  elif [ $machine = WCRAY ]; then
-      ntasks=24
-  else
-    echo "ntasks has not been defined for platform $machine"
-  fi
+mpirun cfp $RUNDIR/cmdfile_0
+export err=$rc; err_chk
+((rc+=$?)) 
 
-  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_0|wc -l))%$ntasks))
-  n=0;while [ $((n+=1)) -le $remainder ] ;do
-     echo "echo do nothing" >> $RUNDIR/cmdfile_0
-  done
-  if [[ $machine = WCOSS ]]; then
-    $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_0
-    ((rc+=$?))
-  elif [[ $machine = WCRAY ]]; then
-    aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_0
-    ((rc+=$?))
-  fi
-  export err=$rc; err_chk
-else
-  echo "cmdfile_0 does not exist - wgrib for invout did not work"
-fi
+#if [ -s $RUNDIR/cmdfile_0 ] ; then
+#  if [ $machine = IBM ]; then
+#    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
+#    # only valid if count .le. 128
+#    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
+#  elif [ $machine = WCOSS ]; then
+#    set +u
+#    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+#      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+#    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+#      ntasks=$LSB_DJOB_NUMPROC
+#    else
+#      ntasks=1
+#    fi
+#    set -u
+#  elif [ $machine = WCRAY ]; then
+#      ntasks=24
+#  else
+#    echo "ntasks has not been defined for platform $machine"
+#  fi
+#
+#  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_0|wc -l))%$ntasks))
+#  n=0;while [ $((n+=1)) -le $remainder ] ;do
+#     echo "echo do nothing" >> $RUNDIR/cmdfile_0
+#  done
+#  if [[ $machine = WCOSS ]]; then
+#    $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_0
+#    ((rc+=$?))
+#  elif [[ $machine = WCRAY ]]; then
+#    aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_0
+#    ((rc+=$?))
+#  fi
+#  export err=$rc; err_chk
+#else
+#  echo "cmdfile_0 does not exist - wgrib for invout did not work"
+#fi
+#
 #echo ' after poe rc='$rc
-if [ $rc -gt 0 ] ; then
-  if [ $RUN_ENVIR = dev ]; then
-    $PERR;exit $rc
-  else
-    export err=$rc; err_chk
-  fi
-else
-  rm -f $RUNDIR/invout_*.sh ; rm -f cmdfile_0 
-fi
+#if [ $rc -gt 0 ] ; then
+#  if [ $RUN_ENVIR = dev ]; then
+#    $PERR;exit $rc
+#  else
+#    export err=$rc; err_chk
+#  fi
+#else
+#  rm -f $RUNDIR/invout_*.sh ; rm -f cmdfile_0 
+#fi
 
-echo ' After invout '
-date
+echo `date` ' After invout '
 
 
 ncmd=$(((nvar-1)/nprocs+1))
@@ -334,43 +337,49 @@ until [ $nn -gt $nvar ] ; do
   nn=$((nn+1))
 done
 
-echo Before POE
-date
-if [ -s $RUNDIR/cmdfile_$ncmd ] ; then
-  if [ $machine = IBM ]; then
-    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-    # only valid if count .le. 128
-    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-  elif [ $machine = WCOSS ]; then
-    set +u
-    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-      ntasks=$LSB_DJOB_NUMPROC
-    else
-      ntasks=1
-    fi
-    set -u
-  elif [ $machine = WCRAY ]; then
-    ntasks=24
-  else
-    echo "ntasks has not been defined for platform $machine"
-  fi
+echo `date` Before POE
 
-  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_$ncmd|wc -l))%$ntasks))
-  n=0;while [ $((n+=1)) -le $remainder ] ;do
-     echo "echo do nothing" >> $RUNDIR/cmdfile_$ncmd
-  done
-fi
-n=0
+#if [ -s $RUNDIR/cmdfile_$ncmd ] ; then
+#  if [ $machine = IBM ]; then
+#    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
+#    # only valid if count .le. 128
+#    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
+#  elif [ $machine = WCOSS ]; then
+#    set +u
+#    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
+#      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+#    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
+#      ntasks=$LSB_DJOB_NUMPROC
+#    else
+#      ntasks=1
+#    fi
+#    set -u
+#  elif [ $machine = WCRAY ]; then
+#    ntasks=24
+#  else
+#    echo "ntasks has not been defined for platform $machine"
+#  fi
+#
+#  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_$ncmd|wc -l))%$ntasks))
+#  n=0;while [ $((n+=1)) -le $remainder ] ;do
+#     echo "echo do nothing" >> $RUNDIR/cmdfile_$ncmd
+#  done
+#fi
+
+n=0; >cfpfile
 while [ $((n+=1)) -le $ncmd ] ;do
-  if [[ $machine = WCOSS ]]; then
-     $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_$n
-  elif [[ $machine = WCRAY ]]; then
-     time aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_$n
-  fi
-  export err=$?; err_chk
+  cat $RUNDIR/cmdfile_$n >> cfpfile
+  [[ $n -eq $ncmd ]] && mpirun cfp  cfpfile
+
+# if [[ $machine = WCOSS ]]; then
+#    $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_$n
+# elif [[ $machine = WCRAY ]]; then
+#    time aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_$n
+# fi
+# export err=$?; err_chk
+
 done
+
 ((rc+=$?))
 if [ $rc -gt 0 ] ; then exit $rc ; else rm -f $RUNDIR/script_*.sh ; rm -f cmdfile_* ; fi
 

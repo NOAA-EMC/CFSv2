@@ -20,7 +20,7 @@
 #  It also outputs eta_daily files on 2.5x2 grid
 #
 
-set -eu
+set -eu; [[ ${VERBOCN:-NO} = YES ]] && set -x
 
 echo executing $0 $*
 
