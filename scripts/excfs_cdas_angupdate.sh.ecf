@@ -317,7 +317,7 @@ cat <<EOF > global_angupdate.namelist
 EOF
 
 # Run global_angupdate program
-eval $PGM < global_angupdate.namelist $REDOUT$PGMOUT $REDERR$PGMERR
+eval $PGM < global_angupdate.namelist ## $REDOUT$PGMOUT $REDERR$PGMERR
 rc=$?
 
 export ERR=$?

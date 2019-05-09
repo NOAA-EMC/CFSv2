@@ -552,11 +552,14 @@ until [[ $nhourb -ge $nhours ]] ; do
 
   export VDATE=$($NDATE $FHINI $start_date)
 
-#  Execute  Coupled Atmospheric-Ocean model forecast
+# Execute  Coupled Atmospheric-Ocean model forecast
 
-  $FORECASTSH - $DATA $VDATE $EXEC_OMD $COM_YMDH \
-    ## >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
+  $FORECASTSH - $DATA $VDATE $EXEC_OMD $COM_YMDH >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
   rc=$?
+
+  cat $(basename $FORECASTSH).out.$FHINI > $pgmout
+  $NCP $(basename $FORECASTSH).err.$FHINI  errfile
+
   if [[ $rc -ne 0 ]] ; then
     if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
        msg="Error in executing the forecast script"
@@ -566,9 +569,6 @@ until [[ $nhourb -ge $nhours ]] ; do
        $PERR;exit $rc
     fi
   fi
-
-  cat $(basename $FORECASTSH).out.$FHINI >> $pgmout
-  $NCP $(basename $FORECASTSH).err.$FHINI  errfile
 
 # if [ $rc -ne 0 ] ; then exit $rc; fi
   export err=$rc; err_chk
@@ -712,4 +712,5 @@ if [[ $current_date -lt $end_date ]] ; then
 else
   echo $start_date $current_date $end_date  > $POSTDEFS/stamp.done
   YMDH_DONE=$YMDH
+  ##cd $homejsw; runcfspost $start_date
 fi

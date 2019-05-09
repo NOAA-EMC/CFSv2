@@ -383,6 +383,11 @@ if [[ $VERBOSE = YES ]] ; then
    set -x
 fi
 
+echo
+echo `date` executing forecast script
+echo $LD_LIBRARY_PATH
+echo
+
 if [ $machine = IBMP6 ] ; then
   export MP_BINDPROC=${MP_BINDPROC:-yes}
   export MEMORY_AFFINIY=${MEMORY_AFFINIY:-MCM}
@@ -434,6 +439,8 @@ elif [ $machine = WCOSS ] ; then
   if [ "$TASK_GEOMETRY" != NONE ] ; then
    export LSB_PJL_TASK_GEOMETRY=$TASK_GEOMETRY
   fi
+elif [ $machine = DELL ] ; then
+  export APRUN=${APRUN:-"mpirun -n256"}
 else
   echo no machine selected $0
   err_exit 999
@@ -1327,13 +1334,16 @@ export tpn=18
 if [ $NPROCS_a -ne 0 ] ; then
   if [ ! "$standalone" = y ] ; then
     if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-      time $APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
+      mpirun -n 1 $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am  1>out.poe.$nhourb 2>err.poe.$nhourb
+      ##mpirun cfp $MP_CMDFILE
+      ##time $APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
       export ERR=$?; export err=$ERR; err_chk
     else
-      export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N$tpn -d$OMP_NUM_THREADS"}
-      export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o -N$tpn"}
-      export C_TASKS=${C_TASKS:-"-n 1"}
-      time $APRUN $C_TASKS $PGM_c : $OM_TASKS $PGM_oc : $AM_TASKS $PGM_am  1>out.poe.$nhourb 2>err.poe.$nhourb
+      mpirun -n 1 $PGM_c : -n 56 $PGM_oc : -n 195 $PGM_am
+      #export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N$tpn -d$OMP_NUM_THREADS"}
+      #export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o -N$tpn"}
+      #export C_TASKS=${C_TASKS:-"-n 1"}
+      #time $APRUN $C_TASKS $PGM_c : $OM_TASKS $PGM_oc : $AM_TASKS $PGM_am  1>out.poe.$nhourb 2>err.poe.$nhourb
       export ERR=$?; export err=$ERR; err_chk
     fi
 
@@ -1413,7 +1423,7 @@ set -x
 #  mpi_combine the decomposed ocean files into global files
 
 [[ $machine = WCRAY ]] && { time $APRUN -n72 $mpinccombine $mppnccombine cmdfile_mpp; export err=$?; err_chk; }
-[[ $machine = WCRAY ]] || { time $APRUN      $mpinccombine $mppnccombine cmdfile_mpp; export err=$?; err_chk; }
+[[ $machine = WCRAY ]] || { time mpirun -n 28 $mpinccombine $mppnccombine cmdfile_mpp; export err=$?; err_chk; }
 
 #  adjust the date stamps on the combined files
 

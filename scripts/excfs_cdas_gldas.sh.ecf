@@ -356,7 +356,7 @@ echo 'executing LIS in directory ' $(pwd)
 PGM=$LISEXEC
 
 if [[ $machine = WCOSS ]]; then
-  eval mpirun.lsf $PGM $REDOUT$PGMOUT $REDERR$PGMERR
+  eval mpirun -n 28 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
 elif [[ $machine = WCRAY ]]; then
   eval aprun -n24 -N12 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
 fi

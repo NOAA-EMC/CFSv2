@@ -374,6 +374,8 @@ if [ -s poescript.grb2 ] ; then
      fi
    elif [ $machine = WCRAY ]; then
        nprocs=24
+   elif [ $machine = DELL  ]; then
+       nprocs=28
    else
      echo "ntasks has not been defined for platform $machine"
    fi
@@ -406,6 +408,8 @@ if [ -s poescript.grb2 ] ; then
         mpirun.lsf
       elif [ $machine = WCRAY ]; then
         aprun -b -j1 -n$nprocs -d1 -cc depth cfp cmdlist.$n
+      elif [ $machine = DELL ]; then
+        mpirun cfp cmdlist.$n
       else
         echo "Variables to run poe are not defined on $machine, please edit the script"
       fi

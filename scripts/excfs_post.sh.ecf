@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/usr/bin/env ksh  
 ######################################################################
 #
 #   Script:  excfs_postprocessing.sh.sms   
@@ -12,6 +12,37 @@
 #   Main driver to do postprocessing for CFS (Climate Forecast SYSTEM)
 #   Coupled Model Integrations
 #   History: 2001.11.06 First Implementation  for SFM
+######################################################################
+# function to check execution wall time
+######################################################################
+timechk() {
+#!/usr/bin/env bash
+set +x
+
+tbeg=$1
+tnow=`date +"%H%M%S"`
+
+h1=10#$(echo $tbeg|cut -c 1-2)
+m1=10#$(echo $tbeg|cut -c 3-4)
+s1=10#$(echo $tbeg|cut -c 5-6)
+
+h2=10#$(echo $tnow|cut -c 1-2)
+m2=10#$(echo $tnow|cut -c 3-4)
+s2=10#$(echo $tnow|cut -c 5-6)
+
+d1=$((h2-h1))
+d2=$((m2-m1))
+d3=$((s2-s1))
+
+if [[ d3 -lt 0 ]]; then d3=$((d3+60)); d2=$((d2-1)); fi
+if [[ d2 -lt 0 ]]; then d2=$((d2+60)); d1=$((d1-1)); fi
+if [[ d1 -lt 0 ]]; then d1=$((d1+24)); fi
+
+printf "%2.2d%2.2d%2.2d\n" $d1 $d2 $d3
+
+return 0
+}
+######################################################################
 
 # ###############################
 #  START CFS POST PROCESSING
@@ -87,8 +118,9 @@ wait_max=10
 while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
 
   wait_count=$((wait_count+1))  
+  defile=$(ls -rt $POSTDEFS/post_def$cyc.* | head -n1)
 
-  while [ -s $POSTDEFS/post_def$cyc.* ] ; do
+  while [ -n "$POSTDEFS/post_def$cyc.*" ] ; do
 
       done_count=$((done_count+1))
       if [[ $done_count -gt $done_max ]]; then
@@ -96,10 +128,20 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
          exit 
       fi
 
+      [[ $done_count -eq 1 ]] && tbeg=$(date +"%H%M%S")
+      tno=$(date +"%H%M%S")
+      tck=$(timechk $tbeg) 
+      if [[ $tck -gt 050000 ]]; then
+         cd $homejsw; ./runcfspost $start_date
+         exit
+      fi
+
       ###############################################
       # Run it if there is definition files for post and not time to resubmit
       ###############################################
-      ls -rt $POSTDEFS/post_def$cyc.* | sed 's/.*\.//g' | read postid
+
+      defile=$(ls -rt $POSTDEFS/post_def$cyc.* | head -n1)
+      bafile=$(basename $defile); postid=${bafile:11}
       . $POSTDEFS/post_def$cyc.$postid
 
       export CDATE=$start_date
@@ -350,3 +392,4 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
     if [ $BREAK_ON_RUN = YES ] ; then break ; fi
   done
 done
+

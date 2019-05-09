@@ -1236,6 +1236,8 @@ if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
   if [ $nprocs -ne $nprocs1 ] ; then echo "Bad $MP_CMDFILE, exiting..."; export err=1; err_chk ; fi
 fi
 
+set -x 
+
 if [ $NPROCS_a != ne 0 ] ; then
 
   # replaced: eval $PGM <<EOF $REDOUT$PGMOUT $REDERR$PGMERR
@@ -1298,7 +1300,9 @@ EOF
   export nhourb=${nhourb:-$FHINI}
   if [ ! "$standalone" ] ; then
     if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-      $APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
+      ##$APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
+      ##mpirun cfp $MP_CMDFILE
+      mpirun -n 1 $PGM_c : -n 56 $PGM_oc : -n 195 $PGM_am
     else
       export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N8 -d3"}
       export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o"}
@@ -1388,6 +1392,8 @@ if [ $MPMD_PROC = YES ] ; then
  > cmdfile_mpp
 fi
 
+# write the cmdfile for combining mom4 tiles
+
 hh_inc_m=$((hh_inc_ocn/2))
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
@@ -1409,13 +1415,7 @@ until [ $p_date -gt $end_date ] ; do
   if [ $NPROCS_o -gt 1 ] ; then
     if [ $MPMD_PROC = YES ] ; then
       echo $mppnccombine $ocnfile >> cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
       echo $mppnccombine $icefile >> cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
-      echo "echo do nothing" >>cmdfile_mpp
     else
       $APRUNMPPNC $mppnccombine $ocnfile
       export err=$?; err_chk
@@ -1426,34 +1426,11 @@ until [ $p_date -gt $end_date ] ; do
   p_date=$($NDATE $hh_inc_ocn $p_date)
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
-#
-if [ $MPMD_PROC = YES ] ; then
-  if [ -s cmdfile_mpp ] ; then
-   ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w) 
-# only valid if count .le. 128
-   [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-   [ $ntasks -eq 0 ] && ntasks=$((NPROCS_c+NPROCS_a+NPROCS_o))
-     remainder=$(($ntasks-$(cat cmdfile_mpp|wc -l)%$ntasks))
-     n=0;while [ $((n+=1)) -le $remainder ] ;do
-         echo "echo do nothing" >>cmdfile_mpp
-     done
-     l=0
-     n=-1
-     while read line ;do ((n+=1))
-         if [ $((n%ntasks)) -eq 0 ] ; then
-             ((l+=1))
-             >cmdlist.$l
-         fi
-         echo "$line" >> cmdlist.$l
-     done < cmdfile_mpp
-     n=0
-     while [ $((n+=1)) -le $l ] ;do
-         $APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
-         export err=$?; err_chk
-     done
-  fi
-fi
-#
+
+mpirun cfp cmdfile_mpp # run the cmdfile processor
+
+# rename the ocn and ice files to reflect the correct time
+
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
 until [ $p_date -gt $end_date ] ; do

@@ -44,6 +44,8 @@ cd $COMOUT ||exit 99
 htar -xvf /NCEPPROD/hpssprod/runhistory/cfs$year/$year$mnth/$year$mnth$days/Analysis/cfs.dumps.$PDY.tar  \*$txxz\*
 rm -f cdas1.$txxz.cmapgrb
 
+[[ ! -s $COMOUT/cdas1.$txxz.adpupa.tm00.bufr_d ]] && exit 99
+
 # copy the tcvitals from rtdumps
 
 set -ex
@@ -51,6 +53,8 @@ set -ex
 mach=$(hostname|cut -c 1-1)
 [[ $mach = t ]] && mach=tide
 [[ $mach = g ]] && mach=gyre
+[[ $mach = v ]] && mach=venus
+[[ $mach = m ]] && mach=mars   
 
 rtdump=/sss/emc/climate/shared/emc.climpara/rtdump/$CDATE/gdas
 scp $mach:$rtdump/tcvitl.gdas.$CDATE  $COMOUT/cdas1.$txxz.syndata.tcvitals.tm00
