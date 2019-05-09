@@ -246,7 +246,7 @@ export SSMITBF=${SSMITBF:-/dev/null}
 #
 ####################################
 wgrib=$WGRIB              
-prev_cdate=$NDATE -6 $PDY$cyc
+prev_cdate=`$NDATE -6 $PDY$cyc`
 RUN_GETGES=${RUN_GETGES:-YES}        # Set to NO if not running getges.sh
 if [ $RUN_GETGES = YES ]; then
  GETGESSH=${GETGESSH:-$HOMEcfs/ush/global_getges.sh}

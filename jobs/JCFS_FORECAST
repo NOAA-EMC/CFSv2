@@ -9,11 +9,11 @@ set -ex
 echo $1
 echo $2
 
-export MP_IOAGENT_CNT=all
-export MP_IO_BUFFER_SIZE=8M
-export MP_SINGLE_THREAD=yes
-export MP_USE_BULK_XFER=yes
-export MP_COLLECTIVE_OFFLOAD=yes
+#export MP_IOAGENT_CNT=all
+#export MP_IO_BUFFER_SIZE=8M
+#export MP_SINGLE_THREAD=yes
+#export MP_USE_BULK_XFER=yes
+#export MP_COLLECTIVE_OFFLOAD=yes
 
 
 ##########################################################################
@@ -102,7 +102,7 @@ export FIXGLOBAL=$FIXcfs
 
 export PARM_AM=$PARMcfs/cfs_parm_am
 export FCSTSHDIR=$HOMEcfs/scripts
-export FIXGLOBAL=$HOMEgsm/fix/fix_am
+##export FIXGLOBAL=$HOMEgsm/fix/fix_am
 
 export mppnccombine=${mppnccombine:-$EXECcfs/cfs_mppnccombine}
 export AM_EXEC=${AM_EXEC:-${EXEC_AMD:-$EXECcfs}/cfs_atmos_fcst}
@@ -312,7 +312,7 @@ fi
 ###################################################
 # msg end of job and clean up temperary directory
 ###################################################
-cat $pgmout
+###cat $pgmout
 msg="ENDED NORMALLY."
 postmsg "$jlogfile" "$msg" 
 

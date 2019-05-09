@@ -147,6 +147,8 @@ export COPYGBAP=$COPYGB # save the copygb app name for mpmd scripts
 [[ $machine = WCRAY ]] && export COPYGB="aprun -n1 $COPYGB"
 [[ $machine = WCRAY ]] && export APRUN="aprun -n24 -d1 -cc depth" ||  export APRUN=""
 
+machine=DELL; [[ $machine = DELL  ]] && export APRUN="mpirun -n 28"                                     
+
 export GRIBVERSION=grib1
 export OCNDIR=$COMOUT
 

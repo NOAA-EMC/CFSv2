@@ -125,10 +125,13 @@ export LEVS_ges=${LEVS_ges:-64}
 
 # These are for the T574L64
 #
+
 export LONA=${LONA:-1152}
 export LATA=${LATA:-576}
+
 export LONB=${LONB:-1760}
 export LATB=${LATB:-880}
+
 export LSOIL=${LSOIL:-4}
 export NLAT=$((${LATA}+2))
 
@@ -400,6 +403,8 @@ else
    echo no known machine is defined
    export err=99; err_chk
 fi
+
+APRUN=" mpirun -n 140 "
 
 ##env
 

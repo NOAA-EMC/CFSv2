@@ -178,13 +178,15 @@ export NTHSTACK=102400000
 
 export machine=${machine:-WCOSS}
 
-if [ $machine = IBM ]; then
-  APRUNCY=""
-elif [ $machine = WCOSS ]; then
-  APRUNCY=mpirun.lsf
-else
-  echo "APRUNCY not defined for this platform"
-fi
+#if [ $machine = IBM ]; then
+#  APRUNCY=""
+#elif [ $machine = WCOSS ]; then
+#  APRUNCY=mpirun.lsf
+#else
+#  echo "APRUNCY not defined for this platform"
+#fi
+
+export APRUN="mpirun -n 28"
 
 ##############################################
 # Define COM directories
@@ -206,6 +208,7 @@ fi
 # Execute the script
 #############################################################
 if [[ $YYYY_NOW -le $YYYYEND ]] ; then
+  export SUFIN= # sufin needs to be empty
   $POST_SCRIPT
 fi
 
