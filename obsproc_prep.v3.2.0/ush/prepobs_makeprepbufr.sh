@@ -809,7 +809,7 @@ echo
 ###################################################################
 ###### temporary logic for runs on WCOSS ##########################
 ###################################################################
-   if [ "$POE" = 'YES' ];then
+   if [ "$POE" = 'yes' ];then
       set +x
 echo
 echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -1654,8 +1654,8 @@ cat $DATA/prepdata.stdin >> prepdata.stdin
 
 BUFRLIST_all="adpupa aircar aircft satwnd proflr vadwnd rassda adpsfc sfcshp \
  sfcbog msonet spssmi erscat qkswnd wdsatr ascatw rtovs atovs goesnd gpsipw"
-###BUFRLIST_all_array=($BUFRLIST_all) # this does not work on all platforms
-set -A BUFRLIST_all_array `echo $BUFRLIST_all` # this works on all platforms
+BUFRLIST_all_array=($BUFRLIST_all) # this does not work on all platforms
+####set -A BUFRLIST_all_array `echo $BUFRLIST_all` # this works on all platforms
 
 
 # Any dump file not included in BUFRLIST is "touched" so that it will not
@@ -1822,7 +1822,8 @@ set -x
 #   background processes to complete
 #  --------------------------------------------------------------------------
       if [ "$POE" != 'NO' ]; then
-         /usr/bin/poe -cmdfile prep_exec.cmd $POE_OPTS
+         ###/usr/bin/poe -cmdfile prep_exec.cmd $POE_OPTS
+         mpirun cfp prep_exec.cmd
       elif [ $BACK = 'YES' ] ; then
          wait
       fi
@@ -2267,31 +2268,37 @@ if [ "$DO_QC" = 'YES' ]; then
    if [ "$PREVENTS"  = 'YES' ];then
       $TIMEIT $USHPREV/prepobs_prevents.sh  $DATA/prepda.${cycle} $CDATE10
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.prevents
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
    if [ "$CQCBUFR"  = 'YES' ];then
       $TIMEIT $USHCQC/prepobs_cqcbufr.sh  $DATA/prepda.${cycle}
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.cqcbufr
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
    if [ "$PROFCQC"  = 'YES' ];then
       $TIMEIT $USHPQC/prepobs_profcqc.sh  $DATA/prepda.${cycle}
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.profcqc
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
    if [ "$CQCVAD"   = 'YES' ];then
       $TIMEIT $USHVQC/prepobs_cqcvad.sh   $DATA/prepda.${cycle} $CDATE10
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.cqcvad
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
    if [ "$PREPACQC" = 'YES' ];then
       $TIMEIT $USHAQC/prepobs_prepacqc.sh $DATA/prepda.${cycle} $DATA/adpsfc
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.acqc
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
    if [ "$OIQCBUFR" = 'YES' ];then
       $TIMEIT $USHOIQC/prepobs_oiqcbufr.sh $DATA/prepda.${cycle} $CDATE10
       errsc=$?
+      cp $DATA/prepda.${cycle} $DATA/prepda.${cycle}.oiqc
       [ "$errsc" -ne '0' ]  &&  exit $errsc
    fi
 fi

@@ -1809,6 +1809,7 @@ C  -------------------------------
  
 C     CALL OPENBF(LUBIN,'IN',LUBIN)
       CALL UFBQCD(LUBIN,'OIQC',QCD)
+      call maxout(25000)
       CALL OPENBF(LUBOT,'OUT',LUBIN)
       imsg = 1
       irec = 1
@@ -4170,7 +4171,7 @@ C$$$
       CHARACTER*3  TAG
       DIMENSION    HDR(5),OBS(7,255),FCS(6,255),QMS(5,255),OES(5,255)
       LOGICAL      QX(300),STUCK,PCHK
-      REAL*8       HDR,OBS,FCS,QMS,OES,SID
+      REAL*8       HDR,OBS,FCS,QMS,OES,SID,BMISS
  
       DATA SUCCESS/'**************************************************',
      .             '**************** STORE SUCCESSFUL ****************',
@@ -4218,6 +4219,7 @@ C  -------------------------------------------------------------------
 C  GET READY TO READ BUFR
 C  ----------------------
 
+      bmiss=10e10; call setbmiss(bmiss)
       call ufbmem(lubfi,0,nmsg,iunit)
       call mpisplit(myid,nmsg,m1,m2)
       imsg = m1

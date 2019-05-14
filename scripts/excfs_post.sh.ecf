@@ -313,9 +313,11 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
          ##############################################################################################
          # Run script to concatenate the time-series file and save them in the "time_grib" directory
          ##############################################################################################
-         end_date=$($NDATE $ENDHOUR $start_date)
-         fh_inc=${INC_HOUR:-360}
-         $USHcfs/cfs_savetimeser.sh $start_date $end_date $fh_inc
+         if [ $SAVE_TIME_45DAYS = YES ]; then
+           end_date=$($NDATE $ENDHOUR $start_date)
+           fh_inc=${INC_HOUR:-360}
+           $USHcfs/cfs_savetimeser.sh $start_date $end_date $fh_inc
+         fi
 
          ####################################################
          # Save the necessary files for restart in a tar file
