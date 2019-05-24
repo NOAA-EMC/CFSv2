@@ -40,7 +40,7 @@ export SENDCOM=${SENDCOM:-YES}
 export PROCESS_GRIBFLDS=${PROCESS_GRIBFLDS:-YES}
 export PROCESS_GDAS_DUMP=${PROCESS_GDAS_DUMP:-YES}
 export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
-export COMSP=${COMSP:-$COMOUT/${RUN}.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
+export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
 export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY} # GDAS file directory
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
@@ -251,6 +251,10 @@ for CTYPE in $DUMP_LIST; do
 #    export err=$dumpstat; err_chk
 #  fi
 
+  echo
+  pwd;ls
+  echo
+
   flist=$CTYPE.list
   [ -f $flist ] && rm $flist
 
@@ -272,7 +276,7 @@ for CTYPE in $DUMP_LIST; do
     set -u
     ln -sf $CTYPE.all fort.50
 
-    $HOMEdump/exec/bufr_combfr < $flist.sort >> $pgmout
+    $HOMEobsproc_dump/exec/bufr_combfr < $flist.sort >> $pgmout
     export err=$?; err_chk
 
     msg="Done processing $CTYPE for ${START_DATE} to ${END_DATE}"

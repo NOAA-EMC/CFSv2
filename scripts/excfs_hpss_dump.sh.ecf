@@ -21,7 +21,7 @@ echo "History: Aug 31 2010 - Original script."
 #                   Default is "YES"
 ###########################################################################
 
-set -ua
+set -uax
 
 # Make sure we are in the $DATA directory
 
@@ -32,8 +32,9 @@ postmsg "$jlogfile" "$msg"
 
 # copy the cdas dump from history
 
-CDATE=$PDY$cyc
+export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}  
 
+CDATE=$PDY$cyc
 year=$(echo $CDATE|cut -c 1-4)
 mnth=$(echo $CDATE|cut -c 5-6)
 days=$(echo $CDATE|cut -c 7-8)
@@ -44,20 +45,106 @@ cd $COMOUT ||exit 99
 htar -xvf /NCEPPROD/hpssprod/runhistory/cfs$year/$year$mnth/$year$mnth$days/Analysis/cfs.dumps.$PDY.tar  \*$txxz\*
 rm -f cdas1.$txxz.cmapgrb
 
-[[ ! -s $COMOUT/cdas1.$txxz.adpupa.tm00.bufr_d ]] && exit 99
+[[ ! -s ${COMSP}adpupa.tm00.bufr_d ]] && exit 99
 
 # copy the tcvitals from rtdumps
 
-set -ex
-
 mach=$(hostname|cut -c 1-1)
 [[ $mach = t ]] && mach=tide
+[[ $mach = m ]] && mach=tide   
 [[ $mach = g ]] && mach=gyre
-[[ $mach = v ]] && mach=venus
-[[ $mach = m ]] && mach=mars   
+[[ $mach = v ]] && mach=gyre 
 
 rtdump=/sss/emc/climate/shared/emc.climpara/rtdump/$CDATE/gdas
 scp $mach:$rtdump/tcvitl.gdas.$CDATE  $COMOUT/cdas1.$txxz.syndata.tcvitals.tm00
+
+# dump ocean bufr data ###########################################################################
+
+cd $DATA
+
+if [ ${PROCESS_OCN_DUMP:-NO} = YES ]; then
+
+### dump ocean data
+DUMPMB=${DUMPMB:-$HOMEcfs/ush/bufr_dumpmb}
+DUMP_LIST="dbuoy bathy tesac"
+LOUD=${LOUD:-off}
+GODAS_WNDO=${GODAS_WNDO:-10}
+START_DATE=`finddate.sh $PDY d-$GODAS_WNDO`
+END_DATE=$PDY
+
+for CTYPE in $DUMP_LIST; do
+  $DUMPMB  $START_DATE  $END_DATE  $CTYPE  ###> dumpmb.$CTYPE.output 2>dumpmb.$CTYPE.errfile
+
+#  dumpstat=$?
+#  echo status from dump is $dumpstat
+#  if [ $dumpstat -ne 0 ]; then
+#    msg="Fatal error -- $DUMPMB failed for $CTYPE for dates ${START_DATE} to ${END_DATE}"
+#    postmsg "$jlogfile" "$msg"
+#    export err=$dumpstat; err_chk
+#  fi
+
+  echo
+  pwd; ls
+  echo
+
+  flist=$CTYPE.list
+  [ -f $flist ] && rm $flist
+
+  DATE=$START_DATE
+  while [ $DATE -le $END_DATE ]; do
+  if [ -s $CTYPE.$DATE ]; then
+    echo $CTYPE.$DATE >> $flist
+  else
+    msg="Warning:  NO $CTYPE DUMP FOR ${DATE}"
+      postmsg "$jlogfile" "$msg"
+  fi
+  DATE=`finddate.sh $DATE d+1`
+  done
+
+  if [ -s $flist ]; then
+    sort $flist > $flist.sort
+    set +u
+    . prep_step
+    set -u
+    ln -sf $CTYPE.all fort.50
+
+    $HOMEobsproc_dump/exec/bufr_combfr < $flist.sort >> $pgmout
+    export err=$?; err_chk
+
+    msg="Done processing $CTYPE for ${START_DATE} to ${END_DATE}"
+    postmsg "$jlogfile" "$msg"
+
+    if [ "$SENDCOM" = 'YES' ]; then
+      [ -s $CTYPE.all ] && cp $CTYPE.all ${COMSP}c${CTYPE}.$tmmark.mbufr_d
+
+      # CTYPE could be dbuoy bathy or tesac
+      if [ $SENDDBN = YES ]; then
+        $DBNROOT/bin/dbn_alert MODEL CDAS1_BUFR_${CTYPE} $job ${COMSP}c${CTYPE}.$tmmark.mbufr_d
+      fi
+    fi
+  fi
+
+done
+
+export STATUS=YES
+
+fi   #  endif $PROCESS_OCN_DUMP
+
+#================================================================
+#================================================================
+
+
+# GOOD RUN
+set +x
+echo " "
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " ****** PROCESSING COMPLETED NORMALLY"
+echo " "
+set -x
+
+
 
 # normal ending
 

@@ -7,6 +7,7 @@
 !
 ! PROGRAM HISTORY LOG:
 ! 2018-05-15  JWoollen    ORIGINAL VERSION FOR IMPLEMENTATION
+! 2019-05-15  JWoollen    FIX BUG IN CONVERTING WPRES TO DBSS
 !
 ! USAGE:
 !   INPUT FILES:
@@ -43,7 +44,7 @@
       CHARACTER*8  CARR(MAX1,MAX2) 
       EQUIVALENCE  (ARR,CARR)
       LOGICAL      COMPRESS,argos
-      REAL*8       ARR(MAX1,MAX2)
+      REAL*8       ARR(MAX1,MAX2),p,z
  
       DATA LUBFR/20/
       DATA LUBFO/50/
@@ -94,7 +95,14 @@
       ! copy subsurface elements converting WPRES to DBSS
 
       CALL UFBINT(LUBFR,ARR,MAX1,MAX2,IRET,'SSTH SALNH WPRES')
-      ARR(3,:)=10.*(101325.+ARR(3,:))/101325. ! convert water pressure to depth below sea surface
+
+      do i=1,iret          ! loop over report levels 
+      p = ARR(3,i)/10000.  ! converting wpres from Pa to dbar
+      z = ((-3.434e-12*p+1.113e-7)*p+0.712953)*p + 14190.7*log(1.0+1.83e-5*p)
+      z = (z/(980.+1.113e-4*p))*1000.
+      ARR(3,i)=z
+      enddo
+      
       CALL UFBINT(LUBFO,ARR,MAX1,IRET,JRET,'STMP SALN  DBSS ')
 
       ! copy the WMOP (numeric) to RPID (char) and left justify RPID string 

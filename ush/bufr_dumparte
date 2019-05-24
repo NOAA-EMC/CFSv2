@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uxa
 
-export DUMPOPS=${DUMPOPS:-$HOMEdump/ush/dumpjb}
+export DUMPOPS=${DUMPJB:-$HOMEdump/ush/dumpjb}
 
 if [[ $3 = tesac && $# -eq 3 ]]; then
 
@@ -9,7 +9,7 @@ if [[ $3 = tesac && $# -eq 3 ]]; then
 
   export DUPC=OFF
   export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-  export ARGOTANK=${ARGOTANK:-/dcom/us007003} 
+  export ARGOTANK=${ARGOTANK:-$DCOMROOT} 
   export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
 
   rm -f tesac.ibm tesac.org argomods

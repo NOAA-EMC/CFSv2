@@ -46,7 +46,7 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
 
-export HOMEobsproc_dump=$HOMEdump
+export HOMEobsproc_dump=${HOMEobsproc_dump:-$HOMEdump}
 
 ##############################################
 # Define COM directories
@@ -57,8 +57,8 @@ export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m 755 -p $COMOUT
 
 export COM_GDAS=${COM_GDAS:-/gpfs/hps/nco/ops/com/gfs/prod}
+export TANK_GRIBFLDS=${TANK_GRIBFLDS:-$DCOMROOT}             
 export COM_SSTOIQD=${COM_SSTOIQD:-/com/omb/prod/sstoiqd}
-export TANK_GRIBFLDS=${TANK_GRIBFLDS:-/dcom/us007003}
 export COM_ENGICE=${COM_ENGICE:-/com2/omb/prod/sice}
 export COMGDAS=$COM_GDAS/gdas.${PDY}
 

@@ -338,7 +338,7 @@ while [ $cymd -le $cymd2 ] ; do
     [ -z "$DCOMROOT" ] && DCOMROOT=/dcom
     DCOM=${DCOMROOT}
 
-    TANK=$DCOM/us007003
+    TANK=$DCOM ####/us007003
     [ -n "$userTANK" ] && TANK=$userTANK
 
 
@@ -559,7 +559,7 @@ while [ $cymd -le $cymd2 ] ; do
         chmod 644 $DATA/$mfile
         RC_MAX=0
       else # MODS file not exist
-        echo "dumpmb: ! MODS file ($mfile) not found in archive"
+        echo "dumpmb: ! MODS file ($mfile) not found in $mspec archive"
         echo "dumpmb: !!! No online data available for dType '$DTYP' on $cymd"
         if [ 32 -gt $RC_MAX ] ; then RC_MAX=32 ; fi
       fi # MODS file exists
