@@ -7,7 +7,7 @@ mac2=$(hostname | cut -c1-2)
 #debug=YES                                       # turn on debug mode     - default - NO
  make_post_lib=YES                               # create post library    - default - NO
  make_post_exec=YES                              # create post executable - default - YES
-#make_nowrf=YES                                  # compile with wrf stub instead of WRF lib
+ make_nowrf=YES                                  # compile with wrf stub instead of WRF lib
 ################################# options ###############################################
 #
 if [ $mac2 = ga ] ; then                         # For GAEA

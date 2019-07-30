@@ -16,5 +16,5 @@ export LDFLAGSM="-qopenmp -auto"
 export OMPFLAGM="-qopenmp -auto"
 
 make -f Makefile clean
-make -f Makefile
+make -f Makefile install
 make -f Makefile clean

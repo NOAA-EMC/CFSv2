@@ -48,6 +48,8 @@ chgres.o: chgres.f
 	$(FC) $(FFLAGS) $(OMPFLAG) -I $(INCMOD1) -I $(INCMOD2) -I $(INCMOD3) -I $(INCMOD4) -c chgres.f
 clean:
 	-rm -f $(OBJS) *.mod
+install:
+	-cp $(CMD) ../../exec/.
 clobber:        clean
 	-rm -f $(CMD)
 void:   clobber
