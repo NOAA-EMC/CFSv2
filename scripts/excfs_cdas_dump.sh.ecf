@@ -187,6 +187,8 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 # copy the production GDAS DUMP files
 #              and rename them to cdas1 files to be saved in the CDAS directory
   
+  COMGDAS=$COMGDAS/$cyc ## need this for new com structure
+
   # bufr_d files
   for gdasfile in `ls $COMGDAS/$gdas1.t${cyc}z.*bufr_d |awk ' BEGIN { FS="/"} { print $NF }'`
   do
