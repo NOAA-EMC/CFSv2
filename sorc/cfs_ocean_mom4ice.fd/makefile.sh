@@ -1,5 +1,12 @@
 #!/bin/bash
 # compile mom4ice & coupler
+
+set +x
+echo
+module unload impi/18.0.1
+module load smpi/10.1.1.0
+module list
+echo
 set -x
 
 root=`pwd`
