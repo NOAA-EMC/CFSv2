@@ -73,7 +73,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays 0.5 degree snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s  $COMGDAS/$gdas1.t${cyc}z.snogrb ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb $COMOUT/${RUN}.t${cyc}z.snogrb
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb $COMOUT/${COMSP}snogrb
    else
       set +x
       echo " "
@@ -99,7 +99,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays T574 snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 $COMOUT/${RUN}.t${cyc}z.snogrb_t574
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 $COMOUT/${COMSP}snogrb_t574
    else
       set +x
       echo " "
@@ -125,7 +125,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays engice grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.engicegrb $COMOUT/${RUN}.t${cyc}z.engicegrb
+      cp $COMGDAS/$gdas1.t${cyc}z.engicegrb $COMOUT/${COMSP}engicegrb
    else
       set +x
       echo " "
@@ -197,14 +197,14 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
   done
 
   # tcvital files
-  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 $COMOUT/${RUN}.t${cyc}z.syndata.tcvitals.tm00
-  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 $COMOUT/${RUN}.t${cyc}z.jtwc-fnoc.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 $COMOUT/${COMSP}syndata.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 $COMOUT/${COMSP}jtwc-fnoc.tcvitals.tm00
 
   # RFC #1550 Update WCOSS to send more CDAS data to NOMADS -20151211
   if [ $SENDDBN = YES ]; then
      fname=ascatw
      alerttype=CDAS1_BUFR_${fname}
-     file=$COMOUT/${RUN}.t${cyc}z.${fname}.tm00.bufr_d
+     file=$COMOUT/${COMSP}${fname}.tm00.bufr_d
      if [ -s ${file} ]; then
        $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
      else
@@ -213,7 +213,7 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 
      for fname in omi ascatt ; do
        alerttype=CDAS1_MSC_${fname}
-       file=$COMOUT/${RUN}.t${cyc}z.${fname}.tm00.bufr_d
+       file=$COMOUT/${COMSP}${fname}.tm00.bufr_d
        if [ -s ${file} ]; then
          $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
        else
