@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ########################################
 # CFS AWIPS PRODUCT GENERATION
@@ -39,7 +39,7 @@ setpdy.sh
 . PDY
 
 # Input file size to check, usually file size with full records is around 38000KB to 49000KB
-MINIMUM_SIZE=30000
+export MINIMUM_SIZE=30000
 
 # Check for the latest data to use 
 if [ $cyc -eq 00 -o $cyc -eq 12 ]; then
@@ -60,14 +60,13 @@ export FIXcfs=$HOMEcfs/fix
 ########################################
 # Set up the com directory
 ########################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export  COMROT=$COMROOT/${NET}/${envir}
+export   COMIN=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
+export  COMOUT=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
+export COMINm1=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${PDYm1}
 mkdir -m755 -p $COMOUT
 
-export COMINm1=$com/${NET}/${envir}/${RUN}.${PDYm1}
 export pcom=${pcom:-$PCOMROOT/${envir}/cfs}
-
 mkdir -p $COMOUT $pcom
 
 env
