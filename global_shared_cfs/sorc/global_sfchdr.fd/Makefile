@@ -10,6 +10,6 @@ CMD     =global_sfchdr
 $(CMD): $(SRCM) $(OBJS)
 	$(FC) -I $(INCMOD) $(FFLAGS) $(SRCM) $(OBJS) $(LIBS) -o $(CMD)
 install:
-	-cp -p $(CMD) ../../exec/.
+	-mv $(CMD) ../../exec/.
 clean:
 	-rm -f $(OBJS) $(CMD)

@@ -21,6 +21,6 @@ cycle.o:	cycle.f
 	$(FC)  -I $(INCMOD) $(FFLAGS) -c cycle.f
 
 install:
-	-cp -p $(CMD) ../../exec/.
+	-mv $(CMD) ../../exec/.
 clean:
 	-rm -f $(OBJS) *.mod

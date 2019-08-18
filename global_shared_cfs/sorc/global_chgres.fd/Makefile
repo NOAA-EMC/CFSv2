@@ -49,7 +49,7 @@ chgres.o: chgres.f
 clean:
 	-rm -f $(OBJS) *.mod
 install:
-	-cp $(CMD) ../../exec/.
+	-mv $(CMD) ../../exec/.
 clobber:        clean
 	-rm -f $(CMD)
 void:   clobber

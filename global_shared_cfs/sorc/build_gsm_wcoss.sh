@@ -8,15 +8,10 @@ set -euax
 
 set +x
 module purge
-#module load ../modulefiles/gfs/gsm_v13.0.0
 source dell-mods.sh
 set -x
 
 curdir=$PWD  
-
-##cd ${curdir}/global_fcst.fd 
-##makefile_wcoss.sh                    
-##
 
 cd ${curdir}/global_chgres.fd
 makefile.sh

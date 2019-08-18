@@ -30,3 +30,4 @@ module load xmlparse/2.0.0
 module load landsfcutil/2.1.0
 
 module list
+set -x

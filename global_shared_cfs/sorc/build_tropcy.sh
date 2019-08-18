@@ -16,10 +16,12 @@
 set -x -e
 
 ###. /usrx/local/Modules/3.2.10/init/sh
+set +x
 module purge
 ##module load ../modulefiles/Module_storm_reloc_v5.1.0_WCOSS
 source dell-mods.sh
 module list
+set -x
 
  export INC="${G2_INCd}"
  export LIBS="${W3EMC_LIBd} ${W3NCO_LIBd} ${BACIO_LIB4} ${G2_LIBd} ${PNG_LIB} ${JASPER_LIB} ${Z_LIB}"
