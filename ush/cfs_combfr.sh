@@ -54,7 +54,7 @@ echo
 err_exit 99
 fi
  
-COMX=${COMX:-$HOME_obsproc_dump/exec/bufr_combfr}               
+COMX=${COMX:-$HOMEcfs/exec/bufr_combfr}               
 COMI=combfr.in; >$COMI
  
 while [ $# -gt 1 ] ; do

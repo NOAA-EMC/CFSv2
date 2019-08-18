@@ -119,6 +119,8 @@ C$$$
 
       DATA  LAST/'XXXXXXXX'/
 
+      real(8) bmiss
+
       include "mpif.h"
 
 !--------------------------------------------------------------------------
@@ -126,6 +128,8 @@ C$$$
       call mpi_comm_rank(MPI_COMM_WORLD,myid,ierr)
       call mpi_comm_size(MPI_COMM_WORLD,nprc,ierr)
 !--------------------------------------------------------------------------
+
+      bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
 
       if(myid==0)then
       CALL W3TAGB('PREPOBS_PREVENTS',2001,0283,0061,'NP22')
