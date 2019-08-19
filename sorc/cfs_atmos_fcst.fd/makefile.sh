@@ -2,14 +2,28 @@
 
 set +x
 echo
-module unload impi/18.0.1  
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
 module load smpi/10.1.1.0
+module load ESMF/4_0_0rp2
+module load NetCDF/3.6.3
+module load bacio/2.0.2
+module load nemsio/2.2.3
+module load sp/2.0.2
+module load w3emc/2.3.0
+module load w3nco/2.0.6
+module load bufr/11.2.0
+module load ip/3.0.1
+module load sfcio/1.0.0
+module load sigio/2.0.1
+module load gfsio/1.1.0
+module load landsfcutil/2.1.0
 module list
 echo
 set -x
 
 machine=wcoss
-ptmp="/gpfs/dell2/ptmp/$USER/Jack/makefcst"
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian
@@ -21,6 +35,7 @@ sorc_dir=$(pwd)
 exec_dir=$(pwd)
 mkdir -p $exec_dir
 
+ptmp=/gpfs/dell2/ptmp/$USER/Jack/makefcst
 make_dir=$ptmp/branch/sorc/$(basename $sorc_dir)
 
 #####################################################################
@@ -31,12 +46,9 @@ if [ $make_dir = $(pwd) ] ; then
 fi
 #####################################################################
 
-mkdir -p $make_dir
+rm -rf $make_dir; mkdir $make_dir
 cd $make_dir || exit 99
 [ $? -ne 0 ] && exit 8
-
-rm $make_dir/*.o
-rm $make_dir/*.mod
 
 tar -cf- -C$sorc_dir .|tar -xf-
 
@@ -65,11 +77,11 @@ export OPTS90M="$OPTSBT   -r8 "
 export OPTS90AM="$OPTSBT  -r8 "
 export LDFLAGSM=$PGSZM
 
-export F77M=mpiifort    
-export F90M=mpiifort   
+export F77M=mpif90      
+export F90M=mpif90     
 export F77B=$F77M
 export FCC=mpicc
-export LDRM=mpiifort
+export LDRM=mpif90   
 export LDFLAGSM="$PGSZM -qopenmp -mkl"
 export FINC=   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"

@@ -21,7 +21,7 @@ export FITSSH=${FITSSH:-$USHcfs/${cfsd}fits.sh}
 export HORZSH=${HORZSH:-$USHcfs/${cfsd}horizn.sh}
 export CNVDIAGEXEC=${CNVDIAGEXEC:-$EXECcfs/${cfsp}post_convdiag}
 
-export PRVT=${PRVT:-$HOMEobsproc_network/fix/prepobs_errtable.global}
+export PRVT=${PRVT:-$HOMEprep/fix/prepobs_errtable.global}
 export PREX=${PREX:-$HOMEcfs/exec/cfs_prevmpi}
 
 export CHGRP_RSTPROD=${CHGRP_RSTPROD:-YES}

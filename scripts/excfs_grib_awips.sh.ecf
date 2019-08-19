@@ -79,7 +79,7 @@ do
   export FORT31=" "
   export FORT51=grib2_cfs_${type}.01.${cfs_day}${cyc}.daily
 
-  $TOCGRIB2 < $HOMEcfs/parm/grib2_cfs_${type}.01.daily
+  $HOMEcfs/exec/tocgrib2_cfs < $HOMEcfs/parm/grib2_cfs_${type}.01.daily
 
   err=$?;export err ;err_chk
   echo " error from tocgrib2=",$err

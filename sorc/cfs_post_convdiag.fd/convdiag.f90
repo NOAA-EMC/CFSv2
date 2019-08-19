@@ -48,6 +48,8 @@
 !-----------------------------------------------------------------------------
 !-----------------------------------------------------------------------------
 
+    bmiss=10e10; call setbmiss(bmiss) ! this sets bufrlib missing value to 10e10
+
    jnt=0; knt=0; nnt=0; mmt=0; nrep=0; nrex=0; iwrk=1; nmatch=0
 
 !  read the 1stguess conv_diag events file and sort into shape
