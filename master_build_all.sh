@@ -2,6 +2,7 @@
 set -euax
 
 export REPOROOT=$PWD  
+export WRFPATH=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/wrf_shared.v1.1.0
 
 [[ $# -eq 0 || $1 = cfs ]] && { cd $REPOROOT/sorc; mkdir -p ../exec; build_all.dell; }
 

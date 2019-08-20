@@ -46,7 +46,7 @@ if [ $make_dir = $(pwd) ] ; then
 fi
 #####################################################################
 
-rm -rf $make_dir; mkdir $make_dir
+rm -rf $make_dir; mkdir -p $make_dir
 cd $make_dir || exit 99
 [ $? -ne 0 ] && exit 8
 

@@ -20,8 +20,8 @@ source dell-mods.sh
 module list
 set -x
 
-CRTM_LIB=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository/global_shared_cfs/CRTMv206/libcrtm_v2.0.6.a
-CRTM_INC=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository/global_shared_cfs/CRTMv206/incmod/crtm_v2.0.6
+CRTM_LIB=$REPOROOT/global_shared_cfs/CRTMv206/libcrtm_v2.0.6.a
+CRTM_INC=$REPOROOT/global_shared_cfs/CRTMv206/incmod/crtm_v2.0.6
 
 cd ncep_post.fd
 

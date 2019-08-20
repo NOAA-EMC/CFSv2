@@ -24,7 +24,7 @@ CPP      = /lib/cpp -P
 CPPFLAGS = -DLINUX 
 FREE     = -FR
 
-WRFPATH    = /gpfs/gp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
+#WRFPATH    = /gpfs/gp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
 #WRFPATH    = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
 #WRFPATH    = /gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
 
