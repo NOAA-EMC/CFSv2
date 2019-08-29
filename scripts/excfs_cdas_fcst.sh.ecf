@@ -1300,9 +1300,7 @@ EOF
   export nhourb=${nhourb:-$FHINI}
   if [ ! "$standalone" ] ; then
     if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-      ##$APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
-      ##mpirun cfp $MP_CMDFILE
-      mpirun -n 1 $PGM_c : -n 56 $PGM_oc : -n 195 $PGM_am
+      mpirun -mxm -n 1 $PGM_c : -n 56 $PGM_oc : -n 195 $PGM_am
     else
       export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N8 -d3"}
       export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o"}
@@ -1316,6 +1314,7 @@ EOF
     export err=$ERR; err_chk
     separate_stdout=${separate_stdout:-$EXECcfs/${cfsp}separ3}
     stdout=${STDOUT_TYPE:-unordered}
+
     if [ "$stdout" = mess ] ; then
       echo $npf_c $npf_o $npf_a $npl_c $npl_o $npl_a | $separate_stdout out.poe.$nhourb out.C.$nhourb out.OM.$nhourb out.AM.$nhourb
 #      echo $npf_c $npf_o $npf_a $npl_c $npl_o $npl_a | $separate_stdout err.poe err.C err.OM err.AM

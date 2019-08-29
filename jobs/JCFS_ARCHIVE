@@ -64,8 +64,15 @@ export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 #
 # Execute the script.
-#
-mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+# mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
+
+echo
+cat poescript
+echo
+
+### mpirun cfp poescript
+
+chmod +x poescript.sh; poescript.sh
 export err=$?; err_chk
 
 cd $DATA

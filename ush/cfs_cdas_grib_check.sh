@@ -32,6 +32,7 @@ while [ $((fh+=fhout)) -le $fhmax ] ; do
 		file=$filetype$fhr.$cdump.$cdate
 		nrec=$($WGRIB -4yr $file|wc -l) 
 		[ $cdate -eq $cdate1 ] && nr1=$nrec
+############### echo $cdate $cdate1 $file $nrec $nr1
 		if [ $nr1 -ne $nrec ] ; then
 			echo "record counts differ $nrec -ne $nr1 $file"; exit 1
 		fi

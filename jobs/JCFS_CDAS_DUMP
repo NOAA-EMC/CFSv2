@@ -60,7 +60,7 @@ export COM_GDAS=${COM_GDAS:-/gpfs/hps/nco/ops/com/gfs/prod}
 export TANK_GRIBFLDS=${TANK_GRIBFLDS:-$DCOMROOT}             
 export COM_SSTOIQD=${COM_SSTOIQD:-/com/omb/prod/sstoiqd}
 export COM_ENGICE=${COM_ENGICE:-/com2/omb/prod/sice}
-export COMGDAS=$COM_GDAS/gdas.${PDY}
+export COMGDAS=$COM_GDAS/gdas.${PDY}/$cyc
 
 
 ########################################################################

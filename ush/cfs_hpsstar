@@ -156,6 +156,9 @@ fi
 HSI="/usrx/local/hpss/hsi"
 HTAR="/usrx/local/hpss/htar"
 
+HSI=$(which hsi)
+HTAR=$(which htar)
+
 set -u
 usage="\
 Usage:  $0  man
