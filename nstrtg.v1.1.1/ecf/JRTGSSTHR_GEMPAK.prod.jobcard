@@ -1,0 +1,37 @@
+set -x
+export envir=prod
+export job=rtgssthr_gempak
+export pid=$$
+export jobid=${job}.$pid
+export RUN_ENVIR=nco
+export SENDECF=YES
+export SENDDBN=YES
+export SENDDBN_NTC=NO
+. /usrx/local/Modules/default/init/ksh
+module load prod_envir
+module load prod_util
+module load grib_util
+module load gempak
+export COMROOT=/com2
+export DCOMROOT=/dcom
+
+if [ "$envir" = 'prod' ] ; then
+  export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+else
+  export jlogfile=${COMROOT}/logs/${envir}/jlogfile.${job}.${pid}
+  export DBNROOT=/nwprod/spa_util/fakedbn
+fi
+
+export DATAROOT=/tmpnwprd_d3
+export DBNROOT=/iodprod/dbnet_siphon
+export SENDCOM=YES
+export SENDWEB=NO
+export KEEPDATA=NO
+export cyc=12
+export model=rtgssthr
+export NWROOT=/nw$envir
+VERSION_FILE=${NWROOT}/versions/${model}.ver
+[ -f $VERSION_FILE ] && . $VERSION_FILE
+modelver=$(eval echo \${${model}_ver})
+export HOMErtgsst=${NWROOT}/${model}.$modelver
+ksh ${HOMErtgsst}/jobs/JRTGSSTHR_GEMPAK

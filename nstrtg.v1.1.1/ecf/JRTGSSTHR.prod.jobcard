@@ -1,0 +1,52 @@
+set -x
+export envir=prod
+export job=jrtgssthr
+export pid=$$
+export jobid=${job}.$pid
+export RUN_ENVIR=nco
+export SENDECF=YES
+export SENDDBN=YES
+export SENDDBN_NTC=NO
+. /usrx/local/Modules/default/init/ksh
+module load prod_envir
+module load prod_util
+module load grib_util
+export COMROOT=/com2
+export DCOMROOT=/dcom
+
+if [ "$envir" = 'prod' ] ; then
+  export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+else
+  export jlogfile=${COMROOT}/logs/${envir}/jlogfile.${job}.${pid}
+  export DBNROOT=/nwprod/spa_util/fakedbn
+fi
+
+export DATAROOT=/tmpnwprd_d3
+export DBNROOT=/iodprod/dbnet_siphon
+export SENDCOM=YES
+export SENDWEB=NO
+export KEEPDATA=NO
+export cyc=12
+export model=rtgssthr
+
+ulimit -s unlimited
+export OMP_NUM_THREADS=1
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+export MP_TASK_AFFINITY=core:1
+export MP_EUIDEVELOP=min
+export KMP_STACKSIZE=1024m
+export MPICH_ALLTOALL_THROTTLE=0
+export MP_SINGLE_THREAD=yes
+export MP_EAGER_LIMIT=65536
+export MP_USE_BULK_XFER=yes
+export MP_SHARED_MEMORY=no
+export MP_MPILIB=mpich2
+export MP_LABELIO=yes
+
+export NWROOT=/nw$envir
+VERSION_FILE=${NWROOT}/versions/${model}.ver
+[ -f $VERSION_FILE ] && . $VERSION_FILE
+modelver=$(eval echo \${${model}_ver})
+export HOMErtgsst=${NWROOT}/${model}.$modelver
+ksh ${HOMErtgsst}/jobs/JRTGSSTHR

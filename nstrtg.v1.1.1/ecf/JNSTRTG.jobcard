@@ -1,0 +1,46 @@
+set -x
+export envir=dev
+export job=jnstrtg
+export pid=$$
+export jobid=${job}.$pid
+export RUN_ENVIR=not_nco
+export SENDECF=YES
+export SENDDBN=YES
+export SENDDBN_NTC=NO
+
+. $MODULESHOME/init/ksh
+
+module purge
+module load ips/18.0.1.163
+module load impi/18.0.1
+
+module load NetCDF/4.5.0
+module load nemsio/2.2.3
+module load w3nco/2.0.6
+module load bacio/2.0.2
+
+module load prod_envir
+module load prod_util
+module load grib_util
+
+module list
+
+if [ "$envir" = 'prod' ] ; then
+  export jlogfile=${COMROOT}/logs/jlogfiles/jlogfile.${job}.${pid}
+else
+  export NWROOT=/gpfs/dell2/emc/modeling/noscrub/Xu.Li
+  export COMROOT=/gpfs/dell3/ptmp/Xu.Li
+  export DATAROOT=/gpfs/dell2/ptmp/Xu.Li
+  export jlogfile=${COMROOT}/logs/${envir}/jlogfile.${job}.${pid}
+fi
+
+export SENDCOM=YES
+export SENDWEB=NO
+export KEEPDATA=NO
+export cyc=12
+export model=nstrtg
+
+modelver=v1.1.1
+
+export HOMEnstrtg=${NWROOT}/${model}.$modelver
+ksh ${HOMEnstrtg}/jobs/JNSTRTG
