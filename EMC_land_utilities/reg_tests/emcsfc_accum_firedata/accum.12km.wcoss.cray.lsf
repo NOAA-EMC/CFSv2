@@ -1,0 +1,91 @@
+#!/bin/ksh
+
+set -x
+
+#-----------------------------------------------------
+# Script to run the emcsfc_accum_firedata program
+# on WCOSS-Cray.
+#
+# Invoke this script as follows:
+# cat ${script_name} | bsub
+#-----------------------------------------------------
+
+#BSUB -P NAM-T2O
+#BSUB -oo accum.12km.log
+#BSUB -eo accum.12km.log
+#BSUB -q dev
+#BSUB -J accum_12
+#BSUB -W 0:05
+#BSUB -M 500
+#BSUB -cwd .
+#BSUB -extsched 'CRAYLINUX[]'
+
+WORK=/gpfs/hps/ptmp/$LOGNAME/accum_12km.fire
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+if [ -d /gpfs/gd1/emc/global/ ]; then
+   INPUT_DIR="/gpfs/gd1/emc/global/noscrub/George.Gayno/fire_data/data"
+elif [ -d /gpfs/td1/emc/global/ ]; then
+   INPUT_DIR="/gpfs/td1/emc/global/noscrub/George.Gayno/fire_data/data"
+else
+   echo CANT FIND INPUT DIRECTORY.  EXIT.
+   exit 2
+fi
+
+# first do a 30-day accumulation
+cat > ./fort.41 << !
+ &setup
+   start_year=2014
+   start_month=8
+   start_day=1
+   start_hour=0
+   end_year=2014
+   end_month=8
+   end_day=31
+   end_hour=0
+   file_resolution_in_km=12
+   input_file_dir="$INPUT_DIR"
+   output_file="./accum.fire.30day.12km.grib2"
+ /
+!
+
+MAIN_DIR=${LS_SUBCWD}/../../exec
+
+#-------------------------------------------------------------------
+# "-j 1" means no hyperthreading
+# "-n"   total number of tasks
+# "-N"   tasks per node
+#-------------------------------------------------------------------
+
+export NODES=1
+# run with 1 mpi task
+aprun -j 1 -n 1 -N 1 ${MAIN_DIR}/emcsfc_accum_firedata
+# run with 4 mpi tasks
+#aprun -j 1 -n 4 -N 4 ${MAIN_DIR}/emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+# then do a 48 hour accumulation.
+cat > ./fort.41 << !
+ &setup
+   start_year=2014
+   start_month=8
+   start_day=1
+   start_hour=0
+   end_year=2014
+   end_month=8
+   end_day=4
+   end_hour=0
+   file_resolution_in_km=12
+   input_file_dir="$INPUT_DIR"
+   output_file="./accum.fire.2day.12km.grib2"
+ /
+!
+
+aprun -j 1 -n 1 -N 1 ${MAIN_DIR}/emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+exit 0

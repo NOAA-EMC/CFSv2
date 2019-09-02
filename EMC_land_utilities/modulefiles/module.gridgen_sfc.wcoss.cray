@@ -1,0 +1,46 @@
+#%Module#################################################################
+proc ModulesHelp { } {
+  puts stderr "Set environment variables for WCOSS-Cray emcsfc_gridgen_sfc driver build"
+}
+
+module-whatis "Set environment variables for WCOSS-Cray emcsfc_gridgen_sfc driver build"
+
+set ver 1.1.0
+
+# intel compiler
+
+module load PrgEnv-intel
+module load craype-haswell
+
+setenv FCOMP ftn
+setenv FFLAGS "-O3 -fp-model strict -convert big_endian -r8 -i4 -craype-verbose"
+setenv LDFLAGS "-openmp"
+
+module load g2-intel/2.5.0
+module load ip-intel/3.0.0
+module load sp-intel/2.0.2
+module load bacio-intel/2.0.1
+module load w3nco-intel/2.0.6
+module load w3emc-intel/2.2.0
+module load jasper-gnu-haswell/1.900.1
+module load zlib-intel-haswell/1.2.7
+module load png-intel-haswell/1.2.49
+
+# cray compiler
+
+#module load PrgEnv-cray
+#module load craype-haswell
+
+#setenv FCOMP ftn
+#setenv FFLAGS "-O2 -h byteswapio -s real64 -s integer32 -craype-verbose"
+#setenv LDFLAGS " "
+
+#module load g2-cray-haswell/2.5.0
+#module load ip-cray-haswell/3.0.0
+#module load sp-cray-haswell/2.0.2
+#module load bacio-cray-haswell/2.0.1
+#module load w3nco-cray-haswell/2.0.6
+#module load w3emc-cray-haswell/2.2.0
+#module load jasper-gnu-haswell/1.900.1
+#module load zlib-cray-haswell/1.2.7
+#module load png-gnu-haswell/1.2.49

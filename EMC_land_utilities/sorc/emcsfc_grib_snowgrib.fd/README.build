@@ -1,0 +1,14 @@
+Instructions for building and installing emcsfc_grib_snowgrib:
+
+1) Invoke the 'make.sh' driver script from the command line:
+
+   "make.sh"
+
+The "make.sh" driver script loads modules (for the compiler and NCEPLIBS)
+and exports environment variables required by the makefile.  It then
+invokes the makefile.
+
+If the program is successfully built, it will be installed
+in the ../../exec directory.
+
+Only tested on Zeus and the NCEP WCOSS machine.

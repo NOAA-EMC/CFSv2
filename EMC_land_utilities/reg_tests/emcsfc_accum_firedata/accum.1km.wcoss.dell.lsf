@@ -1,0 +1,86 @@
+#!/bin/bash
+
+#-----------------------------------------------------
+# Run the accum_firedata program on wcoss dell.
+#
+# Invoke this script as follows:
+# cat $script | bsub
+#-----------------------------------------------------
+
+#BSUB -oo accum.1km.log
+#BSUB -eo accum.1km.log
+#BSUB -M 3000
+#BSUB -q debug
+#BSUB -P NAM-T2O
+#BSUB -J accum_1
+#BSUB -W 0:05
+#BSUB -x                  # not shared
+#BSUB -n 1                # total tasks
+#BSUB -R "span[ptile=1]"  # tasks per node
+#BSUB -R "affinity[core(1):distribute=balance]"
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+module load impi/18.0.1
+module load lsf/10.1
+module list
+
+WORK=/gpfs/dell1/stmp/$LOGNAME/accum_1km.fire
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+if [[ -d /gpfs/gp1/nco/ops/dcom/us007003/burned_area ]]; then
+  input_dir=/gpfs/gp1/nco/ops/dcom/us007003/burned_area
+else
+  input_dir=/gpfs/tp1/nco/ops/dcom/us007003/burned_area
+fi
+
+# first do a 30-day accumulation
+cat > ./fort.41 << !
+ &setup
+   start_year=2018
+   start_month=12
+   start_day=25
+   start_hour=0
+   end_year=2019
+   end_month=1
+   end_day=15
+   end_hour=0
+   file_resolution_in_km=1
+   input_file_dir="${input_dir}"
+   output_file="./accum.fire.30day.1km.grib2"
+ /
+!
+
+MAIN_DIR=${LS_SUBCWD}/../../exec
+cp ${MAIN_DIR}/emcsfc_accum_firedata .
+mpirun ./emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+# then do a 48 hour accumulation.
+cat > ./fort.41 << !
+ &setup
+   start_year=2019
+   start_month=1
+   start_day=10
+   start_hour=0
+   end_year=2019
+   end_month=1
+   end_day=12
+   end_hour=0
+   file_resolution_in_km=1
+   input_file_dir="${input_dir}"
+   output_file="./accum.fire.2day.1km.grib2"
+ /
+!
+
+mpirun ./emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+exit 0

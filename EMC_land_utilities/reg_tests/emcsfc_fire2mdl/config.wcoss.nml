@@ -1,0 +1,12 @@
+ &source_data
+  nesdis_1km_fire_file="/global/noscrub/George.Gayno/fire_case_2014082300/accum.fire.30day.1km.grib2"
+  nesdis_12km_fire_file=""
+ /
+ &model_specs
+  model_lat_file="/nwprod/fix/nam_hpnt_latitudes.grb"
+  model_lon_file="/nwprod/fix/nam_hpnt_longitudes.grb"
+  model_lsmask_file="/nwprod/fix/nam_slmask.grb"
+ /
+ &output_data
+  model_fire_file="./accum.fire.30day.nam.grib2"
+ /

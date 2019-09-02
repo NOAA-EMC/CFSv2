@@ -1,0 +1,45 @@
+#!/bin/bash
+ 
+#-----------------------------------------------------
+# Run the fire2mdl program by invoking its 'ush'
+# script on wcoss dell.
+#
+# Invoke this script as follows:
+# cat $script | bsub
+#-----------------------------------------------------
+
+#BSUB -oo fire2mdl.log
+#BSUB -eo fire2mdl.log
+#BSUB -q debug
+#BSUB -R affinity[core(1)]
+#BSUB -J fire2mdl
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+
+HOMEemcsfc=${LS_SUBCWD}/../..
+export HOMEemcsfc
+
+#export NESDIS_12KM_FIRE_FILE="/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/fire2mdl/accum.fire.30day.12km.grib2"
+export NESDIS_1KM_FIRE_FILE="/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/fire2mdl/accum.fire.30day.1km.grib2"
+
+export MODEL_LATITUDE_FILE="/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/fire2mdl/nam_hpnt_latitudes.grb"
+export MODEL_LONGITUDE_FILE="/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/fire2mdl/nam_hpnt_longitudes.grb"
+export MODEL_LSMASK_FILE="/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/fire2mdl/nam_slmask.grb"
+
+export DATA="/gpfs/dell1/stmp/$LOGNAME/fire2mdl"
+rm -fr $DATA
+mkdir $DATA
+cd $DATA
+
+## sh /nwprod/util.v1.0.0/ush/setup.sh
+
+$HOMEemcsfc/ush/emcsfc_fire2mdl.sh
+
+exit 0

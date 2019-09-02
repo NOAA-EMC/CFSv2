@@ -1,0 +1,75 @@
+#!/bin/ksh
+
+set -x
+
+#-----------------------------------------------------
+# Run the accum_firedata program on wcoss phase 1.
+#
+# Invoke this script as follows:
+# cat $script | bsub
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -R rusage[mem=1000]
+#BSUB -R affinity[core]
+#BSUB -R span[ptile=1]
+#BSUB -P NAM-T2O
+#BSUB -oo accum.12km.log
+#BSUB -eo accum.12km.log
+#BSUB -q dev_shared
+#BSUB -J accum_12
+#BSUB -cwd .
+#BSUB -W 0:05
+
+export MP_LABELIO=YES
+
+WORK=/stmpp1/George.Gayno/accum_12km.fire
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+# first do a 30-day accumulation
+cat > ./fort.41 << !
+ &setup
+   start_year=2014
+   start_month=8
+   start_day=1
+   start_hour=0
+   end_year=2014
+   end_month=8
+   end_day=31
+   end_hour=0
+   file_resolution_in_km=12
+   input_file_dir="/global/noscrub/George.Gayno/fire_data/data"
+   output_file="./accum.fire.30day.12km.grib2"
+ /
+!
+
+MAIN_DIR=${LS_SUBCWD}/../../exec
+mpirun.lsf ${MAIN_DIR}/emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+# then do a 48 hour accumulation.
+cat > ./fort.41 << !
+ &setup
+   start_year=2014
+   start_month=8
+   start_day=1
+   start_hour=0
+   end_year=2014
+   end_month=8
+   end_day=4
+   end_hour=0
+   file_resolution_in_km=12
+   input_file_dir="/global/noscrub/George.Gayno/fire_data/data"
+   output_file="./accum.fire.2day.12km.grib2"
+ /
+!
+
+mpirun.lsf ${MAIN_DIR}/emcsfc_accum_firedata
+
+rm -f ./fort.41
+
+exit 0

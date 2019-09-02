@@ -1,0 +1,20 @@
+Instructions for building emcsfc_gridgen_sfc.
+
+emcsfc_gridgen_sfc was written to create static fields, such as
+landmask, terrain, and vegetation type, for several NCEP grids. 
+The algorithms are organized into a library that may be 
+mapped into a user's application.  A driver is
+also provided so the user may run emcsfc_gridgen_sfc
+as a stand-alone application.
+
+The library must be compiled first.  The source code and
+build script are in the ./lib subdirectory.  See the README.build
+file in that directory for detailed instructions on how to compile.
+
+If desired, the user may then compile the driver program to run
+emcsfc_gridgen_sfc as a stand-alone program.  See the 
+README.build in the ./driver subdirectory for detailed instructions.
+
+A set of scripts and configuration files to run the driver program
+for several NCEP grids may be found in the 
+../../reg_tests/emcsfc_gridgen_sfc directory.  

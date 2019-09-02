@@ -1,0 +1,45 @@
+#!/bin/sh
+ 
+#-----------------------------------------------------
+# Run the fire2mdl program on WCOSS-Cray.
+#
+# Invoke this script as follows:
+# cat runit.wcoss.cray.lsf | bsub
+#-----------------------------------------------------
+
+#BSUB -oo fire2mdl.log
+#BSUB -eo fire2mdl.log
+#BSUB -q dev_shared
+#BSUB -R rusage[mem=1500]
+#BSUB -J fire2mdl
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+module list
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+
+WORK="/gpfs/hps/stmp/$LOGNAME/fire2mdl"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+EXE=${execdir}/emcsfc_fire2mdl
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${rundir}/config.wcoss.cray.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+$EXE
+
+exit 0

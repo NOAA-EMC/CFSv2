@@ -1,0 +1,58 @@
+#!/bin/sh
+ 
+#-----------------------------------------------------
+# Run the emcsfc_grib_snowgrib program on the
+# WCOSS cray machine.
+#
+# Invoke this script as follows:
+# "cat run.wcoss.cray.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -oo grib_snowgrib.log
+#BSUB -eo grib_snowgrib.log
+#BSUB -q dev_shared
+#BSUB -R rusage[mem=300]
+#BSUB -J grib_snowgrib
+#BSUB -P GFS-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+module list
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+EXE=emcsfc_grib_snowgrib
+
+WORK="/gpfs/hps/stmp/$LOGNAME/emcsfc_grib_snowgrib"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+# input snow files
+date8="20160112"
+if [[ -d /gpfs/tp1/ ]]; then
+  INPUT_DATA_DIR=/gpfs/tp1/nco/ops/dcom/us007003/${date8}
+elif [[ -d /gpfs/gp1 ]]; then
+  INPUT_DATA_DIR=/gpfs/gp1/nco/ops/dcom/us007003/${date8}
+else
+  echo "INPUT DATA DIRECTORY NOT FOUND.  EXIT"
+  exit 1
+fi
+
+ln -fs ${INPUT_DATA_DIR}/wgrdbul/PRD.SPPROD.SNODEPH.NHMAMAP fort.11
+ln -fs ${INPUT_DATA_DIR}/wgrdbul/PRD.SPPROD.SNODEPH.SHMAMAP fort.12
+ln -fs ${INPUT_DATA_DIR}/wgrbbul/imssnow.grb fort.13
+
+# output 0.5-degree snow analysis
+ln -fs snowdepth.global.grb fort.52
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+cp ${execdir}/$EXE .
+$EXE
+
+exit 0

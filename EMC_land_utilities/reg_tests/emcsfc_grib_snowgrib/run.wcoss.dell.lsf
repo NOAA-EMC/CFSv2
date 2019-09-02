@@ -1,0 +1,57 @@
+#!/bin/bash
+ 
+#-----------------------------------------------------
+# Run the emcsfc_grib_snowgrib program on the
+# WCOSS Dell machine
+#
+# Invoke this script as follows:
+# "cat $script | bsub"
+#-----------------------------------------------------
+
+#BSUB -oo grib_snowgrib.log
+#BSUB -eo grib_snowgrib.log
+#BSUB -q debug
+#BSUB -R affinity[core(1)]
+#BSUB -J grib_snowgrib
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+#BSUB -M 1000
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+EXE=${execdir}/emcsfc_grib_snowgrib
+
+WORK="/gpfs/dell1/stmp/$LOGNAME/emcsfc_grib_snowgrib"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+date8=20190326
+if [[ -d /gpfs/gp1/nco/ops/dcom/us007003/${date8}/wgrbbul ]]; then
+  input_dir=/gpfs/gp1/nco/ops/dcom/us007003/${date8}/wgrbbul
+else
+  input_dir=/gpfs/tp1/nco/ops/dcom/us007003/${date8}/wgrbbul
+fi
+
+# input snow files
+ln -fs $input_dir/NPR.SNWN.SP.S1200.MESH16 fort.11
+ln -fs $input_dir/NPR.SNWS.SP.S1200.MESH16 fort.12
+ln -fs $input_dir/imssnow.grb fort.13
+
+# output 0.5-degree snow analysis
+ln -fs snowdepth.global.grb fort.52
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+$EXE
+
+exit 0

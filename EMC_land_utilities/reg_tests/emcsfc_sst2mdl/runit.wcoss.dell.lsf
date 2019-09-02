@@ -1,0 +1,65 @@
+#!/bin/bash
+ 
+#-----------------------------------------------------
+# Run the sst2mdl program on the WCOSS Dell
+#
+# Invoke this script as follows:
+# cat runit.wcoss.dell.lsf | bsub
+#
+# When using FLAKE data, run with multiple threads
+# to reduce wall clock time.  Otherwise, use one
+# thread.
+#
+# Note: OMP_NUM_THREADS=ptile=n
+#-----------------------------------------------------
+
+#BSUB -oo sst2mdl.log
+#BSUB -eo sst2mdl.log
+#BSUB -q debug
+#BSUB -R span[ptile=1]
+#BSUB -n 1
+#BSUB -J sst2mdl
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+module list
+
+#------------------------------------------------------------
+# Always place this statement after the module loads 
+# otherwise it will be unset (and program will run
+# with one thread).
+#------------------------------------------------------------
+
+export OMP_NUM_THREADS=1
+
+WORK="/gpfs/dell1/stmp/$LOGNAME/sst2mdl"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+
+cp ${execdir}/emcsfc_sst2mdl     ./
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${rundir}/config.wcoss.dell.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+./emcsfc_sst2mdl 
+
+rm -f ./fort.41
+
+exit 0

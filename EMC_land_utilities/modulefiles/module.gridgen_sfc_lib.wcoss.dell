@@ -1,0 +1,15 @@
+#%Module#################################################################
+proc ModulesHelp { } {
+  puts stderr "Set environment variables for WCOSS Dell emcsfc_gridgen_sfc library build"
+}
+
+module-whatis "Set environment variables for WCOSS Dell emcsfc_gridgen_sfc library build"
+
+module load ips/18.0.1.163
+module load impi/18.0.1
+
+setenv FCOMP mpif90
+setenv FFLAGS "-O3 -fp-model strict -I. -convert big_endian -r8 -i4"
+
+module load g2/3.1.0
+module load ip/3.0.1

@@ -1,0 +1,54 @@
+#!/bin/bash
+ 
+#-----------------------------------------------------
+# Run gridgen_sfc for a conus nest on wcoss dell.
+#
+# Invoke this script as follows:
+# "cat $script | bsub"
+#-----------------------------------------------------
+
+#BSUB -oo conus.log
+#BSUB -eo conus.log
+#BSUB -M 3000
+#BSUB -q debug
+#BSUB -P NAM-T2O
+#BSUB -J gridgen
+#BSUB -W 0:05
+#BSUB -x                  # not shared
+#BSUB -n 1                # total tasks
+#BSUB -R "span[ptile=1]"  # tasks per node
+#BSUB -R "affinity[core(1):distribute=balance]"
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+module load impi/18.0.1
+module load lsf/10.1
+module list
+
+EXEC_DIR=${LS_SUBCWD}/../../../exec
+
+EXEC=emcsfc_gridgen_sfc
+
+WORK="/gpfs/dell1/stmp/${LOGNAME}/conus"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+cp ${EXEC_DIR}/$EXEC    ./
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${LS_SUBCWD}/conus.dell.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+mpirun ./$EXEC
+
+exit 0

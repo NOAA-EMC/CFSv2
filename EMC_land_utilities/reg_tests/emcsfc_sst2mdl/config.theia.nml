@@ -1,0 +1,21 @@
+ &source_data
+  input_src_file="/scratch4/NCEPDEV/global/noscrub/dump/2015052600/gdas/rtgssthr.grb.gdas.2015052600"
+  input_src_bitmap_file=""
+  input_src14km_file=""
+  input_flake_file=""
+ /
+
+ &model_specs
+  model_lat_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_hpnt_latitudes.grb"
+  model_lon_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_hpnt_longitudes.grb"
+  model_lsmask_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_slmask.grb"
+ /
+
+ &output_data
+  output_file="./sst.grb"
+  output_grib2=.true.
+ /
+
+ &parameters
+  climo_4_lakes=.true.
+  /

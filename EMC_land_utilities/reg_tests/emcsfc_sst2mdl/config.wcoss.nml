@@ -1,0 +1,72 @@
+!-----------------------------------------------------------------------
+! "input_src_file" can be the following mmab global sst files located
+! in /com/gfs/prod/sst.$yyyymmdd:
+!   - rtgssthr_grb_0.083  (1/12-degree, grib 1)
+!   - rtgssthr_grb_0.083.grib2  (1/12-degree, grib 2)
+!   - rtgssthr_grb_0.5 (1/2-degree grib 1)
+!   - rtgssthr_grb_0.5.grib2 (1/2-degree grib 2)
+! This dataset is required.
+!
+! The global mmab datasets have data everywhere, including 'land'
+! points.  The 1/12-degree data has a separate land mask that
+! may use used to bitmap out the land points.  This dataset
+! is specified by the "input_src_bitmap_file" variable.
+! It is in grib2 format and is baselined under the subversion
+! trunk: ./fix/emcsfc_gland5min.grib2.  This dataset is optional.
+! To not use, set "input_src_bitmap_file" to a zero length
+! string.
+!
+! "input_src14km_file" is the NOAA/GLERL (14km) sst file for use
+! in better initializing the Great Lakes.  The file is not in grib
+! format.  It is optional.  On WCOSS, this data may be found in:
+! /com/gfs/prod/sst.$yyyymmdd/sst2dvar.t12z.nam_grid
+! To not use, set to a zero length string.
+!
+! "input_flake_file" is the flake climatology file in grib 2:
+! ./fix/emcsfc_flake_sst_climo.grib2.  When selected,
+! a cressman analysis is performed at any undefined model lakes,
+! which are points not resolved by the mmab global data.  The
+! analysis considers surrounding model points that were
+! resolved by the global data, and the flake value at the undefined
+! model point. If flake is not selected, a nominal value is used
+! at these undefined lakes.  Set to a zero length string to not use.
+!-----------------------------------------------------------------------
+
+ &source_data
+  input_src_file="/global/noscrub/George.Gayno/sst2mdl/rtgssthr_grb_0.083"
+  input_src_bitmap_file=""
+  input_src14km_file="/global/noscrub/George.Gayno/sst2mdl/sst2dvar.t12z.nam_grid"
+  input_flake_file=""
+ /
+
+!-----------------------------------------------------------------------
+! "model_lat/lon_file" are the model grid lat/lons.
+! "model_lsmask_file" is the model lsmask file.
+!  May be grib 1 or grib 2.  Required files.
+!-----------------------------------------------------------------------
+
+ &model_specs
+  model_lat_file="/global/noscrub/George.Gayno/sst2mdl/nam_hpnt_latitudes.grb"
+  model_lon_file="/global/noscrub/George.Gayno/sst2mdl/nam_hpnt_longitudes.grb"
+  model_lsmask_file="/global/noscrub/George.Gayno/sst2mdl/nam_slmask.grb"
+ /
+
+!-----------------------------------------------------------------------
+! "output file" is the model sst filename.  When "output_grib2" is 'true',
+! the file is grib 2.  Otherwise, it is grib 1.
+!-----------------------------------------------------------------------
+
+ &output_data
+  output_file="./sst.grb"
+  output_grib2=.false.
+ /
+
+!-----------------------------------------------------------------------
+! "climo_4_lakes" is a logical.  when true, model points within the
+! great salt lake, lake champlain, salton sea and ft peck reservior 
+! will be set to a climo value.
+!-----------------------------------------------------------------------
+
+ &parameters
+  climo_4_lakes=.true.
+  /

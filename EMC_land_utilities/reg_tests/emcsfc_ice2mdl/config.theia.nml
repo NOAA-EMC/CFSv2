@@ -1,0 +1,45 @@
+!--------------------------------------------------------------------
+
+ &global_src
+  input_global_src_file=""
+  input_global_src_lsmask_file=""
+ /
+
+!--------------------------------------------------------------------
+
+ &ims_src
+  input_ims_src_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/imssnow96.grb"
+  input_ims_src_lsmask_file=""
+ /
+
+!--------------------------------------------------------------------
+! the model latitude, longitude and landmask files.  may be
+! grib1 or grib2.
+!--------------------------------------------------------------------
+
+ &model_specs
+  model_lat_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_hpnt_latitudes.grb"
+  model_lon_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_hpnt_longitudes.grb"
+  model_lsmask_file="/scratch4/NCEPDEV/da/noscrub/George.Gayno/snow2mdl/nam_slmask.grb"
+  /
+
+!--------------------------------------------------------------------
+! output_file - path/name of output ice analysis file
+! output_grib2 - grib2 when true.  otherwise grib1.
+!--------------------------------------------------------------------
+
+ &output
+  output_file="./ice.grb"
+  output_grib2=.false.
+ /
+
+!--------------------------------------------------------------------
+! the date/time to be placed in the output ice analysis grib header.
+!--------------------------------------------------------------------
+
+ &output_grib_time
+  grib_year=2012
+  grib_month=10
+  grib_day=30
+  grib_hour=00
+ /

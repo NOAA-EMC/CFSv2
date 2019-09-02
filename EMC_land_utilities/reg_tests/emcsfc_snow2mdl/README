@@ -1,0 +1,101 @@
+!--------------------------------------------------------------------------
+! Program will run with nesdis/ims cover data (nh only), afwa depth data
+! (nh and sh), and autosnow cover data (sh only).  A depth and
+! cover analysis is produced.
+!
+! Note: When the program was originally created, the ims cover data
+! was produced by nesdis.  It is now produced by the national ice
+! center.  However, variable names and print statements still use
+! the nesdis tag.  If you see a reference to nesdis in the code or
+! namelist, it refers to the ims product.
+!
+! In the NH: 
+!  (1) afwa data may be used by itself
+!  (2) nesdis/ims data may be used by itself
+!  (3) both data sets may used.
+!
+! When (1) is chosen, cover and depth are set from afwa.
+! When (2) is chosen, the depth is set to "min_snow_depth" where
+! nesdis/ims indicates snow cover.  "min_snow_depth" is set
+! below via namelist.
+! When (3) is chosen, the final snow depth will
+! be a blend of the two data sources.  If nesdis/ims indicates snow
+! cover, the final depth will be set to the afwa value or 
+! "min_snow_depth", whichever is greater.  If nesdis/ims indicates no
+! snow cover, then the final depth is set to zero regardless
+! of the afwa value. 
+!
+! In the SH: 
+!  (1) afwa data may be used by itself
+!  (2) autosnow data may be used by itself
+!  (3) both data sets may used.
+!
+! When (1) is chosen, cover and depth are set from afwa.
+! When (2) is chosen, the depth is set to "min_snow_depth" where
+! autosnow indicates snow cover.  
+! When (3) is chosen, the final snow depth will
+! be a blend of the two data sources.  If autosnow indicates snow
+! cover, the final depth will be set to the afwa value or 
+! "min_snow_depth", whichever is greater.  If autosnow indicates no snow
+! cover, then the final depth is set to zero regardless
+! of the afwa value. 
+!
+! Namelist settings are thus:
+!
+! autosnow_file: path and name of autosnow snow cover data (grib 2 format).
+! To not use, set to zero length string.
+!
+! nesdis_snow_file: path and name of nesdis/ims snow cover grib data.
+! Can use either the 23 (16th mesh) or 4 km (96th mesh) file.  Can be 
+! grib 1 or grib 2 versions. To not use, set to zero length string.
+!
+! nesdis_lsmask_file: path and name of nesdis/ims 23 km (16th mesh) land mask.
+! This file is only needed for the 23 km data because it is not
+! gribbed with a bitmap section.  When using the 4km nesdis/ims data,
+! set the string length to zero. The 23km mask is "/nwprod/fix/nam_imsmask".
+! To not use, set to zero length string.
+!
+! afwa_snow_global_file: name and path of global afwa snow depth data (grib 1).
+! To not use, set to zero length string.
+!
+! afwa_snow_nh(sh)_file: name and path of nh(sh) afwa snow depth data.
+! May choose 46 km (8th mesh) binary file or 23 km (16th mesh) grib 1 file.
+! To not use, set to zero length string.
+!
+! afwa_lsmask_nh(sh)_file: name and path of nh(sh) afwa land/sea mask.
+! Needed when using 46 km binary files, which do not have a bitmap.
+! To not use, set to zero length string.
+!
+! climo_qc_file: path and name of climatological snow cover file used to 
+! quality control the nesdis/ims and nh afwa data.  optional.  if
+! not chosen (set to zero length string), a more rudimentary qc is done.
+! file is grib 1 format.
+!
+! model_lat(lon)_file: name and path of model lat/lon data (grib 1)
+!
+! model_lsmask_file: name and path of model land/sea mask (grib 1)
+!
+! gfs_lpl_file: gfs reduced grid definition (text file)
+! To run on full gfs grid, don't select (set to zero length string).
+!
+! model_snow_file: User selected file name for output snow depth and 
+! coverage on model grid (grib 1).
+!
+! &output_grib_time entries:  The various input sources are valid at 
+! different times.  This namelist allows you to set the grib header date/time
+! in the "model_snow_file" to anything you wish.
+!
+! lat_threshold: After interpolation of the nesdis/ims and afwa data to
+! the model grid, some model points may still be undefined (no nesdis/ims
+! or afwa data nearby).  In this case, set all undefined points poleward
+! of the threshold to a snow cover of 100% if the nesdis/ims indicates
+! sea ice nearby.  Otherwise, set snow coverage and depth to zero. 
+! 
+! snow_cvr_threshold: If nesdis/ims or autosnow indicates a coverage
+! above this threshold, the model point is considered snow covered
+! and given a non-zero depth of "min_snow_depth" or the afwa depth,
+! whichever is greater.  Otherwise, the snow depth is zero.
+!
+! min_snow_depth: The minimum snow depth (in meters) of a model point
+! if nesdis/ims or autosnow indicate snow cover above "snow_cvr_threshold".
+!---------------------------------------------------------------------------

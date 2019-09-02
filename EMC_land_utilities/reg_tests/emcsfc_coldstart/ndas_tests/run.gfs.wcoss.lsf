@@ -1,0 +1,134 @@
+#!/bin/ksh
+
+#-----------------------------------------------------
+# Interpolate gfs land states to the ndas grid
+# on WCOSS phase 1.
+#
+# Invoke this script as follows:
+# "cat run.gfs.wcoss.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -R rusage[mem=1000]
+#BSUB -R affinity[core]
+#BSUB -oo coldstart.gfs.log
+#BSUB -eo coldstart.gfs.log
+#BSUB -q dev_shared
+#BSUB -J coldstart
+#BSUB -P NDAS-T2O
+#BSUB -cwd .
+#BSUB -W 0:04
+
+set -x
+
+# first interpolate gfs to target grid.
+# this is the gfs file.                     
+INPUT_FILE="/global/noscrub/George.Gayno/coldstart/gdas1.t00z.sfcanl"
+INPUT_FILE_TYPE="gfs"
+
+# this is the restart file for the 'large' target grid.
+# must be nems io format.
+WRF_BINARY_FILE="test_input_umo_regional.nemsio.d01"
+DYN_CORE="nems"
+
+# the cold start executable
+
+RUN_DIR=${LS_SUBCWD}
+EXE_DIR=${RUN_DIR}/../../../exec
+EXEC=${EXE_DIR}/emcsfc_coldstart
+
+# when running 'merged', create fixed climo fields for soil type,
+# veg type, z0, snow free albedo, max snow albedo using gridgen_sfc.
+# then place grib files in this directory.
+FIXDIR="/global/noscrub/George.Gayno/coldstart"
+
+# your working directory
+WORK_DIR="/ptmpp1/$LOGNAME/coldstart.gfs"
+mkdir -p $WORK_DIR
+cd $WORK_DIR
+
+cp /global/noscrub/George.Gayno/coldstart/${WRF_BINARY_FILE}   .
+chmod 644 ${WRF_BINARY_FILE}
+
+#----------------------------------------------------------------
+# don't touch fort.41 namelist settings.
+#----------------------------------------------------------------
+
+cat > ${WORK_DIR}/fort.41 << !
+ &input_state_fields
+  input_file="${INPUT_FILE}"
+  input_file_type="${INPUT_FILE_TYPE}"
+ /
+ &output_grid_specs
+  specs_from_output_file=.false.
+  lats_output_file="${FIXDIR}/nam_hpnt_latitudes.grb"
+  lons_output_file="${FIXDIR}/nam_hpnt_longitudes.grb"
+  lsmask_output_file="${FIXDIR}/nam_slmask.grb"
+  orog_output_file="${FIXDIR}/nam_elevtiles.grb"
+  substrate_temp_output_file="${FIXDIR}/nam_tbot.grb"
+ /
+ &optional_output_fields
+  snow_free_albedo_output_file="${FIXDIR}/nam_snowfree_albedo.grb"
+  greenfrc_output_file="${FIXDIR}/nam_vegfrac.grb"
+  mxsnow_alb_output_file="${FIXDIR}/nam_mxsnoalb.grb"
+  slope_type_output_file=""
+  soil_type_output_file="${FIXDIR}/nam_soiltiles.grb"
+  veg_type_output_file="${FIXDIR}/nam_vegtiles.grb"
+  z0_output_file="${FIXDIR}/nam_z0clim.grb"
+ /
+ &soil_parameters
+  soil_src_input = "zobler"
+  smclow_input  = 0.5
+  smchigh_input = 6.0
+  smcmax_input= 0.421, 0.464, 0.468, 0.434, 0.406, 0.465,
+                0.404, 0.439, 0.421
+  beta_input  =   4.26,  8.72, 11.55,  4.74, 10.73,  8.17,
+                  6.77,  5.25,  4.26
+  psis_input  =   0.040, 0.620, 0.470, 0.140, 0.100, 0.260,
+                  0.140, 0.360, 0.040
+  satdk_input = 1.41e-5, 0.20e-5, 0.10e-5, 0.52e-5, 0.72e-5,
+                0.25e-5, 0.45e-5, 0.34e-5, 1.41e-5
+  soil_src_output = "statsgo"
+  smclow_output  = 0.5
+  smchigh_output = 3.0
+  smcmax_output= 0.395, 0.421, 0.434, 0.476, 0.476, 0.439,
+                 0.404, 0.464, 0.465, 0.406, 0.468, 0.457,
+                 0.464, -9.99,  0.20, 0.421
+  beta_output =  4.05,  4.26,  4.74,  5.33,  5.33,  5.25,
+                 6.77,  8.72,  8.17, 10.73, 10.39, 11.55,
+                 5.25, -9.99,  4.05,  4.26
+  psis_output =  0.0350, 0.0363, 0.1413, 0.7586, 0.7586, 0.3548,
+                 0.1349, 0.6166, 0.2630, 0.0977, 0.3236, 0.4677,
+                 0.3548, -9.99,  0.0350, 0.0363
+  satdk_output = 1.7600e-4, 1.4078e-5, 5.2304e-6, 2.8089e-6, 2.8089e-6,
+                3.3770e-6, 4.4518e-6, 2.0348e-6, 2.4464e-6, 7.2199e-6,
+                1.3444e-6, 9.7394e-7, 3.3770e-6,     -9.99, 1.4078e-5,
+                1.4078e-5
+ /
+
+ &veg_parameters
+  veg_src_input = "sib"
+  veg_src_output = "igbp"
+  salp_output = 4.0
+  snup_output = 0.080, 0.080, 0.080, 0.080, 0.080, 0.020,
+                0.020, 0.060, 0.040, 0.020, 0.010, 0.020,
+                0.020, 0.020, 0.013, 0.013, 0.010, 0.020,
+                0.020, 0.020
+ /
+
+ &final_output
+  output_file_type="${DYN_CORE}"
+  output_file="${WRF_BINARY_FILE}"
+ /
+ &options
+  landice_opt=4
+ /
+ &nam_options
+  merge=.false.
+ /
+!
+
+mpirun.lsf $EXEC 
+
+exit 0

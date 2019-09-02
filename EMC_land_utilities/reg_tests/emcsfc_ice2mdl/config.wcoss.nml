@@ -1,0 +1,81 @@
+!--------------------------------------------------------------------
+! Global mmab ice data.  Must select this data when running
+! for a gfs grid.  May select grib1 or grib2 version. 
+! The mmab ice data does not have a bitmap, so a separate
+! landmask file must be read in as well.
+!
+! on wcoss this data is located in: /com/omb/prod/sice.$yyyymmdd
+!
+! - engice.tCCz.grb         0.5-degree (grib 1)
+! - engice.tCCz.grb.grib2   0.5-degree (grib 2)
+! - seaice.tCCz.5min.grb        1/12-degree (grib 1)
+! - seaice.tCCz.5min.grb.grib2  1/12-degree (grib 2)
+!
+! the mask files are in /nwprod/fix:
+! - seaice_gland5min   1/12-degree (binary)
+! - seaice_newland     0.5-degree (binary)
+!
+! to select, set the variables to the path/filename you want.
+! to not select, set the varaibles to a zero length string.
+!--------------------------------------------------------------------
+
+ &global_src
+  input_global_src_file=""
+  input_global_src_lsmask_file=""
+ /
+
+!--------------------------------------------------------------------
+! The ims ice cover data.  Data is NH only.  Can't use for gfs
+! grids.
+!
+! on wcoss this data is located in: /dcom/us007003/$yyyymmdd/wgrbbul
+!
+! imssnow96.grb - 4km (96th mesh) in grib 1
+! imssnow96.grb.grib2 - 4km (96th mesh) in grib 2
+! imssnow.grb - 23km (16th mesh) in grib 1
+! imssnow.grb.grib2 - 23km (16th mesh) in grib 2
+!
+! the 23km data does not have a bitmap.  so you must select a
+! separate landmask file.  this is part of the subversion
+! baseline: ./fix/emcsfc_ims_mask_16.ascii  (ascii)
+!
+! to select, set the variables to the path/filename you want.
+! to not select, set the varaibles to a zero length string.
+!--------------------------------------------------------------------
+
+ &ims_src
+  input_ims_src_file="/global/noscrub/George.Gayno/icedat/imssnow96.grb"
+  input_ims_src_lsmask_file=""
+ /
+
+!--------------------------------------------------------------------
+! the model latitude, longitude and landmask files.  may be
+! grib1 or grib2.
+!--------------------------------------------------------------------
+
+ &model_specs
+  model_lat_file="/global/noscrub/George.Gayno/snow2mdl/nam_hpnt_latitudes.grb"
+  model_lon_file="/global/noscrub/George.Gayno/snow2mdl/nam_hpnt_longitudes.grb"
+  model_lsmask_file="/global/noscrub/George.Gayno/snow2mdl/nam_slmask.grb"
+  /
+
+!--------------------------------------------------------------------
+! output_file - path/name of output ice analysis file
+! output_grib2 - grib2 when true.  otherwise grib1.
+!--------------------------------------------------------------------
+
+ &output
+  output_file="./ice.grb"
+  output_grib2=.false.
+ /
+
+!--------------------------------------------------------------------
+! the date/time to be placed in the output ice analysis grib header.
+!--------------------------------------------------------------------
+
+ &output_grib_time
+  grib_year=2014
+  grib_month=2
+  grib_day=16
+  grib_hour=00
+ /

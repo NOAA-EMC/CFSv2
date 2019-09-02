@@ -1,0 +1,48 @@
+#!/bin/ksh
+ 
+#-----------------------------------------------------
+# Run gridgen_sfc on wcoss phase 1 for a t574 
+# gaussian grid.
+#
+# Invoke this script as follows:
+# "cat run.t574.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -R rusage[mem=6000]
+#BSUB -R affinity[core]
+#BSUB -oo t574.log
+#BSUB -eo t574.log
+#BSUB -q dev_shared
+#BSUB -J gridgen_sfc
+#BSUB -P GFS-T2O
+#BSUB -cwd .
+#BSUB -W 0:10
+
+set -x
+
+EXEC_DIR=${LS_SUBCWD}/../../../exec
+
+EXEC=emcsfc_gridgen_sfc
+
+WORK="/stmpp1/$LOGNAME/t574"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+cp ${EXEC_DIR}/$EXEC    ./
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${LS_SUBCWD}/t574.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+mpirun.lsf ./$EXEC
+
+exit 0

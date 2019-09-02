@@ -1,0 +1,22 @@
+#%Module#################################################################
+proc ModulesHelp { } {
+  puts stderr "Set environment variables for WCOSS Dell emcsfc_fire2mdl build"
+}
+
+module-whatis "Set environment variables for WCOSS Dell emcsfc_fire2mdl build"
+
+# load intel compiler
+
+module load ips/18.0.1.163
+
+setenv FCOMP ifort
+setenv FFLAGS "-O0 -g -r8 -i4"
+
+module load ip/3.0.1
+module load sp/2.0.2
+module load w3nco/2.0.6
+module load bacio/2.0.2
+module load jasper/1.900.1
+module load zlib/1.2.11
+module load libpng/1.2.44
+module load g2/3.1.0

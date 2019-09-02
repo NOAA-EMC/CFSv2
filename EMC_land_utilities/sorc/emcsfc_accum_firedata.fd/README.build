@@ -1,0 +1,52 @@
+Instructions for building and installing emcsfc_accum_firedata (only
+tested on WCOSS-Phase1/2/Cray/Dell and Theia):
+
+--------------------------------------------------------------------
+On WCOSS-Dell:
+--------------------------------------------------------------------
+
+Invoke the 'make.sh' driver script from the command line with
+no arguments: "make.sh"
+
+--------------------------------------------------------------------
+On WCOSS-Phase 1/2:
+--------------------------------------------------------------------
+
+1) Load the build module:
+      "module load ../../modulefiles/module.accum_firedata.wcoss"
+2) Build the executable:
+      "make all"
+3) If build is successfull, install the executable in ../../exec:
+      "make install"
+4) Unload the build module:
+      "module unload module.accum_firedata.wcoss"
+
+Alternately, steps 1-4 may be accomplished by invoking the 'make.sh'
+driver script:
+      "make.sh"
+
+--------------------------------------------------------------------
+On WCOSS-Cray:
+--------------------------------------------------------------------
+
+To build with the Intel Fortran compiler:
+
+1) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+To build with the Cray Fortran compiler:
+
+1) Edit the "../../modulefiles/module.accum_firedata.wcoss.cray" file. 
+   Comment out the module loads and FCOMP/FFLAGS/LDFLAGS statements for the
+   Intel compiler.  Uncomment the corresponding lines for the
+   Cray compiler.
+
+2) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+--------------------------------------------------------------------
+On Theia:
+--------------------------------------------------------------------
+
+1) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"

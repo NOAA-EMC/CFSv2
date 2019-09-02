@@ -1,0 +1,48 @@
+#!/bin/sh
+
+#-----------------------------------------------------------
+# Run the 'ush' script on wcoss dell.  Invoke as follows:
+#
+# cat accum.ush.lsf | bsub
+#-----------------------------------------------------------
+
+#BSUB -n 1               # total tasks
+#BSUB -R span[ptile=1]   # tasks per node
+#BSUB -R "affinity[core(1):distribute=balance]"
+#BBUB -x
+#BSUB -oo accum.fire.log
+#BSUB -eo accum.fire.log
+#BSUB -q debug
+#BSUB -J accum_fire
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+module load impi/18.0.1
+module load lsf/10.1
+module list
+
+HOMEemcsfc=${LS_SUBCWD}/../..
+export HOMEemcsfc
+
+export DATA="/gpfs/dell1/stmp/$LOGNAME/accum_fire"
+rm -fr $DATA
+mkdir -p $DATA
+cd $DATA
+
+if [[ -d /gpfs/gp1/nco/ops/dcom/us007003/burned_area ]]; then
+  export INPUT_FIRE_DIR=/gpfs/gp1/nco/ops/dcom/us007003/burned_area
+else
+  export INPUT_FIRE_DIR=/gpfs/tp1/nco/ops/dcom/us007003/burned_area
+fi
+
+#sh /nwprod/util.v1.0.0/ush/setup.sh
+
+$HOMEemcsfc/ush/emcsfc_accum_firedata.sh 2019010300 2019010812 1
+
+exit 0

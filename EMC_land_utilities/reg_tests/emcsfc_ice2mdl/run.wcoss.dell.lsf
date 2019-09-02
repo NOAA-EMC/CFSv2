@@ -1,0 +1,48 @@
+#!/bin/bash
+ 
+#--------------------------------------------------------
+# Run the ice2mdl program on the WCOSS Dell.
+#
+# Invoke this script as follows:
+# "cat $script | bsub"
+#--------------------------------------------------------
+
+#BSUB -oo ice2mdl.log
+#BSUB -eo ice2mdl.log
+#BSUB -q debug
+#BSUB -R affinity[core(1)]
+#BSUB -J ice2mdl
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+#BSUB -M 2000
+
+set -x
+
+module purge
+module load EnvVars/1.0.2
+module load ips/18.0.1.163
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+
+WORK="/gpfs/dell1/stmp/$LOGNAME/ice2mdl"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+cp ${execdir}/emcsfc_ice2mdl     ./
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${rundir}/config.wcoss.dell.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+./emcsfc_ice2mdl 
+
+exit 0

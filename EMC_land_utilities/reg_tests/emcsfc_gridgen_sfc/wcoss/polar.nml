@@ -1,0 +1,91 @@
+&grid
+ domain_name="g91"
+ domain_type="polar"
+ dx_mdl=2976
+ dy_mdl=2976
+ imdl=1649
+ jmdl=1105
+ lat_11_mdl=40.53
+ lon_11_mdl=181.429
+ orient_lon_mdl=210.0
+ hemi_mdl=1.0
+/
+
+&tiling
+ max_total_land_tiles=1
+/
+
+&veg_tiling
+ max_veg_tiles=1
+ veg_tile_threshold=0.05
+ default_veg_category=7
+ num_veg_groups = 5
+!-------------------------------------------------------------
+! veg groups
+! 1 - forest           categories - 1,2,3,4,5,8,9
+! 2 - barren           categories - 15,16,20
+! 3 - urban            categories - 13
+! 4 - grass/cropland   categories - 10,12,14
+! 5 - wetland/tundra   categories - 6,7,11,18,19
+!
+ veg_groups =1,1,1,1,1,5,5,1,1,4,5,4,3,4,2,2,9,5,5,2
+!--------------------------------------------------------------
+/
+
+&soil_tiling
+ max_soil_tiles=1
+ soil_tile_threshold=0.1
+ default_soil_category=7
+ num_soil_groups = 5
+!----------------------------------------------
+! soil groups
+! 1 - sand  - cats 1,2,3
+! 2 - silt  - cats 4,5,8
+! 3 - loam  - cats 6,7,9
+! 4 - clay  - cats 10,11,12
+! 5 - other - cats 13,15,16
+!----------------------------------------------
+ soil_groups = 1,1,1,2,2,3,3,2,3,4,4,4,5,9,5,5
+/
+
+!-----------------------------------------------------------
+! Note: Smoothing options not implemented for polar grids.
+!-----------------------------------------------------------
+
+&lsmask_orog_tiling
+ lsmask_aavg=.true.
+ lsmask_tiles=.false.
+ lsmask_tile_threshold=0.25
+ lsmask_flake=.false.
+ orog_gwd_tiles=.false.
+ max_orog_tiles=1
+ orog_bin_width=500.0
+ orog_tile_threshold=0.0
+ smooth=0
+ num_smooth_passes1=0
+ num_smooth_passes2=0
+ smooth_bndy=.false.
+/
+
+
+&input_data
+ leaf_area_idx_file=""
+ gfrac_file=""
+ mxsnow_alb_file="/global/noscrub/George.Gayno/climo_fields_big_endian/mxsnoalb.1.0.bin"
+ roughness_file=""
+ slopetype_file=""
+ snowfree_albedo_file=""
+ soiltype_tile_file=""
+ substrate_temp_file=""
+ vegtype_tile_file=""
+ lsmask_file="/global/noscrub/George.Gayno/climo_fields_big_endian/mask.sstlakes.30s.bin"
+ orog_file="/global/noscrub/George.Gayno/climo_fields_big_endian/terrain_usgs.30s.bin"
+/
+
+!----------------------------------------------------------
+! for grib 1 output, set to false.
+!----------------------------------------------------------
+
+&output_data
+ grib2=.true.
+/

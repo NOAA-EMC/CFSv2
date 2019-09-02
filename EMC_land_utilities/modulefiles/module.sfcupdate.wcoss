@@ -1,0 +1,22 @@
+#%Module#################################################################
+proc ModulesHelp { } {
+  puts stderr "Set environment variables for WCOSS Phase 1/2 emcsfc_sfcupdate build"
+}
+
+module-whatis "Set environment variables for WCOSS Phase 1/2 emcsfc_sfcupdate build"
+
+set ver 1.1.0
+
+module load ics/12.1
+setenv FCOMP mpfort
+setenv FFLAGS "-O0 -compiler intel -convert big_endian -r8 -i4 -FR"
+setenv LDFLAGS " "
+
+module load w3nco/v2.0.6
+module load bacio/v2.0.2
+module load nemsio/v2.2.2
+module load jasper/v1.900.1
+module load z/v1.2.6
+module load png/v1.2.44
+module load g2/v2.5.1
+module load landsfcutil/v2.1.0

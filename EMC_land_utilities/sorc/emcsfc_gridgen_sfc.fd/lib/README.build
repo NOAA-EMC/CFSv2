@@ -1,0 +1,62 @@
+Instructions for building and installing the emcsfc_gridgen_sfc
+library and module files (only tested on WCOSS-Phase1/2/Cray/Dell
+and Theia):
+
+--------------------------------------------------------------------
+On WCOSS-Phase 1/2:
+--------------------------------------------------------------------
+
+1) Load the build module:
+      "module load ../../../modulefiles/module.gridgen_sfc_lib.wcoss"
+2) Build the libary and module files:
+      "make all"
+3) If build is successfull, install it:
+      "make install"
+   The library - libgridgen_sfc.a - will be in ../../../lib
+   and the module files will be in ../../../incmod/emcsfc_gridgen_sfc.
+4) Unload the build module:
+      "module unload module.gridgen_sfc_lib.wcoss"
+
+Alternately, steps 1-4 may be accomplished by invoking the 'make.sh'
+driver script:
+      "make.sh"
+
+--------------------------------------------------------------------
+On WCOSS-Cray:
+--------------------------------------------------------------------
+
+To build with the Intel Fortran compiler:
+
+1) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+To build with the Cray Fortran compiler:
+
+1) Edit the "../../../modulefiles/module.gridgen_sfc_lib.wcoss.cray" file. 
+   Comment out the module loads and FCOMP/FFLAGS statements for the
+   Intel compiler.  Uncomment the corresponding lines for the
+   Cray compiler.
+
+2) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+   If there are no build errors, the library - libgridgen_sfc.a -
+   will be installed in ../../../lib.  And the module files
+   will be installed in ../../../incmod/emcsfc_gridgen_sfc.
+
+--------------------------------------------------------------------
+On WCOSS-Dell and Theia:
+--------------------------------------------------------------------
+
+1) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+   If there are no build errors, the library - libgridgen_sfc.a -
+   will be installed in ../../../lib.  And the module files
+   will be installed in ../../../incmod/emcsfc_gridgen_sfc.
+
+After a successful build:
+
+Link the library and module files to your application.  Or to
+run emcsfc_gridgen_sfc 'stand-alone', use the driver program
+in ../driver.

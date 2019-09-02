@@ -1,0 +1,320 @@
+#!/bin/ksh
+
+#############################################################
+echo "JSNOWGRB - This jobs runs the Snow Depth Analyses "                     
+echo "History: - 01 Mar 2000 - converted to run on the IBM SP"
+#############################################################
+
+# this function is invoked if there is a problem creating
+# gaussian snow data.  in this case, the previous days
+# gaussian snow file is copied to the current days directory.
+
+function copy_forward
+{
+   set -x
+   OLD_FILE="${TANKDIR}/${PDYm1}/wgrbbul/${OUTPUT_FILE}"
+   OLD_FILE_G2="${TANKDIR}/${PDYm1}/wgrbbul/${OUTPUT_FILE}.grib2"
+   if [[ -s $OLD_FILE && -s $OLD_FILE_G2 ]]
+   then
+     set +x
+     echo " "
+     echo "*****************************************************"
+     echo "* COPY PREVIOUS DAYS ${DOMAIN} DATA TO CURRENT DIRECTORIES."
+     echo "*****************************************************"
+     echo " "
+     set -x
+     cp $OLD_FILE ${TANKDIR}/${PDY}/wgrbbul
+     cp $OLD_FILE $COMOUT/${OUTPUT_FILE}_${cyc}
+     cp $OLD_FILE_G2 ${TANKDIR}/${PDY}/wgrbbul
+     msg="PREVIOUS DAYS ${DOMAIN} DATA COPIED TO CURRENT DIRECTORIES."
+     postmsg "$jlogfile" "$msg"
+   else
+     set +x
+     echo " "
+     echo "*****************************************************"
+     echo "* PREVIOUS DAYS ${DOMAIN} DATA NOT AVAILABLE; ABORT."
+     echo "*****************************************************"
+     echo " "
+     set -x
+     msg="NO BACKUP DATA FOR ${DOMAIN}; WILL ABORT"
+     postmsg "$jlogfile" "$msg"
+     error=1
+   fi
+}  # end function copy_forward
+
+cd $DATA
+
+###################################################################
+# JOB FLOW STEPS
+# 1) if cycle is 00z, create global snow analysis on gaussian grid
+# 2) create global .5 deg snow analysis
+###################################################################
+
+set -x
+
+
+set +x
+echo " "
+echo "############################################################"
+echo "# Create the gaussian snow depth analysis from the Air "
+echo "# Force snow depth analysis and the IMS snow "
+echo "# cover analysis.  The IMS is available only in N.H."
+echo "############################################################"
+echo " "
+set -x
+
+IMS_FILE_NAME="imssnow96.grb"
+IMS_DIR="${TANKDIR}/${PDY}/wgrbbul"
+IMS_FILE=${IMS_DIR}/${IMS_FILE_NAME}
+
+AFWA_NH_FILE_NAME="NPR.SNWN.SP.S1200.MESH16"
+AFWA_SH_FILE_NAME="NPR.SNWS.SP.S1200.MESH16"
+AFWA_DIR="${TANKDIR}/${PDY}/wgrbbul"
+AFWA_NH_FILE=${AFWA_DIR}/${AFWA_NH_FILE_NAME}
+AFWA_SH_FILE=${AFWA_DIR}/${AFWA_SH_FILE_NAME}
+
+error=0
+
+# dont run snow2mdl program at 20z.  it is too late be of
+# benefit to the 00z gfs/gdas.
+
+if test "$cyc" = '20'
+then
+  OUTPUT_FILE="snowdepth.t574.grb"
+  cp $COMOUT/${OUTPUT_FILE}_00 $COMOUT/${OUTPUT_FILE}_${cyc}
+else  # run snow2mdl program if data available
+if [[ -s $IMS_FILE && -s $AFWA_NH_FILE && -s $AFWA_SH_FILE ]]
+then
+  TEMP_DATE=`$WGRIB -4yr $IMS_FILE | head -1`
+  typeset -L10 IMS_DATE
+  IMS_DATE=${TEMP_DATE#*:d=}
+  CYCLE_TIME=$IMS_DATE
+  CYCLE_YEAR=`echo $CYCLE_TIME | cut -c1-4`
+  CYCLE_MON=`echo $CYCLE_TIME | cut -c5-6`
+  CYCLE_DAY=`echo $CYCLE_TIME | cut -c7-8`
+  CYCLE_HOUR="00"
+  for DOMAIN in t574
+  do
+    msg="RUN SNOW2MDL PROGRAM FOR ${DOMAIN}"
+    postmsg "$jlogfile" "$msg"
+    OUTPUT_FILE="snowdepth.${DOMAIN}.grb"
+    if test "$DOMAIN" = 't574'
+    then
+      min_d=.05
+    fi
+    rm -f ./fort.41
+    cat > ./fort.41 << !
+      &source_data
+       autosnow_file=""
+       nesdis_snow_file="${IMS_FILE}"
+       nesdis_lsmask_file=""
+       afwa_snow_global_file=""
+       afwa_snow_nh_file="${AFWA_NH_FILE}"
+       afwa_snow_sh_file="${AFWA_SH_FILE}"
+       afwa_lsmask_nh_file=""
+       afwa_lsmask_sh_file=""
+      /
+       &qc
+        climo_qc_file="${FIXgrib}/emcsfc_snow_cover_climo.grib2"
+      /
+       &model_specs
+        model_lat_file="${FIXgrib}/global_latitudes.${DOMAIN}.grb"
+        model_lon_file="${FIXgrib}/global_longitudes.${DOMAIN}.grb"
+        model_lsmask_file="${FIXgrib}/global_slmask.${DOMAIN}.grb"
+        gfs_lpl_file=""
+       /
+       &output_data
+        model_snow_file="./${OUTPUT_FILE}"
+        /
+       &output_grib_time
+        grib_year=$CYCLE_YEAR
+        grib_month=$CYCLE_MON
+        grib_day=$CYCLE_DAY
+        grib_hour=$CYCLE_HOUR
+       /
+       &parameters
+        lat_threshold=55.0
+        min_snow_depth=${min_d}
+        snow_cvr_threshold=50.0
+        /
+!
+    ${EXECgrib}/emcsfc_snow2mdl
+    export err=$?
+    if (($err != 0))
+    then
+      msg="ABNORMAL TERMINATION IN SNOW2MDL PROGRAM FOR ${DOMAIN}. STATUS IS ${err}"
+      postmsg "$jlogfile" "$msg"
+      set +x
+      echo " "
+      echo "*****************************************************"
+      echo "* ABNORMAL TERMINATION IN SNOW2MDL PROGRAM FOR ${DOMAIN}"
+      echo "*****************************************************"
+      echo " "
+      set -x
+      if test "$SENDCOM" = 'YES'
+      then
+        copy_forward
+      fi
+    else
+      msg="NORMAL TERMINATION OF SNOW2MDL PROGRAM FOR ${DOMAIN}"
+      postmsg "$jlogfile" "$msg"
+      set +x
+      echo " "
+      echo "*****************************************************"
+      echo "* NORMAL TERMINATION OF SNOW2MDL PROGRAM FOR ${DOMAIN}"
+      echo "*****************************************************"
+      echo " "
+      set -x
+      if test "$SENDCOM" = 'YES'
+      then
+        set +x
+        echo "COPY ${DOMAIN} SNOW DATA TO PRODUCTION DIRECTORIES"
+        set -x
+        $CNVGRIB -g12 -p31 $OUTPUT_FILE ${OUTPUT_FILE}.grib2
+        cp $OUTPUT_FILE ${TANKDIR}/${PDY}/wgrbbul
+        cp $OUTPUT_FILE $COMOUT/${OUTPUT_FILE}_${cyc}
+        cp ${OUTPUT_FILE}.grib2 ${TANKDIR}/${PDY}/wgrbbul
+      fi
+      if [ -e ${TANKDIR}/${PDY}/wgrbbul/${OUTPUT_FILE}.grib2 ] ; then
+        if test "$SENDDBN_GB2" = 'YES'
+        then
+          $DBNROOT/bin/dbn_alert MODEL SNOW_GB_GB2 $job ${TANKDIR}/${PDY}/wgrbbul/${OUTPUT_FILE}.grib2
+        fi
+      fi
+    fi  # did program run error free?
+  done  # cycle over domains
+else  # all input data not available.
+  set +x
+  echo " "
+  echo "*****************************************************"
+  echo "* CURRENT AFWA AND/OR IMS DATA NOT AVAILABLE."
+  echo "* CANT RUN SNOW2MDL PROGRAM."
+  echo "*****************************************************"
+  echo " "
+  set -x
+  msg="CURRENT AFWA AND/OR IMS DATA NOT AVAILABLE. CANT RUN SNOW2MDL."
+  postmsg "$jlogfile" "$msg"
+  if test "$SENDCOM" = 'YES'
+  then
+    for DOMAIN in t574
+    do
+      OUTPUT_FILE="snowdepth.${DOMAIN}.grb"
+      copy_forward
+    done # loop over domains.
+  fi  # is sendcom yes?
+fi # does raw snow data exist?
+
+fi # is this 00 or 20z cycle?
+
+#-----------------------------------------------------------------
+# now run program to create 0.5 degree global snow
+# data product.
+#-----------------------------------------------------------------
+
+msg="CREATE 0.5 DEGREE GLOBAL SNOW DATA."
+postmsg "$jlogfile" "$msg"
+
+rm fort.52 fort.11 fort.12 fort.13 
+
+ls -l $TANKDIR/${PDY}/wgrbbul
+ls -l $TANKDIR/${PDY}/wgrdbul
+
+ cp $TANKDIR/${PDY}/wgrbbul/snowdepth.global.grb fort.52
+errcp=$?
+[ "$errcp" -ne '0' ]  &&  \
+ cp $TANKDIR/${PDYm1}/wgrbbul/snowdepth.global.grb fort.52
+cp $TANKDIR/$PDY/wgrbbul/NPR.SNWN.SP.S1200.MESH16 fort.11
+cp $TANKDIR/$PDY/wgrbbul/NPR.SNWS.SP.S1200.MESH16 fort.12
+cp $TANKDIR/$PDY/wgrbbul/imssnow.grb fort.13
+
+if [ ! -s fort.11 -o ! -s fort.12 -o ! -s fort.13 ]
+then
+  if [ ! -s fort.52 ]
+  then
+    msg=" both data and backup are empty; abort"
+    postmsg "$jlogfile" "$msg"
+    errexit
+  fi
+fi
+
+set +x
+echo " "
+echo "############################################################"
+echo "# Create the global .5 deg snow depth analysis from the Air "
+echo "# Force snow depth analysis (47km) and the IMS 23km snow "
+echo "# cover analysis.  The IMS 23km is available only in N.H."
+echo "############################################################"
+echo " "
+set -x
+
+###################################
+# Make the program unit assignments
+###################################
+
+pgm=`basename  $EXECgrib/emcsfc_grib_snowgrib`
+. prep_step
+
+export FORT11="fort.11"
+export FORT12="fort.12"
+export FORT13="fort.13"
+export FORT51="fort.51"
+export FORT52="fort.52"
+
+$EXECgrib/emcsfc_grib_snowgrib >> $pgmout 2> pgmerr
+err=$?
+
+snow_date=`$WGRIB -4yr -d 1 fort.52 | \
+ awk -F: '{print $3}' | awk -F= '{print $2}'`
+
+set +x
+echo
+echo "The date of the snowdepth.global.grb file is $snow_date"
+echo
+set -x
+
+diff_date=$PDYm5
+
+if [ "$snow_date" -lt "$diff_date" ];then
+    msg=" date of snowdepth.global.grb file is BAD; abort"
+    postmsg "$jlogfile" "$msg"
+    errexit
+fi
+
+if [ "$err" -ne '0' ]; then
+    msg="### $pgm r.c.=$err; copy most recent snowdepth.global.grb file \
+into todays wgrbbul tank"
+    postmsg "$jlogfile" "$msg"
+else
+  msg="0.5 DEGREE GLOBAL SNOW DATA PROGRAM COMPLETED NORMALLY"
+  postmsg "$jlogfile" "$msg"
+fi
+
+###################################################
+# Save the output snow grib files in /dcom and /com
+###################################################
+
+if test "$SENDCOM" = 'YES'
+then
+   cp fort.52 $TANKDIR/${PDY}/wgrbbul/snowdepth.global.grb
+   cp fort.52 $COMOUT/snowdepth.global.grb_${cyc}
+fi
+
+if ((error != 0))
+then
+  msg="PROBLEM CREATING GAUSSIAN GRID SNOW."
+  postmsg "$jlogfile" "$msg"
+  errexit
+fi
+
+####################################################################
+# GOOD RUN
+set +x
+echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
+echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
+echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
+set -x
+#####################################################################
+
+msg="JOB COMPLETED NORMALLY"
+echo $msg
+postmsg "$jlogfile" "$msg"

@@ -1,0 +1,63 @@
+#!/bin/ksh
+
+#-----------------------------------------------------
+# To run coldstart for sref nmm (e-grid) members on
+# wcoss phase 1.
+#
+# Note: this script does not exactly mimic sref ops
+# because the "pre-coldstart" nmm input file
+# is not saved to /nwges.  Only the "post-coldstart"
+# is saved.
+#
+# Invoke this script as follows:
+# "cat nmm.wcoss.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -R rusage[mem=1000]
+#BSUB -R affinity[core]
+#BSUB -oo nmm.log
+#BSUB -eo nmm.log
+#BSUB -q dev_shared
+#BSUB -J sref_nmm
+#BSUB -P SREF-T2O
+#BSUB -cwd .
+#BSUB -W 0:07
+
+set -x
+
+HOMEsref="/nwprod/sref.v6.1.5/"
+
+RUN_DIR=${LS_SUBCWD}
+EXE_DIR=${RUN_DIR}/../../../../exec
+EXEC=${EXE_DIR}/emcsfc_coldstart
+#EXEC=$HOMEsref/exec/sref_coldstart_wrf
+
+WORK_DIR="/ptmpp1/$LOGNAME/sref_coldstart.nmm"
+rm -fr $WORK_DIR
+mkdir -p $WORK_DIR
+cd $WORK_DIR
+
+# The input sref file. Note: this is the "post-coldstart" file.
+# The "pre-coldstart" file is not saved.
+yyyymmdd=20140828
+cp /nwges/prod/sref.$yyyymmdd/NMM.t03z.ctl.wrfinput_d01  ./wrfinput_d01
+cp wrfinput_d01  wrfinput_d01.b4.coldstart
+
+# ndas file with the land states we want.
+DATA_DIR=/nwges/prod/ndas.$yyyymmdd
+ln -fs ${DATA_DIR}/ndas.t06z.nmm_b_restart_nemsio_anl.tm03  ./edas12rst_ndas
+
+# the coldstart namelist
+ln -fs $HOMEsref/parm/sref_wrfnmm_config.nml  ./fort.41
+
+# the fixed files
+ln -fs $HOMEsref/fix/sref_wrfnmm_roughness.grb     .
+ln -fs $HOMEsref/fix/sref_wrfnmm_usgs_vegtype.grb  .
+
+mpirun.lsf $EXEC
+
+mv wrfinput_d01  wrfinput_d01.after.coldstart
+
+exit 0

@@ -1,0 +1,53 @@
+#!/bin/ksh
+ 
+#-----------------------------------------------------
+# Run the sst2mdl program on the WCOSS phase 2 nodes.
+#
+# Invoke this script as follows:
+# cat runit.wcoss.p2.lsf | bsub
+#
+# When using FLAKE data, run with multiple threads
+# to reduce wall clock time.  Otherwise, use one
+# thread.
+#-----------------------------------------------------
+
+#BSUB -oo sst2mdl.log
+#BSUB -eo sst2mdl.log
+#BSUB -q dev2_shared
+#BSUB -R rusage[mem=500]
+#BSUB -R affinity[core(1)]
+#BSUB -a openmp
+#BSUB -n 2
+#BSUB -R span[ptile=2]
+#BSUB -J sst2mdl
+#BSUB -P NAM-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+WORK="/stmpp2/$LOGNAME/sst2mdl"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+
+cp ${execdir}/emcsfc_sst2mdl     ./
+
+#------------------------------------------------------------
+# input/output files are set in the namelist. 
+#------------------------------------------------------------
+
+ln -fs ${rundir}/config.wcoss.nml   ./fort.41
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+./emcsfc_sst2mdl 
+
+rm -f ./fort.41
+
+exit 0

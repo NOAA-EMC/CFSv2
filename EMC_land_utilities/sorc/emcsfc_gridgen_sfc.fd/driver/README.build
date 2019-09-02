@@ -1,0 +1,65 @@
+Instructions for building and installing the emcsfc_gridgen_sfc
+'stand-alone' driver program (only tested on WCOSS-Phase1/2/Cray/Dell
+and Theia):
+
+Before building the driver program, you must build and 
+install the emcsfc_gridgen_sfc library and module
+files.  See the README.build file in ../lib for details.
+
+Sample scripts and configuration files to run the driver program
+are in ../../../reg_tests/emcsfc_gridgen_sfc.
+
+--------------------------------------------------------------------
+TO BUILD PROGRAM:
+--------------------------------------------------------------------
+
+--------------------------------------------------------------------
+On WCOSS-Phase 1/2:
+--------------------------------------------------------------------
+
+1) Load the build module:
+      "module load ../../../modulefiles/module.gridgen_sfc.wcoss"
+2) Build the executable:
+      "make all"
+3) If build is successfull, install the executable - emcsfc_gridgen_sfc -
+   in ../../../exec as follows:
+      "make install"
+4) Unload the build module:
+      "module unload module.gridgen_sfc.wcoss"
+
+Alternately, steps 1-4 may be accomplished by invoking the 'make.sh'
+driver script:
+      "make.sh"
+
+--------------------------------------------------------------------
+On WCOSS-Cray:
+--------------------------------------------------------------------
+
+To build with the Intel Fortran compiler:
+
+1) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+To build with the Cray Fortran compiler:
+
+1) Edit the "../../../modulefiles/module.gridgen_sfc.wcoss.cray" file.  
+   Comment out the module loads and FCOMP/FFLAGS/LDFLAGS statements for the
+   Intel compiler.  Uncomment the corresponding lines for the
+   Cray compiler.
+
+2) Invoke the 'make.sh' driver script from the command line:
+   "make.sh"
+
+If there are no build errors, the program - emcsfc_gridgen_sfc -
+will be installed in ../../../exec. 
+
+--------------------------------------------------------------------
+On WCOSS-Dell and Theia:
+--------------------------------------------------------------------
+
+1) Invoke the 'make.sh' driver script from the command line:
+
+   "./make.sh"
+
+If there are no build errors, the program - emcsfc_gridgen_sfc -
+will be installed in ../../../exec. 

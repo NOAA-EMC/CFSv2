@@ -1,0 +1,47 @@
+#!/bin/ksh
+ 
+#-----------------------------------------------------
+# Run the emcsfc_grib_snowgrib program on the
+# WCOSS phase 1 nodes.
+#
+# Invoke this script as follows:
+# "cat run.wcoss.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -oo grib_snowgrib.log
+#BSUB -eo grib_snowgrib.log
+#BSUB -q dev_shared
+#BSUB -R rusage[mem=300]
+#BSUB -R affinity[core(1)]
+#BSUB -J grib_snowgrib
+#BSUB -P GFS-T2O
+#BSUB -cwd .
+#BSUB -W 0:02
+
+set -x
+
+rundir=${LS_SUBCWD}
+execdir=${rundir}/../../exec
+EXE=${execdir}/emcsfc_grib_snowgrib
+
+WORK="/stmpp1/$LOGNAME/emcsfc_grib_snowgrib"
+rm -fr $WORK
+mkdir -p $WORK
+cd $WORK
+
+# input snow files
+date8="20150209"
+ln -fs /dcom/us007003/${date8}/wgrdbul/PRD.SPPROD.SNODEPH.NHMAMAP fort.11
+ln -fs /dcom/us007003/${date8}/wgrdbul/PRD.SPPROD.SNODEPH.SHMAMAP fort.12
+ln -fs /dcom/us007003/${date8}/wgrbbul/imssnow.grb fort.13
+
+# output 0.5-degree snow analysis
+ln -fs snowdepth.global.grb fort.52
+
+#------------------------------------------------------------
+# Run executable.
+#------------------------------------------------------------
+
+$EXE
+
+exit 0

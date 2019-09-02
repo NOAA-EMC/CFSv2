@@ -1,0 +1,66 @@
+#!/bin/ksh
+
+#-----------------------------------------------------
+# To run coldstart for sref nmb members on wcoss
+# phase 1.
+#
+# Note: this script does not exactly mimic sref ops
+# because the "pre-coldstart" nmb input file
+# is not saved to /nwges.  Only the "post-coldstart"
+# is saved.
+#
+# Invoke this script as follows:
+# "cat nmb.wcoss.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -oo nmb.log
+#BSUB -eo nmb.log
+#BSUB -q "dev_shared"
+#BSUB -R rusage[mem=2000]
+#BSUB -R affinity[core]
+#BSUB -P SREF-T2O
+#BSUB -J "sref_nmb"
+#BSUB -cwd .
+#BSUB -W 0:04
+
+set -x
+
+yyyymmdd=20141216
+CYC=21
+
+HOMEsref="/meso/save/Jun.Du/sref.v7.0.0"
+
+RUN_DIR=${LS_SUBCWD}
+EXE_DIR=${RUN_DIR}/../../../../exec
+EXEC=${EXE_DIR}/emcsfc_coldstart
+
+WORK_DIR="/ptmpp1/$LOGNAME/sref_coldstart.nmb"
+rm -fr $WORK_DIR
+mkdir -p $WORK_DIR
+cd $WORK_DIR
+
+# The input sref file. 
+cp /ptmpp1/Jun.Du/tmpnwprd/sref_NMB_real_${CYC}_prod/real.ctl/input_domain_01_nemsio_b4coldstart  ./
+cp input_domain_01_nemsio_b4coldstart input_domain_01_nemsio
+
+# ndas file with the land states we want.
+DATA_DIR=/nwges/prod/ndas.$yyyymmdd
+if [ $CYC -eq 09 ]; then
+  ln -fs ${DATA_DIR}/ndas.t12z.nmm_b_restart_nemsio_anl.tm03 edas12rst_ndas
+elif [ $CYC -eq 21 ]; then
+  ln -fs ${DATA_DIR}/ndas.t00z.nmm_b_restart_nemsio_anl.tm03 edas12rst_ndas
+fi 
+
+# the coldstart namelist
+ln -fs $HOMEsref/parm/sref_wrfnmb_config.nml_4igbp  ./fort.41
+
+mpirun.lsf $EXEC
+rc=$?
+
+if [ $rc -eq 0 ]; then
+  mv input_domain_01_nemsio input_domain_01_nemsio.after.coldstart
+fi
+
+exit 0

@@ -1,0 +1,68 @@
+#!/bin/ksh
+
+#-----------------------------------------------------
+# To run coldstart for sref arw members on wcoss
+# phase 1.
+#
+# Note: this script does not exactly mimic sref ops
+# because the "pre-coldstart" arw input file
+# is not saved to /nwges.  Only the "post-coldstart"
+# is saved.
+#
+# Invoke this script as follows:
+# "cat arw.wcoss.lsf | bsub"
+#-----------------------------------------------------
+
+#BSUB -a poe
+#BSUB -n 1
+#BSUB -R rusage[mem=1000]
+#BSUB -R affinity[core]
+#BSUB -oo arw.log
+#BSUB -eo arw.log
+#BSUB -q dev_shared
+#BSUB -J sref_arw
+#BSUB -P SREF-T2O
+#BSUB -cwd .
+#BSUB -W 0:03
+
+set -x
+
+date8=20141215
+CYC=09
+
+HOMEsref="/meso/save/Jun.Du/sref.v7.0.0"
+
+RUN_DIR=${LS_SUBCWD}
+EXE_DIR=${RUN_DIR}/../../../../exec
+EXEC=${EXE_DIR}/emcsfc_coldstart
+
+WORK_DIR="/ptmpp1/$LOGNAME/sref_coldstart.arw"
+rm -fr $WORK_DIR
+mkdir -p $WORK_DIR
+cd $WORK_DIR
+
+cp /ptmpp1/Jun.Du/tmpnwprd/sref_ARW_real_${CYC}_prod/real.ctl/wrfinput_d01_b4ndasreplacement  ./
+cp wrfinput_d01_b4ndasreplacement wrfinput_d01
+
+# ndas file with the land states we want.
+DATA_DIR=/nwges/prod/ndas.${date8}
+if [ $CYC -eq 09 ]; then
+  ln -fs ${DATA_DIR}/ndas.t12z.nmm_b_restart_nemsio_anl.tm03 edas12rst_ndas
+elif [ $CYC -eq 21 ]; then
+  ln -fs ${DATA_DIR}/ndas.t00z.nmm_b_restart_nemsio_anl.tm03 edas12rst_ndas
+fi
+
+# the coldstart namelist
+ln -fs $HOMEsref/parm/sref_wrfem_config.nml  ./fort.41
+
+# fix file
+ln -fs $HOMEsref/fix/sref_wrfem_usgs_vegtype.grb   .
+
+mpirun.lsf $EXEC
+rc=$?
+
+if [ $rc -eq 0 ]; then
+  mv wrfinput_d01 wrfinput_d01.aftercoldstart
+fi
+
+exit 0
