@@ -11,7 +11,7 @@
 
 mkdir -p ../exec # place for executables
 
-for directory in emcsfc_snow2mdl.fd  emcsfc_grib_snowgrib.fd
+for directory in emcsfc_snow2mdl.fd  emcsfc_grib_snowgrib.fd  ## only compile the snow programs
 do
   case $directory in
     *gridgen_sfc.fd)
@@ -26,6 +26,7 @@ do
       cd $directory
       make clean
       make.sh
+      rm -f *.o *.mod
       cd .. ;;
   esac
 
