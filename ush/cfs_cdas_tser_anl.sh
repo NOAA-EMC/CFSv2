@@ -10,7 +10,7 @@ set -x
 
 #export MP_STDOUTMODE=ordered
 #export MP_LABELIO=yes
-export APRUN=${APRUN:-mpirun.lsf}
+export APRUN=${APRUN:-mpirun}
 
 export yyyymm=${1:-${yyyymm:-$yyyy$mm}}
 export inp_file=${2:-${inp_file:-pgbf}}
@@ -250,7 +250,7 @@ if [ $maketim = 1 ] ;then
 
   #$APRUN -pgmmodel mpmd -cmdfile cmdfile_0
   cp cmdfile_0 cmdfile
-  $APRUN mpiserial
+  $APRUN cfp cmdfile  
   ((rc+=$?))
   if [ $rc -gt 0 ] ; then export err=$rc; err_chk ; else rm invout_*.sh ; rm cmdfile_0 ; fi
 
@@ -357,7 +357,7 @@ if [ $maketim = 1 ] ;then
   do
     #$APRUN -pgmmodel mpmd -cmdfile cmdfile_$n
     cp cmdfile_$n cmdfile
-    $APRUN mpiserial
+    $APRUN cfp cmdfile 
     ((rc+=$?))
     export err=$rc; err_chk
   done
@@ -371,7 +371,7 @@ if [ $makefix = 1 ] ; then
 
 cat <<\EOF > tser.fix.sh
 #!/bin/ksh
-set -x
+##set -x
 if [ $# -ne 1 ] ; then echo "Usage:$0 grib";exit 1;fi
 grib=$1
 $WGRIB $grib >$grib.wgrib 2>/dev/null
@@ -418,9 +418,9 @@ EOF
 
   n=-1;while [ $((n+=1)) -le $npoe ] ; do
     cat cmdfile_$n
-#    $APRUN -pgmmodel mpmd -cmdfile cmdfile_$n
+    ###$APRUN -pgmmodel mpmd -cmdfile cmdfile_$n
     cp cmdfile_$n cmdfile
-    $APRUN  mpiserial
+    $APRUN  cfp cmdfile
     export err=$?; err_chk
   done
 

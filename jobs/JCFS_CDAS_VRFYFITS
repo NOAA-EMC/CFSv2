@@ -80,19 +80,15 @@ mkdir -m 775 -p $GESdir
 export RESDIR=${RESDIR:-$GESdir}
 mkdir -p $RESDIR
 
-env
+##env
 
 #############################################################
-# execute the script
+# execute the fit script for cfs and gfs
 #############################################################
 
-for cyc in 00 06 12 18
-do
-  export cycle=t${cyc}z
-  export CDATE=${PDY}$cyc
-  ${VRFYFITSSH:-$HOMEcfs/scripts/excfs_cdas_vrfyfits.sh.ecf}
-  err=$?; err_chk
-done
+${VRFYFITSSH:-$HOMEcfs/scripts/excfs_cdas_vrfyfits.sh.ecf} CFS $CDATE; err=$?; err_chk
+
+${VRFYFITSSH:-$HOMEcfs/scripts/excfs_cdas_vrfyfits.sh.ecf} GFS $CDATE; err=$?; err_chk
 
 ###################################################
 # msg end of job and clean up temperary directory

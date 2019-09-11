@@ -2,13 +2,15 @@
 set -x
 
 export machine=${machine:-WCOSS}
+
+echo jsw $machine
 ######################################################################
 #   This script creates pke (energetics) monthly means of grib files.
 #
 #       Originally written by Shrinivas Moorthi
 #       Updated by Patrick Tripp Sept 2010
 ######################################################################
-export APRUN=${APRUN:-mpirun.lsf}
+export APRUN="mpirun -n 28"  ##${APRUN:-mpirun.lsf}
 export CDUMP=${CDUMP:-"gdas"}
 
 errs=0
@@ -116,7 +118,8 @@ if [ $prefix2 = f -o $prefix2 = h -o $prefix2 = l ] ; then
       done < $cmdfile
       n=0
       while [ $((n+=1)) -le $l ] ;do
-        $APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
+        ##$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
+        mpirun cfp cmdlist.$n
         export err=$?; err_chk
       done
   fi
@@ -193,7 +196,8 @@ else
       done < $cmdfile
       n=0
       while [ $((n+=1)) -le $l ] ;do
-        $APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
+        ##$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
+        mpirun cfp cmdlist.$n
         export err=$?; err_chk
       done
   fi

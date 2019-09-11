@@ -3,8 +3,8 @@ set -xa
 
 date
 
-. /usrx/local/Modules/default/init/ksh
-module load mpiserial
+###. /usrx/local/Modules/default/init/ksh
+###module load mpiserial
 
 ####################################
 # Specify NET and RUN Name and model

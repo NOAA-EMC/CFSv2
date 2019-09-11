@@ -18,7 +18,8 @@
 #######################################################
 # Incoming parameters
 #######################################################
-set -x
+
+[[ $VERBOSE != NO ]] && set -x
 
 YYYYMM=${1:-${YYYYMM:-201005}}
 
@@ -28,15 +29,9 @@ echo "YYYYMM=$YYYYMM"
 
 export machine=${machine:-WCOSS}
 
-if [ $machine = IBM ]; then
-   export APRUN=${APRUN:-poe}
-elif [ $machine = WCOSS ]; then
-   export APRUN=${APRUN:-mpirun.lsf}
-else
-   echo "please specify APRUN variable"
-fi
-
 rundate=${YYYYMM}0100
+
+export APRUN=mpirun 
 
 YYYYMMDD=`echo $rundate | cut -c1-8`
 YYYY=`echo $rundate | cut -c1-4`
@@ -885,7 +880,7 @@ if [ $dogrib2means = "YES" ] ; then
     do
       #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
       cp cmdlist.$n cmdfile
-      $APRUN mpiserial
+      $APRUN cfp cmdfile   
       # Error check
       export err=$?; err_chk
       ((rc+=$err))
@@ -1166,7 +1161,7 @@ if [ $dogrib2time = "YES" ] ; then
     do
       #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
       cp cmdlist.$n cmdfile
-      $APRUN mpiserial
+      $APRUN cfp cmdfile  
       # Error check
       export err=$?; err_chk
       ((rc+=$err))

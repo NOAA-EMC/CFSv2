@@ -19,7 +19,7 @@ export fh2=$6
 prfile=$DATAX/fits.$CDATE
 > $prfile
 
-list='raob sfc acft acar'
+list='raob sfc surf acft acar'
 for sub in $list ; do
   cp $PRPO fort.11
   ln -sf f$fh1.$sub.$CDATE fort.51

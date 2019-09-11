@@ -7,7 +7,7 @@ set -x
 #       Originally written by Shrinivas Moorthi
 #       Updated by Patrick Tripp Sept 2010
 ######################################################################
-export APRUN=${APRUN:-mpirun.lsf}
+export APRUN=${APRUN:-mpirun}
 
 # fix for files > 2GB
 
@@ -165,7 +165,7 @@ n=-1;while [ $((n+=1)) -le $npoe ] ; do
 	cat cmdfile.$$.$n
 	#$APRUN -pgmmodel mpmd -cmdfile cmdfile.$$.$n 
         cp cmdfile.$$.$n cmdfile
-        $APRUN mpiserial
+        $APRUN cfp cmdfile   
         export err=$?; err_chk
 done
 rc=$?

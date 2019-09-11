@@ -8,7 +8,7 @@ set -xeu
 #       Updated by Patrick Tripp Sept 2010
 #######################################################
 
-export APRUN=${APRUN:-mpirun.lsf}
+export APRUN="mpirun -n 16" ###${APRUN:-mpirun -n 16}
 WINDEX=${WINDEX:-$GRBINDEX}
 #export MP_STDOUTMODE=ordered
 #export MP_LABELIO=yes
