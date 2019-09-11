@@ -252,7 +252,7 @@ if [ $RC_ARG -eq 0 ] ; then
   DUMP=${DUMP:-"$HOMEcfs/ush/bufr_dumparte"}
   MODX=${MODX:-"$HOMEcfs/exec/bufr_prepmods"}
   BTAB=${BTAB:-"$HOMEdump/fix/bufrtab.mods"}
-  LIST=${LIST:-"$HOMEdump/fix/bufr_dumplist"}
+  LIST=${LIST:-"$HOMEdump/fix/bufr_dumplist"}  ## could be LIST=$HOMEobsproc_shared_bufr_dumplist/fix/bufr_dumplist}
 
   TIME_CENTER=${TIME_CENTER:-"12"}
   TIME_RADIUS=${TIME_RADIUS:-"11.999"}

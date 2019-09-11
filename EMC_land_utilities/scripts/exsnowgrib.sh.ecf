@@ -295,7 +295,7 @@ fi
 
 if test "$SENDCOM" = 'YES'
 then
-   cp fort.52 $TANKDIR/${PDY}/wgrbbul/snowdepth.global.grb
+   ###### ???????  cp fort.52 $TANKDIR/${PDY}/wgrbbul/snowdepth.global.grb
    cp fort.52 $COMOUT/snowdepth.global.grb_${cyc}
 fi
 

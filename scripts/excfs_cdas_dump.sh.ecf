@@ -40,8 +40,8 @@ export SENDCOM=${SENDCOM:-YES}
 export PROCESS_GRIBFLDS=${PROCESS_GRIBFLDS:-YES}
 export PROCESS_GDAS_DUMP=${PROCESS_GDAS_DUMP:-YES}
 export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
-export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}    # preferred, but don't know how RUN will be set in J-Script
-export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY} # GDAS file directory
+export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}         # preferred, but don't know how RUN will be set in J-Script
+export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY/$cyc} # GDAS file directory
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
 postmsg "$jlogfile" "$msg"
@@ -53,6 +53,39 @@ postmsg "$jlogfile" "$msg"
 # get grib fields
 if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
 
+# create snowdepth.global.grb from AFWA snow fields
+
+set +x
+echo
+echo '------------------------------------------------------------------------------------'
+echo 'JISNI processing -------------------------------------------------------------------'
+echo '------------------------------------------------------------------------------------'
+set -x
+${JISNISH:-$USHcfs/cfs_snowdepth.sh} >$PWD/sdout.$$ 2>&1
+set +x
+echo '------------------------------------------------------------------------------------'
+echo '------------------------------------------------------------------------------------'
+echo
+set -x
+
+# create the nsstsstqd files 
+
+set +x
+echo
+echo '------------------------------------------------------------------------------------'
+echo 'NSST SST QD processing -------------------------------------------------------------------'
+echo '------------------------------------------------------------------------------------'
+set -x
+SFCanl=$COMGDAS/$gdas1.t${cyc}z.sfcanl.nemsio
+[[ -s $SFCanl ]] && ${NSTSSTQD:-$HOMEcfs/ush/cfs_nstsstqd.sh} $CDATE $SFCanl >$PWD/nstout.$$ 2>&1
+set +x
+echo '------------------------------------------------------------------------------------'
+echo '------------------------------------------------------------------------------------'
+echo
+set -x
+
+##exit
+
 ########################################################
 ########################################################
 #  copy snogrb (0.5 deg) from $TANK_GRIBFLDS
@@ -61,8 +94,11 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
 ########################################################
 ########################################################
 
-   snogrb=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.global.grb
-   snoold=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.global.grb
+   #snogrb=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.global.grb
+   #snoold=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.global.grb
+
+   snogrb=$COMOUT/snowdepth.global.grb_$cyc
+   snoold=$COMOUT/snowdepth.global.grb_$cyc
 
    if [ -s $snogrb ]; then
       cp $snogrb ${COMSP}snogrb
@@ -73,7 +109,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays 0.5 degree snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s  $COMGDAS/$gdas1.t${cyc}z.snogrb ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb $COMOUT/${COMSP}snogrb
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb ${COMSP}snogrb
    else
       set +x
       echo " "
@@ -87,8 +123,11 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       err_exit
    fi
 
-   snogrb_t574=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.t574.grb
-   snoold_t574=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.t574.grb
+   #snogrb_t574=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.t574.grb
+   #snoold_t574=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.t574.grb
+
+   snogrb_t574=$COMOUT/snowdepth.t574.grb_$cyc ## t574 snowdepth file
+   snoold_t574=$COMOUT/snowdepth.t574.grb_$cyc ## t574 snowdepth file
 
    if [ -s $snogrb_t574 ]; then
       cp $snogrb_t574 ${COMSP}snogrb_t574
@@ -99,7 +138,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays T574 snow grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 $COMOUT/${COMSP}snogrb_t574
+      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ${COMSP}snogrb_t574
    else
       set +x
       echo " "
@@ -125,7 +164,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
       msg="**todays engice grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.engicegrb $COMOUT/${COMSP}engicegrb
+      cp $COMGDAS/$gdas1.t${cyc}z.engicegrb ${COMSP}engicegrb
    else
       set +x
       echo " "
@@ -149,11 +188,11 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
    sstold=${COM_SSTOIQD}.$PDYm1/sstoiqd.sst.grb
 
    if [ -s $sstgrb ]; then
-      cp $sstgrb ${COMSP}sstgrb
+      cp $sstgrb ${COMSP}sstgrb.oisst
       msg="todays sst grib file located and copied to /com"
       postmsg "$jlogfile" "$msg"
    elif [ -s $sstold ]; then
-      cp $sstold ${COMSP}sstgrb
+      cp $sstold ${COMSP}sstgrb.oisst
       msg="**todays sst grib file not located - copy 1-day old file"
       postmsg "$jlogfile" "$msg"
    else
@@ -187,7 +226,7 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 # copy the production GDAS DUMP files
 #              and rename them to cdas1 files to be saved in the CDAS directory
   
-  COMGDAS=$COMGDAS/$cyc ## need this for new com structure
+##COMGDAS=$COMGDAS/$cyc ## need this for new com structure
 
   # bufr_d files
   for gdasfile in `ls $COMGDAS/$gdas1.t${cyc}z.*bufr_d |awk ' BEGIN { FS="/"} { print $NF }'`
@@ -197,14 +236,14 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
   done
 
   # tcvital files
-  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 $COMOUT/${COMSP}syndata.tcvitals.tm00
-  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 $COMOUT/${COMSP}jtwc-fnoc.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 ${COMSP}syndata.tcvitals.tm00
+  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 ${COMSP}jtwc-fnoc.tcvitals.tm00
 
   # RFC #1550 Update WCOSS to send more CDAS data to NOMADS -20151211
   if [ $SENDDBN = YES ]; then
      fname=ascatw
      alerttype=CDAS1_BUFR_${fname}
-     file=$COMOUT/${COMSP}${fname}.tm00.bufr_d
+     file=${COMSP}${fname}.tm00.bufr_d
      if [ -s ${file} ]; then
        $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
      else
@@ -213,7 +252,7 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
 
      for fname in omi ascatt ; do
        alerttype=CDAS1_MSC_${fname}
-       file=$COMOUT/${COMSP}${fname}.tm00.bufr_d
+       file=${COMSP}${fname}.tm00.bufr_d
        if [ -s ${file} ]; then
          $DBNROOT/bin/dbn_alert MODEL ${alerttype} $job ${file}
        else
