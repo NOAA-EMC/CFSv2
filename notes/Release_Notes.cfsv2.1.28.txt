@@ -41,3 +41,42 @@ cfs_cdas_ocnanal  v27      v28
 wall              300      1700
 cpu               692      3546
 w/c               .43      .48
+
+cfs trunk updated to version 2.1.28
+	
+Thu, Jul 19, 2018, 11:15 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r100 | xiaoxue.wang@noaa.gov | 2018-07-19 15:13:53 +0000 (Thu, 19 Jul 2018) | 1 line
+Changed paths:
+   A /trunk/Release_Notes.cfsv2.1.28.txt
+   A /trunk/exec/bufr_argodump
+   A /trunk/exec/bufr_argodump_hold
+   A /trunk/exec/bufr_prepmods
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+   A /trunk/sorc/bufr_argodump.fd
+   A /trunk/sorc/bufr_argodump.fd/Makefile
+   A /trunk/sorc/bufr_argodump.fd/bufr_argodump.f
+   A /trunk/sorc/bufr_argodump.fd/makefile.sh
+   A /trunk/sorc/bufr_argodump.fd/runt
+   A /trunk/sorc/bufr_argodump.fd_hold
+   A /trunk/sorc/bufr_argodump.fd_hold/Makefile
+   A /trunk/sorc/bufr_argodump.fd_hold/bufr_argodump.f
+   A /trunk/sorc/bufr_argodump.fd_hold/makefile.sh
+   A /trunk/sorc/bufr_prepmods.fd
+   A /trunk/sorc/bufr_prepmods.fd/Makefile
+   A /trunk/sorc/bufr_prepmods.fd/bufr_prepmods.f
+   A /trunk/sorc/bufr_prepmods.fd/clonlat.f
+   A /trunk/sorc/bufr_prepmods.fd/makefile.sh
+   A /trunk/sorc/bufr_prepmods.fd/mnemonics.f
+   A /trunk/sorc/bufr_prepmods.fd/obname.f
+   A /trunk/sorc/bufr_prepmods.fd/raddate.f
+   A /trunk/sorc/bufr_prepmods.fd/ssmipn.f
+   A /trunk/sorc/bufr_prepmods.fd/tideg.f
+   A /trunk/ush/bufr_dumparte
+   A /trunk/ush/bufr_dumpmb
+
+Include data from new bufr tank b031/xx005 into ocean DA data flow (ARFC 4648)
+
+

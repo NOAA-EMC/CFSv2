@@ -1,0 +1,13 @@
+cfs trunk updated to version 2.1.23
+	
+Tue, Nov 1, 2016, 11:11 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r87 | floyd.fayton@noaa.gov | 2016-11-01 15:09:17 +0000 (Tue, 01 Nov 2016) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_DUMP
+
+RFC#2507 SEAICE/RTGSSTHR Upgrade Implementation
+------------------------------------------------------------------------
+

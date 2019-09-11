@@ -1,0 +1,15 @@
+cfs trunk updated to version 2.1.18
+	
+Tue, Dec 15, 2015, 10:57 PM
+	
+
+SVN Log:
+------------------------------------------------------------------------
+r76 | simon.hsiao@noaa.gov | 2015-12-16 03:54:01 +0000 (Wed, 16 Dec 2015) | 1 line
+Changed paths:
+   D /trunk/scripts/excfs_cdas_dump.sh.ecf.20151110
+   D /trunk/ush/cfs_timavg_fcst.sh.06072013
+
+RFC #1550: Send CDAS to NOMADS; to alter the cfs sig/sfc/siganl/sfcanl files, not grb2 files
+------------------------------------------------------------------------
+

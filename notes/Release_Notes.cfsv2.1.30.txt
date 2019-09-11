@@ -1,0 +1,17 @@
+cfs trunk updated to version 2.1.30
+
+Fri, Dec 21, 2018, 2:20 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r104 | xiaoxue.wang@noaa.gov | 2018-12-21 19:19:15 +0000 (Fri, 21 Dec 2018) | 1 line
+Changed paths:
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2017.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2018.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2019.txt_proj
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2019.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2018.txt
+
+yearly CO2 files update (RFC 5277)
+------------------------------------------------------------------------
+

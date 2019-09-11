@@ -1,0 +1,13 @@
+cfs trunk updated to version 2.1.26
+	
+Wed, Sep 13, 2017, 4:05 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r93 | xiaoxue.wang@noaa.gov | 2017-09-13 20:04:12 +0000 (Wed, 13 Sep 2017) | 1 line
+Changed paths:
+   M /trunk/ush/cfs_archive.sh
+
+Move m2,m3,m4 from 2 year archive directory to permanent archive directory
+------------------------------------------------------------------------
+

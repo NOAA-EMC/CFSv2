@@ -1,0 +1,12 @@
+cfs trunk updated to version 2.1.16
+
+SVN Log:
+------------------------------------------------------------------------
+r70 | simon.hsiao@noaa.gov | 2015-12-11 19:52:38 +0000 (Fri, 11 Dec 2015) | 1 line
+Changed paths:
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+   A /trunk/scripts/excfs_cdas_dump.sh.ecf.20151110
+   A /trunk/scripts/excfs_cdas_dump.sh.ecf.new
+
+RFC #1550: send CDAS to NOMADS
+------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+cfs trunk updated to version 2.1.24
+	
+Mon, Mar 6, 2017, 12:21 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r89 | xiaoxue.wang@noaa.gov | 2017-03-06 17:20:17 +0000 (Mon, 06 Mar 2017) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_PREP
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+
+point to latest version of prepobs_prepdata executable in cfs_cdas_prep for v7 BUFR data change
+------------------------------------------------------------------------
+

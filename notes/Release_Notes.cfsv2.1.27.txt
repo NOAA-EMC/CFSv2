@@ -1,0 +1,27 @@
+cfs trunk updated to version 2.1.27
+	
+Tue, Dec 19, 2017, 11:52 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r95 | kit.menlove@noaa.gov | 2017-12-19 16:51:26 +0000 (Tue, 19 Dec 2017) | 1 line
+Changed paths:
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2015.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2016.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2016.txt_proj
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2016.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2017.txt_proj
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2017.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2018.txt_proj
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2015.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2016.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2017.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2018.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2014.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2015.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2016.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2017.txt
+
+Update yearly CO2 fix files
+------------------------------------------------------------------------
+

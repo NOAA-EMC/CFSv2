@@ -1,0 +1,13 @@
+cfs trunk updated to version 2.1.22
+	
+Wed, Oct 12, 2016, 10:31 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r85 | xiaoxue.wang@noaa.gov | 2016-10-12 14:29:57 +0000 (Wed, 12 Oct 2016) | 1 line
+Changed paths:
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+
+Change cdas1.tCCz.gpsipw.bufr_d to restrict data (RFC 2414)
+------------------------------------------------------------------------
+

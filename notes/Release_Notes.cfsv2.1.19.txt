@@ -1,0 +1,18 @@
+cfs trunk updated to version 2.1.19
+	
+Thu, May 12, 2016, 2:03 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r79 | kit.menlove@noaa.gov | 2016-05-12 17:59:56 +0000 (Thu, 12 May 2016) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_DUMP
+   M /trunk/parm/cfs_parm_am/cfs_config
+   M /trunk/parm/cfs_parm_am/cfs_config_catch
+   M /trunk/parm/cfs_parm_am/cfs_hur_config
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+   D /trunk/scripts/excfs_cdas_dump.sh.ecf.new
+
+Update for GFS Upgrade (RFC 1919)
+------------------------------------------------------------------------
+

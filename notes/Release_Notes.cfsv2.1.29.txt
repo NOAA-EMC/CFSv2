@@ -1,0 +1,15 @@
+cfs trunk updated to version 2.1.29
+	
+Fri, Oct 26, 2018, 4:13 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r102 | xiaoxue.wang@noaa.gov | 2018-10-26 20:12:08 +0000 (Fri, 26 Oct 2018) | 1 line
+Changed paths:
+   A /trunk/Release_Notes.cfsv2.1.29.txt
+   M /trunk/ush/bufr_dumparte
+
+Turn off data duplic checking for tesac/argo data (RFC 5065)
+------------------------------------------------------------------------
+
+

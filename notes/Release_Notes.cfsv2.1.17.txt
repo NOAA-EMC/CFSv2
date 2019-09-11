@@ -1,0 +1,14 @@
+cfs trunk updated to version 2.1.17
+
+SVN Log:
+------------------------------------------------------------------------
+r72 | simon.hsiao@noaa.gov | 2015-12-15 03:51:00 +0000 (Tue, 15 Dec 2015) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_ANGUPDATE
+   M /trunk/scripts/excfs_cdas_angupdate.sh.ecf
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+   M /trunk/scripts/excfs_post.sh.ecf
+   M /trunk/ush/cfs_keepfile.sh
+
+RFC#1550: Send CDAS to NOMADS; adding more  cfs alerted products
+------------------------------------------------------------------------

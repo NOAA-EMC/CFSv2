@@ -1,0 +1,14 @@
+cfs trunk updated to version 2.1.20
+
+Thu, May 26, 2016, 1:30 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r81 | xiaoxue.wang@noaa.gov | 2016-05-26 17:29:25 +0000 (Thu, 26 May 2016) | 1 line
+Changed paths:
+   M /trunk/ush/cfs_archive.sh
+   M /trunk/ush/cfs_cdas_archive.sh
+
+Remove verification step in cfs_archive jobs (RFC 1973)
+------------------------------------------------------------------------
+

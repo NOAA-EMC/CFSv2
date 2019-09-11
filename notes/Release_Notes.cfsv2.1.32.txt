@@ -1,0 +1,16 @@
+cfs trunk updated to version 2.1.32
+	
+Jun 13, 2019, 2:42 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r108 | xiaoxue.wang@noaa.gov | 2019-06-13 18:40:28 +0000 (Thu, 13 Jun 2019) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_DUMP
+   M /trunk/jobs/JCFS_CDAS_PREP
+   D /trunk/jobs/JCFS_CDAS_PREP.org
+   D /trunk/sorc/bufr_argodump.fd/bufr_argodump.o
+
+Update for GFS FV3 upgrade and seaice_analysis transition to phase3 (RFC 5783)
+------------------------------------------------------------------------
+

@@ -7,3 +7,19 @@ FILE CHANGES
   /nwprod/cfs.v2.1.21/fix/cfs_fix_cdas/global_satinfo.txt
 
 
+
+cfs trunk updated to version 2.1.21
+
+Fri, Sep 9, 2016, 4:09 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r83 | jianbin.yang@noaa.gov | 2016-09-09 20:08:06 +0000 (Fri, 09 Sep 2016) | 1 line
+Changed paths:
+   A /trunk/Release_Notes.cfsv2.1.21.txt
+   M /trunk/fix/cfs_fix_am/global_satinfo.txt
+   M /trunk/fix/cfs_fix_cdas/global_satinfo.txt
+
+Urgent update to switch off Metop-A HIRS in all models
+------------------------------------------------------------------------
+
