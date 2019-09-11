@@ -1,0 +1,52 @@
+#!/bin/sh
+set -aeu
+
+[ $# -eq 1 ] && plat=$1 || plat=none ; mkdir -p ../../exec
+
+if [ $plat = jibb ]; then
+ export LIBD=/home/jwoollen/lib  
+ export LIBS="-L$LIBD  -lw3_4 -lbufr_4_64 -lsp_4 -lsigio_4 -lsfcio_4 -lbacio_4 -mkl"
+ export INCS="-I$LIBD/incmod/sigio_4 -I$LIBD/incmod/sfcio_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = wcoss ]; then
+ export LIBD=/nwprod/lib
+ export LIBS="$BUFR_LIB4 -L$LIBD -lnemsio_v2.2.1 -lw3emc_4 -lw3nco_4 -lsp_4 -lsigio_4 -lsfcio_4 -lbacio_4 -mkl"
+ export INCS="-I$LIBD/incmod/nemsio_v2.2.1 -I$LIBD/incmod/sigio_4 -I$LIBD/incmod/sfcio_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = gaea ]; then
+ export LIBD=/lustre/f1/dev/ncep/Jack.Woollen/nwprod/lib
+ export LIBS="-L$LIBD -lw3emc_4 -lw3nco_4 -lbufr_4_64 -lsp_4 -lsigio_4 -lsfcio_4 -lbacio_4 -mkl"
+ export INCS="-I$LIBD/incmod/sigio_4 -I$LIBD/incmod/sfcio_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="ftn"
+elif [ $plat = zeus ]; then
+ export LIBD=/contrib/nceplibs/nwprod/lib            
+ export LIBS="-L$LIBD -lw3emc_4 -lw3nco_4 -lbufr_4_64 -lsp_4 -lsigio_4 -lsfcio_4 -lbacio_4 -mkl"
+ export INCS="-I$LIBD/incmod/sigio_4 -I$LIBD/incmod/sfcio_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="mpif90"  
+elif [ $plat = theia ]; then
+ export LIBD=/scratch3/NCEPDEV/nwprod/lib            
+ export LIBS="-L$LIBD -lnemsio_v2.2.1 -lw3emc_4 -lw3nco_4 -lbufr_4_64 -lsp_4 -lsigio_4 -lsfcio_4 -lbacio_4 -mkl"
+ export INCS="-I$LIBD/incmod/nemsio_v2.2.1 -I$LIBD/incmod/sigio_4 -I$LIBD/incmod/sfcio_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = cray  ]; then
+ export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4 $SP_LIB4 $SIGIO_LIB4 $SFCIO_LIB4 $BACIO_LIB4 $NEMSIO_LIB $W3NCO_LIB4"
+ export INCS="-I$SIGIO_INC4 -I$SFCIO_INC4 -I$NEMSIO_INC"
+ export FFLAGS="-O3 -g -traceback -openmp"
+ export FCMP="ftn"
+elif [ $plat = dell  ]; then
+ export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4 $SP_LIB4 $SIGIO_LIB4 $SFCIO_LIB4 $BACIO_LIB4 $NEMSIO_LIB $W3NCO_LIB4"
+ export INCS="-I$SIGIO_INC4 -I$SFCIO_INC4 -I$NEMSIO_INC"
+ export FFLAGS="-O3 -g -traceback -qopenmp"
+ export FCMP="mpiifort"
+else
+ echo "no recognized platform specified ($plat)"
+ exit 99
+fi
+
+rm -f *.o *.mod; make -f Makefile
+

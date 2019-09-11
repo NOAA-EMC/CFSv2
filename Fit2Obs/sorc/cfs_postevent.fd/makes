@@ -1,0 +1,52 @@
+#!/bin/sh
+set -aeu
+
+[ $# -eq 1 ] && plat=$1 || plat=none ; mkdir -p ../../exec
+
+if [ $plat = jibb ]; then
+ export LIBD=/home/jwoollen/lib
+ export LIBS="-L$LIBD -lw3_4 -lbufr_4_64"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="ifort"
+elif [ $plat = wcoss ]; then
+ export LIBD=/nwprod/lib
+ export LIBS="$BUFR_LIB4 -L$LIBD -lw3emc_4 -lw3nco_4"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="ifort"
+elif [ $plat = gaea ]; then
+ export LIBD=/lustre/f1/dev/ncep/Jack.Woollen/nwprod/lib
+ export LIBS="-L$LIBD -lw3emc_4 -lw3nco_4 -lbufr_4_64"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="ftn"
+elif [ $plat = zeus ]; then
+ export LIBD=/contrib/nceplibs/nwprod/lib            
+ export LIBS="-L$LIBD -lw3emc_4 -lw3nco_4 -lbufr_4_64"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="ifort"
+elif [ $plat = theia ]; then
+ export LIBD=/scratch3/NCEPDEV/nwprod/lib            
+ export LIBS="-L$LIBD -lw3emc_4 -lw3nco_4 -lbufr_4_64"
+ export FFLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = cray  ]; then
+ export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4"
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="ftn"
+elif [ $plat = dell  ]; then
+ export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4"
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+else
+ echo "no recognized platform specified ($plat)"
+ exit 99
+fi
+
+make -f Makefile_convdiag
+
+make -f Makefile_duprep
+
+make -f Makefile_combfr  
+
+make -f Makefile_splitac
+
+make -f Makefile_rembfr   
