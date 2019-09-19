@@ -120,7 +120,7 @@ export APRUN="aprun -n1"
 # either run the godas every synoptic time or olny at 00z
 # -------------------------------------------------------
 
-if [[ $cyc = 00 || ${GODAS:-24} = 24 ]]; then
+if [[ $cyc = 00 || ${GODAS:-00} = 24 ]]; then
   ${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh.ecf}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
 else 
   # use guess as analysis
