@@ -116,7 +116,28 @@ export NTHSTACK=102400000
 
 export APRUN="aprun -n1"
 
-${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh.ecf}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
+# -------------------------------------------------------
+# either run the godas every synoptic time or olny at 00z
+# -------------------------------------------------------
+
+if [[ $cyc = 00 || ${GODAS:-24} = 24 ]]; then
+  ${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh.ecf}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
+else 
+  # use guess as analysis
+  ##OCNGES=$ptmp/nwges/prod/cdas.$xpdy/cdas1.t${xcyc}z.next_ocnr.tar
+  mkdir -p $DATA/OCNrest; cd $DATA/OCNrest; rm -f *
+  tar -xvf $OCNGES # This is the guess/restart files
+  for newname in $(ls -rt ${CDATE}* | cut -c11-) ; do
+    mv ${CDATE}$newname $newname
+  done
+
+  cp $FIXcfs/M4tables/input.nml .
+  cp $FIXcfs/M4tables/*_table   .
+  tar -cvf ocnanl.$CDATE.tar *.res *.nc *_table input.nml
+
+  cp ocnanl.$CDATE.tar $COMOUT/cdas1.t${cyc}z.ocnanl.tar
+  cp ocnanl.$CDATE.tar $GESdir/cdas1.t${cyc}z.ocnanl.tar
+fi
 export err=$?; err_chk
 
 msg="ENDED NORMALLY."
