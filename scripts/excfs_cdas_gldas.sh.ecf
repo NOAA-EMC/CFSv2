@@ -34,8 +34,6 @@
 ################################################################################
 set -ux
 
-################################################################################
-
 export REALTIME=${REALTIME:-1}  # "1" for realtime run and "0" for reanalysis
 export PBEG=${PBEG:-""}
 export PEND=${PEND:-""}
@@ -45,6 +43,7 @@ if [ ! -z $PBEG ]; then $PBEG ; fi
 
 ################################################################################
 # Set other variables
+################################################################################
 
 export CDATE=${CDATE:-$PDY$cyc}
 export CDUMP=${CDUMP:-gdas}
@@ -64,178 +63,96 @@ export FIX_LM=${FIX_LM:-$HOMEcfs/fix/cfs_fix_lm/FIX_T$grid}
 export LISEXEC=${LISEXEC:-$HOMEcfs/exec/cfs_cdas_gldas_LIS}
 export exec_gldas2gdas=${exec_gldas2gdas:-$HOMEcfs/exec/cfs_cdas_gldas_gldas2gdas}
 fghr=$((24/$gdas_cyc)) ; [[ $fghr -lt 10 ]]&&fghr=0$fghr
+
 export rundir=${LIS_rundir:-$DATA}
-export COMROT=${COMROT:-$rundir}
 mkdir -p $rundir
 cd $rundir
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
- #export RESDIR=${RESDIR:-$COMROT/RESTART}
- export RESDIR=${RESDIR:-$COMOUT}
-else
- export RESDIR=${RESDIR:-$COMROT/RESTART}
- mkdir -p $RESDIR
-fi
+
+export RESDIR=${RESDIR:-$COMOUT}
 export NCP=${NCP:-/bin/cp}
-#
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
 export OBERRFLAG=${OBERRFLAG:-.false.}
+
 typeset -L1 l=$PGMOUT
 [[ $l = '&' ]]&&a=''||a='>'
 export REDOUT=${REDOUT:-'1>'$a}
 typeset -L1 l=$PGMERR
 [[ $l = '&' ]]&&a=''||a='>'
 export REDERR=${REDERR:-'2>'$a}
-#
+
 if [[ $grid -ne 126 && $grid -ne 382 && $grid -ne 574 ]]; then
  echo "GFS/CFS/LIS supports T126/T382/T574 resolutions only"
  exit
 fi
+
+################################################################################
 #
 #                     Run gldas analysis
 #                     ------------------
-start_date=$GDATE
-end_date=$CDATE
 #
 ################################################################################
-#
+
+start_date=$GDATE
+end_date=$CDATE
 mkdir -p $rundir/input
-#
+
 script=$HOMEcfs/ush  
-if [ $RUN_ENVIR != nco  -a $RUN_ENVIR != devpara ]
-then
- ln -s $COMROT $rundir/input/GDAS
-fi
 
 ### LOG
 
 date1=$(echo $start_date | cut -c1-8)
 date2=$(echo $end_date | cut -c1-8)
+
 log="LIS.T${grid}.log.$date1.$date2.log"
 rm -f $log ; touch $log ; echo $script  >> $log
 
 ### CHECK CMAP UPDATE
 
 currdir=$(pwd)
-if [ $REALTIME != 1 ] ; then   # This is for regular CFSR dumps
-####################################################
-# Get the CMAP data when runnng in reanalysis mode
-#CMAP is available every day.
-####################################################
-  COMDMPTMP=${COMDMPTMP:-$COMDMP}
 
-# This will use precip data $PRECIP_DATA_DELAY hours before $CDATE
+################################################################################
+### Realtime mode. CMAP is lag. Check operational archive for update.
+################################################################################
 
-  CMAPDIR=${CMAPDIR:-$COMROT}
-  PRECIP_DATA_DELAY=${PRECIP_DATA_DELAY:-0}
-  XDATE=$($NDATE -$PRECIP_DATA_DELAY $CDATE)
-  eval COMDMP=$(CDATE=$XDATE CDUMP=gdas eval echo $COMDMPTMP)
-  CMAPDMP=$(eval echo $COMDMP|cut -f2 -d,)
-  $NCP $CMAPDMP/cmap.gdas.* $COMROT
-  for cyc in 18 12 06 ; do
-    YDATE=$($NDATE -$cyc $XDATE)
-    eval COMDMP=$(CDATE=$YDATE CDUMP=gdas eval echo $COMDMPTMP)
-    CMAPDMP=$(eval echo $COMDMP|cut -f2 -d,)
-    $NCP $CMAPDMP/cmap.gdas.* $CMAPDIR
+CMAPDIR=${CMAPDIR:-$rundir}
+dumpdate=$date2
+
+COMCMAP=${COMCMAP:-$COMROT}
+CMAP_DMPSUF=${CMAP_DMPSUF:-""}
+export CMAPfile0=$COMCMAP/cdas.${dumpdate}/cdas1.t00z.cmapgrb
+export CMAPfile=cmapgrb.gdas.${dumpdate}00.$grid
+
+if [ -s $CMAPfile0 ] ; then
+  export LONB=${LONB:-1760}
+  export LATB=${LATB:-880}
+  $COPYGB -g"255 4 $LONB $LATB 89843 0 128 -89843 -204 204 440" -x $CMAPfile0 $CMAPfile
+fi
+
+if [ -e $CMAPfile ] ; then
+  echo $CMAPfile
+  for rec in `$WGRIB -s -4yr $CMAPfile | cut -f1-3 -d:` ; do
+  recnum=`echo $rec | cut -f1 -d:`
+  cmapdate=`echo $rec | cut -f3 -d: | cut -c3-12`
+  if [ -s $rundir/cmap.gdas.$cmapdate ] ; then rm $rundir/cmap.gdas.$cmapdate ; fi
+  $WGRIB $CMAPfile | grep "^$recnum:" | $WGRIB -i $CMAPfile -grib -o $rundir/cmap.gdas.$cmapdate
   done
 
-  if [ $RUN_ENVIR != nco  -a $RUN_ENVIR != devpara ]
-  then
-   ln -s $COMROT $rundir/input/GDAS
-  fi
-  prev_date=$($NDATE -$GLDASCYCHR $CDATE)
-  if [ -s $COMROT/cmap.date ] ; then
-   CMAPdate1=`cat $COMROT/cmap.date`
-   nn=$(echo $CMAPdate1 | wc -c)
-   if [ $nn -gt 1 ] ; then
-     if [ $CMAPdate1 -gt $CDATE ] ; then
-      CMAPdate1=$prev_date
-     else
-      yyyymmdd=$(echo $CMAPdate1 | cut -c1-8)
-      prev_cyc=$(echo $prev_date | cut -c9-10)
-      CMAPdate1=${yyyymmdd}${prev_cyc}
-     fi
-   else
-    CMAPdate1=$prev_date
-   fi
-  else
-   CMAPdate1=$prev_date
-  fi
-#
-  cd $CMAPDIR
-  #cyc=$(echo $CMAPdate1 | cut -c9-10)    
-  cyc1=$(echo $CMAPdate1 | cut -c9-10)
-  CMAPfile=$(ls -1 cmap.${CDUMP}*${cyc1} | tail -1)
-# CMAPdate2=$(basename $CMAPfile | cut -c 11-20)
-  CMAPdate2=$(basename $CMAPfile | awk -F"." '{print $3}')
-  nn=$(echo $CMAPdate2 | wc -c)
-  if [ $nn -gt 1 ] ; then
-   if [ $CMAPdate2 -gt $CDATE ] ; then CMAPdate2=$CDATE ; fi
-   echo "CMAP UPDATES FROM $CMAPdate1 TO $CMAPdate2"   >> $log
-
-### DETERMINE CURRENT EXECUTION TIME
-
-   if [[ $CMAPdate1 -ne $CMAPdate2 && $CMAPdate1 -lt ${date1}00 ]]; then
+  CMAPdate1=$(ls -1 $rundir/cmap.gdas.* | head -1 | awk ' BEGIN { FS="."} { print $NF }')
+  CMAPdate2=$(ls -1 $rundir/cmap.gdas.* | tail -1 | awk ' BEGIN { FS="."} { print $NF }')
+  echo "CMAP UPDATES FROM $CMAPdate1 TO $CMAPdate2"   >> $log
+  if [[ $CMAPdate1 -ne $CMAPdate2 && $CMAPdate1 -lt ${date1}00 ]]; then
     start_date=$CMAPdate1
     date1=$(echo $start_date | cut -c1-8)
-   fi
+    fi
   else
-   echo "NO CMAP PRECIP files available - fcst precip used" >> $log
-  fi
-
-else
-
-### Realtime mode. CMAP is lag. Check operational archive for update.
-
-  CMAPDIR=${CMAPDIR:-$rundir}
-# dumpdate=$date1
-  dumpdate=$date2
-  if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-    COMCMAP=${COMCMAP:-$COMROT}
-    CMAP_DMPSUF=${CMAP_DMPSUF:-""}
-    export CMAPfile0=$COMCMAP/cdas.${dumpdate}/cdas1.t00z.cmapgrb
-  else
-    CMAPDMP=${CMAPDMP:-/climate/noscrub/wx24ds/dump}
-    CMAP_DMPSUF=${CMAP_DMPSUF:-/gdasc}
-#   ln -s $COMROT $rundir/input/GDAS
-    export CMAPfile0=$CMAPDMP/${dumpdate}00$CMAP_DMPSUF/cmapgrb.gdas.${dumpdate}00
-  fi
-#  export CMAPfile0=$CMAPDMP/${dumpdate}00$CMAP_DMPSUF/cmapgrb.gdas.${dumpdate}00
-  export CMAPfile=cmapgrb.gdas.${dumpdate}00.$grid
-  if [ -s $CMAPfile0 ] ; then
-    export LONB=${LONB:-1760}
-    export LATB=${LATB:-880}
-    $COPYGB -g"255 4 $LONB $LATB 89843 0 128 -89843 -204 204 440" -x $CMAPfile0 $CMAPfile
-  fi
-  if [ -e $CMAPfile ] ; then
-   echo $CMAPfile
-   for rec in `$WGRIB -s -4yr $CMAPfile | cut -f1-3 -d:` ; do
-    recnum=`echo $rec | cut -f1 -d:`
-    cmapdate=`echo $rec | cut -f3 -d: | cut -c3-12`
-    if [ -s $rundir/cmap.gdas.$cmapdate ] ; then rm $rundir/cmap.gdas.$cmapdate ; fi
-    $WGRIB $CMAPfile | grep "^$recnum:" | $WGRIB -i $CMAPfile -grib -o $rundir/cmap.gdas.$cmapdate
-   done
-   CMAPdate1=$(ls -1 $rundir/cmap.gdas.* | head -1 | awk ' BEGIN { FS="."} { print $NF }')
-   CMAPdate2=$(ls -1 $rundir/cmap.gdas.* | tail -1 | awk ' BEGIN { FS="."} { print $NF }')
-   echo "CMAP UPDATES FROM $CMAPdate1 TO $CMAPdate2"   >> $log
-   if [[ $CMAPdate1 -ne $CMAPdate2 && $CMAPdate1 -lt ${date1}00 ]]; then
-    start_date=$CMAPdate1
-    date1=$(echo $start_date | cut -c1-8)
-   fi
-  else
-   echo "NO CMAP PRECIP files available - fcst precip used" >> $log
-  fi
-
+    echo "NO CMAP PRECIP files available - fcst precip used" >> $log
 fi
 
 date=$($NDATE -24 $start_date)
 while [[ $date -lt $end_date ]]; do
   yymmdd=`echo $date | cut -c1-8`
-  if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-    FLXF06=$COMROT/cdas.$yymmdd/cdas1.t18z.sfluxgrbf06
-  else
-    FLXF06=$COMROT/flxf06.$CDUMP.${yymmdd}${cyc}
-  fi
+  FLXF06=$COMROT/cdas.$yymmdd/cdas1.t18z.sfluxgrbf06
   if [ ! -s $FLXF06 ]; then start_date=$($NDATE 24 $start_date); fi
   date=$($NDATE 24 $date)
 done
@@ -247,9 +164,9 @@ cd $currdir
 date1=$(echo $start_date | cut -c1-8)
 echo "LIS  RUNS    FROM $date1 TO $date2"  >> $log
 
-### CARDFILE
 ################################################################################
-# Import and execute lis.crd.sh
+### CARDFILE Import and execute lis.crd.sh
+################################################################################
 
 export yyyy1=`echo $date1 | cut -c 1-4`
 export   mm1=`echo $date1 | cut -c 5-6`
@@ -260,7 +177,6 @@ export   dd2=`echo $date2 | cut -c 7-8`
 export  grid=$grid
 export currPath=${rundir:-$(pwd)}
 export PARM_LM=$PARM_LM
-#
 export  LISCARD="$currPath/lis.crd"
 
 rm -f $LISCARD
@@ -284,46 +200,43 @@ cat $PARM_LM/lis.crd.T${grid}.tmp.2   >> $LISCARD
 #cat $currPath/lis.crd.T${grid}.tmp.2 >> $LISCARD
 
 ### DONE lis.crd
-### FIX FIELDS
 
-#rm -fr ${LIS}FIX
+################################################################################
+### FIX FIELDS
+################################################################################
+
 rm -fr $rundir/FIX
 ln -s  $FIX_LM $rundir/FIX
 
+################################################################
 ### INITIAL LAND STATES
+################################################################
 
 yyyy=`echo $date1 | cut -c1-4`
-
 rm -f $rundir/noah.rst
-
-#
 rst_date=$start_date
 
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  rdir=$COMROT/cdas.$(echo $rst_date | cut -c1-8)
-  #echo $rdir/noah.rst.$CDUMP.$rst_date >> $log
-  echo $rdir/${RUN1}.t${cyc}z.noah.rst >> $log
-  if [ ! -s $rdir/${RUN1}.t${cyc}z.noah.rst ]; then
-    echo "Restart File ${RUN1}.t${cyc}z.noah.rst for $rst_date is not available"
-    export err=9; err_chk
-  else
-    $NCP $rdir/${RUN1}.t${cyc}z.noah.rst $rundir/noah.rst
-  fi
+rdir=$COMROT/cdas.$(echo $rst_date | cut -c1-8)
+echo $rdir/${RUN1}.t${cyc}z.noah.rst >> $log
+if [ ! -s $rdir/${RUN1}.t${cyc}z.noah.rst ]; then
+  echo "Restart File ${RUN1}.t${cyc}z.noah.rst for $rst_date is not available"
+  export err=9; err_chk
 else
-  echo $RESDIR/noah.rst.$CDUMP.$rst_date >> $log
-  $NCP $RESDIR/noah.rst.$CDUMP.$rst_date $rundir/noah.rst
+  $NCP $rdir/${RUN1}.t${cyc}z.noah.rst $rundir/noah.rst
 fi
 
+################################################################
 ### Make the LIS RUN
+################################################################
 
 date=$($NDATE -24 $start_date)
 gdas_int=$((24/gdas_cyc))
+
 while [[ $date -lt $end_date ]]; do
- yymmdd=`echo $date | cut -c1-8`
- tcyc=`echo $date | cut -c9-10`
- for fhr in 00 01 02 03 04 05 06 ; do
-  mkdir -p $rundir/input/GDAS/$CDUMP.$yymmdd
-  if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+  yymmdd=`echo $date | cut -c1-8`
+  tcyc=`echo $date | cut -c9-10`
+  for fhr in 00 01 02 03 04 05 06 ; do
+    mkdir -p $rundir/input/GDAS/$CDUMP.$yymmdd
     $NCP $COMROT/cdas.$yymmdd/cdas1.t${tcyc}z.sfluxgrbf$fhr $rundir/input/GDAS/$CDUMP.$yymmdd/gdas1.t${tcyc}z.sfluxgrbf$fhr
     if [ -s $COMROT/cdas.$yymmdd/cdas1.t${tcyc}z.sfluxgrbif$fhr ]
     then
@@ -331,14 +244,10 @@ while [[ $date -lt $end_date ]]; do
     else
       $GRBINDEX $COMROT/cdas.$yymmdd/cdas1.t${tcyc}z.sfluxgrbf$fhr $rundir/input/GDAS/$CDUMP.$yymmdd/gdas1.t${tcyc}z.sfluxgrbf$fhr.index
     fi
-  else
-    ln -fs $COMROT/flxf$fhr.$CDUMP.${yymmdd}${cyc} $rundir/input/GDAS/$CDUMP.$yymmdd/gdas1.t${tcyc}z.sfluxgrbf$fhr 
-    ln -fs $COMROT/flxf$fhr.$CDUMP.${yymmdd}${cyc}.index $rundir/input/GDAS/$CDUMP.$yymmdd/gdas1.t${tcyc}z.sfluxgrbf$fhr.index
-  fi
- done
- date=$($NDATE $gdas_int $date)
+  done
+date=$($NDATE $gdas_int $date)
 done
-#
+
 if [ $CMAPDIR != $rundir ] ; then
   date=$start_date
   while [[ $date -le $end_date ]]; do
@@ -349,77 +258,60 @@ if [ $CMAPDIR != $rundir ] ; then
    date=$($NDATE $gdas_int $date)
   done
 fi
-#
+
 ls -ltr $LISCARD
 echo 'executing LIS in directory ' $(pwd)
-
 PGM=$LISEXEC
-
-if [[ $machine = WCOSS ]]; then
-  eval mpirun -n 28 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
-elif [[ $machine = WCRAY ]]; then
-  eval aprun -n24 -N12 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
-fi
-
+eval mpirun -n 28 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
 export err=$?; err_chk
-### REPORT
 
-if [ $REALTIME != 1 ] ; then   # This is for regular CFSR dumps
- if [ $(echo $CMAPdate2 | wc -c) -gt 1 ] ; then
-  rm -f ./tmp
-  echo  $CMAPdate2 > ./tmp
-  mv ./tmp $COMROT/cmap.date
- fi
-fi
+################################################################
+### REPORT
+################################################################
 
 rm -f ./tmp
 echo $date1 $date2 $grid > ./tmp
-mv ./tmp $COMROT/gldas2gfs.T${grid}.date
+mv ./tmp $COMOUT/gldas2gfs.T${grid}.date
 
 yyyymmdd=$(echo $end_date | cut -c1-8)
 PDY_edate=$yyyymmdd
 yyyy=$(echo $end_date | cut -c1-4)
 mkdir -p $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
 cd $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  for file in `ls LIS.E$grid.${yyyymmdd}*.NOAH.grb`
-  do
-    hh=`echo $file |awk -F"." '{print $3}' |cut -c9-10`
-    $NCP LIS.E$grid.${yyyymmdd}${hh}.NOAH.grb $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noahgrb.lis${hh}
-  done
-  $NCP LIS.E$grid.${yyyymmdd}*.NOAHgbin $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noahbin.lis
-  $NCP LIS.E$grid.${end_date}.Noahrst   $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noah.rst
-else
-  $NCP LIS.E$grid.${yyyymmdd}*.NOAH.grb $COMROT
-  $NCP LIS.E$grid.${yyyymmdd}*.NOAHgbin $COMROT
-  $NCP LIS.E$grid.${end_date}.Noahrst   $RESDIR/noah.rst.$CDUMP.$end_date
-fi
-#
-### Save the LIS files updated for the previous days covered in the CMAP GRIB ####
-### They will be saved in the current day's output directory in a tarball ###
-date=$($NDATE -24 $end_date)
-until [[ $date -lt $start_date ]] ; do
- yyyymmdd=$(echo $date | cut -c1-8)
- yyyy=$(echo $date | cut -c1-4)
- mkdir -p $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
- cd $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
- if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-   tarfile=$COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.LIS.diagnos.${yyyymmdd}.tar
-   tar -cvf $tarfile LIS.E$grid.${yyyymmdd}*.N* 
- else
-   tar -cvf $COMROT/LIS.diagnos.${yyyymmdd}.tar LIS.E$grid.${yyyymmdd}*.N* 
- fi
- date=$($NDATE -24 $date)
+
+for file in `ls LIS.E$grid.${yyyymmdd}*.NOAH.grb`
+do
+hh=`echo $file |awk -F"." '{print $3}' |cut -c9-10`
+$NCP LIS.E$grid.${yyyymmdd}${hh}.NOAH.grb $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noahgrb.lis${hh}
 done
 
-################################################################################
+$NCP LIS.E$grid.${yyyymmdd}*.NOAHgbin $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noahbin.lis
+$NCP LIS.E$grid.${end_date}.Noahrst   $COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.noah.rst
+
+##################################################################################
+### Save the LIS files updated for the previous days covered in the CMAP GRIB ####
+### They will be saved in the current day's output directory in a tarball ###
+##################################################################################
+
+date=$($NDATE -24 $end_date)
+until [[ $date -lt $start_date ]] ; do
+  yyyymmdd=$(echo $date | cut -c1-8)
+  yyyy=$(echo $date | cut -c1-4)
+  mkdir -p $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
+  cd $rundir/EXP$grid/NOAH/$yyyy/$yyyymmdd
+  tarfile=$COMROT/cdas.$PDY_edate/${RUN1}.t${cyc}z.LIS.diagnos.${yyyymmdd}.tar
+  tar -cvf $tarfile LIS.E$grid.${yyyymmdd}*.N* 
+  date=$($NDATE -24 $date)
+done
+
+
 rc=$?
 if [[ $rc -ne 0 ]];then 
   echo "Job failed with error $rc"
   export err=$rc; err_chk
   exit
 fi
-#
+
 ################################################################################
 # create updated sfc file
 ################################################################################
@@ -430,32 +322,17 @@ date=$CDATE
 
 yyyy=$(echo $date | cut -c1-4)
 yymmdd=$(echo $date | cut -c1-8)
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  scyc=`echo $fcst_date |cut -c9-10`
-  sdate=`echo $fcst_date |cut -c1-8`
-  SFCINP=$COMROT/cdas.${sdate}/cdas1.t${scyc}z.b${suffix}
-  SFCGLD=$rundir/EXP$grid/NOAH/$yyyy/$yymmdd/LIS.E${grid}.$date.NOAHgbin
-  SFCOUT=$COMROT/cdas.${sdate}/cdas1.t${scyc}z.b${suffix}.LIS
-else
-  SFCINP=$COMROT/sfc$suffix.$CDUMP.$fcst_date
-  SFCGLD=$rundir/EXP$grid/NOAH/$yyyy/$yymmdd/LIS.E${grid}.$date.NOAHgbin
-  SFCOUT=$COMROT/sfc$suffix.$CDUMP.$fcst_date.LIS
-fi
-#
- $exec_gldas2gdas $SFCINP $SFCOUT $SFCGLD
- export err=$?; err_chk
+scyc=`echo $fcst_date |cut -c9-10`
+sdate=`echo $fcst_date |cut -c1-8`
+SFCINP=$COMROT/cdas.${sdate}/cdas1.t${scyc}z.b${suffix}
+SFCGLD=$rundir/EXP$grid/NOAH/$yyyy/$yymmdd/LIS.E${grid}.$date.NOAHgbin
+SFCOUT=$COMROT/cdas.${sdate}/cdas1.t${scyc}z.b${suffix}.LIS
 
-
- rc=$?
- if [[ $rc -ne 0 ]];then $PERR;exit 1;fi
-
-################################################################################
-# Copy out restart and output files
-
-rc=$?
+$exec_gldas2gdas $SFCINP $SFCOUT $SFCGLD
+export err=$?; err_chk
 
 ################################################################################
 # Exit gracefully
+################################################################################
 
-if [[ $rc -ne 0 ]];then $PERR;exit 1;fi
-if [ ! -z $PEND ]; then $PEND ; fi
+exit 0
