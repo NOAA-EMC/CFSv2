@@ -89,13 +89,8 @@ do
     HPSSROT=${HPSSROT:-/NCEPPROD/hpssprod/runhistory}
 
     # Member 1 is in permanent archive
-    # Members 2,3,4 are in 2year archive
-    if [[ $member == '01' ]] ; then
-      #HPSSBASE=$HPSSROT/cfs$YYYY/$YYYY$MM/$rundate
+    # Members 2,3,4 are in 2year archive; Move to permanent archive on 20170913 06z
       HPSSBASE=$HPSSROT/cfs$YYYY/$YYYY$MM/$YYYYMMDD
-    else
-      HPSSBASE=$HPSSROT/2year/cfs$YYYY/$YYYY$MM/$YYYYMMDD
-    fi
 
     ### Determine runtype based on cycle and member
 
