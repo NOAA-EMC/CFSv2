@@ -81,15 +81,6 @@ export VERBOSE=${VERBOSE:-YES}
 
 export RUN_GETGES=${RUN_GETGES:-YES}
 
-#################################
-# Define the Log File directory
-#################################
-if [ "$envir" = 'nco' ]; then 
-   export jlogfile=$COMROOT/logs/jlogfiles/jlogfile.${job}.${pid}
-else
-   export jlogfile=/dev/null
-fi
-
 ####################################
 # Specify Execution Areas
 ####################################

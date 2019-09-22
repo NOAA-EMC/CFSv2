@@ -38,8 +38,6 @@ export CHGRP_RSTPROD=${CHGRP_RSTPROD:-YES}
 #################################################################
 
 cd $DATA
-msg="JOB $job HAS BEGUN"
-postmsg "$jlogfile" "$msg"
 
 # make bufr convdiag postevents for analysis only...
 fh1=06

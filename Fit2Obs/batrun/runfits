@@ -23,6 +23,5 @@ export COMLOX=$DATA/fitx; mkdir -p $COMLOX
 
 echo "echo err_chk">$DATA/err_chk; chmod 755 $DATA/err_chk
 echo "echo postmsg">$DATA/postmsg; chmod 755 $DATA/postmsg
-job=test; jlogfile=logfile
 
 $fitdir/excfs_gdas_vrfyfits.sh.ecf     
