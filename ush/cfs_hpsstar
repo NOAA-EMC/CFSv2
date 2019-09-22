@@ -1,148 +1,4 @@
 #!/bin/ksh
-# hpsstar script modified from 10/28/2011 version of hpsstar in /nwprod/util/ush/hpsstar
-#  This script modifies hpss names that include /hpssuser as follows
-#  FOR READS and QUERIES 
-#  For names that begin with  /hpssuser, /NCEPDEV is prepended to the name.
-#  If the name does not exist, the old /hpssuser name is retained. 
-#  For names that begin with /NCEPDEV/hpssuser, the name  is checked for hpss existence
-#  if it does not exist the /NCEPDEV prefix is removed and the script acts on that new stripped name.
-#
-#  For WRITES AND DELETES ,  NO CHANGE TO NAMES IS MADE 
-#  THE SCRIPT WILL NEED MODIFICATION ON JANUARY 17, 2011 TO FORCE ALL /hpssuser WRITES AND DELETES 
-#  TO THE PREPENDED /NCEPDEV/hpssuser NAME 
-
-###******* RESTATEMENT OF ABOVE IN DOCUMENTATION BELOW **************
-#  PREFIX POLICY.  
-
-## ANY NAME THAT DOES NOT BEGIN WITH /hpssuser  or /NCEPDEV is unaltered 
-
-## 1. /hpssuser names
-## Any name that begins with /hpssuser  will have /NCEPDEV
-##added to it for READS and QUERIES.   If the /NCEPDEV
-##name does not exist, the old name will be used
-## PRIOR TO JANUARY 17, 2012, WRITES and DELETES  are unchanged.  On Janury 17,2012
-# ALL WRITES  AND DELETES WILL HAVE THE PATH /NCEPDEV prepended to any name that begins with /hpssuser
-
-## 2. /NCEPDEV  names
-
-## ANY NAME THAT BEGINS WITH /NCEPDEV WILL BE PROCESSED AS FOLLOWS
-##  FOR WRITES AND DELETES ,  NO CHANGE
-## FOR READS and QUERIES, the /NCEPDEV NAME WILL BE CHECKED FIRST.  IF IT DOES NOT EXIST the /NCEPDEV
-## STRING WILL BE stripped  AND THE NAME RECHECKED.
-
- 
-###******* END RESTATEMENT                                              
-
-## FUNCTIONS TO ADD/CUT NEW PREFIX TO /HPSSUSER
-
-tobjexist()
-{
-ntt=`echo $object | cut -c 1-8`
-if  [ $ntt == '/NCEPDEV' ]
-then
-hsi -P  ls -ld $object >/dev/null
-NRCC=$?
-ott=`echo $object | sed "s?/NCEPDEV/?/?" `
-export old_hpss_pathname=$ott
-export new_hpss_pathname=$object
-hsi ls -ld $ott
-RCC=$?
-if [ $RCC -ne 0 ]
-then
-export oexistt=nope
-else
-export oexistt=yes
-fi
-if [ $NRCC -ne 0 ]
-then
-export nexistt=nope
-else
-export nexistt=yes
-fi
-
-else 
-hsi ls -ld $object
-RCC=$?
-export old_hpss_pathname=$object
-export new_hpss_pathname=/NCEPDEV$object
-hsi  -P ls -ld /NCEPDEV$object >/dev/null
-NRCC=$?
-if [ $RCC -ne 0 ]
-then
-export oexistt=nope
-else
-export oexistt=yes
-fi
-if [ $NRCC -ne 0 ]
-then
-export nexistt=nope
-else
-export nexistt=yes
-fi
-fi   #ENDIF  [ $ntt == '/NCEPDEV' ]
-}
-
-tobjadd()
-# ALWAYS prefix /NCEPDEV to any /hpssuser path 
-# use for new writes a
-{   ott=`echo $object | cut -c 1-9`
-if  [ $ott == '/hpssuser' ]
-then
-ott=/NCEPDEV"$object"
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  APPENDED PATH  $ott ;  fi
-object=$ott
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  UNCHANGED PATH $object  NOT PREPENDED ; fi
-fi
-}
-tobjaddif()
-#  prefix /NCEPDEV to any /hpssuser path if NEW PATH exists
-# use for new reads 
-{   ott=`echo $object | cut -c 1-9`
-if [ $nexistt -eq 'yes' ]
-then
-if  [ $ott == '/hpssuser' ]
-then
-ott=/NCEPDEV"$object"
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  APPENDED PRECHECKED  PATH $ott ; fi
-object=$ott
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then  echo  UNCHANGED  PATH $object  ; fi
-fi
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo ADVISORY   /NCEPDEV$object does not exist  ; echo ADVISORY   $object WILL BE RETAINED AS THE OBJECT  ; fi
-fi
-}
-tobjcut()
-#ALWAYS STRIP /NCEPDEV FROM PATH IF IT IS IN THE PATH BEGINNING
-{   ott=`echo $object | cut -c 1-17`
-if  [ $ott == '/NCEPDEV/hpssuser' ]
-then
-ott=`echo $object | sed "s?/NCEPDEV/?/?" ` 
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  STRIPPED PATH $ott ; fi
-object=$ott
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo UNCHANGED PATH  $object   NOT CUT  ; fi
-fi
-}
-tobjcutif()
-#CONDITIONALLY  STRIP /NCEPDEV FROM PATH IF IT IS IN THE PATH BEGINNING and     
-# THE OBJECT DOES NOT EXIST
-{   ott=`echo $object | cut -c 1-17`
-if  [ $ott == '/NCEPDEV/hpssuser' ]
-then
-if [ $nexistt != 'yes' ]
-then
-ott=`echo $object | sed "s?/NCEPDEV/?/?" `
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  STRIP /NCEPDEV FROM $ott ; fi
-object=$ott
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo EXISTING  $object  NOT CUT  ; fi
-fi
-else
- if   [   $VERBOSE_HPSSTAR  == yes ]     ; then echo  PATH  $object DOES NOT BEGIN WITH NCEPDEV, NOT CUT ; fi
-fi
-}
 
 ##  HPSSTAR LOGIC BEGINS HERE
 # toggle path redirect information on or off (off unless "yes" in environment)
@@ -152,9 +8,6 @@ break
 else
 VERBOSE_HPSSTAR=no
 fi
-
-HSI="/usrx/local/hpss/hsi"
-HTAR="/usrx/local/hpss/htar"
 
 HSI=$(which hsi)
 HTAR=$(which htar)
@@ -255,17 +108,6 @@ fi
 rc=0
 action=$1
 object=${2:-.}
-tobjexist
-#echo  ' EXIST ---- >>>>  old  = '  $oexistt  ' new = ' $nexistt  ' <<------'
-if  [   $VERBOSE_HPSSTAR  == yes ]
-then
-echo
-echo  ' --- > 'OLD PATH $old_hpss_pathname $oexistt   ' <<------' 
-echo  ' --- > ' NEW PATH $new_hpss_pathname $nexistt ' <<------'
-echo
-fi
-
-[[ $object = /* ]]||object=/home/$LOGNAME/$object
 
 case $action in
   man) echo "$usage";echo "$uhelp";;
@@ -275,7 +117,6 @@ case $action in
        hpssquota all|grep -v [A-Z]|sort -nr -k${object#alls}
        else hpssquota $object;fi;;
   put) if [[ $# -ge 3 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
 
 
        t=0;for k in $(du -ks $*|awk '{print $1}');do ((t+=k));done;((t=t/1024))
@@ -285,7 +126,6 @@ case $action in
        $HTAR -cvf $object  $*;rc=$?
        else rc=-42;fi;;
   pu1) if [[ $# -ge 3 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        t=0;for k in $(du -ks $*|awk '{print $1}');do ((t+=k));done;((t=t/1024))
        if [[ $t -lt 30 ]];then c1=231;elif [[ $t -lt 2000 ]];then c1=231;else c1=231;fi
        t=$(ls -R $*|wc -l);((t=t/1024))
@@ -293,7 +133,6 @@ case $action in
        $HTAR -cvf $object  $*;rc=$?
        else rc=-42;fi;;
   pu2) if [[ $# -ge 3 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        t=0;for k in $(du -ks $*|awk '{print $1}');do ((t+=k));done;((t=t/1024))
        if [[ $t -lt 30 ]];then c1=231;elif [[ $t -lt 2000 ]];then c1=231;else c1=231;fi
        t=$(ls -R $*|wc -l);((t=t/1024))
@@ -301,7 +140,6 @@ case $action in
        $HTAR -cvf $object  $*;rc=$?
        else rc=-42;fi;;
   putv) if [[ $# -ge 3 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        t=0;for k in $(du -ks $*|awk '{print $1}');do ((t+=k));done;((t=t/1024))
        if [[ $t -lt 30 ]];then c1=231;elif [[ $t -lt 2000 ]];then c1=231;else c1=231;fi
        t=$(ls -R $*|wc -l);((t=t/1024))
@@ -309,10 +147,6 @@ case $action in
        $HTAR -H verify=compare -cvf $object  $*;rc=$? 
        else rc=-42;fi;;               
   get) if [[ $# -ge 2 ]];then shift 2
-        tobjadd 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object ADD ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        if [[ $# -eq 0 ]];then
        $HTAR -xvf $object;rc=$?
        else
@@ -320,9 +154,6 @@ case $action in
        fi
        else rc=-42;fi;;
   getnostage) if [[ $# -ge 2 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        if [[ $# -eq 0 ]];then
        $HTAR -Hnostage -xvf $object;rc=$?
        else
@@ -330,9 +161,6 @@ case $action in
        fi
        else rc=-42;fi;;
   gem) if [[ $# -ge 2 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        if [[ $# -eq 0 ]];then
        $HTAR -xvmf $object;rc=$?
        else
@@ -340,9 +168,6 @@ case $action in
        fi
        else rc=-42;fi;;
   gemnostage) if [[ $# -ge 2 ]];then shift 2
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR '
        if [[ $# -eq 0 ]];then
        $HTAR -Hnostage -xvmf $object;rc=$?
        else
@@ -350,29 +175,15 @@ case $action in
        fi
        else rc=-42;fi;;
   inv) if [[ $# -eq 2 ]];then
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
-       
        $HTAR -tvf $object;rc=$?
        else rc=-42;fi;;
   inx) if [[ $# -eq 2 ]];then
-        tobjadd 
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        $HTAR -tvf $object|awk '{print $7}';rc=$?
        else rc=-42;fi;;
   inw) if [[ $# -eq 2 ]];then
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        echo $object $($HTAR -tvf $object|awk '{print $7}'|tr '\n' ' ');rc=$?
        else rc=-42;fi;;
   idx) if [[ $# -eq 2 ]];then
-        tobjadd ; if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then   echo $object   ADD  ; fi
-        tobjcutif 
-         if   [   $VERBOSE_HPSSTAR  == yes ]     ;  then  echo $object  ' <--- FINAL OBJECT USED IN HPSSTAR ' ; fi
        $HSI "rm $object.idx"
        t=$($HTAR -Xvf $object |wc -l);((t=t/1024))
        if [[ $t -lt 1 ]];then c2=3;elif [[ $t -lt 30 ]];then c2=3;else c2=3;fi
