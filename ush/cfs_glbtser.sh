@@ -4,16 +4,6 @@ set -eu
 #  This script extracts selected grib fields from pgb, flx, ipv or diab files
 #  Shrinivas Moorthi - April 2010
 
-export APRUN=${APRUN:-mpirun.lsf}
-
-if [ $RUN_ENVIR = dev ]; then
-  export SHDIR=${SHDIR:-${HOMEDIR:-$BASEDIR}/bin}
-  export PBEG=${PBEG:-$SHDIR/pbeg}
-  export PERR=${PERR:-$SHDIR/perr}
-  export PLOG=${PLOG:-$SHDIR/plog}
-  export PEND=${PEND:-$SHDIR/pend}
-fi
-
 export CDATE=${1:-$CDATE}
 export inp_file=${2:-${inp_file:-pgbf}}
 #export CDUMP=${3:-$CDUMP}
@@ -22,22 +12,15 @@ export fout=${4:-${fout:-${fhout:-${FHOUT:-6}}}}
 export edate=${5:-${edate:-$($NDATE -$fout $(echo $($NDATE 768 $(echo $sdate | cut -c1-6)0100) | cut -c1-6)0100)}}
 export INDIR=${6:-$INDIR}
 export TIMEDIR=${7:-${TIMEDIR:-$INDIR}}
-export RUNDIR=${RUNDIR:-${DATA:-/ptmp/$LOGNAME}/glbts_${sdate}_${edate}}
+export RUNDIR=${RUNDIR:-$DATA} 
 export CLEAN_RUNDIR=${CLEAN_RUNDIR:-NO}
 export jn=${jn:-gbltseries}
 export resl=${8:-f}
-#export RUNLOG=${10:-$RUNLOG}
+export pgm=$0
 
 if [ $sdate -eq $CDATE ] ; then export sdate=$($NDATE $fout $CDATE) ; fi
 
-date
-
-if [ $RUN_ENVIR = dev ]; then
- echo "PSLOT is $PSLOT"
- echo "RUNLOG is $RUNLOG"
- echo "CDUMP is $CDUMP"
- $PLOG "$RUNLOG" OK "$jn begun for $PSLOT"
-fi
+echo `date` Starting $0
 echo "CDATE is $CDATE"
 echo "fout is $fout"
 echo "INDIR is $INDIR"
@@ -46,12 +29,7 @@ echo "sdate is $sdate"
 echo "edate is $edate"
 echo "RUNDIR is $RUNDIR"
 
-
-#$PLOG "$RUNLOG" OK "$jn begun for $PSLOT"
-#-------------------------------------------------------------
-
-mkdir -p $RUNDIR
-if [ $CLEAN_RUNDIR = YES ] ; then rm -f $RUNDIR/* ; fi
+mkdir -p $RUNDIR; if [ $CLEAN_RUNDIR = YES ] ; then rm -f $RUNDIR/* ; fi
 
 ####   35 pgb records
 
@@ -62,7 +40,6 @@ pgbkpd_35=':kpds5=7:kpds6=100:kpds7=200:   :kpds5=7:kpds6=100:kpds7=500: :kpds5=
 ####   40 flx records
 
 flxvlst_40='lhtfl shtfl ustrs vstrs prate pressfc pwat tmp2m  tmpsfc tmphy1 snohf u10m v10m dlwsfc dswsfc ulwsfc ulwtoa uswsfc uswtoa soilm1 soilm2 soilm3 soilm4 soilt1 gflux weasd runoff tmin tmax q2m icecon icethk nddsf srweq vddsf csusf csdsf csdlf cprat tcdcclm'
-
 
 flxkpd_40=':kpds5=121:kpds6=1:kpds7=0: :kpds5=122:kpds6=1:kpds7=0: :kpds5=124:kpds6=1:kpds7=0: :kpds5=125:kpds6=1:kpds7=0: :kpds5=59:kpds6=1:kpds7=0: :kpds5=1:kpds6=1:kpds7=0: :kpds5=54:kpds6=200:kpds7=0: :kpds5=11:kpds6=105:kpds7=2: :kpds5=11:kpds6=1:kpds7=0: :kpds5=11:kpds6=109:kpds7=1: :kpds5=229:kpds6=1:kpds7=0: :kpds5=33:kpds6=105:kpds7=10: :kpds5=34:kpds6=105:kpds7=10: :kpds5=205:kpds6=1:kpds7=0: :kpds5=204:kpds6=1:kpds7=0: :kpds5=212:kpds6=1:kpds7=0: :kpds5=212:kpds6=8:kpds7=0: :kpds5=211:kpds6=1:kpds7=0: :kpds5=211:kpds6=8:kpds7=0: :kpds5=144:kpds6=112:kpds7=10: :kpds5=144:kpds6=112:kpds7=2600: :kpds5=144:kpds6=112:kpds7=10340: :kpds5=144:kpds6=112:kpds7=25800: :kpds5=11:kpds6=112:kpds7=10: :kpds5=155:kpds6=1:kpds7=0: :kpds5=65:kpds6=1:kpds7=0: :kpds5=90:kpds6=1:kpds7=0: :kpds5=16:kpds6=105:kpds7=2: :kpds5=15:kpds6=105:kpds7=2: :kpds5=51:kpds6=105:kpds7=2: :kpds5=91:kpds6=1:kpds7=0: :kpds5=92:kpds6=1:kpds7=0: :kpds5=169:kpds6=1:kpds7=0: kpds5=64:kpds6=1:kpds7=0: kpds5=167:kpds6=1:kpds7=0: kpds5=160:kpds6=1:kpds7=0: kpds5=161:kpds6=1:kpds7=0: kpds5=163:kpds6=1:kpds7=0: kpds5=214:kpds6=1:kpds7=0: kpds5=71:kpds6=200:kpds7=0:'
 
@@ -92,6 +69,9 @@ kpdave=':kpds5=121:kpds6=1:kpds7=0: :kpds5=122:kpds6=1:kpds7=0: :kpds5=229:kpds6
 
 dup_rec=${dup_rec:-'3 4 12 15 16 33'}
 
+# setup the variables for this run
+# --------------------------------
+
 prefix=$(echo $inp_file | cut -c1-3)
 if [ $prefix = pgb ] ; then
  varlist=${varlist:-$pgbvlst_35}
@@ -116,6 +96,11 @@ totnum=$(echo $varlist | wc -w)
 set -A all_kpdv  $totnum
 set -A all_ofile $totnum
 set -A ave_kpd   $totnum
+set -A varn      $totnum
+
+# setup arrays for finding start_bytes for inventories
+# ----------------------------------------------------
+
 n=0
 for kpd in $kpdlist ; do
  n=$((n+1))
@@ -128,41 +113,31 @@ for kpd in $kpdlist ; do
  fi
 done
 
+# setup arrays for creating cmdfiles for extracting records
+# ---------------------------------------------------------
+
+n=0
+for var in $varlist; do
+ n=$((n+1))
+ varn[n]=$var
+ echo $n $var ${varn[$n]}
+done
+
+# get started with the time series processing
+# -------------------------------------------
+
 rc=0
 
 cd $TIMEDIR
 
 SUFIN=${SUFIN:-""}
-#SUFIN=${SUFIN:-.gdas2.$CDATE}
-if [ RUN_ENVIR = dev ] ; then
- SUFOUT=${SUFOUT:-.$sdate.$edate$SUFIN}
-else
- SUFOUT=.$sdate.$edate$SUFIN
-fi
+SUFOUT=.$sdate.$edate$SUFIN
 
 echo "SUFIN is $SUFIN"
 echo "SUFOUT is $SUFOUT"
 
-nprocs=28
-
-#if [ $machine = IBM ]; then
-#  nprocs=`poe hostname | wc -w`
-#elif [ $machine = WCOSS ]; then
-#  set +u
-#  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-#     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-#  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-#     nprocs=$LSB_DJOB_NUMPROC
-#  else
-#     nprocs=1
-#  fi
-#  set -u
-#elif [ $machine = WCRAY ]; then
-#     nprocs=24
-#else
-#  echo "nprocs has not been defined for platform $machine"
-#fi
-
+# create output filenames for time series variables
+# -------------------------------------------------
 
 nvar=0
 for var in $varlist ; do
@@ -170,6 +145,7 @@ for var in $varlist ; do
   fc=$(echo $var | cut -c1-1)
   f3=no
   if [ $nc -gt 3 ] ; then f3=$(echo $var | cut -c1-3) ; fi
+
   if [ $fc = u -a $f3 !=  ulw -a $f3 != usw ] ; then
     lev=$(echo $var | cut -c2-$nc)
     ofile=wnd${lev}_${resl}$SUFOUT
@@ -179,126 +155,72 @@ for var in $varlist ; do
   else
     ofile=${var}_${resl}$SUFOUT
   fi
-  if [ $fc != v -o $f3 = vve -o $f3 = vdd ] ; then  > $ofile ; fi
 
+  if [ $fc != v -o $f3 = vve -o $f3 = vdd ] ; then  > $ofile ; fi
   ls -l $ofile
   nvar=$((nvar+1))
   all_ofile[nvar]=$ofile
 done
 
+# Find begining, end, and counts in time period
+# ---------------------------------------------
+
 fhini=$($NHOUR $sdate $CDATE)
 fhmax=$($NHOUR $edate $CDATE)
 ntimes=$(((fhmax-fhini)/fout+1))
-ncmd=$(((ntimes-1)/nprocs+1))
-if [ $ncmd -lt 1 ] ; then ncmd=1 ; fi
-> $RUNDIR/cmdfile_0
-n=0
-while [ $((n+=1)) -le $nprocs ] ; do
-  > $RUNDIR/invout_$n.sh
-  chmod u+x $RUNDIR/invout_$n.sh
-  echo $RUNDIR/invout_$n.sh >> $RUNDIR/cmdfile_0
-done
 
-nn=0
+# create inventories for each time in this inp_file 
+# -------------------------------------------------
+
+nn=0; >$RUNDIR/invout.cmdfile
 while [ $((nn+=1)) -le $ntimes ] ; do
-
   FH=$((fhini+(nn-1)*fout))
   if [ $FH -lt 10 ] ; then FH=0$FH ; fi
   ifile=$INDIR/${inp_file}${FH}${SUFIN}
   ls -l $ifile
   ((rc+=$?))
   if [ -s $ifile ] ; then
-    np=$(((nn-1)/ncmd+1))
     invout=$RUNDIR/$(basename $ifile).invout_$FH
     if [ ! -s $invout ] ; then
-     echo $WGRIB $ifile \> $invout >> $RUNDIR/invout_$np.sh
+     echo $WGRIB $ifile \> $invout >> $RUNDIR/invout.cmdfile
      ((rc+=$?))
     fi
   else
     ((rc+=1))
     echo "$ifile does not exist"
   fi
-done
+done; export err=$rc; err_chk  
 
-#echo 'Before poe for invout rc='rc
-date
+# run mpmd to get inventories
+# ---------------------------
 
-mpirun cfp $RUNDIR/cmdfile_0
-export err=$rc; err_chk
-((rc+=$?)) 
+echo `date` run mpmd to get inventories         
+mpirun cfp $RUNDIR/invout.cmdfile >/dev/null 
+export err=$?; pgm=inventories; err_chk
 
-#if [ -s $RUNDIR/cmdfile_0 ] ; then
-#  if [ $machine = IBM ]; then
-#    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-#    # only valid if count .le. 128
-#    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-#  elif [ $machine = WCOSS ]; then
-#    set +u
-#    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-#      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-#    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-#      ntasks=$LSB_DJOB_NUMPROC
-#    else
-#      ntasks=1
-#    fi
-#    set -u
-#  elif [ $machine = WCRAY ]; then
-#      ntasks=24
-#  else
-#    echo "ntasks has not been defined for platform $machine"
-#  fi
-#
-#  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_0|wc -l))%$ntasks))
-#  n=0;while [ $((n+=1)) -le $remainder ] ;do
-#     echo "echo do nothing" >> $RUNDIR/cmdfile_0
-#  done
-#  if [[ $machine = WCOSS ]]; then
-#    $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_0
-#    ((rc+=$?))
-#  elif [[ $machine = WCRAY ]]; then
-#    aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_0
-#    ((rc+=$?))
-#  fi
-#  export err=$rc; err_chk
-#else
-#  echo "cmdfile_0 does not exist - wgrib for invout did not work"
-#fi
-#
-#echo ' after poe rc='$rc
-#if [ $rc -gt 0 ] ; then
-#  if [ $RUN_ENVIR = dev ]; then
-#    $PERR;exit $rc
-#  else
-#    export err=$rc; err_chk
-#  fi
-#else
-#  rm -f $RUNDIR/invout_*.sh ; rm -f cmdfile_0 
-#fi
+# loop over times inside vars to make extraction cmdfiles
+# -------------------------------------------------------
 
-echo `date` ' After invout '
-
-
-ncmd=$(((nvar-1)/nprocs+1))
-n=0;while [ $((n+=1)) -le $ncmd ] ; do rm -f $RUNDIR/cmdfile_$n ; > $RUNDIR/cmdfile_$n ; done
+> $RUNDIR/uwind.cmdfile
+> $RUNDIR/vwind.cmdfile
+> $RUNDIR/scalr.cmdfile
 
 nn=1
 until [ $nn -gt $nvar ] ; do
-  > $RUNDIR/script_$nn.sh
-  chmod u+x $RUNDIR/script_$nn.sh
   ofile=${all_ofile[nn]}
   kpdv=${all_kpdv[nn]}
-  np=$(((nn-1)/nprocs+1))
-  echo $RUNDIR/script_$nn.sh >> $RUNDIR/cmdfile_$np
+  var=${varn[nn]}
+
+  >$RUNDIR/uwind.script.$nn; chmod +x $RUNDIR/uwind.script.$nn
+  >$RUNDIR/vwind.script.$nn; chmod +x $RUNDIR/vwind.script.$nn
+  >$RUNDIR/scalr.script.$nn; chmod +x $RUNDIR/scalr.script.$nn
 
   nt=0
   while [ $((nt+=1)) -le $ntimes ] ; do
-
   FH=$((fhini+(nt-1)*fout))
   if [ $FH -lt 10 ] ; then FH=0$FH ; fi
     ifile=$INDIR/${inp_file}${FH}${SUFIN}
     invout=$RUNDIR/$(basename $ifile).invout_$FH
-
-
     if [ ${ave_kpd[nn]} = YES ] ; then
       start_byt=$(grep "$kpdv" $invout | grep ":NAve"| awk -F: '{print $2}')
       rec_num=$(grep "$kpdv" $invout | grep ":NAve"| awk -F: '{print $1}')
@@ -307,7 +229,6 @@ until [ $nn -gt $nvar ] ; do
       if [ $nrec -gt 1 ] ; then
         nnr=1
         while [ $nnr -le $nrec ] ; do
-       
           nns=$(echo $rec_num | eval awk \'{print \$$nnr}\')
           for rec in $dup_rec ; do
             if [ $rec = $nns ] ; then
@@ -318,11 +239,6 @@ until [ $nn -gt $nvar ] ; do
          done
       fi
       start_byt=$(echo $start_byt | awk '{print $1}')
-
-
-#     if [ $(echo $start_byt | wc -w) -gt 1 ] ; then
-#       start_byt=$(echo $start_byt | awk '{print $1}')
-#     fi
     else
       start_byt=$(grep "$kpdv" $invout | awk -F: '{print $2}')
       if [ $(echo $start_byt | wc -w) -gt 1 ] ; then
@@ -330,70 +246,38 @@ until [ $nn -gt $nvar ] ; do
       fi
     fi
 
-    echo $WGRIB $ifile -p $start_byt -grib -append -o $ofile >> $RUNDIR/script_$nn.sh
-    ((rc+=$?))
-#echo ' after wgrib rc='$rc ' nn='$nn
-  done
+    # separate the extractions into u,v,and scalr lists
+    # -------------------------------------------------
+
+    ofn=$(echo $ofile|cut -c 1-3)
+    var=$(echo $var  |cut -c 1-1)
+
+    [[ $ofn = wnd && $var = u ]] && echo $WGRIB $ifile -p $start_byt -grib -append -o $ofile >> $RUNDIR/uwind.script.$nn
+    [[ $ofn = wnd && $var = v ]] && echo $WGRIB $ifile -p $start_byt -grib -append -o $ofile >> $RUNDIR/vwind.script.$nn
+    [[ $ofn = wnd             ]] || echo $WGRIB $ifile -p $start_byt -grib -append -o $ofile >> $RUNDIR/scalr.script.$nn
+
+  done ## time loop
+  [[ -s $RUNDIR/uwind.script.$nn ]] && echo $RUNDIR/uwind.script.$nn >> $RUNDIR/uwind.cmdfile
+  [[ -s $RUNDIR/vwind.script.$nn ]] && echo $RUNDIR/vwind.script.$nn >> $RUNDIR/vwind.cmdfile
+  [[ -s $RUNDIR/scalr.script.$nn ]] && echo $RUNDIR/scalr.script.$nn >> $RUNDIR/scalr.cmdfile
   nn=$((nn+1))
-done
+done ## vars loop
 
-echo `date` Before POE
+# run mpmd to extract recordis for each var and time
+# --------------------------------------------------
 
-#if [ -s $RUNDIR/cmdfile_$ncmd ] ; then
-#  if [ $machine = IBM ]; then
-#    ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-#    # only valid if count .le. 128
-#    [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-#  elif [ $machine = WCOSS ]; then
-#    set +u
-#    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-#      ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-#    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-#      ntasks=$LSB_DJOB_NUMPROC
-#    else
-#      ntasks=1
-#    fi
-#    set -u
-#  elif [ $machine = WCRAY ]; then
-#    ntasks=24
-#  else
-#    echo "ntasks has not been defined for platform $machine"
-#  fi
-#
-#  remainder=$((($ntasks-$(cat $RUNDIR/cmdfile_$ncmd|wc -l))%$ntasks))
-#  n=0;while [ $((n+=1)) -le $remainder ] ;do
-#     echo "echo do nothing" >> $RUNDIR/cmdfile_$ncmd
-#  done
-#fi
+echo `date` run mpmd to extract record for each var and time
+mpirun cfp  $RUNDIR/uwind.cmdfile >/dev/null; export err=$?; pgm=u-extract; err_chk
+mpirun cfp  $RUNDIR/vwind.cmdfile >/dev/null; export err=$?; pgm=v-extract; err_chk
+mpirun cfp  $RUNDIR/scalr.cmdfile >/dev/null; export err=$?; pgm=s-extract; err_chk
 
-n=0; >cfpfile
-while [ $((n+=1)) -le $ncmd ] ;do
-  cat $RUNDIR/cmdfile_$n >> cfpfile
-  [[ $n -eq $ncmd ]] && mpirun cfp  cfpfile
-
-# if [[ $machine = WCOSS ]]; then
-#    $APRUN -pgmmodel mpmd -cmdfile $RUNDIR/cmdfile_$n
-# elif [[ $machine = WCRAY ]]; then
-#    time aprun -q -b -j1 -n$ntasks -d1 -cc depth cfp $RUNDIR/cmdfile_$n
-# fi
-# export err=$?; err_chk
-
-done
-
-((rc+=$?))
-if [ $rc -gt 0 ] ; then exit $rc ; else rm -f $RUNDIR/script_*.sh ; rm -f cmdfile_* ; fi
-
+################################################################################
+####export err=99; err_chk  # end for test
 ################################################################################
 # Exit gracefully
 
-date
-if [ $RUN_ENVIR = dev ] ; then
- if [[ $rc -ne 0 ]] ; then
-  $PLOG "$RUNLOG" ERROR "$jn failed for $PSLOT"
-  exit 1
- else
-  $PLOG "$RUNLOG" OK "$jn ended for $PSLOT"
- fi
-fi
-exit $rc
-
+cd $RUNDIR
+rm -f uwind.script.* vwind.script.* scalr.script.* 
+rm -f uwind.cmdfile  vwind.cmdfile  scalr.cmdfile  
+echo $(date) finished $0 normally 
+exit 
