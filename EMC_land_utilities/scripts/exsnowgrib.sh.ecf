@@ -194,6 +194,8 @@ else  # all input data not available.
   set -x
   msg="CURRENT AFWA AND/OR IMS DATA NOT AVAILABLE. CANT RUN SNOW2MDL."
   postmsg "$jlogfile" "$msg"
+  exit 99 # return to try one day earlier
+
   if test "$SENDCOM" = 'YES'
   then
     for DOMAIN in t574
