@@ -11,7 +11,8 @@ if [ $# -lt 2 ]; then
   err_exit 99
 fi
 
-[[ $machine = WCRAY ]] && export aprun="aprun -n1" || export aprun=''
+export machine=DELL
+export aprun="mpirun -n $LSB_DJOB_NUMPROC"
 
 set -x
 export cfss=${cfss:-"/cfs"}

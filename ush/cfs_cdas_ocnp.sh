@@ -5,8 +5,6 @@
 ###############################################################
 set -x
 
-[[ $machine = WCRAY ]] && export aprun="aprun -n1" || aprun=""
-
 export cfss=${cfss:-"/cfs"}
 export cfsd=${cfsd:-"cfs_cdas_"}
 export cfsp=${cfsp:-"cfs_"}
@@ -129,7 +127,6 @@ export flone=${flone:-359.5}
 
 # Defaults to 1x1 output
 
-
 export imo=${im_ocn:-360}
 if [ $imo -gt 360 ] ; then
  export SUFO=h
@@ -137,8 +134,7 @@ else
  export SUFO=f
 fi
 
-#
-#                    To start post from the middle
+# To start post from the middle
 if [ $FH_STRT_POST -ne 99999 ] ; then
  FHINI=$FH_STRT_POST
 elif [ -s $COMROT/FHREST.$CDUMP.$CDATE.$nknd ] ; then
@@ -152,9 +148,7 @@ fi
 if [ $FHINI -gt $FHEND ] ; then
  echo ' FHINI > FHEND Post processing stopped, FHINI= '$FHINI', FHEND= '$FHEND
 fi
-#
-#
-#
+
 if [ $AVG_FCST = YES -o $TSER_FCST = YES ] ; then
   export xdate=$($NDATE $FHINI $CDATE)
   if [ $AVG_INT -eq 999 ] ; then              # Monthly mean
@@ -174,14 +168,10 @@ if [ $AVG_FCST = YES -o $TSER_FCST = YES ] ; then
 else
    PDATE=$CDATE
 fi
-#
-#
-#
 
 export sdate=$($NDATE $FHINI $CDATE)
 export edate=$($NDATE $FHEND $CDATE)
-#
-#
+
 export date=$($NDATE $FHOUT $sdate)
 FH=$($NHOUR $date $CDATE)
 FH=$((FH+0))
@@ -192,27 +182,10 @@ if [ $cdump = GDAS -a ${AVRG_HOURLY:-YES} = YES ] ; then
  set -A icefiles 6
 fi
 
-cmd=cmd.$$
-if [ $machine = IBM ]; then
-  nprocs=$(poe hostname|wc -l)
-elif [ $machine = WCOSS ]; then
-  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-     nprocs=$LSB_DJOB_NUMPROC
-  else
-     nprocs=1
-  fi
-elif [ $machine = WCRAY ]; then
-     nprocs=24
-else
-  echo "nprocs calculation is not defined here"
-fi
->$cmd
-chmod 755 $cmd
-
+# setup and run the ocean post mpmd process
 
 nh=0
+cmd=cmd.$$; >$cmd; chmod 755 $cmd
 until [[ $date -gt $edate ]] ; do
   if [ $FH -lt 10 ] ; then FH=0$FH ; fi
   ymd=`echo $date | cut -c1-8`
@@ -220,11 +193,10 @@ until [[ $date -gt $edate ]] ; do
   mm=`echo $date | cut -c5-6`
   dd=`echo $date | cut -c7-8`
   hh=`echo $date | cut -c9-10`
-#
+
   export ocnfile=$OCNDIR/ocn_${yyyy}_${mm}_${dd}_${hh}$SUFOUT.nc
   export icefile=$OCNDIR/ice_${yyyy}_${mm}_${dd}_${hh}$SUFOUT.nc
-# export outfile=$COMOUT/ocn${SUFO}${FH}$SUFOUT
-##export outfile=$DATA/ocn${SUFO}${FH}$SUFOUT
+
   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
     ofile=$COMOUT/${RUN1}.t${cyc}z.ocngrb${SUFO}${FH}
   else
@@ -255,60 +227,13 @@ until [[ $date -gt $edate ]] ; do
       fi
     fi
   fi
-#
   date=$($NDATE $FHOUT $date)
   FH=$((FH+FHOUT))
 done
-#
+
 if [ -s $cmd ] ; then
-  if [ $machine = IBM ]; then
-    nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-    # only valid if count .le. 128
-    [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
-  elif [ $machine = WCOSS ]; then
-    if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-       nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-    elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-       nprocs=$LSB_DJOB_NUMPROC
-    else
-       nprocs=1
-    fi
-  elif [ $machine = WCRAY ]; then
-       nprocs=24
-  elif [ $machine = DELL  ]; then
-       nprocs=28
-  else
-    echo "nprocs calculation is not defined here"
-  fi
-
-   remainder=$(($nprocs-$(cat $cmd|wc -l)%$nprocs))
-   n=0;while [ $((n+=1)) -le $remainder ] ;do
-       echo "echo do nothing" >> $cmd
-   done
-   l=0
-   n=-1
-   while read line ;do ((n+=1))
-       if [ $((n%nprocs)) -eq 0 ] ; then
-           ((l+=1))
-           >cmdlist.$l
-       fi
-       echo "$line" >> cmdlist.$l
-   done < $cmd
-
-   n=0
-   while [ $((n+=1)) -le $l ] ;do
-       if [[ $machine = WCOSS ]]; then
-          poe -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
-          export err=$?; err_chk
-       elif [[ $machine = WCRAY ]]; then
-          aprun -b -j1 -n$nprocs -d1 -cc depth cfp cmdlist.$n
-          export err=$?; err_chk
-       elif [[ $machine = DELL  ]]; then
-          mpirun cfp cmdlist.$n
-          export err=$?; err_chk
-       fi
-   done
-
+  mpirun cfp $cmd  |grep 'CFP RANK'
+  export err=$?; err_chk
 fi
 #
 ################################################################################

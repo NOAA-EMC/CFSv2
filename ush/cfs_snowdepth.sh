@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euax
+set -uax
 
 
 ######################################
@@ -18,3 +18,10 @@ export FIXgrib=${FIXgrib:-$HOMEgrib/fix}
 
 
 $HOMEgrib/scripts/exsnowgrib.sh.ecf
+
+# try yesterday if today is missing
+
+if [[ $? -ne 0 ]]; then
+  export PDY=$PDYm1
+  $HOMEgrib/scripts/exsnowgrib.sh.ecf
+fi

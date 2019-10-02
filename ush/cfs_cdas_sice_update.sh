@@ -4,7 +4,7 @@
 #  Original Author : Xingren.Wu@noaa.gov
 #  Modified to Korn shell for CFS - S. Moorthi
 #
-set -x
+set -ux
 export cfss=${cfss:-"/cfs"}
 export cfsp=${cfsp:-"cfs_"}
 export cfsd=${cfsd:-"cfs_cdas_"}
@@ -13,10 +13,9 @@ export GRIDSPEC=${GRIDSPEC:-$HOMEcfs/fix/${cfsp}fix_om/grid_spec.nc}
 
 #setup the compute node command
 
-export APRUN=${APRUN:-''}
-[[ $machine = WCOSS ]] && export APRUN="mpirun -n 28"
-[[ $machine = WCRAY ]] && export APRUN='aprun -n24'
+# find the number of procs
 
+export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
 
 export name=regrid_fice
 export cdate=$1

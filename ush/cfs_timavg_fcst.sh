@@ -6,15 +6,7 @@
 #set -xeu
 set -eu
 
-if [[ $machine = WCOSS ]]; then
-   export APRUN=mpirun.lsf
-elif [[ $machine = WCRAY ]]; then
-   export APRUN="aprun -n24"
-fi
-
 APRUN="mpirun -n 28"
-
-###export MP_COLLECTIVE_OFFLOAD=yes
 
 export WINDEX=${WINDEX:-$GRBINDEX}
 

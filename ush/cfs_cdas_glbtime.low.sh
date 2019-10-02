@@ -55,26 +55,23 @@ flxlist='lhtfl shtfl prate wnd10m wndstrs pressfc pwat tmp2m tmpsfc tmphy1 snohf
 
 flxplist='soilm1 soilm2 soilm3 soilm4 weasd'
 	
-if [ $machine = IBM ]; then
-  ntasks=$(poe hostname|wc -l)
-elif [ $machine = WCOSS ]; then
-  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-    ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-    ntasks=$LSB_DJOB_NUMPROC
-  else
-    ntasks=1
-  fi
+# find the number of procs
+
+if [ -n "$LSB_DJOB_NUMPROC" ]; then
+   ntasks=$LSB_DJOB_NUMPROC
 else
-  echo "ntasks not defined for this platform $machine"
+   echo "ntasks not defined for this platform"
+   export err=99; err_chk
 fi
 
+# setup the cmdfiles
 
 n=0
 npoe=0
 prefix=$(echo $inp_file|cut -c1-3)
-> cmdfile.$$.$npoe
+rm cmdfile.*; > cmdfile.$$.$npoe
 list=
+
 if [ inp_file = all -o $prefix = flx ] ; then
 	list="$list $flxlist"
 	for name in $flxlist;do 
@@ -130,7 +127,6 @@ elif [ inp_file = all -o $prefix = ipv  ] ; then
 		[ ! -s $ifile ] && exit 1
 		ofile=${name}.l.$CDUMP.$yyyymm
 
-		# echo $COPYGB -xX -i0 -g2 $ifile $ofile>>cmdfile.$$.$npoe
 		echo $COPYGBFIX -xX -i0 -g2 $ifile $ofile>>cmdfile.$$.$npoe
 
 		if [ $((n+=1)) -eq $ntasks ] ; then
@@ -156,29 +152,12 @@ elif [ inp_file = all -o $prefix = ocn  ] ; then
 		fi
 	done 
 fi
-if [ $n -gt 0 ] ; then
-	while [ $((n+=1)) -le $ntasks ] ; do
-		echo "echo occupy task $((n-1)) " >>cmdfile.$$.$npoe
-	done
-fi
-n=-1;while [ $((n+=1)) -le $npoe ] ; do
-	cat cmdfile.$$.$n
-	#$APRUN -pgmmodel mpmd -cmdfile cmdfile.$$.$n 
-        cp cmdfile.$$.$n cmdfile
-        $APRUN cfp cmdfile   
-        export err=$?; err_chk
-done
-rc=$?
 
-# for name in $list;do 
-	# ofile=$name.l.$CDUMP.$yyyymm
-	# chgrp reanl $ofile
-	# chmod 750 $ofile
-# done
+# concat the separate cmdfiles and run cfp
 
-rm  cmdfile.$$* 
+cat cmdfile.* >cfpfile
+mpirun cfp cfpfile  >/dev/null 
+export err=$?; err_chk
 
-################################################################################
-# Exit gracefully
-
-exit $rc
+rm  cfpfile cmdfile.$$* 
+exit 

@@ -13,8 +13,6 @@ WRK=$DATA/${FH}${TM}
 mkdir -p $WRK
 cd $WRK
 
-export COPYGB=$COPYGBAP ## this so mpmd script won't use aprun ##
-
 if [ $DO_POST = YES ] ; then
   #    Post ocean files from netcdf to grib
   #

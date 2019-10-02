@@ -1,16 +1,24 @@
 #!/bin/ksh
 set -x
 
-export machine=${machine:-WCOSS}
-
-echo jsw $machine
 ######################################################################
 #   This script creates pke (energetics) monthly means of grib files.
 #
 #       Originally written by Shrinivas Moorthi
 #       Updated by Patrick Tripp Sept 2010
 ######################################################################
-export APRUN="mpirun -n 28"  ##${APRUN:-mpirun.lsf}
+
+
+# find the number of procs
+
+if [ -n "$LSB_DJOB_NUMPROC" ]; then
+   nprocs=$LSB_DJOB_NUMPROC
+   export APRUN="mpirun -n $nprocs" 
+else
+   echo "nprocs not defined for this platform"
+   export err=99; err_chk
+fi
+
 export CDUMP=${CDUMP:-"gdas"}
 
 errs=0
@@ -85,47 +93,15 @@ if [ $prefix2 = f -o $prefix2 = h -o $prefix2 = l ] ; then
     fi
     cdate=$($NDATE $dhour $cdate)
   done
+
   if [ -s $cmdfile ] ; then
    cat $cmdfile
-      if [ $machine = IBM ]; then
-        ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-        # only valid if count .le. 128
-        [ $ntasks -eq 128 ] && ntasks=$(poe hostname|wc -l)
-      elif [ $machine = WCOSS ]; then
-        if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-          ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-        elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-          ntasks=$LSB_DJOB_NUMPROC
-        else
-          ntasks=1
-        fi
-      else
-        echo "ntasks has not been defined for platform $machine"
-      fi
-
-      remainder=$(($ntasks-$(cat $cmdfile|wc -l)%$ntasks))
-      n=0;while [ $((n+=1)) -le $remainder ] ;do
-          echo "echo do nothing" >>$cmdfile
-      done
-      l=0
-      n=-1
-      while read line ;do ((n+=1))
-          if [ $((n%ntasks)) -eq 0 ] ; then
-              ((l+=1))
-              >cmdlist.$l
-          fi
-          echo "$line" >> cmdlist.$l
-      done < $cmdfile
-      n=0
-      while [ $((n+=1)) -le $l ] ;do
-        ##$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
-        mpirun cfp cmdlist.$n
-        export err=$?; err_chk
-      done
+   mpirun cfp $cmdfile |grep 'CFP RANK'
+   export err=$?; err_chk
   fi
 
- if [ -s nampke  ] ; then rm nampke ; fi
- echo 'catting'
+  rm -f nampke
+  echo 'catting'
 
 cat > nampke <<EOF
 &nampke
@@ -136,20 +112,19 @@ syear=$syear, smonth=$smonth, sday=$sday, shour=$shour,
 eyear=$eyear, emonth=$emonth, eday=$eday, ehour=$ehour,
 fhour=$fhr, dhour=$dhour,/
 EOF
-echo 'after catting'
 
   $APRUN $AVGPKEEXEC < nampke 1> pkeavg.${sdate}_${edate}.out_$fhr 2> pkeavg.${sdate}_${edate}.err_$fhr
   export err=$?; err_chk
-  #if [ $? -ne 0 ] ; then echo "ERROR: $AVGPKEEXEC returned non-zero" ; ((errs+=1)) ; fi
   cat dgout.* > $OUTDIR/${oname}$SUFOUT
- done
+
 else
   export iname=pgb${prefix2}
   export index=pgi${prefix2}
   export oname=${prefix1}${prefix2}
   fhr=${fhr:-0}
 
-# compute index files if they don't exits
+  # compute index files if they don't exits
+
   cdate=$sdate
   if [ -s $cmdfile ] ; then rm $cmdfile ; fi
   > $cmdfile
@@ -163,47 +138,10 @@ else
     fi
     cdate=$($NDATE $dhour $cdate)
   done
+
   if [ -s $cmdfile ] ; then
-   cat $cmdfile
-      if [ $machine = IBM ]; then
-        ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-        # only valid if count .le. 128
-        [ $ntasks -eq 128 ] && ntasks=$(poe hostname|wc -l)
-      elif [ $machine = WCOSS ]; then
-        if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-          ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-        elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-          ntasks=$LSB_DJOB_NUMPROC
-        else
-          ntasks=1
-        fi
-      else
-        echo "ntasks has not been defined for platform $machine"
-      fi
-
-      remainder=$(($ntasks-$(cat $cmdfile|wc -l)%$ntasks))
-      n=0;while [ $((n+=1)) -le $remainder ] ;do
-          echo "echo do nothing" >>$cmdfile
-      done
-      l=0
-      n=-1
-      while read line ;do ((n+=1))
-          if [ $((n%ntasks)) -eq 0 ] ; then
-              ((l+=1))
-              >cmdlist.$l
-          fi
-          echo "$line" >> cmdlist.$l
-      done < $cmdfile
-      n=0
-      while [ $((n+=1)) -le $l ] ;do
-        ##$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n
-        mpirun cfp cmdlist.$n
-        export err=$?; err_chk
-      done
+     mpirun cfp $cmdfile |grep 'CFP RANK'
   fi
-
- if [ -s nampke  ] ; then rm nampke ; fi 
-   echo 'catting'
 
 cat > nampke <<EOF
 &nampke
@@ -215,12 +153,9 @@ eyear=$eyear, emonth=$emonth, eday=$eday, ehour=$ehour,
 fhour=$fhr, dhour=$dhour,/
 EOF
 
-  echo 'after catting'
   $APRUN $AVGPKEEXEC <nampke 1>pkeavg.${sdate}_${edate}.out2 2>pkeavg.${sdate}_${edate}.err
   export err=$?; err_chk
-  #rc=$?
   #if [ $? -ne 0 ] ; then echo "ERROR: $AVGPKEEXEC returned non-zero" ; ((errs+=1)) ; fi
-
   cat dgout.* > $OUTDIR/${oname}$SUFOUT
 fi
 

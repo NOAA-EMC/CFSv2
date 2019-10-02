@@ -77,34 +77,8 @@ if [ $cck -eq 0 -o $cca -eq 0 ] ; then
    cdate=$($NDATE $INTSIG $cdate)
    done
 
-   mpirun cfp cfpfile
+   mpirun cfp cfpfile |grep 'CFP RANK'
    
-#  n=0; remainder=$(($nprocs-$(cat cfpfile|wc -l)%$nprocs))
-#
-#  while [ $((n+=1)) -le $remainder ] ;do
-#     echo "echo do nothing" >> cfpfile 
-#  done
-#
-#  #  mpmd block
-#
-#  nrun=0; ncfp=$(cat cfpfile|wc -l)
-#
-#  while [[ $nrun -lt $ncfp ]]; do
-#     rm -f cfpart
-#     tail -n$((ncfp-nrun)) cfpfile | head -n$nprocs > cfpart
-#     echo; cat cfpart; echo
-#     if [[ $machine = WCRAY ]]; then
-#        time aprun -q -b -j1 -n$nprocs -d1 -cc depth cfp cfpart    
-#        export err=$?; err_chk
-#     elif [[ $machine = WCOSS ]]; then
-#        time poe -pgmmodel mpmd -cmdfile cfpart -stdoutmode ordered
-#        export err=$?; err_chk
-#     fi
-#     nrun=$((nrun+$nprocs))
-#  done
-
-   set -x
-
 #  Collect time series of selected variables
 
   fhend=$($NHOUR $edate $start_date)

@@ -81,54 +81,14 @@ do
   fi
 done      
 
-mpirun cfp poescript
+# run the cfp mpmd
+
+mpirun cfp poescript | grep 'CFP RANK'
 export err=$?; err_chk
 
-if [ -s poescript ] ; then
-# if [ $machine = IBM ]; then
-#   nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-#   # only valid if count .le. 128
-#   [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
-# elif [ $machine = WCOSS ]; then
-#   if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-#     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-#   elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-#     nprocs=$LSB_DJOB_NUMPROC
-#   else
-#     nprocs=1
-#   fi
-# elif [ $machine = WCRAY ]; then
-#     nprocs=24
-# else
-#   echo "nprocs has not been defined for platform $machine"
-# fi
-#
-#    remainder=$(($nprocs-$(cat poescript|wc -l)%$nprocs))
-#    n=0;while [ $((n+=1)) -le $remainder ] ;do
-#      echo "echo do nothing" >> poescript
-#    done
-#
-#    l=0
-#    n=-1
-#    while read line ;do ((n+=1))
-#      if [ $((n%nprocs)) -eq 0 ] ; then
-#        ((l+=1))
-#        >cmdlist.$l
-#      fi
-#      echo "$line" >> cmdlist.$l
-#    done < poescript
-#  n=0
-#  while [ $((n+=1)) -le $l ] ;do
-#     if [[ $machine = WCOSS ]]; then
-#        $APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
-#        export err=$?; err_chk
-#     elif [[ $machine = WCRAY ]]; then
-#        aprun -q -b -j1 -n$nprocs -d1 -cc depth cfp cmdlist.$n            
-#        export err=$?; err_chk
-#     fi
-#  done
+# Move the grib2 files to time_grib directory
 
-   # Move the grib2 files to time_grib directory
+if [ -s poescript ] ; then
    if [ $SENDCOM = YES ]
    then
      for grb2file in `ls *.grb2`	

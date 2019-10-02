@@ -1,8 +1,6 @@
 #!/bin/ksh
 set -x
 
-[[ $machine = WCRAY ]] && export aprun="aprun -n1" || aprun=""
-
 #if [ $# -lt 5 ] ; then echo "Usage: $0 CDATE SST_DIR SSS_DIR omres GRIDSPEC" ;exit 1 ;fi
 #
 #  This script creates sst and sss restore datasets for  MOM4 GODAS
@@ -40,11 +38,11 @@ ln -sf $FIX_OCN/SFM4_WOA09.nc   SFM4_WOA09.nc
 ln -sf $SSS_DIR/salt12.nc salt12.nc
 
 echo "Making temp_sfc_restore.nc"
-$aprun $mk1DySst4i -p $SST_DIR -g grid_spec.nc -d $dte -o temp_sfc_restore.nc -y 65
+$mk1DySst4i -p $SST_DIR -g grid_spec.nc -d $dte -o temp_sfc_restore.nc -y 65
 export err=$?; err_chk
 
 echo "Making salt_sfc_restore.nc"
-$aprun $mk1DySss4i -f salt12.nc -g grid_spec.nc -d $dte -o salt_sfc_restore.nc -y 65
+$mk1DySss4i -f salt12.nc -g grid_spec.nc -d $dte -o salt_sfc_restore.nc -y 65
 export err=$?; err_chk
 
 # turn these off per DaveB #

@@ -273,15 +273,8 @@ if [[ "$VERBOSE" = "YES" ]] ; then
    echo $(date) EXECUTING $0 $* >&2
    set -x
 fi
-export machine=${machine:-WCOSS}
-export machine=$(echo $machine|tr '[a-z]' '[A-Z]')
-if [ $machine = WCOSS_C ]; then
-  . $MODULESHOME/init/sh
-  module load PrgEnv-intel intel cray-mpich
-  module load prod_envir prod_util grib_util
-fi
 
-[[ $machine = WCRAY ]] && export APRUNC="aprun -n1"
+export APRUNC="mpirun -n LSB_DJOB_NUMPROC"
 
 #  Command line arguments.
 export APRUNC=${APRUNC:-""}
@@ -365,17 +358,10 @@ export XLSMPOPTS=${XLSMPOPTS:-"parthds=$NTHREADS:stack=$NTHSTACK"}
 export KMP_STACKSIZE=${KMP_STACKSIZE:-$NTHSTACK}
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
-if [ $machine = IBMP6 ] ; then
-  typeset -L1 l=$PGMOUT
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDOUT=${REDOUT:-'1>'$a}
-  typeset -L1 l=$PGMERR
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDERR=${REDERR:-'2>'$a}
-else
-  export REDOUT=${REDOUT:-'1>'}
-  export REDERR=${REDERR:-'2>'}
-fi
+
+export REDOUT=${REDOUT:-'1>'}
+export REDERR=${REDERR:-'2>'}
+
 if [ $OUTTYP = 1 ]; then
   export GRDFMT_CH='bin4'
 elif [ $OUTTYP = 2 ]; then
