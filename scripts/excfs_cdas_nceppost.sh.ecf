@@ -15,8 +15,6 @@ postmsg "$jlogfile" "$msg"
 
 export MP_LABELIO=YES
 
-export machine=${machine:-WCOSS}
-
 #poe hostname
 
 ############################################################

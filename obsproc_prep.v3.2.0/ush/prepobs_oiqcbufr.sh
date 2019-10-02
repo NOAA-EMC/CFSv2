@@ -80,14 +80,10 @@ export FORT65=tosslist
 export FORT70=$PRPI.oiqcbufr
 export FORT81=obogram.out
 export FORT82=obogram.bin
-TIMEIT=${TIMEIT:-""}
-[ -s $DATA/time ] && TIMEIT="$DATA/time -p"
-# $TIMEIT mpirun $OIQCX > outout 2> errfile
-#$TIMEIT mpirun -genvall -n $LSB_DJOB_NUMPROC -machinefile $LSB_DJOB_HOSTFILE $OIQCX > outout 2> errfile
-$TIMEIT mpirun -n 28 $OIQCX > outout 2> errfile
 
-err=$?
-###cat errfile
+mpirun -n 28 $OIQCX > outout 2> errfile
+export err=$?; err_chk  
+
 cat errfile >> outout
 cat outout >> oiqcbufr.out
 cp outout obcnt.out

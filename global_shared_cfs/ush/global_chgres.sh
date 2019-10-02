@@ -264,17 +264,13 @@
 ####
 ################################################################################
 #  Set environment.
+
 export VERBOSE=${VERBOSE:-"NO"}
 if [[ "$VERBOSE" = "YES" ]] ; then
    echo $(date) EXECUTING $0 $* >&2
    set -x
 fi
-export machine=${machine:-WCOSS}
-export machine=$(echo $machine|tr '[a-z]' '[A-Z]')
-#if [ $machine = ZEUS ] ; then
-# module load intel
-# module load mpt
-#fi
+
 #  Command line arguments.
 export APRUNC=${APRUNC:-""}
 export SIGINP=${1:-${SIGINP:-NULL}}
@@ -345,17 +341,10 @@ export XLSMPOPTS=${XLSMPOPTS:-"parthds=$NTHREADS:stack=$NTHSTACK"}
 export KMP_STACKSIZE=${KMP_STACKSIZE:-$NTHSTACK}
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
-if [ $machine = IBMP6 ] ; then
-  typeset -L1 l=$PGMOUT
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDOUT=${REDOUT:-'1>'$a}
-  typeset -L1 l=$PGMERR
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDERR=${REDERR:-'2>'$a}
-else
-  export REDOUT=${REDOUT:-'1>'}
-  export REDERR=${REDERR:-'2>'}
-fi
+
+export REDOUT=${REDOUT:-'1>'}
+export REDERR=${REDERR:-'2>'}
+
 ################################################################################
 #  Preprocessing
 $INISCRIPT
@@ -462,30 +451,12 @@ EOF
 
 export OMP_NUM_THREADS=${OMP_NUM_THREADS_CH:-${CHGRESTHREAD:-1}}
 
-#if [ $machine = IBM ] ; then
  eval $APRUNC $CHGRESEXEC <<EOF $REDOUT$PGMOUT $REDERR$PGMERR
   &NAMCHG JCAP=$JCAP, LEVS=$LEVS, LONB=$LONB, LATB=$LATB,
            NTRAC=$NTRAC, IDVC=3    , IDSL=$IDSL,
            LSOIL=$LSOIL, IVSSFC=$IVSSFC, OUTTYP=$OUTTYP, IDRT=$IDRT, $CHGRESVARS
  /
 EOF
-#else
-# export OMP_NUM_THREADS=${OMP_NUM_THREADS_CH:-1}
-# export mpi_tasks_ch=${mpi_tasks_ch:-1}
-# export npe_node=${npe_node:-24}
-# export pe_node=$((npe_node/OMP_NUM_THREADS))
-# if [ $pe_node -gt $mpi_tasks_ch ] ; then export pe_node=$mpi_tasks_ch ; fi
-# VDATE=${VDATE:-""}
-#echo aprun -n$mpi_tasks_ch -N$pe_node -d$OMP_NUM_THREADS $CHGRESEXEC  >out_chgres_$VDATE
-#aprun -n$mpi_tasks_ch -N$pe_node -d$OMP_NUM_THREADS $CHGRESEXEC <<EOF  >o_out_chgres_$VDATE 2>e_out_chgres_$VDATE
-#&NAMCHG JCAP=$JCAP, LEVS=$LEVS, LONB=$LONB, LATB=$LATB,
-#          NTRAC=$NTRAC, IDVC=$IDVC, IDSL=$IDSL,
-#          LSOIL=$LSOIL, IVSSFC=$IVSSFC, OUTTYP=$OUTTYP, IDRT=$IDRT, $CHGRESVARS
-#/
-#EOF
-
-#fi
-
 
 export ERR=$?
 export err=$ERR

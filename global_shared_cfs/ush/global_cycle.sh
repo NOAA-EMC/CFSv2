@@ -213,16 +213,12 @@
 
 #  Set environment.
 export VERBOSE=${VERBOSE:-"NO"}
+
 if [[ "$VERBOSE" = "YES" ]] ; then
    echo $(date) EXECUTING $0 $* >&2
    set -x
 fi
-export machine=${machine:-WCOSS}
-export machine=$(echo $machine|tr '[a-z]' '[A-Z]')
-#if [ $machine = ZEUS ] ; then
-# module load intel
-# module load mpt
-#fi
+
 export APRUNCY=${APRUNCY:-""}
 
 #  Command line arguments.
