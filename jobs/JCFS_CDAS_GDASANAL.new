@@ -109,8 +109,6 @@ export SAVEGES=${SAVEGES:-NO} # put the analysis in GESdir
 # Set executable, script, and fix
 #
 export GSIEXEC=${GSIEXEC:-$EXECGSI/global_gsi}
-[[ $machine = WCRAY ]] && export ANALYSISSH=$HOMEcfs/scripts/exglobal_analysis.sh.ecf
-[[ $machine = WCOSS ]] && export ANALYSISSH=$SCRGSI/exglobal_analysis.sh.ecf
 
 # Forecast Horizontal Resolution
 #
@@ -386,25 +384,8 @@ export KMP_STACKSIZE=2048m
 export NTHSTACK=1024000000                # stacks for fcst step; default 128000000
 export NTHSTACK_GSI=1024000000            # stack size for anal, default=128000000
 
-#-------------------------
-# machine related business
-#-------------------------
-
-if [[ $machine = WCOSS ]]; then
-  export APRUN="mpirun.lsf"   
-  export OMP_NUM_THREADS_CY=20 
-  export APRUNCY=""  
-elif [[ $machine = WCRAY ]]; then
-   export OMP_NUM_THREADS_CY=20 
-   export APRUNCY="aprun -n1 -d$OMP_NUM_THREADS_CY "
-   export NTHREADS_GSI=${NTHREADS_GSI:-1}
-   export APRUN="aprun -n160 -N16 -d$NTHREADS_GSI"
-else
-   echo no known machine is defined
-   export err=99; err_chk
-fi
-
-APRUN=" mpirun -n 140 "
+export OMP_NUM_THREADS_CY=20 
+export APRUN=" mpirun -n $LSB_DJOB_NUMPROC"
 
 ##env
 

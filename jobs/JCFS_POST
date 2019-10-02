@@ -176,17 +176,7 @@ YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
 
 export NTHSTACK=102400000
 
-export machine=${machine:-WCOSS}
-
-#if [ $machine = IBM ]; then
-#  APRUNCY=""
-#elif [ $machine = WCOSS ]; then
-#  APRUNCY=mpirun.lsf
-#else
-#  echo "APRUNCY not defined for this platform"
-#fi
-
-export APRUN="mpirun -n 28"
+export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
 
 ##############################################
 # Define COM directories

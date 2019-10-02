@@ -70,10 +70,10 @@ echo
 cat poescript
 echo
 
-### mpirun cfp poescript
-
-chmod +x poescript.sh; poescript.sh
+mpirun cfp poescript | grep 'CFP RANK'
 export err=$?; err_chk
+
+##chmod +x poescript.sh; poescript.sh
 
 cd $DATA
 cat $pgmout

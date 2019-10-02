@@ -213,9 +213,6 @@ export MP_EUILIB=us
 export MP_LABELIO=yes
 export MP_SHARED_MEMORY=yes
 
-export machine=WCOSS
-export APRUN=${APRUN:-'mpirun.lsf'}
-
 ##env
 
 #############################################################
