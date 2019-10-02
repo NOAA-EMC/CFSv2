@@ -1426,7 +1426,7 @@ until [ $p_date -gt $end_date ] ; do
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
 
-mpirun cfp cmdfile_mpp # run the cmdfile processor
+mpirun cfp cmdfile_mpp |grep 'CFP RANK'   # run the cmdfile processor
 
 # rename the ocn and ice files to reflect the correct time
 

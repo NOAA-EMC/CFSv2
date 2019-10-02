@@ -33,7 +33,6 @@ postmsg "$jlogfile" "$msg"
 
 cat break > $pgmout
 
-export machine=${machine:-WCOSS}
 export NET_uc=$(echo $NET | tr [a-z] [A-Z])
 export tmmark_uc=$(echo $tmmark | tr [a-z] [A-Z])
 export SENDCOM=${SENDCOM:-YES}
@@ -273,10 +272,6 @@ DUMPMB=${DUMPMB:-$HOMEcfs/ush/bufr_dumpmb}
 DUMP_LIST="dbuoy bathy tesac"
 LOUD=${LOUD:-off}
 GODAS_WNDO=${GODAS_WNDO:-10}
-
-if [ $machine = IBM ]; then
-  export XLFRTEOPTS="unit_vars=yes"
-fi
 
 START_DATE=`finddate.sh $PDY d-$GODAS_WNDO`
 END_DATE=$PDY

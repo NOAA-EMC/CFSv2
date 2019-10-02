@@ -21,17 +21,15 @@
 
 [[ $VERBOSE != NO ]] && set -x
 
+export pgm=$(basebame $0)
+
 YYYYMM=${1:-${YYYYMM:-201005}}
 
 echo "YYYYMM=$YYYYMM"
 
 #######################################################
 
-export machine=${machine:-WCOSS}
-
 rundate=${YYYYMM}0100
-
-export APRUN=mpirun 
 
 YYYYMMDD=`echo $rundate | cut -c1-8`
 YYYY=`echo $rundate | cut -c1-4`
@@ -278,10 +276,6 @@ fi # if dolinks
 #########################################################################################
 ## END LINK Analysis
 #########################################################################################
-
-
-
-
 
 
 #########################################################################################
@@ -570,9 +564,8 @@ if [ $makemeanpke = "YES" ] ; then
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: avgpke returned non-zero exit for $name"
     ((rc+=1))
-    export err=$rc; err_chk
+    export err=$rc; pgm=$(basename $0); err_chk
   fi
-  # /bin/rm -rf $RUNDIR
 
   ### for forecast average over each forecast hour cycle ...
 
@@ -632,7 +625,6 @@ if [ $makemeanpke = "YES" ] ; then
     echo "ERROR: avgpke returned non-zero exit for $name"
     export err=$rc; err_chk
   fi
-  # /bin/rm -rf $RUNDIR
 
   ### for analysis average over each forecast hour cycle ...
   for hh in $hhlist
@@ -838,57 +830,14 @@ if [ $dogrib2means = "YES" ] ; then
 
 
   # Submit MPMD Job to do grib2 conversion
+  # --------------------------------------
 
-  if [ -s $poescript ] ; then
-    if [ $machine = IBM ]; then
-      nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-      # only valid if count .le. 128
-      [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
-    elif [ $machine = WCOSS ]; then
-      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-         nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-         nprocs=$LSB_DJOB_NUMPROC
-      else
-         nprocs=1
-      fi
-    else
-      echo "nprocs calculation is not defined here"
-    fi
+  mpirun cfp $poescript
+  export err=$?; pgm="$(basename($0) mmean cfp"; err_chk
 
-    remainder=$(($nprocs-$(cat $poescript|wc -l)%$nprocs))
-    n=0
-    while [ $((n+=1)) -le $remainder ]
-    do
-      echo "echo do nothing" >> $poescript
-    done
+  # Cleanup
+  # -------
 
-    l=0
-    n=-1
-    while read line
-    do
-      ((n+=1))
-      if [ $((n%nprocs)) -eq 0 ] ; then
-        ((l+=1))
-        >cmdlist.$l
-      fi
-      echo "$line" >> cmdlist.$l
-    done < $poescript
-
-    n=0
-    while [ $((n+=1)) -le $l ]
-    do
-      #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
-      cp cmdlist.$n cmdfile
-      $APRUN cfp cmdfile   
-      # Error check
-      export err=$?; err_chk
-      ((rc+=$err))
-    done
-  fi
-
-
-  ## Cleanup
   /bin/rm -f $poelist
   /bin/rm -f cmdlist*
 
@@ -972,8 +921,6 @@ if [ $maketime = "YES" ] ; then
     fi
   done  # inp_name loop
 
-  # /bin/rm -rf $RUNDIR
-
   ((rcall+=$rc))    # Accumulator for error code
 
   echo "END: Timeseries Creation - rc: $rc"
@@ -986,14 +933,10 @@ if [ $maketime = "YES" ] ; then
 fi  # maketime
 
 
-
-
-
-
-if [ $dogrib2time = "YES" ] ; then
 ##########################################################################
 # TIMESERIES GRIB2 CONVERSION
 ##########################################################################
+if [ $dogrib2time = "YES" ] ; then
 
   echo "BEGIN: Timeseries Grib2 Conversion"
   now=`date`
@@ -1115,61 +1058,15 @@ if [ $dogrib2time = "YES" ] ; then
     done  ## end variable-loop namelist
   done  # typelist
 
-
-  ## MPMD Loop
   # Submit MPMD Job to do grib2 conversion
+  # --------------------------------------
 
-#  cd $TEMPDIR
-  if [ -s $poescript ] ; then
-    if [ $machine = IBM ]; then
-      nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-      # only valid if count .le. 128
-      [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
-    elif [ $machine = WCOSS ]; then
-      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-        nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-        nprocs=$LSB_DJOB_NUMPROC
-      else
-        nprocs=1
-      fi
-    else
-      echo "nprocs has not been defined for platform $machine"
-    fi
+  mpirun cfp $poescript
+  export err=$?; pgm="$(basename($0) tser cfp"; err_chk
 
-    remainder=$(($nprocs-$(cat $poescript|wc -l)%$nprocs))
-    n=0
-    while [ $((n+=1)) -le $remainder ]
-    do
-      echo "echo do nothing" >> $poescript
-    done
+  # Cleanup
+  # -------
 
-    l=0
-    n=-1
-    while read line
-    do
-      ((n+=1))
-      if [ $((n%nprocs)) -eq 0 ] ; then
-        ((l+=1))
-        >cmdlist.$l
-      fi
-      echo "$line" >> cmdlist.$l
-    done < $poescript
-
-    n=0
-    while [ $((n+=1)) -le $l ]
-    do
-      #$APRUN -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
-      cp cmdlist.$n cmdfile
-      $APRUN cfp cmdfile  
-      # Error check
-      export err=$?; err_chk
-      ((rc+=$err))
-    done
-  fi
-
-
-  ## Cleanup
   /bin/rm -f $poescript
 
   ((rcall+=$rc))    # Accumulator for error code

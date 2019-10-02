@@ -316,113 +316,59 @@ if [ ${PROCESS_GB2:-YES} = YES ]
 then
 
 # Convert the analysis files:
+
 for name in pgrb ipvgrb; do
   for resl in hanl anl lanl; do
     ifile=$COMOUT/${RUN}.${cycle}.${name}${resl}
     ofile=${RUN}.${cycle}.${name}${resl}.grib2
-
     echo "$CNVGRIB -g12 -p40 $ifile $ofile" >>poescript.grb2
   done
 done
 
 # Convert the forecast files:
+
 for fhr in $post_times; do
   for name in pgrb ipvgrb sfluxgrb; do
     if [ $name = "sfluxgrb" ]; then reslist="f l"; else reslist="h f l"; fi
     for resl in $reslist; do
       ifile=$COMOUT/${RUN}.${cycle}.${name}${resl}${fhr}
       ofile=${RUN}.${cycle}.${name}${resl}${fhr}.grib2
-
       echo "$CNVGRIB -g12 -p40 $ifile $ofile" >>poescript.grb2
     done
   done
 done
 
 # Convert the SPL files:
+
 for name in splgrbanl splgrblanl splgrbf06 splgrbl06
 do
   ifile=$COMOUT/${RUN}.${cycle}.${name}
   ofile=${RUN}.${cycle}.${name}.grib2
-  
   echo "$CNVGRIB -g12 -p40 $ifile $ofile" >>poescript.grb2
 done
 
 # convert ocean files to grib2
+
 for fhr in 01 02 03 04 05 06 06m 07 08 09; do 
   if [ $fhr = "06m" ]; then reslist="h f"; else reslist="h f l"; fi
   for resl in $reslist; do
     ifile=$COMOUT/${RUN}.${cycle}.ocngrb${resl}${fhr}
     ofile=${RUN}.${cycle}.ocngrb${resl}${fhr}.grib2
-
     echo "$CNVGRIB -g12 -p40 $ifile $ofile" >>poescript.grb2
    done
 done
 
-# Create poe to process the cnvgrib conversion
-if [ -s poescript.grb2 ] ; then
-   if [ $machine = IBM ]; then
-     nprocs=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-     # only valid if count .le. 128
-     [ $nprocs -eq 0 ] && nprocs=$(poe hostname|wc -l)
-   elif [ $machine = WCOSS ]; then
-     if [ -n "$LSB_DJOB_NUMPROC" ]; then
-       nprocs=$LSB_DJOB_NUMPROC
-     elif [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-       nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-     else
-       nprocs=1
-     fi
-   elif [ $machine = WCRAY ]; then
-       nprocs=24
-   elif [ $machine = DELL  ]; then
-       nprocs=28
-   else
-     echo "ntasks has not been defined for platform $machine"
-   fi
+# run the cfp mpmd process
 
-   remainder=$(($nprocs-$(cat poescript.grb2|wc -l)%$nprocs))
-   n=0;while [ $((n+=1)) -le $remainder ] ;do
-     echo "echo do nothing" >> poescript.grb2
-   done
-   l=0
-   n=-1
-   while read line ;do ((n+=1))
-     if [ $((n%nprocs)) -eq 0 ] ; then
-       ((l+=1))
-       >cmdlist.$l
-     fi
-     echo "$line" >> cmdlist.$l
-   done < poescript.grb2
-   n=0
-   while [ $((n+=1)) -le $l ] ;do
-      if [ $machine = IBM ]; then
-        poe -pgmmodel mpmd -cmdfile cmdlist.$n -stdoutmode ordered
-      elif [ $machine = WCOSS ]; then
-        export MP_CMDFILE=cmdlist.$n
-        export MP_EUIDEVICE=sn_all
-        export MP_EUILIB=us
-        export MP_PGMMODEL=mpmd
-        export MP_TASK_AFFINITY=cpu
-        export MP_LABLEIO=YES
-        export MP_INFOLEVEL=3
-        mpirun.lsf
-      elif [ $machine = WCRAY ]; then
-        aprun -b -j1 -n$nprocs -d1 -cc depth cfp cmdlist.$n
-      elif [ $machine = DELL ]; then
-        mpirun cfp cmdlist.$n
-      else
-        echo "Variables to run poe are not defined on $machine, please edit the script"
-      fi
-
-      export err=$?; err_chk
-   done
-fi
+mpirun cfp poescript.grb2 |grep 'CFP RANK'
+export err=$?; err_chk
 
 # Copy all the grib2 files to COMOUT
+
 if [ $SENDCOM = YES ]; then
   for grb2file in `ls ${RUN}.t${cyc}z.*.grib2`
   do
-    $WGRIB2 $grb2file -s >${grb2file}.idx
+  $WGRIB2 $grb2file -s >${grb2file}.idx
   done
   mv ${RUN}.t${cyc}z.*.grib2 $COMOUT/.
   mv ${RUN}.t${cyc}z.*.grib2.idx $COMOUT/.

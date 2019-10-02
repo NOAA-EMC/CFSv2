@@ -12,7 +12,6 @@
 ########################################################
 set -x
 
-export machine=${machine:-WCOSS}
 export PERR=${PERR:-""}
 export PARM_GODAS=${PARM_GODAS:-$HOMEcfs/parm/cfs_parm_om/tbl_nml}
 export gdas_cyc=${gdas_cyc:-4}
@@ -95,7 +94,6 @@ if [ $RUN_ENVIR != nco  ] ; then export DMP_SUF=c ; fi
  export sstfile=${9:-${sstfile:-$(pwd)/sstgrb.$CDUMP.$CDATE}}
 
  export DMP_SUF=${DMP_SUF:-""}
- BOMB=0
 
 #----------------------------------------------------------------------------
 # setup directory structure
@@ -296,28 +294,11 @@ $mRSTsh
 
   echo "Begining GODAS-M4 single analysis at $yr-$mo-$dy"
 
-# export MP_SHARED_MEMORY=no
-  if [ $machine = IBM ]; then
-    poe $pgm > fms.out || BOMB=1
-  elif [ $machine = DELL ]; then
-    mpirun -n 28 $pgm > fms.out || BOMB=1
-  elif [ $machine = WCOSS ]; then
-    mpirun -n 28 $pgm > fms.out || BOMB=1
-  elif [ $machine = WCRAY ]; then
-    aprun -n24 -N24  $pgm > fms.out || BOMB=1
-  else
-    echo "Set up for $machine is not ready"
-    BOMB=1
-  fi
+  mpirun -n $LSB_DJOB_NUMPROC $pgm > fms.out 
+  export err=$?; err_chk  
 
-  if [ $BOMB -ge 1 ]; then
-    echo "Job failure."
-    export err=$BOMB; err_chk
-    exit [ -1 ]
-  else
-    echo "Job done."
-    echo "Begin post processing."
-  fi
+  echo "Job done."
+  echo "Begin post processing."
 
   dte=`cat end_date`
 #
