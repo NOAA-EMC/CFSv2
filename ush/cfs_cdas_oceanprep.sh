@@ -12,7 +12,7 @@ if [ $# -lt 2 ]; then
 fi
 
 export machine=DELL
-export aprun="mpirun -n $LSB_DJOB_NUMPROC"
+export aprun="" 
 
 set -x
 export cfss=${cfss:-"/cfs"}
