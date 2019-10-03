@@ -64,10 +64,10 @@ export  COMROT=$COMROOT/${NET}/${envir}
 export   COMIN=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
 export  COMOUT=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
 export COMINm1=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${PDYm1}
-mkdir -m755 -p $COMOUT
 
 export pcom=$COMOUT/wmo 
-mkdir -p $COMOUT $pcom
+
+mkdir -m755 -p $COMOUT $pcom
 
 env
 

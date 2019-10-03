@@ -128,34 +128,34 @@ mkdir -m 775 -p $GESdir
 ####################################
 # Specify Special Vars
 ####################################
-#
+
 # Forecast Model Horizontal Resolution
-#
+
 export JCAP_ges=${JCAP:-574}
-#
+
 # Forecast Model Vertical Resolution
-#
+
 export LEVS_ges=${LEVS:-64}
-#
+
 # Analysis valid time
-#
+
 export CDATE=${CDATE:-${PDY}${cyc}}
 
 ####################################
 # Fix Files
-#
+
 export SATANGL=${SATANGL:-${FIXcfs}/global_satangbias.txt}
 
 ####################################
 # Input Fields
-#
+
 export PREINP=${PREINP:-${RUN}.${cycle}.}
 export RADSTAT=${RADSTAT:-${COMIN}/${PREINP}radstat}
 
 ############################################################################ 
 #
 # Output File Names
-#
+
 export SATANGO=${SATANGO:-$DATA/${RUN}.${cycle}.satang}
 
 msg="HAS BEGUN on `hostname`"

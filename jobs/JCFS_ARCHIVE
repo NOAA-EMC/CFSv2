@@ -62,7 +62,7 @@ export MP_CMDFILE=$DATA/poescript
 export MP_TASK_AFFINITY=cpu
 export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
-#
+
 # Execute the script.
 # mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 
@@ -72,8 +72,6 @@ echo
 
 mpirun cfp poescript | grep 'CFP RANK'
 export err=$?; err_chk
-
-##chmod +x poescript.sh; poescript.sh
 
 cd $DATA
 cat $pgmout

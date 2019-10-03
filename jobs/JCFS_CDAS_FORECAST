@@ -162,9 +162,6 @@ export OCNR=$GESdir/$RUN1.$cycle.next_ocnr.tar
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
 
-### test by Luke #####
-###export gespath=$GESROOT/prod
-
 if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
   export SIGI=${SIGI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sanl}
   export SFCI=${SFCI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sfcanl}

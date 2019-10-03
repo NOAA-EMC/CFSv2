@@ -96,7 +96,6 @@ export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
 export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
 export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
 export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_am}
-export RTMFIX=${RTMFIX:-${HOMEGLOBAL}/crtm_2.0.5}
 
 ##############################
 # Set up the UTILITIES
@@ -360,6 +359,9 @@ export KMP_STACKSIZE=2048m
 
 export NTHREADS_GSI=${NTHREADS_GSI:-2}
 export MP_TASK_AFFINITY=${MP_TASK_AFFINITY:-cpu:$NTHREADS_GSI}
+export APRUN='mpirun -n 140'
+
+export RTMFIX=$homecfs/global_shared_cfs/CRTMv205
 
 ##env
 
