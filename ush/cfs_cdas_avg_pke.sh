@@ -71,7 +71,8 @@ export ehour=`echo $edate | cut -c9-10`
 
 cmdfile=$RUNDIR/cmdfile
 if [ $prefix2 = f -o $prefix2 = h -o $prefix2 = l ] ; then
- ((fhr=fhini-fhout)); while [ $((fhr=10#$fhr+10#$fhout)) -le $fhmax ] ; do
+  ((fhr=fhini-fhout))
+  while [ $((fhr=10#$fhr+10#$fhout)) -le $fhmax ] ; do
 
   [ ${#fhr} -lt 2 ] && fhr=0$fhr
 
@@ -117,6 +118,8 @@ EOF
   export err=$?; err_chk
   cat dgout.* > $OUTDIR/${oname}$SUFOUT
 
+  done
+
 else
   export iname=pgb${prefix2}
   export index=pgi${prefix2}
@@ -127,7 +130,7 @@ else
 
   cdate=$sdate
   if [ -s $cmdfile ] ; then rm $cmdfile ; fi
-  > $cmdfile
+  > $cmdfile	
   while [ $cdate -le $edate ] ; do
     pgb=$INDIR/$iname.$CDUMP.$cdate
     [ ! -s $pgb ] && exit 1

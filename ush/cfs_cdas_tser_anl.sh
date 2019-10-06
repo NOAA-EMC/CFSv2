@@ -248,9 +248,7 @@ if [ $maketim = 1 ] ;then
     cat invout_$np.sh
   done
 
-  #$APRUN -pgmmodel mpmd -cmdfile cmdfile_0
-  cp cmdfile_0 cmdfile
-  $APRUN cfp cmdfile  
+  $APRUN cfp cmdfile_0 | grep 'CFP RANK'
   ((rc+=$?))
   if [ $rc -gt 0 ] ; then export err=$rc; err_chk ; else rm invout_*.sh ; rm cmdfile_0 ; fi
 
@@ -355,9 +353,7 @@ if [ $maketim = 1 ] ;then
   n=0
   while [ $((n+=1)) -le $ncmd ]
   do
-    #$APRUN -pgmmodel mpmd -cmdfile cmdfile_$n
-    cp cmdfile_$n cmdfile
-    $APRUN cfp cmdfile 
+    $APRUN cfp cmdfile_$n | grep 'CFP RANK'
     ((rc+=$?))
     export err=$rc; err_chk
   done
@@ -418,9 +414,7 @@ EOF
 
   n=-1;while [ $((n+=1)) -le $npoe ] ; do
     cat cmdfile_$n
-    ###$APRUN -pgmmodel mpmd -cmdfile cmdfile_$n
-    cp cmdfile_$n cmdfile
-    $APRUN  cfp cmdfile
+    $APRUN  cfp cmdfile_$n | grep 'CFP RANK'
     export err=$?; err_chk
   done
 

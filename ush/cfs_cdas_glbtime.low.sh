@@ -21,7 +21,7 @@ export INDIR=${5:-$INDIR}
 export TIMEDIR=${6:-${TIMEDIR:-$INDIR}}
 
 
-WINDEX=${WINDEX:-${GRBINDEX}
+WINDEX=${WINDEX:-${GRBINDEX}}
 
 export MP_STDOUTMODE=ordered
 export MP_LABELIO=yes

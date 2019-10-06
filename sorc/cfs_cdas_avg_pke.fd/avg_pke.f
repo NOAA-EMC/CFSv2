@@ -1,6 +1,5 @@
       program avg_pke
       implicit none
-      include 'mpif.h'
       integer, parameter :: komax=200, kom37=komax-37
 
       CHARACTER*120 indir,iname,index,indxdir
@@ -30,37 +29,50 @@
      &         650,600,550,500,450,400,350,300,250,225,200,175,
      &         150,125,100,70,50,30,20,10,7,5,3,2,1,kom37*0/
 !
-      integer j
-!
+      integer j,ierr,nrank,ntask
+
+      include 'mpif.h'
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+
+      call mpi_init(ierr)
+      call mpi_comm_rank(MPI_COMM_WORLD,nrank,ierr)
+      call mpi_comm_size(MPI_COMM_WORLD,ntask,ierr)
+      !!if(ierr/=0.or.nrank>0) goto 99
+
       indir     = 'indir'
       indxdir   = 'indxdir'
       index     = 'index'
       iname     = 'iname'
       cdump     = 'gdas'
       fcst_avrg = .false.
-!
+
+      open(5,file='nampke')
       read (5, nampke)
       write(6, nampke)
-!
+
       allocate (deg(jo))
       dlat = 180.0 / float(jo-1)
       do j=1,jo
         deg(j) = 90.0 - float(j-1)*dlat
       enddo
-!
+
+      print*,'call avg'
       call avg(io,    jo,     ko,   indir, indxdir, fhour
      &,         syear, smonth, sday, shour
      &,         eyear, emonth, eday, ehour, dhour
      &,         iname,idbug,deg,po,cdump,index,fcst_avrg)
-!
+
+99    call mpi_finalize(ierr)
       stop
       end
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       subroutine avg(idim,jdim,kdim,inputdir,indxdir,ifhr,
      &                isyr,ismth,isday,iscy,ieyr,iemth,ieday,iecy,idcy,
      &                iname,idbug,deg,po,cdump,index,fcst_avrg)
 !
       implicit none
-      include 'mpif.h'
 !
       logical fcst_avrg
       integer idim, jdim,  kdim, ifhr, isyr, ismth, isday, iscy
@@ -136,16 +148,24 @@
       integer ncns, ncne, ncn, ndays, icomm, m1, m2, iret
      &,       i, j, k, nl, n, ntmx, icy, inx, plev, kskp
      &,       idayyr, iday, idaywk, imth, iyr, kpds5, ndata
-!     &,       ntasks, ierr, nrank, iyb, im, item, MPI_COMM_WORLD
-     &,       ntasks, ierr, nrank, iyb, im, item
+     &,       ntask, ierr, nrank, iyb, im, item
+
+      include 'mpif.h'
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
+       call mpi_comm_rank(MPI_COMM_WORLD,nrank,ierr)
+       call mpi_comm_size(MPI_COMM_WORLD,ntask,ierr)
+       print*,' task ',nrank,' of ',ntask
+
        indate='          '
-!
+
        ncns  = iw3jdn(isyr,ismth,isday)
        ncne  = iw3jdn(ieyr,iemth,ieday)
        ndays = ncne - ncns + 1
+
+       if(nrank==0) then
        print *,' ncns ',ncns,' ncne ',ncne,' ndays ',ndays, nrank
-!
        print *,' ncns ',ncns,' ncne ',ncne,' ndays ',ndays
        print *,' iscy ',iscy,' iecy ',iecy
        print *,' idim ',idim,' jdim ',jdim,' kdim ',kdim
@@ -153,36 +173,21 @@
        print *,' iname ',iname
        print *,' inputdir ',inputdir
        print *,' indxdir ',indxdir
-!
-       call mpi_init(iret)
-       if (iret .ne. 0) then
-         print*,' iret = ',iret,' from mpi_init' ;stop 1 
-       endif
-       icomm = MPI_COMM_WORLD
-       call mpi_comm_rank(icomm,nrank,iret)
-       if (iret .ne. 0) then
-   	 print*,'icomm, iret = ',icomm,iret,' from mpi_comm_rank';stop 1 
-       endif
-       call mpi_comm_size(icomm,ntasks,iret)
-       if (iret .ne. 0) then
- 	 print*,' icomm,iret = ',icomm,iret,' from mpi_comm_size' ;stop 1 
        endif
 
-       print*,' task ',nrank,' of ',ntasks
+       m1 = nint(float(kdim* nrank   )/float(ntask)) + 1
+       m2 = nint(float(kdim*(nrank+1))/float(ntask))
 
-       m1 = nint(float(kdim* nrank   )/float(ntasks)) + 1
-       m2 = nint(float(kdim*(nrank+1))/float(ntasks))
-
-       print*,m1,m2,nrank,ntasks
+       print*,m1,m2,nrank,ntask
 
        if (nrank == 0) call w3tagb('avg_pke',2007,0332,0055,'NP23')
-!
+
        write(dgout,'(''dgout.'',i3.3)') nrank
        write(*,*) "dgout= ",dgout
        call baopenwt(51,dgout,ierr)
          if(ierr.ne.0) then
          print *,'error opening file ',dgout
-         stop
+         goto 99
        endif
 
        psmean = 0.0
@@ -235,7 +240,7 @@
            call baopenr(11,ingrib,ierr)
            if(ierr.ne.0) then
              print *,'error opening file ',ingrib
-             stop
+             goto 99
            endif
            inx = 0
            if (len(trim(index)) .ne. 0 ) then
@@ -247,7 +252,7 @@
              call baopenr(inx,indexx,ierr)
              if(ierr.ne.0) then
                print *,'error opening file ',indexx
-               stop
+               goto 99
              endif
            endif
 !
@@ -275,7 +280,7 @@
      &                  NDATA,KSKP,KPDS,KGDS,LBMS,GRIDU,IRET)
              if(iret.ne.0) then
                print *,nl,' error in GETGB for uwind ',iret,jpds
-               stop
+               goto 99
              endif
 !
              
@@ -308,7 +313,7 @@
      &                  NDATA,KSKP,KPDS,KGDS,LBMS,GRIDV,IRET)
              if(iret.ne.0) then
                print *,nl,' error in GETGB for vwind ',iret,jpds
-               stop
+               goto 99
              endif
 !
 !... get Temp...
@@ -441,7 +446,7 @@
                  wqmean(i,j,nl) = wqmean(i,j,nl) + w * q
                enddo
              enddo
-!
+
            enddo                             !... end level-loop
 !
 !.... get surface pressure
@@ -465,7 +470,7 @@
      &                  NDATA,KSKP,KPDS,KGDS,LBMS,gridps,IRET)
              if(iret.ne.0) then
                print *,nl,' error in GETGB for sfc ps ',iret,jpds
-               stop
+               goto 99
              endif
              do j=1,jdim
                do i=1,idim
@@ -480,7 +485,7 @@
            call baclose(11,ierr)
            if(ierr.ne.0) then
              print *,'error closing file ',ingrib
-             stop
+             goto 99
            endif
 !
          enddo                               !... end cycle-loop
@@ -691,7 +696,7 @@
        if(idbug.eq.1) print *,'*****  Variance of w '
        call wrtpgb(wp,idim,jdim,kdim,po,
      &             kpds,kgds,deg,ndata,idbug,m1,m2)
-!
+
 !.. psp...
        if (nrank == 0) then
          kpds(5) = 203
@@ -702,19 +707,19 @@
          call wrtpgb(psp,idim,jdim,1,po,
      &               kpds,kgds,deg,ndata,idbug,1,1)
        endif
-!
+
        call baclose(51,ierr)
        if(ierr.ne.0) then
          print *,'error closing file ',dgout
-          stop
+          goto 99
        endif
-!
-       if (nrank == 0) call w3tage('avg_pke')
-!
-       call mpi_finalize(iret)
-!
+
+       call mpi_barrier(MPI_COMM_WORLD,ierr)
+99     if (nrank == 0) call w3tage('avg_pke')
        return
        end
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
        subroutine wrtpgb(grid,idim,jdim,kdim,po,
      &                   kpds,kgds,deg,ndata,idbug,m1,m2)
 !
@@ -735,7 +740,7 @@
          CALL PUTGB(51,NDATA,KPDS,KGDS,LBMS,GRID(1,1,nl),IRET)
          if(iret.ne.0) then
            print *,kpds(7),' error in PUTGB for : iret ',iret,kpds
-           stop
+           return
          endif
          if(idbug.eq.1) then
            call gridav(grid(1,1,nl),idim,jdim,deg,glob)
