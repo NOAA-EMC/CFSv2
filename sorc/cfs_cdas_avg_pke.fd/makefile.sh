@@ -1,7 +1,6 @@
 #!/bin/bash
 set -x
-export machine=wcoss
-export FC=mpiifort
+export FC=mpif90  
 
 export FFLAGSM="-O0 -convert big_endian -g -traceback"
 export LDFLAGSM="-qopenmp"
@@ -13,7 +12,7 @@ echo make-ing ${make%.*}
 echo
 
 make -f Makefile
-mv ${make%.*} ../../exec
+mv ${make%.*} ..
 rm -f *.o *.mod
 
 

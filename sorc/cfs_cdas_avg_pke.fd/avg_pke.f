@@ -48,8 +48,8 @@
       fcst_avrg = .false.
 
       open(5,file='nampke')
-      read (5, nampke)
-      write(6, nampke)
+      read(5, nampke)
+      if(nrank==0) write(6, nampke)
 
       allocate (deg(jo))
       dlat = 180.0 / float(jo-1)
@@ -57,13 +57,12 @@
         deg(j) = 90.0 - float(j-1)*dlat
       enddo
 
-      print*,'call avg'
       call avg(io,    jo,     ko,   indir, indxdir, fhour
      &,         syear, smonth, sday, shour
      &,         eyear, emonth, eday, ehour, dhour
      &,         iname,idbug,deg,po,cdump,index,fcst_avrg)
 
-99    call mpi_finalize(ierr)
+      call mpi_finalize(ierr)
       stop
       end
 !-----------------------------------------------------------------------
@@ -71,9 +70,9 @@
       subroutine avg(idim,jdim,kdim,inputdir,indxdir,ifhr,
      &                isyr,ismth,isday,iscy,ieyr,iemth,ieday,iecy,idcy,
      &                iname,idbug,deg,po,cdump,index,fcst_avrg)
-!
+
       implicit none
-!
+
       logical fcst_avrg
       integer idim, jdim,  kdim, ifhr, isyr, ismth, isday, iscy
      &,        ieyr, iemth, ieday, iecy, idcy, idbug
@@ -86,7 +85,7 @@
       CHARACTER*2  LABM(12)
       CHARACTER*2  LABD(31)
       CHARACTER*2  LABC(24)
-!
+
       real psmean(idim,jdim)
       real umean(idim,jdim,kdim),  vmean(idim,jdim,kdim)
       real tmean(idim,jdim,kdim),  qmean(idim,jdim,kdim)
@@ -97,7 +96,7 @@
       real utmean(idim,jdim,kdim), uqmean(idim,jdim,kdim)
       real vtmean(idim,jdim,kdim), wtmean(idim,jdim,kdim)
       real wqmean(idim,jdim,kdim), vqmean(idim,jdim,kdim)
-!
+
       real up(idim,jdim,kdim),     vp(idim,jdim,kdim)
      &,    tp(idim,jdim,kdim),     qp(idim,jdim,kdim)
      &,    wp(idim,jdim,kdim),     psp(idim,jdim)
@@ -105,11 +104,10 @@
      &,    uptp(idim,jdim,kdim),   upqp(idim,jdim,kdim)
      &,    vptp(idim,jdim,kdim),   vpqp(idim,jdim,kdim)
      &,    wptp(idim,jdim,kdim),   wpqp(idim,jdim,kdim)
-!
+
       real gridu(idim,jdim), gridv(idim,jdim), gridt(idim,jdim)
       real                   gridq(idim,jdim), gridw(idim,jdim)
       real gridps(idim,jdim)
-!     real gridr(idim,jdim), gridq(idim,jdim), gridw(idim,jdim)
       real deg(jdim)
 
       real po(kdim)
@@ -118,9 +116,9 @@
       integer JPDS(200),  JGDS(200)
       integer ICYCL(24)
       integer nfill, iw3jdn
-!
+
       logical*1 lbms(idim,jdim)
-!
+
       DATA LABC/'00','01','02','03','04','05',
      &          '06','07','08','09','10','11',
      &          '12','13','14','15','16','17',
@@ -132,15 +130,15 @@
      &          '.10Z','.11Z','.12Z','.13Z','.14Z',
      &          '.15Z','.16Z','.17Z','.18Z','.19Z',
      &          '.20Z','.21Z','.22Z','.23Z','    '/
-!
+
       DATA LABD/'01','02','03','04','05','06','07','08','09','10',
      &          '11','12','13','14','15','16','17','18','19','20',
      &          '21','22','23','24','25','26','27','28','29','30',
      &          '31'/
-!
+
       DATA LABM/'01','02','03','04','05','06','07','08','09','10',
      &          '11','12'/
-!
+
       real    globu, globv, globt, globq, globw, globr
      &,       fntmx, um, vm, tm, wm, qm, uvm, utm, vtm, wtm
      &,       uu, vv, tt, qq, ww, ek, uqm, vqm, wqm, psm
