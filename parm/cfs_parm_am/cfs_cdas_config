@@ -245,9 +245,9 @@ if [ $COUP_FCST = YES ] ; then
   imos=160
   omres=${omres:-05}
   
-  NPROCS_o=${NPROCS_o:-60}
-  NPROCS_c=1
-  NPROCS_a=$((tasks-NPROCS_o-NPROCS_c))
+# NPROCS_o=${NPROCS_o:-60}
+# NPROCS_c=1
+# NPROCS_a=$((tasks-NPROCS_o-NPROCS_c))
 # OCN_DT=${OCN_DT:-3600}
 # CouplingPeriod=${CouplingPeriod:-$OCN_DT}
   CouplingPeriod=${CouplingPeriod:-$DELTIM}
