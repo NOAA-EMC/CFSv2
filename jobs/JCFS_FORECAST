@@ -129,6 +129,21 @@ export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
 export NCP=${NCP:-/bin/cp}
 
 #############################################
+# Set some variables before thr config script
+#############################################
+
+export OMP_NUM_THREADS=2
+export NTHREADS=2
+
+export DELTIM=600
+export dt_ocean=1800
+export cnvgwd=.true.
+
+export NPROCS_c=1
+export NPROCS_o=60
+export NPROCS_a=67
+
+#############################################
 # Get the variables setup from config script
 #############################################
 export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
