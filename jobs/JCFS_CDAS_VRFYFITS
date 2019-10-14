@@ -10,6 +10,7 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 date
 export PS4='$SECONDS + '
@@ -75,20 +76,49 @@ export COMINIC=$COMROT/cdas.$PDYm1
 ##############################################
 export gespath=${gespath:-${GESROOT}/${envir}}
 export GESdir=$gespath/cdas.${PDY}
-mkdir -m 775 -p $GESdir
-
 export RESDIR=${RESDIR:-$GESdir}
 mkdir -p $RESDIR
 
 ##env
 
 #############################################################
-# execute the fit script for cfs and gfs
+# execute the updated fit script for cfs and gfs
 #############################################################
 
-${VRFYFITSSH:-$HOMEcfs/scripts/excfs_cdas_vrfyfits.sh.ecf} CFS $CDATE; err=$?; err_chk
+fitdir=$HOMEcfs/Fit2Obs/batrun
+TMPDIR=$DATAROOT/fit2obs.$$; mkdir -p $TMPDIR
 
-${VRFYFITSSH:-$HOMEcfs/scripts/excfs_cdas_vrfyfits.sh.ecf} GFS $CDATE; err=$?; err_chk
+export OMP_NUM_THREADS=${FITOMP:-1}
+export MPIRUN="mpirun -n 3"
+export KMP_AFFINITY=disabled
+
+export KEEPDATA=YES 
+
+export NEMS=${NEMS:-YES}   
+export PRVT=${PRVT:-$HOMEcfs/fix/cfs_fix_cdas/prepobs_errtable.global}
+export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
+
+##############################################################
+# run the fits for this time for the CFS and the GFS models 
+##############################################################
+
+for EXPNAM in CFS GFS; do
+[[ $EXPNAM = GFS ]] && COMFIT=$COMROOT/gfs/prod
+[[ $EXPNAM = GFS ]] && ACPROFit=YES  
+[[ $EXPNAM = CFS ]] && COMFIT=$COMROOT/cfs/prod
+[[ $EXPNAM = CFS ]] && ACPROFit=NO 
+ARCDIR=$DATA/$EXPNAM.fits
+time $fitdir/runfits $EXPNAM $CDATE $COMFIT
+err=$?; err_chk
+
+# tar up the fits and save in COMROT/fit2obs
+
+cd $ARCDIR
+FITARC=$COMROT/fit2obs; mkdir -p $FITARC
+tar -cf $FITARC/$EXPNAM.fits.$CDATE *
+err=$?; err_chk
+
+done
 
 ###################################################
 # msg end of job and clean up temperary directory
