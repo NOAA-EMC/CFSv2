@@ -96,6 +96,13 @@ set +u
 set -a; . $CDAS_CONFIG_FILE; set +a
 set -u
 
+#############################################
+# Set the number of cores per model         
+#############################################
+export CPROCS=1
+export OPROCS=56
+export APROCS=195
+
 env
 
 export MP_SHARED_MEMORY=no
