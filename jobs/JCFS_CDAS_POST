@@ -9,6 +9,7 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES
@@ -53,6 +54,9 @@ export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 #################################################
 # Define location of specific scripts/executables
 #################################################
+
+export HOMEgsm=${HOMEgsm:-HOMEcfs/global_shared_cfs}
+export HOMEpost=${HOMEpost:-HOMEcfs/global_shared_cfs}
 
 export CHGRESSH=${CHGRESSH:-$HOMEgsm/ush/global_chgres.sh}
 export SIGHDR=${SIGHDR:-$HOMEgsm/exec/global_sighdr}

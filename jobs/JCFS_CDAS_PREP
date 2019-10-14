@@ -26,6 +26,7 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
+export jlogfile=${jlogfile:-/dev/null}
 export pgmout="OUTPUT.${pid}"
 
 ####################################

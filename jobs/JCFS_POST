@@ -31,6 +31,7 @@ export RTYPE=${1:-${RTYPE:-forepost}}
 export RUN=${RUN:-cfs}
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -67,6 +68,8 @@ export EXECcfs=$HOMEcfs/exec
 export PARMcfs=$HOMEcfs/parm 
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
+
+export HOMEpost=HOME_cfs/global_shared_cfs
 
 export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
 

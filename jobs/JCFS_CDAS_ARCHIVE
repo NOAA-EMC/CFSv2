@@ -8,6 +8,7 @@ export NET=cfs
 export RUN=cdas
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES

@@ -22,6 +22,7 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -81,10 +82,11 @@ export BATCH_POST=${BATCH_POST:-NO}
 # Run setpdy and initialize PDY variables
 ##############################
 
+export CDATE=${CDATE:-${PDY}$cyc}
+export PDY=$(echo $CDATE|cut -c 1-8)
 sh setpdy.sh
 . ./PDY
 
-export CDATE=${CDATE:-${PDY}$cyc}
 
 #############################################
 # Get the variables setup from config script

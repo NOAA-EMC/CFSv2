@@ -9,6 +9,7 @@ export NET=cfs
 export RUN=cmap
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 
@@ -55,7 +56,9 @@ export GETPRECIP_FROM_CPC=${GETPRECIP_FROM_CPC:-NO}
 export EXECcfs=$HOMEcfs/exec
 export PARMcfs=$HOMEcfs/parm 
 export USHcfs=$HOMEcfs/ush  
+export EXECcfs=$HOMEcfs/exec
 export FIXcfs=$HOMEcfs/fix  
+export FIX_LM=$FIXcfs/cfs_fix_lm
 
 ##############################################
 # Define COM directories
@@ -73,14 +76,6 @@ export COMOUTCMAP=$COMROT/cmap/pentad
 export COMOUTGAGE=$COMROT/cmap/gauge
 
 mkdir -m 775 -p $COMOUTGLDAS $COMOUTCMAP $COMOUTGAGE $COMOUT
-
-#############################################################
-# define some directories
-#############################################################
-
-export FIXcfs=$HOMEcfs/fix
-export EXECcfs=$HOMEcfs/exec
-export FIX_LM=$FIXcfs/cfs_fix_lm
 
 #############################################################
 # execute the script

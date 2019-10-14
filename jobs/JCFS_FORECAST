@@ -33,6 +33,7 @@ export RTYPE=${1:-${RTYPE:-forecast}}
 export RUN=${RUN:-cfs}
 
 export host=${host:-`hostname | cut -c1`}
+export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -93,16 +94,14 @@ export CDATE=${CDATE:-${PDY}$cyc}
 export EXECcfs=$HOMEcfs/exec
 export PARMcfs=$HOMEcfs/parm 
 export USHcfs=$HOMEcfs/ush  
-
 export FIXcfs=$HOMEcfs/fix/cfs_fix_am  
-
 export FIX_AM=$FIXcfs
 export FIXDIR=$FIXcfs
 export FIXGLOBAL=$FIXcfs
-
 export PARM_AM=$PARMcfs/cfs_parm_am
 export FCSTSHDIR=$HOMEcfs/scripts
-##export FIXGLOBAL=$HOMEgsm/fix/fix_am
+
+export HOMEgsm=$HOMEcfs/global_shared_cfs
 
 export mppnccombine=${mppnccombine:-$EXECcfs/cfs_mppnccombine}
 export AM_EXEC=${AM_EXEC:-${EXEC_AMD:-$EXECcfs}/cfs_atmos_fcst}

@@ -16,6 +16,8 @@ export NET=cfs
 ####################################
 # Determine Job Output Name on System
 ####################################
+
+export jlogfile=${jlogfile:-/dev/null}
 export pgmout="OUTPUT.${pid}"
 
 msg="HAS BEGUN on `hostname`"

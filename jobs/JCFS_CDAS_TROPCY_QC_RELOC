@@ -29,6 +29,8 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
+
+export jlogfile=${jlogfile:-/dev/null}
 export pgmout="OUTPUT.${pid}"
 
 ##########################################################
@@ -43,6 +45,8 @@ export FIXcfs=$HOMEcfs/fix
 ####################################
 # Specify Execution Data Areas
 ####################################
+
+export HOMEglob=${HOMEglob:-$HOMEcfs/global_shared_cfs}
 
 export HOMESYND=${HOMESYND:-$HOMEglob}
 export EXECSYND=${HOMESYND}/exec

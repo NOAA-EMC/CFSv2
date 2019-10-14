@@ -11,6 +11,7 @@ set -xa
 export PS4='$SECONDS + ' 
 date
 export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}
+export jlogfile=${jlogfile:-/dev/null}
 
 ##########################################################
 # obtain unique process id (pid) and make temp directory

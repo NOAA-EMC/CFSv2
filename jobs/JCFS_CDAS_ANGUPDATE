@@ -23,7 +23,8 @@ if [[ $RUN_ENVIR = nco && $envir != prod ]]; then
   export SENDDBN=${SENDDBN:-NO}
 fi
 
-#
+export jlogfile=${jlogfile:-/dev/null}
+
 ####################################
 # Specify NET and RUN Name and model
 ####################################

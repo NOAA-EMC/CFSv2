@@ -19,6 +19,8 @@ cd $DATA
 export cycle=t${cyc}z
 export tmmark=tm00
 
+export jlogfile=${jlogfile:-/dev/null}
+
 ##########################
 # Specify NET and RUN Name
 ##########################
@@ -47,7 +49,6 @@ export USHcfs=$HOMEcfs/ush
 export FIXcfs=$HOMEcfs/fix  
 
 export HOMEdump=$HOMEcfs
-export HOMEobsproc_dump=$HOMEcfs 
 
 ##############################################
 # Define COM directories
