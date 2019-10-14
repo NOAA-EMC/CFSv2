@@ -228,16 +228,6 @@ then
 fi
 cd $DATA
 
-#$NWPROD/util/ush/setup.sh
-
-if [ ${PARAFLAG} = 'YES' ]
-then 
-  $NWPROD/util/ush/setup.sh
-#else
-#TM take out this else part for operations.....
-#  $NWPROD/util/ush/setup.sh
-fi
-
 if [ ${#PDY} -eq 0 -o ${#CYL} -eq 0 -o ${#cmodel} -eq 0 ]
 then
   set +x

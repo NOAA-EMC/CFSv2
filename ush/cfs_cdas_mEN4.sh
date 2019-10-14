@@ -74,4 +74,5 @@ ${mkEvNc4r:-$EXECcfs/cfs_cdas_mkEvNc4r}; export err=$?; err_chk
 rm -f TS.nc
 rm -f ${dte}ocean_temp_salt.res.nc
 rm -f gs.nc
+exit $?
 
