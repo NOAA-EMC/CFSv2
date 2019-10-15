@@ -2,7 +2,8 @@
 set -euax
 
 export REPOROOT=$PWD  
-export WRFPATH=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/wrf_shared.v1.1.0
+
+export WRFPATH=/gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
 
 [[ $# -eq 0 || $1 = 206 ]] && { cd $REPOROOT/global_shared_cfs/CRTMv206/sorc; . configure/ifort.setup; cd ..; build; }
 
