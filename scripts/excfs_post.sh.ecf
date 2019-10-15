@@ -124,16 +124,16 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
 
       done_count=$((done_count+1))
       if [[ $done_count -gt $done_max ]]; then
-         cd $homejsw; ./runcfspost $start_date
-         exit 
+         ###cd $homejsw; ./runcfspost $start_date
+         ##exit
       fi
 
       [[ $done_count -eq 1 ]] && tbeg=$(date +"%H%M%S")
       tno=$(date +"%H%M%S")
       tck=$(timechk $tbeg) 
       if [[ $tck -gt 050000 ]]; then
-         cd $homejsw; ./runcfspost $start_date
-         exit
+         ###cd $homejsw; ./runcfspost $start_date
+         ###exit
       fi
 
       ###############################################

@@ -707,10 +707,10 @@ current_date=$($NDATE $FHMAX $YMDH)
 
 if [[ $current_date -lt $end_date ]] ; then
   echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
-  echo $start_date $current_date $end_date  submitting next $FH_CYCL segment                           
-  cd $homejsw; runcfs $start_date 
+  echo $start_date $current_date $end_date  ###submitting next $FH_CYCL segment                           
+  ###cd $homejsw; runcfs $start_date 
 else
   echo $start_date $current_date $end_date  > $POSTDEFS/stamp.done
   YMDH_DONE=$YMDH
-  ##cd $homejsw; runcfspost $start_date
+  ###cd $homejsw; runcfspost $start_date
 fi

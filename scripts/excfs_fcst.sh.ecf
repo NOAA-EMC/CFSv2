@@ -388,69 +388,14 @@ echo `date` executing forecast script
 echo $LD_LIBRARY_PATH
 echo
 
-if [ $machine = IBMP6 ] ; then
-  export MP_BINDPROC=${MP_BINDPROC:-yes}
-  export MEMORY_AFFINIY=${MEMORY_AFFINIY:-MCM}
-  export MP_SYNC_QP=${MP_SYNC_QP:-yes}
-  export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-"NO"}
-  export MP_COREFILE_FORMAT=${MP_COREFILE_FORMAT:-"lite"}
-  export MPMD_PROC=${MPMD_PROC:-YES}
-elif [ $machine = ZEUS ] ; then
-  export MPI_BUFS_PER_PROC=${MPI_BUFS_PER_PROC:-2048}
-  export MPI_BUFS_PER_HOST=${MPI_BUFS_PER_HOST:-2048}
-# export MPI_BUFFER_MAX=${MPI_BUFFER_MAX:-2000}
-  export MPMD_PROC=${MPMD_PROC:-NO}
-  export APRUN=${APRUN:-"poe"}
-  export APRUNMPPNC=${APRUNMPPNC:-""}
-elif [ $machine = GAEA -o $machine = WCRAY ] ; then
-  export MPICH_FAST_MEMCPY=${MPICH_FAST_MEMCPY:-"ENABLE"}
-  export MPICH_MAX_SHORT_MSG_SIZE=${MPICH_MAX_SHORT_MSG_SIZE:-4096}
-  export MPICH_UNEX_BUFFER_SIZE=${MPICH_UNEX_BUFFER_SIZE:-1024000000}
-  export MPICH_PTL_UNEX_EVENTS=${MPICH_PTL_UNEX_EVENTS:-400000}
-  export MPICH_PTL_OTHER_EVENTS=${MPICH_PTL_OTHER_EVENTS:-100000}
-  export MPMD_PROC=${MPMD_PROC:-NO}
-  export APRUNMPPNC=${APRUNMPPNC:-"aprun"}
-elif [ $machine = WCOSS ] ; then
-  export MP_EUIDEVELOP=${MP_EUIDEVELOP:-min}
-  export MP_EUIDEVICE=${MP_EUIDEVICE:-sn_all}
-  export MP_USE_BULK_XFER=${MP_USE_BULK_XFER:-yes}
-  export MP_LABELIO=${MP_LABELIO:-yes}
-  export MP_STDOUTMODE=${MP_STDOUTMODE:-unordered}
-  export MP_EUILIB=${MP_EUILIB:-us}
-  export MP_TASK_AFFINITY=${MP_TASK_AFFINITY:-"cpu:$NTHREADS"}
-  export MPICH_ALLTOALL_THROTTLE=${MPICH_ALLTOALL_THROTTLE:-0}
-  export MP_SINGLE_THREAD=${MP_SINGLE_THREAD:-yes}
-  export MP_EAGER_LIMIT=${MP_EAGER_LIMIT:-65536}
-  export MPMD_PROC=${MPMD_PROC:-YES}
-  export APRUN=${APRUN:-"mpirun.lsf"}
+machine=DELL
 
-  export MP_PULSE=0                             ##XXW  recommended by Farid to avoid time out message
-  unset MP_DEBUG_NOTIMEOUT                      ##XXW
-
-# export MP_EUIDEVICE=${MP_EUIDEVICE:-min}
-# export MP_EUILIB=${MP_EUILIB:-us}
-# export MP_TASK_AFFINITY=${MP_TASK_AFFINITY:-"cpu:$NTHREADS"}
-# export MPICH_ALLTOALL_THROTTLE=${MPICH_ALLTOALL_THROTTLE:-0}
-# export MP_SINGLE_THREAD=${MP_SINGLE_THREAD:-yes}
-# export APRUN=${APRUN:-"poe"}
-
-  export APRUNMPPNC=${APRUNMPPNC:-""}
-  export TASK_GEOMETRY=${TASK_GEOMETRY:-NONE}
-  if [ "$TASK_GEOMETRY" != NONE ] ; then
-   export LSB_PJL_TASK_GEOMETRY=$TASK_GEOMETRY
-  fi
-elif [ $machine = DELL ] ; then
-  export APRUN=${APRUN:-"mpirun -n256"}
-else
-  echo no machine selected $0
-  err_exit 999
-fi
 export APRUN=${APRUN:-"aprun"}
 export ENS_NUM=${ENS_NUM:-1}
 export FM=${FM:-""}
-#
+
 #  Command line arguments.
-#
+
 separator='-'
 n_pp=1
 for pp in $*; do
@@ -461,6 +406,7 @@ if [ $n_pp -gt $# ] ; then
   echo "WARNING: no separator ( $separator ) in positional parameter list for $0 ."
   echo "         No positional parameters are recognized as OM related"
 fi
+
 export SIGI;  if [ 1 -lt $n_pp ] ; then SIGI=$1;  else SIGI=${SIGI:-?};   fi
 export SFCI;  if [ 2 -lt $n_pp ] ; then SFCI=$2;  else SFCI=${SFCI:-?};   fi
 export SIGO;  if [ 3 -lt $n_pp ] ; then SIGO=$3;  else SIGO=${SIGO};      fi
@@ -469,9 +415,9 @@ export FHOUT; if [ 5 -lt $n_pp ] ; then FHOUT=$5; else FHOUT=${FHOUT:-3}; fi
 export FHMAX; if [ 6 -lt $n_pp ] ; then FHMAX=$6; else FHMAX=${FHMAX:-0}; fi
 export IGEN;  if [ 7 -lt $n_pp ] ; then IGEN=$7;  else IGEN=${IGEN:-0};   fi
 export D3DO;  if [ 8 -lt $n_pp ] ; then D3DO=$8;  else D3DO=${D3DO};      fi
-#
+
 #  Directories.
-#
+
 export HOMEDIR=${HOMEDIR:-$NWROOT}
 export cfsp=${cfsp:-"cfs_"}
 export FIXSUBDA=${FIXSUBDA:-fix/${cfsp}fix_am}
@@ -481,7 +427,9 @@ export FIX_RAD=${FIX_RAD:-$FIXDIR}
 export DATA=${DATA:-$(pwd)}
 export COMOUT=${COMOUT:-$(pwd)}
 export RESDIR=${RESDIR:-$DATA}
+
 #  Filenames.
+
 export model=${model:-global}
 export XC=${XC:-""}
 export SUFOUT=${SUFOUT:-""}
@@ -521,15 +469,12 @@ export O3FORC=${O3FORC:-${FIXDIR}/global_o3prdlos.f77}
 export O3CLIM=${O3CLIM:-${FIXDIR}/${model}_o3clim.txt}
 export FNGLAC=${FNGLAC:-${FIXDIR}/${model}_glacier.2x2.grb}
 export FNMXIC=${FNMXIC:-${FIXDIR}/${model}_maxice.2x2.grb}
-#export FNTSFC=${FNTSFC:-${FIXDIR}/${model}_oi2sst1x1monclim19822001.grb}
 export FNTSFC=${FNTSFC:-${FIXDIR}/cfs_oi2sst1x1monclim19822001.grb}
 export FNSNOC=${FNSNOC:-${FIXDIR}/${model}_snoclim.1.875.grb}
 export FNZORC=${FNZORC:-${FIXDIR}/${model}_zorclim.1x1.grb}
 export FNALBC=${FNALBC:-${FIXDIR}/${model}_albedo4.1x1.grb}
-#export FNAISC=${FNAISC:-${FIXDIR}/${model}_ice1x1monclim19822001.grb}
 export FNAISC=${FNAISC:-${FIXDIR}/cfs_ice1x1monclim19822001.grb}
 export FNTG3C=${FNTG3C:-${FIXDIR}/${model}_tg3clim.2.6x1.5.grb}
-#export FNVEGC=${FNVEGC:-${FIXDIR}/${model}_vegfrac.1x1.grb}
 export FNVEGC=${FNVEGC:-${FIXDIR}/${model}_vegfrac.0.144.decpercent.grb}
 export FNVETC=${FNVETC:-${FIXDIR}/${model}_vegtype.1x1.grb}
 export FNSOTC=${FNSOTC:-${FIXDIR}/${model}_soiltype.1x1.grb}
@@ -538,25 +483,22 @@ export FNVMNC=${FNVMNC:-${FIXDIR}/${model}_shdmin.0.144x0.144.grb}
 export FNVMXC=${FNVMXC:-${FIXDIR}/${model}_shdmax.0.144x0.144.grb}
 export FNSLPC=${FNSLPC:-${FIXDIR}/${model}_slope.1x1.grb}
 export FNABSC=${FNABSC:-${FIXDIR}/${model}_snoalb.1x1.grb}
-#export FNMSKH=${FNMSKH:-${FIXDIR}/${model}_seaice_newland.grb}
 export FNMSKH=${FNMSKH:-${FIXDIR}/seaice_newland.grb}
 export OROGRAPHY=${OROGRAPHY:-${FIXDIR}/${model}_orography.t$MTNRSL..grb}
 export FNTSFA=${FNTSFA:-""}
 export FNACNA=${FNACNA:-""}
 export FNSNOA=${FNSNOA:-""}
-#
+
 export AERODIR=${AERODIR:-${FIX_RAD}}
 export EMISDIR=${EMISDIR:-${FIX_RAD}}
 export SOLCDIR=${SOLCDIR:-${FIX_RAD}}
 export VOLCDIR=${VOLCDIR:-${FIX_RAD}}
 export CO2DIR=${CO2DIR:-${FIX_RAD}}
-#export ALBDIR=${ALBDIR:-${FIX_RAD}}
 export IEMS=${IEMS:-0}
 export ISOL=${ISOL:-0}
 export IAER=${IAER:-0}
 export ICO2=${ICO2:-0}
-#export IALB=${IALB:-0}
-#
+
 export SIGR1=${SIGR1:-${DATA}/sigr1}
 export SIGR2=${SIGR2:-${DATA}/sigr2}
 export SFCR=${SFCR:-${DATA}/sfcr}
@@ -569,7 +511,9 @@ export INISCRIPT=${INISCRIPT:-""}
 export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}
 export LOGSCRIPT=${LOGSCRIPT:-""}
 export ENDSCRIPT=${ENDSCRIPT:-""}
+
 #  Other variables.
+
 export FHINI=${FHINI:-$(echo ifhr|eval $SIGHDR $SIGI)}
 export CDATE=${CDATE:-$(echo idate|eval $SIGHDR $SIGI)}
 export FHSEG=${FHSEG:-0}
@@ -581,17 +525,17 @@ export FHLWR=${FHLWR:-1}
 export FHSWR=${FHSWR:-1}
 export FHROT=${FHROT:-0}
 export FHDFI=${FHDFI:-0}
-#
+
 export RUN_NAME=${RUN_NAME:-cfs_fcst}
 export RESTART_CONTROL_FILE=${RESTART_CONTROL_FILE:-$DATA/$RUN_NAME.2restart$SUFOUT}
 if [ ! -f $RESTART_CONTROL_FILE ] ; then
   FHDFI=${FHDFI_INIT:-$FHDFI}
   echo "FHDFI=$FHDFI"
 fi
-#
-env
+
+env>env.out
+
 export FHCYC=${FHCYC:-0}
-#
 export gfsio_in=${gfsio_in:-.false.}
 export gfsio_out=${gfsio_out:-.false.}
 export FCSTVARS="gfsio_in=$gfsio_in,gfsio_out=$gfsio_out,$FCSTVARS"
@@ -609,7 +553,7 @@ elif [ $IDVC = 3 ] ; then
  export GEN_COORD_HYBRID=.true.
  export HYBRID=.false.
 fi
-#
+
 export TFILTC=${TFILTC:-0.85}
 export FCSTVARS=${FCSTVARS:-""}
 export TRACERVARS=${TRACERVARS:-""}
@@ -628,20 +572,13 @@ export FILESTYLE=${FILESTYLE:-'L'}
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
 export MEMBER_NAMES=${MEMBER_NAMES:-''}
-if [ $machine = IBMP6 ] ; then
-  export BIND_TASKS=${BIND_TASKS:-no}
-  typeset -L1 l=$PGMOUT
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDOUT=${REDOUT:-'1>'$a}
-  typeset -L1 l=$PGMERR
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDERR=${REDERR:-'2>'$a}
-else
-  export REDOUT=${REDOUT:-'1>'}
-  export REDERR=${REDERR:-'2>'}
-fi
+
+export REDOUT=${REDOUT:-'1>'}
+export REDERR=${REDERR:-'2>'}
+
 ################################################################################
 #  Preprocessing
+
 $INISCRIPT
 pwd=$(pwd)
 if [[ -d $DATA ]] ; then
@@ -1091,7 +1028,6 @@ else
 fi
 #
 cd $WORKDIR
-##cp -p $executable $executable:t   ???????????????????????????
 
 #------------------------------------------------------------------------------#
 # End pre-execution section of OM script (2)
@@ -1207,65 +1143,6 @@ if [ $NPROCS_c = 0 -a $NPROCS_a != 0 -a $NPROCS_o != 0 -o $NPROCS_c != 0 -a $NPR
 fi
 NPROCS=$((NPROCS_c+NPROCS_a+NPROCS_o))
 
-#s=`poe hostname`
-#nprocs=`echo $s|wc -w`
-if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-  export MP_PGMMODEL=mpmd
-  export MP_CMDFILE=cmdf
-  nprocs=$(poe hostname | wc -w)
-  if [ $nprocs -eq 0 ] ; then
-   nprocs=$NPROCS
-  fi
-  if [ $nprocs != $NPROCS ] ; then
-    echo "nprocs=$nprocs but NPROCS=$NPROCS (how come?). Exiting"
-    exit
-  fi
-fi
-
-#if [ $nprocs != $NPROCS ] ; then
-#  echo "nprocs=$nprocs but NPROCS=$NPROCS (how come?). Exiting"
-#  export err=10
-#  err_exit
-#fi
-
-if [ $NPROCS -eq $NPROCS_c -o $NPROCS -eq $NPROCS_o -o $NPROCS -eq $NPROCS_a ] ;
-then
-  standalone=y
-else
-  npf_c=0
-  npf_o=$NPROCS_c
-  npf_a=$((npf_o+NPROCS_o))
-  npl_c=$((npf_o-1))
-  npl_o=$((npf_a-1))
-  npl_a=$((NPROCS-1))
-  standalone=n
-fi
-
-if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-  rm -f $MP_CMDFILE
-  i=1
-  while [ $i -le $NPROCS_c ] ; do
-    echo "Adding line # $i to $MP_CMDFILE: $PGM_c"
-    echo $PGM_c>>$MP_CMDFILE
-    i=$((i+1))
-  done
-  j=1
-  while [ $j -le $NPROCS_o ] ; do
-    echo "Adding line # $i to $MP_CMDFILE: $PGM_oc"
-    echo $PGM_oc>>$MP_CMDFILE
-    j=$((j+1))
-    i=$((i+1))
-  done
-  j=1
-  while [ $j -le $NPROCS_a ] ; do
-    echo "Adding line # $i to $MP_CMDFILE: $PGM_am"
-    echo $PGM_am>>$MP_CMDFILE
-    j=$((j+1))
-    i=$((i+1))
-  done
-  nprocs1=`cat $MP_CMDFILE|wc -w`
-  if [ $nprocs -ne $nprocs1 ] ; then echo "Bad $MP_CMDFILE, exiting..."; export err=1; err_chk ; fi
-fi
 
 cat  > gfs_namelist <<EOF
  &nam_mrf
@@ -1323,51 +1200,13 @@ cat  > gfs_namelist <<EOF
   $CYCLVARS /
 EOF
 
-export cpn=24     
-export OMP_NUM_THREADS=1
-export nhourb=${nhourb:-$FHINI}
-export tpn=$((cpn/OMP_NUM_THREADS))
-export tpn=18
-
+#------------------------------------------------------------------------------#
 # run the coupled model
+#------------------------------------------------------------------------------#
 
-if [ $NPROCS_a -ne 0 ] ; then
-  if [ ! "$standalone" = y ] ; then
-    if [ $machine = IBMP6 -o $machine = WCOSS ] ; then
-      mpirun -n 1 $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am  1>out.poe.$nhourb 2>err.poe.$nhourb
-      ##mpirun cfp $MP_CMDFILE
-      ##time $APRUN 1>out.poe.$nhourb 2>err.poe.$nhourb
-      export ERR=$?; export err=$ERR; err_chk
-    else
-      mpirun -n 1 $PGM_c : -n 56 $PGM_oc : -n 195 $PGM_am
-      #export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N$tpn -d$OMP_NUM_THREADS"}
-      #export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o -N$tpn"}
-      #export C_TASKS=${C_TASKS:-"-n 1"}
-      #time $APRUN $C_TASKS $PGM_c : $OM_TASKS $PGM_oc : $AM_TASKS $PGM_am  1>out.poe.$nhourb 2>err.poe.$nhourb
-      export ERR=$?; export err=$ERR; err_chk
-    fi
-
-    #cat out.poe.$nhourb err.poe.$nhourb
-    # separate coupled outputs
-    # separate_stdout=${separate_stdout:-$EXECcfs/${cfsp}separ3}
-    # echo $npf_c $npf_o $npf_a $npl_c $npl_o $npl_a | $separate_stdout out.poe.$nhourb out.C.$nhourb out.OM.$nhourb out.AM.$nhourb
-
-  else
-    # run the AM alone
-    export OMP_NUM_THREADS=3
-    export AM_TASKS=${AM_TASKS:-"-n$NPROCS_a -N8 -d3"}
-    time $APRUN $AM_TASKS $PGM_am 1>out.poe.$nhourb 2>err.poe.$nhourb
-    export ERR=$?
-    cat out.poe.$nhourb err.poe.$nhourb
-    mv out.poe.$nhourb out.AM.$nhourb
-    export err=$ERR; err_chk
-    exit 000
-  fi
-else
-  export OM_TASKS=${OM_TASKS:-"-n$NPROCS_o"}
-  time $APRUN $OM_TASKS $PGM_oc >> mom4$VDATE.out 2>> errfile
-  export ERR=$?; export err=$ERR; err_chk
-fi
+export OMP_NUM_THREADS=2
+mpirun -mxm -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
+export ERR=$?; export err=$ERR; err_chk
 
 #------------------------------------------------------------------------------#
 # End MPMD execution section (4)
@@ -1418,12 +1257,20 @@ until [ $p_date -gt $end_date ] ; do
   p_date=$($NDATE $hh_inc_ocn $p_date)
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
+
+#set +x
+#module load NetCDF/4.5.0 ## on dell this has the shared load libs for netcdf
+
 set -x
 
 #  mpi_combine the decomposed ocean files into global files
 
-[[ $machine = WCRAY ]] && { time $APRUN -n72 $mpinccombine $mppnccombine cmdfile_mpp; export err=$?; err_chk; }
-[[ $machine = WCRAY ]] || { time mpirun -n 28 $mpinccombine $mppnccombine cmdfile_mpp; export err=$?; err_chk; }
+nprocs=$LSB_DJOB_NUMPROC
+ncmds=$(wc -l cmdfile_mpp|sed 's/cmdfile_mpp//')
+[[ $nprocs -lt $ncmds ]] && ncmds=$nprocs
+
+mpirun -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp
+export err=$?; err_chk
 
 #  adjust the date stamps on the combined files
 
@@ -1497,13 +1344,15 @@ rm -f SFC.F*
 rm -f FLX.F*
 rm -f LOG.F*
 rm -f D3D.F*
-#rm -f sigr1 sigr2 sfcr
+
 ################################################################################
 #  Postprocessing
+################################################################################
+
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 $ENDSCRIPT
-#set +x
+
 if [[ $VERBOSE = YES ]] ; then
    echo $(date) EXITING $0 with return code $err >&2
 fi
