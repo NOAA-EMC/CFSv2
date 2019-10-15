@@ -69,7 +69,7 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
 
-export HOMEpost=HOME_cfs/global_shared_cfs
+export HOMEpost=$HOMEcfs/global_shared_cfs
 
 export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
 
