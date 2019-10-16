@@ -200,13 +200,13 @@ pgm=$(basename $0)
       set +x
       echo " "
       echo " #########################################"
-      echo " cannot locate sst grib file - fatal error"
+      echo " cannot locate oisst grib file            "
       echo " #########################################"
       echo " "
       set -x
-      msg="**CANNOT LOCATE SST GRIB FILE --> EXIT DATA DUMP"
-      postmsg "$jlogfile" "$msg"
-      err_exit
+      ##msg="**CANNOT LOCATE SST GRIB FILE --> EXIT DATA DUMP"
+      ##postmsg "$jlogfile" "$msg"
+      ##err_exit
    fi
 
    [ -f errfile ] && rm errfile
