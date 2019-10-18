@@ -195,7 +195,7 @@ done; export err=$rc; err_chk
 # ---------------------------
 
 echo `date` run mpmd to get inventories         
-mpirun cfp $RUNDIR/invout.cmdfile >/dev/null 
+mpirun cfp $RUNDIR/invout.cmdfile |grep 'CFP RANK'
 export err=$?; pgm=inventories; err_chk
 
 # loop over times inside vars to make extraction cmdfiles
@@ -267,9 +267,9 @@ done ## vars loop
 # --------------------------------------------------
 
 echo `date` run mpmd to extract record for each var and time
-mpirun cfp  $RUNDIR/uwind.cmdfile >/dev/null; export err=$?; pgm=u-extract; err_chk
-mpirun cfp  $RUNDIR/vwind.cmdfile >/dev/null; export err=$?; pgm=v-extract; err_chk
-mpirun cfp  $RUNDIR/scalr.cmdfile >/dev/null; export err=$?; pgm=s-extract; err_chk
+mpirun cfp  $RUNDIR/uwind.cmdfile |grep 'CFP RANK'; export err=$?; pgm=u-extract; err_chk
+mpirun cfp  $RUNDIR/vwind.cmdfile |grep 'CFP RANK'; export err=$?; pgm=v-extract; err_chk
+mpirun cfp  $RUNDIR/scalr.cmdfile |grep 'CFP RANK'; export err=$?; pgm=s-extract; err_chk
 
 ################################################################################
 ####export err=99; err_chk  # end for test
