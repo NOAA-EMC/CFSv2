@@ -47,6 +47,7 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
 
+export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
 export HOMEobsproc_prep=$HOMEprep
 
 export PARMPREP=$PARMcfs/cfs_parm_prep

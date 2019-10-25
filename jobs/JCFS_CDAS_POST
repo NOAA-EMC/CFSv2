@@ -55,8 +55,8 @@ export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 # Define location of specific scripts/executables
 #################################################
 
-export HOMEgsm=${HOMEgsm:-HOMEcfs/global_shared_cfs}
-export HOMEpost=${HOMEpost:-HOMEcfs/global_shared_cfs}
+export HOMEgsm=${HOMEgsm:-$HOMEcfs/global_shared_cfs}
+export HOMEpost=${HOMEpost:-$HOMEcfs/global_shared_cfs}
 
 export CHGRESSH=${CHGRESSH:-$HOMEgsm/ush/global_chgres.sh}
 export SIGHDR=${SIGHDR:-$HOMEgsm/exec/global_sighdr}
