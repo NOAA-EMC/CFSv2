@@ -124,6 +124,7 @@ if ((rc != 0));then
   exit
 else
   make install
+  make clean
 fi
 
 exit

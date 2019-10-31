@@ -35,7 +35,7 @@ grib_utils.o: grib_utils.f
 	$(FCOMP) $(FFLAGS) -I$(G2_INCd) -c grib_utils.f
 all: check_prereqs $(CMD)
 clean:
-	rm -f *.o *.mod $(CMD) ../../exec/$(CMD)
+	rm -f *.o *.mod $(CMD) 
 install:
 	/usr/bin/install -c -d ../../exec
 	/usr/bin/install -c $(CMD) ../../exec
