@@ -43,8 +43,6 @@ SFCanl=/gpfs/dell1/nco/ops/com/gfs/prod
 
 SFCanl=$2 ### arg 2 is the sfcanl file path
 
-PTMP=$DATAROOT/JACK$$; mkdir -p $PTMP 
-
 # loop over the date range once a day
 # -----------------------------------
 
@@ -57,7 +55,7 @@ day=$(echo $date|cut -c 1-8)
 cyc=$(echo $date|cut -c 9-10)
 echo $(date) $date
 
-WorkDir=$PTMP/nstrtg; rm -rf $WorkDir; mkdir -p $WorkDir; cd $WorkDir
+WorkDir=$DATA/nstrtg.$$; rm -rf $WorkDir; mkdir -p $WorkDir; cd $WorkDir
 
 sfcanl=$SFCanl                                                          # surface analysis file at Gaussian grids, for T1534, 3072 x 1536
 iceanl=/gpfs/tp1/emc/globaldump/$date/gdas/seaice.5min.grb.gdas.$date   # input Sea ice daily analysis, 1/12 lat/lon grids, 4320 x 2160

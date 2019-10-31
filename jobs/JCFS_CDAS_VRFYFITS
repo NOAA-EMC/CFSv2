@@ -79,7 +79,7 @@ export GESdir=$gespath/cdas.${PDY}
 export RESDIR=${RESDIR:-$GESdir}
 mkdir -p $RESDIR
 
-##env
+env
 
 #############################################################
 # execute the updated fit script for cfs and gfs

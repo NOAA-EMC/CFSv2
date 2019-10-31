@@ -266,15 +266,15 @@ syyyy=`echo ${PDY} | cut -c1-4`
 symdh=${PDY}${CYL}
 
 export gfsvitdir=${gfsvitdir:-${COMDIR}${COMROOT}/gfs/${envir}/gfs.$PDY}
-export namvitdir=${namvitdir:-${COMDIR}${COMROOTp1}/nam/prod/nam.$PDY}
-export gltrkdir=${gltrkdir:-${COMDIR}${COMROOTp1}/hur/${envir}/global}
+export namvitdir=${namvitdir:-${COMDIR}${COMROOT}/nam/prod/nam.$PDY}
+export gltrkdir=${gltrkdir:-${COMDIR}${COMROOT}/hur/${envir}/global}
 export TPCATdir=/tpcprd/atcf
 
 export homesyndir=${homesyndir:-${HOMERELO}}
 export homesyndir=${homesyndir:-$NWPROD/util}
 export exectrkdir=${exectrkdir:-${homesyndir}/exec}
 export ushtrkdir=${ushtrkdir:-${homesyndir}/ush}
-export archsyndir=${archsyndir:-${COMDIR}${COMROOTp1}/arch/prod/syndat}
+export archsyndir=${archsyndir:-${COMDIR}${COMROOT}/arch/prod/syndat}
 
 ##cp /com/date/t${CYL}z ncepdate
 ##export CENT=` cut -c7-8 ncepdate `

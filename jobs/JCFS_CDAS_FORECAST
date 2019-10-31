@@ -82,11 +82,8 @@ export BATCH_POST=${BATCH_POST:-NO}
 # Run setpdy and initialize PDY variables
 ##############################
 
-export CDATE=${CDATE:-${PDY}$cyc}
-export PDY=$(echo $CDATE|cut -c 1-8)
 sh setpdy.sh
 . ./PDY
-
 
 #############################################
 # Get the variables setup from config script

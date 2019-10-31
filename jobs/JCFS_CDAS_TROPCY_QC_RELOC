@@ -58,16 +58,14 @@ export HOMERELO=${HOMERELO:-$HOMEglob}
 export EXECRELO=${HOMERELO}/exec
 export FIXRELO=${HOMERELO}/fix
 export USHRELO=${HOMERELO}/ush
-export utilexec=$(dirname $NDATE)
-export utilscript=$(dirname $(which finddate.sh))
 
-export HOMEarch=${HOMEarch:-${COMROOTp1}/arch/${envir}}
+export HOMEarch=${HOMEarch:-${COMROOT}/arch/${envir}}
 export ARCHSYND=${HOMEarch}/syndat
 mkdir -p $ARCHSYND
 mkdir -p $ARCHSYND
 
 #  path to tropical cyclone record database (used by qctropcy processing)
-export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/us007003}   
+export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/prod}   
 
 ##############################
 # Run setpdy and initialize PDY variables

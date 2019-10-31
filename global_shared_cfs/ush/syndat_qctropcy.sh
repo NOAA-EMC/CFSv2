@@ -76,7 +76,7 @@ echo "                        directories.  These must now be passed in. "
 
 set -xua
 
-ARCHSYND=${ARCHSYND:-$COMROOTp1/arch/prod/syndat}
+ARCHSYND=${ARCHSYND:-$COMROOT/arch/prod/syndat}
 HOMENHC=${HOMENHC:-/nhc/save/guidance/storm-data/ncep}
 TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/us007003}
 slmask=${slmask:-$FIXSYND/syndat_slmask.t126.gaussian}

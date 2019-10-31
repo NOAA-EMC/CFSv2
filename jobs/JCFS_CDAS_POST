@@ -141,7 +141,7 @@ restart_file=${restart_file:-$COMIN/${RUN1}.t${cyc}z.logf}
 export SLEEP_TIME=${SLEEP_TIME:-900}
 export SLEEP_INT=${SLEEP_INT:-5}
 
-##env
+env
 
 ###############################
 # Various script parmeters

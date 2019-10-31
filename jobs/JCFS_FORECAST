@@ -267,6 +267,8 @@ export IC_FROM_DISK=${IC_FROM_DISK:-YES}
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg" 
 
+env
+
 ############################################################
 #  Loop for year (for hindcast); for forecast YYYYSS=YYYYEND
 ############################################################

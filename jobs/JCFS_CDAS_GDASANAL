@@ -364,7 +364,7 @@ export APRUN='mpirun -n 140'
 
 export RTMFIX=$HOMEcfs/global_shared_cfs/CRTMv205
 
-##env
+env
 
 #############################################################
 # Execute the script
@@ -396,8 +396,8 @@ postmsg "$jlogfile" "$msg"
 ##############################
 # Remove the Temporary working directory
 ##############################
-cd $DATA_IN
-if [ ${RM_TMPDIR:-YES} = YES ] ; then rm -rf $DATA ; fi
+cd $DATAROOT
+if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
 
 date
 

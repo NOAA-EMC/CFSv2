@@ -2,6 +2,17 @@
 
 set -xa
 
+#####################################################################################
+# Run config file to get input parameters
+# This config file should define the following variables
+# DATA_IN: Location of working directory, default to /tmpnwprd1
+# DEV_ECF: If the job is to be running using SMS, default to YES
+# SENDDBN: Set to NO for developers, default to YES
+# COM_IN:  Directory for input files, default to /com/$NET/${envir}
+# COM_OUT: Directory for output file, default to /com/$NET/${envir}
+# gespath: Directory for the guess or restart files, default to /nwges/${envir}
+#####################################################################################
+
 ####################################
 # Specify NET and RUN Name and model
 ####################################

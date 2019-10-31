@@ -863,8 +863,6 @@ EXECSYND=${EXECSYND:-${HOMEobsproc_prep}/exec}
 PARMSYND=${PARMSYND:-${HOMEobsproc_network}/parm}
 FIXSYND=${FIXSYND:-${HOMEobsproc_prep}/fix}
 
-utilexec=${utilexec:-/nwprod/util/exec}
-
 GETGUESS=${GETGUESS:-YES}
 
 PREPDATA=${PREPDATA:-YES}
@@ -1222,7 +1220,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                set -x
             fi
             $USHGETGES/getges.sh -e $envir_getges -n $network_getges \
-              -f $fhr -v `$utilexec/ndate $dhr $CDATE10` > \
+              -f $fhr -v `$NDATE $dhr $CDATE10` > \
               sgesprep${sfx}_pathname
             errges=$?
             if test $errges -ne 0
