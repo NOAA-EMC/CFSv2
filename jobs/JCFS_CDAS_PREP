@@ -49,6 +49,8 @@ export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
 export envir_getges=prod
 
+export USHGETGES=$HOMEcfs/global_shared_cfs/ush
+
 ##############################
 # Run setpdy and initialize PDY variables
 ##############################
