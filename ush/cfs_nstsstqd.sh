@@ -17,54 +17,43 @@
 #       tf_rtg_grb2     : RTG-like Tf analysis with non-water grids filled as RTG, GRIB2
 #
 # Author, 03/21/2019     - Xu Li
+# Author, 10/15/2019     - Woollen 
 #
 
 
-set -eua
+set -euax
 
-set +x
-module purge
-module load EnvVars/1.0.2
-module load ips/18.0.1.163
-module load impi/18.0.1
-module load prod_util/1.1.2
-module load grib_util/1.1.1
-module load NetCDF/4.5.0
-module list
-set -x
-
-HOMEcfs=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository
 HOMEnst=$HOMEcfs/nstrtg.v1.1.1
 EXECnst=$HOMEnst/exec
 FIXnst=$HOMEnst/fix
 
-SFCanl=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/oisst.lal
-SFCanl=/gpfs/dell1/nco/ops/com/gfs/prod
+# loop backwards over one day to find a sfcanl file 
+# -------------------------------------------------
 
-SFCanl=$2 ### arg 2 is the sfcanl file path
+date=$1; dend=$($NDATE -24 $date); inc=6  # date is the date for COMGDAS
 
-# loop over the date range once a day
-# -----------------------------------
-
-date=$1; dend=$1; inc=6 
-
-[[ $date -lt 999999 ]] && { dend=${date}3200; date=${date}0100; }                 
-
-while [[ $date -le $dend ]]; do
+while [[ $date -ge $dend ]]; do
 day=$(echo $date|cut -c 1-8)
-cyc=$(echo $date|cut -c 9-10)
-echo $(date) $date
+our=$(echo $date|cut -c 9-10)
+COMGDAS=$COM_GDAS/gdas.${day}/$our
+
+sfcanl=$COMGDAS/gdas.t${our}z.sfcanl.nemsio                             # surface analysis file at Gaussian grids, for T1534, 3072 x 1536
+iceanl=$COMGDAS/gdas.t${our}z.seaice.5min.grb                           # input Sea ice daily analysis, 1/12 lat/lon grids, 4320 x 2160  
+
+if [[ ! -s $sfcanl ]] ; then    
+   date=$($NDATE -$inc $date)                                           # if no sfcanl try 6 hours earlier 
+   continue                  
+fi
 
 WorkDir=$DATA/nstrtg.$$; rm -rf $WorkDir; mkdir -p $WorkDir; cd $WorkDir
 
-sfcanl=$SFCanl                                                          # surface analysis file at Gaussian grids, for T1534, 3072 x 1536
-iceanl=/gpfs/tp1/emc/globaldump/$date/gdas/seaice.5min.grb.gdas.$date   # input Sea ice daily analysis, 1/12 lat/lon grids, 4320 x 2160
-iceanl=$COMGDAS/gdas.t${cyc}z.seaice.5min.grb                               # get the ice file from comgdas
+echo
+echo $CDATE nsst from $COMGDAS
+echo
+
 rtgmsk=$FIXnst/rtgssthr_ls_nas.twelfthdeg.dat                           # Surface land/water mask 1/12 lat/lon grids, 4320 x 2160
 sstclm=$FIXnst/RTGSST.1982.2012.monthly.clim.grb                        # monthly SST climatology (1/12 degree RTG is used here)
 salclm=$FIXnst/WOA05_pottemp_salt-GRADS.nc                              # Salinity climatology, half lat/lon degree
-
-[[ -s $sfcanl ]] || { date=$($NDATE $inc $date); continue; }
 
 ln -sf $sfcanl    sfcanl
 ln -sf $iceanl    iceanl
@@ -80,6 +69,9 @@ cat << EOF > nstrtg_parm.input # Make namelist for  1/12 degree RTG-like file
 catime='$date',lputsi=.false.,dsearch=500.,nx=4320,ny=2160
 /
 EOF
+
+# run the NSST file creation process - output file is tf_rtg_grb
+# --------------------------------------------------------------
 
 $HOMEnst/exec/nstrtg.x < nstrtg_parm.input  1>res.log 2>err.log
 
@@ -110,7 +102,12 @@ echo $date|$HOMEcfs/exec/cfs_overdate_grib  1>>res.log  2>>err.log
 cp $nstout $COMOUT/cdas1.t${cyc}z.sstgrb.nsst 
 cp $nstout $COMOUT/cdas1.t${cyc}z.sstgrb
 
-date=$($NDATE $inc $date) # do the next date
+exit 0
 
 done
 
+echo
+echo CANNOT FIND GDAS SFCANL FOR THE LAST 24 HOURS
+echo
+
+exit 9999 
