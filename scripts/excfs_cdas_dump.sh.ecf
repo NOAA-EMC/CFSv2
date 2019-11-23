@@ -76,9 +76,8 @@ echo '--------------------------------------------------------------------------
 echo 'NSST SST QD processing -------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
 set -x
-SFCanl=$COMGDAS/$gdas1.t${cyc}z.sfcanl.nemsio
-[[ -s $SFCanl ]] && ${NSTSSTQD:-$HOMEcfs/ush/cfs_nstsstqd.sh} $CDATE $SFCanl >$PWD/nstout.$$ 2>&1
-export err=$?; pgm=cfs_nstsstqd.sh; err_chk
+${NSTSSTQD:-$HOMEcfs/ush/cfs_nstsstqd.sh} $CDATE $SFCanl >$PWD/nstout.$$ 2>&1
+export err=$?; export pgm=cfs_nstsstqd.sh; err_chk
 set +x
 echo '------------------------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
