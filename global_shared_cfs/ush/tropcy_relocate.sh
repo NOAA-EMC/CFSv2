@@ -243,7 +243,7 @@ then
 #  problem with obtaining date record so exit
    set +x
    echo
-   echo "problem with obtaining date record;"
+   echo "FATAL ERROR: problem with obtaining date record;"
    echo "ABNORMAL EXIT!!!!!!!!!!!"
    echo
    set -x
@@ -400,7 +400,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 #  problem obtaining global sigma first guess so exit
          set +x
          echo
-         echo "problem obtaining global sigma guess valid $fhr hrs relative \
+         echo "FATAL ERROR: problem obtaining global sigma guess valid $fhr hrs relative \
 to center relocation date/time;"
          echo "ABNORMAL EXIT!!!!!!!!!!!"
          echo
@@ -454,7 +454,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 #  problem obtaining global pressure grib guess so exit
          set +x
          echo
-         echo "problem obtaining global pressure grib guess valid $fhr hrs \
+         echo "FATAL ERROR: problem obtaining global pressure grib guess valid $fhr hrs \
 relative to center relocation date/time;"
          echo "ABNORMAL EXIT!!!!!!!!!!!"
          echo

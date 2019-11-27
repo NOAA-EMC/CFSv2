@@ -68,7 +68,7 @@ export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m775 -p $COMOUT
 
-export DCOM=${DCOM:-/dcom/us007003}
+export DCOM=${DCOM:-$DCOMROOT/prod}
 export COMCDAS=${COMCDAS:-${COMROOT}/cfs/${envir}}
 
 export COMOUTGLDAS=$COMROT/cmap/gldas

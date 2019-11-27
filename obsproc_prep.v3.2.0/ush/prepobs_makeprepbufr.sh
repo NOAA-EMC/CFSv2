@@ -857,7 +857,7 @@ USHOIQC=${USHOIQC:-${HOMEobsproc_prep}/ush}
 EXECPREP=${EXECPREP:-${HOMEobsproc_prep}/exec}
 PARMPREP=${PARMPREP:-${HOMEobsproc_network}/parm}
 FIXPREP=${FIXPREP:-${HOMEobsproc_prep}/fix}
-DICTPREP=${DICTPREP:-/nw${envir}/decoders/decod_shared/dictionaries}
+DICTPREP=${DICTPREP:-${NWROOT}/decoders/decod_shared/dictionaries}
 
 EXECSYND=${EXECSYND:-${HOMEobsproc_prep}/exec}
 PARMSYND=${PARMSYND:-${HOMEobsproc_network}/parm}

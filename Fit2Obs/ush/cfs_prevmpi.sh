@@ -1,3 +1,4 @@
+#!/bin/ksh
 ###########################################################################
 #
 # This script encodes the background (first guess) and observational

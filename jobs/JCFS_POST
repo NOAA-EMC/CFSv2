@@ -94,15 +94,6 @@ export sigavg=${sigavg:-$EXECcfs/cfs_sigavg}
 export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
 export NCP=${NCP:-/bin/cp}
 
-#############################################
-# Specify the recovery and postjob directries
-#############################################
-export COMROT=${COMROOT}/$RUN/${envir}/$RUN
-export YYYYMMDD=$(echo $start_date |cut -c1-8)
-export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
-export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
-mkdir -p $RECOVERY $POSTDEFS
-
 ####################################
 # Determine Job Output Name on System
 ####################################
@@ -180,6 +171,15 @@ YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
 export NTHSTACK=102400000
 
 export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
+
+#############################################
+# Specify the recovery and postjob directries
+#############################################
+export COMROT=${COMROOT}/$RUN/${envir}/$RUN
+export YYYYMMDD=$(echo $start_date |cut -c1-8)
+export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
+export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
+mkdir -p $RECOVERY $POSTDEFS
 
 ##############################################
 # Define COM directories

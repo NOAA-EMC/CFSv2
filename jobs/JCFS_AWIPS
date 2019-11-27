@@ -36,8 +36,8 @@ export RUN=cfs
 ###################################
 # Run setpdy and initialize PDY variables
 ###################################
-setpdy.sh
-. PDY
+sh setpdy.sh
+. ./PDY
 
 # Input file size to check, usually file size with full records is around 38000KB to 49000KB
 export MINIMUM_SIZE=30000
@@ -61,9 +61,9 @@ export FIXcfs=$HOMEcfs/fix
 ########################################
 # Set up the com directory
 ########################################
-export  COMROT=$COMROOT/${NET}/${envir}
-export   COMIN=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
-export  COMOUT=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
+export COMROT=$COMROOT/${NET}/${envir}
+export  COMIN=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
+export COMOUT=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
 export COMINm1=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${PDYm1}
 
 export pcom=$COMOUT/wmo 

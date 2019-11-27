@@ -25,7 +25,7 @@ do
     *)
       cd $directory
       make clean
-      make.sh
+      ./make.sh
       rm -f *.o *.mod
       cd .. ;;
   esac

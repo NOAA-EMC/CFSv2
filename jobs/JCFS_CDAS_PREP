@@ -15,6 +15,7 @@ cd $DATA
 cp $(which postmsg) $DATA   # need to call this because the obsproc VS is not NCO stanards complliant.
 
 export tmmark=tm00
+export cycle=t${cyc}z
 
 ##########################
 # Specify NET and RUN Name
@@ -47,8 +48,8 @@ export HOMEobsproc_prep=$HOMEprep
 
 export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
-export envir_getges=prod
 
+export envir_getges=${envir_getges:-prod}
 export USHGETGES=$HOMEcfs/global_shared_cfs/ush
 
 ##############################

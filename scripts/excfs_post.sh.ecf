@@ -113,14 +113,15 @@ done_max=${done_max:-5}
 done_count=0
 
 wait_count=0
-wait_max=10
+wait_max=180
 
 while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
 
   wait_count=$((wait_count+1))  
   defile=$(ls -rt $POSTDEFS/post_def$cyc.* | head -n1)
 
-  while [ -n "$POSTDEFS/post_def$cyc.*" ] ; do
+# while [ -n "$POSTDEFS/post_def$cyc.*" ] ; do
+  while [ -s $POSTDEFS/post_def$cyc.* ] ; do
 
       done_count=$((done_count+1))
 
@@ -395,5 +396,6 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
     wait_count=0 ## use wait_count for segments
     if [ $BREAK_ON_RUN = YES ] ; then break ; fi
   done
+  sleep 30
 done
 

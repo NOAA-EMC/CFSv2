@@ -39,6 +39,7 @@ export pgmout="OUTPUT.${pid}"
 sh setpdy.sh
 . ./PDY
 
+export CDATE=${CDATE:-${PDY}$cyc}
 ##########################################################
 # define cfs directories/scripts/executables            
 ##########################################################
@@ -49,6 +50,10 @@ export USHcfs=$HOMEcfs/ush
 export FIXcfs=$HOMEcfs/fix  
 
 export HOMEdump=$HOMEcfs
+
+export HOMEnst=$HOMEcfs/nstrtg.v1.1.1
+export EXECnst=$HOMEnst/exec
+export FIXnst=$HOMEnst/fix
 
 ##############################################
 # Define COM directories
@@ -64,10 +69,16 @@ mkdir -m 755 -p $COMOUT
 
 export DCOMROOT=/gpfs/dell1/nco/ops/dcom/prod   ## dells dcom
 export TANK_GRIBFLDS=${TANK_GRIBFLDS:-$DCOMROOT}             
-export COM_GDAS=/gpfs/dell1/nco/ops/com/gfs/prod
-export COM_ENGICE=/gpfs/dell1/nco/ops/com/omb/prod/sice    ## after 20190613
-export COM_SSTOIQD=/gpfs/gp1/nco/ops/com/omb/prod/sstoiqd  ## will this go away ??
-export COMGDAS=$COM_GDAS/gdas.${PDY}/$cyc
+export COM_GDAS=${COM_GDAS:-$(compath.py com/gfs/prod)}
+export COM_ENGICE=${COM_ENGICE:-$(compath.py com/omb/prod/sice)}       ## after 20190613
+export COM_SSTOIQD=${COM_SSTOIQD:-$(compath.py com/omb/prod/sstoiqd)}  ## will this go away ??
+export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc}
+export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc}
+
+#export COM_GDAS=/gpfs/dell1/nco/ops/com/gfs/prod
+#export COM_ENGICE=/gpfs/dell1/nco/ops/com/omb/prod/sice    ## after 20190613
+#export COM_SSTOIQD=/gpfs/gp1/nco/ops/com/omb/prod/sstoiqd  ## will this go away ??
+#export COMGDAS=$COM_GDAS/gdas.${PDY}/$cyc
 
 ########################################################################
 # execute the script

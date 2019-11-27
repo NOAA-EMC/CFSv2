@@ -1,6 +1,3 @@
-set -euax
-
-set +x
 module purge
 module load EnvVars/1.0.2
 module load ips/18.0.1.163  impi/18.0.1
@@ -13,7 +10,7 @@ module load sp/2.0.2
 module load w3emc/2.3.0
 module load w3nco/2.0.6
 module load NetCDF/3.6.3
-module load bufr/11.2.0
+module load bufr/11.3.0
 module load ip/3.0.1
 module load sfcio/1.0.0
 module load sigio/2.0.1
@@ -28,6 +25,5 @@ module load grib_util/1.1.0
 module load g2tmpl/1.5.0    
 module load xmlparse/2.0.0
 module load landsfcutil/2.1.0
-
+module load wrfio/1.1.1
 module list
-set -x

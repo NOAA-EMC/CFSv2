@@ -35,7 +35,7 @@ export cycle=t${cyc}z
 # Run setpdy and initialize PDY variables
 ##############################
 sh setpdy.sh
-. PDY
+. ./PDY
 
 ##########################################################
 # define cfs directories/scripts/executables            

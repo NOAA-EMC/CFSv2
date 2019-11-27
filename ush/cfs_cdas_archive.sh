@@ -47,7 +47,7 @@ HRLY6DIR=${HRLY6DIR:-$COMFCST/6hrly_grib_$member}
 
 COMANALYSIS=${COMANALYSIS:-$COMROT/cdas.$YYYYMMDD}
 
-HPSSROT=${HPSSROT:-/NCEPPROD/hpssprod/runhistory}
+HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM/$YYYYMMDD/Analysis}
 
 # Analysis files staging area
@@ -101,6 +101,7 @@ if [ $dohpssanl = "YES" ] ; then
 
   # Each cycle cdas1 types
   typelista="abias abias_pc abias_air cnvstat gsistat radstat oznstat prepbufr prepbufr.acft_profiles prepqa"
+  typelista="abias cnvstat gsistat radstat oznstat satang prepbufr prepqa"
 
   # 00Z only
   typelist0="noah.rst noahbin.lis"
@@ -363,7 +364,8 @@ if [ $dohpsshic = "YES" ] ; then
   # sanl sf are sigma, sfc bf are sfc
 
   rstlist='sanl sf00 sf06 sfcanl bf00 bf06 abias abias_pc abias_air ocnanl.tar'
-  
+  rstlist='sanl sf00 sf06 sfcanl bf00 bf06 satang abias ocnanl.tar'
+ 
   for hh in $hhlist
   do
 

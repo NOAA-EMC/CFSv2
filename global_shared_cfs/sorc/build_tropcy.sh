@@ -13,13 +13,13 @@
 #        7) supvit.fd/supvit
 #        8) gettrk.fd/gettrk
 #
-set -x -e
+set -x 
 
 ###. /usrx/local/Modules/3.2.10/init/sh
-set +x
+#set +x
 module purge
 ##module load ../modulefiles/Module_storm_reloc_v5.1.0_WCOSS
-source dell-mods.sh
+source ./dell-mods.sh
 module list
 set -x
 

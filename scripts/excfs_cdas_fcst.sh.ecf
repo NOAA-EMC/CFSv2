@@ -415,7 +415,7 @@ export FIXDIR=${FIXDIR:-$FIXcfs/cfs_fix_am}
 export FIX_RAD=${FIX_RAD:-$FIXDIR}
 export RESDIR=${RESDIR:-$DATA}
 #  Filenames.
-export model=${model:-global}
+export model=global
 export SUFOUT=${SUFOUT}
 
 export FSYNCEXEC=${FSYNC}

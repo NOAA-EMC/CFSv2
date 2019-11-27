@@ -388,7 +388,7 @@ export NTHSTACK_GSI=1024000000            # stack size for anal, default=1280000
 export OMP_NUM_THREADS_CY=20 
 export APRUN=" mpirun -n $LSB_DJOB_NUMPROC"
 
-##env
+env
 
 #############################################################
 # Execute the script

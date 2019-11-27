@@ -47,6 +47,7 @@ export USHcfs=$HOMEcfs/ush
 export FIXcfs=$HOMEcfs/fix  
 export hpsstar=$USHcfs/cfs_hpsstar
 
+COMROT=${COMROT:-$COMROOT/cfs/${envir}}
 ###############################
 # Execute the Script
 ###############################

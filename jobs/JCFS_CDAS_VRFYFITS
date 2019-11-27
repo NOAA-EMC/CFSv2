@@ -105,7 +105,7 @@ export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 for EXPNAM in CFS GFS; do
 [[ $EXPNAM = GFS ]] && COMFIT=$COMROOT/gfs/prod
 [[ $EXPNAM = GFS ]] && ACPROFit=YES  
-[[ $EXPNAM = CFS ]] && COMFIT=$COMROOT/cfs/prod
+[[ $EXPNAM = CFS ]] && COMFIT=$COMROOT/cfs/${envir}
 [[ $EXPNAM = CFS ]] && ACPROFit=NO 
 ARCDIR=$DATA/$EXPNAM.fits
 time $fitdir/runfits $EXPNAM $CDATE $COMFIT

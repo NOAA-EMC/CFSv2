@@ -106,7 +106,7 @@ export FILESTYLE='C'
 # Run setpdy and initialize PDY variables
 ##############################
 
-setpdy.sh
+sh setpdy.sh
 . ./PDY
 
 ##############################################
@@ -115,7 +115,7 @@ setpdy.sh
 export COM_IN=${COM_IN:-$COMROOT/${NET}/${envir}}
 export COM_OUT=${COM_OUT:-$COMROOT/${NET}/${envir}}
 
-export COMIN=$COM_IN/cdas.${PDY}
+export  COMIN=$COM_IN/cdas.${PDY}
 export COMOUT=$COM_OUT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
 
@@ -214,7 +214,7 @@ export MP_EUILIB=us
 export MP_LABELIO=yes
 export MP_SHARED_MEMORY=yes
 
-##env
+env
 
 #############################################################
 # Execute the script

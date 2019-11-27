@@ -430,6 +430,7 @@ export RESDIR=${RESDIR:-$DATA}
 
 #  Filenames.
 
+export model=global
 export model=${model:-global}
 export XC=${XC:-""}
 export SUFOUT=${SUFOUT:-""}

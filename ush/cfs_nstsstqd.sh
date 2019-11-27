@@ -23,10 +23,6 @@
 
 set -euax
 
-HOMEnst=$HOMEcfs/nstrtg.v1.1.1
-EXECnst=$HOMEnst/exec
-FIXnst=$HOMEnst/fix
-
 # loop backwards over one day to find a sfcanl file 
 # -------------------------------------------------
 

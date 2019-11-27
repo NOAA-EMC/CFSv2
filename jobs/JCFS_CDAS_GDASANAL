@@ -111,8 +111,8 @@ export FILESTYLE='C'
 ##############################
 # Run setpdy and initialize PDY variables
 ##############################
-setpdy.sh
-. PDY
+sh setpdy.sh
+. ./PDY
 
 ##############################################
 # Define COM directories

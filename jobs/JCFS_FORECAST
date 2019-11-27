@@ -161,16 +161,6 @@ export gespath=${gespath:-${GESROOT}/${envir}}
 export GESdir=$gespath/${NET}.$PDY
 #mkdir -m 775 -p $GESdir
 
-#############################################
-# Specify the recovery and postjob directries
-#############################################
-
-export COMROT=${COMROOT}/$RUN/${envir}/$RUN
-export YYYYMMDD=$(echo $start_date |cut -c1-8)
-export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
-export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
-mkdir -p $RECOVERY $POSTDEFS
-
 ############################################
 # determine  the current day of the forecast
 ############################################
@@ -218,6 +208,17 @@ else
   exit
 fi
 #
+
+#############################################
+# Specify the recovery and postjob directries
+#############################################
+
+export COMROT=${COMROOT}/$RUN/${envir}/$RUN
+export YYYYMMDD=$(echo $start_date |cut -c1-8)
+export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
+export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
+mkdir -p $RECOVERY $POSTDEFS
+
 if [[ ! -s $RECOVERY/stamp.$RUN ]] ; then
   export current_date=$start_date
   echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
@@ -281,7 +282,7 @@ if [ $YYYYSTART -le $YYYYEND ] ; then
   ##############################################
     YYYYMMDD=$(echo $start_date |cut -c1-8)
     HH=$(echo $start_date |cut -c9-10)
-    export COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
+    export  COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
     export COMOUT=$COMROT/$RUN.$YYYYMMDD/$HH
     export CLIMCOM=$COMOUT
     mkdir -m 775 -p $COMOUT
