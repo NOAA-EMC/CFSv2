@@ -281,7 +281,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
 
 #     clean up temporary files and stop the post job
 
-      if [[ $FHE = $FHE ]] ; then
+      if [[ $FHE = $nhours ]] ; then
         if [ $rc =  0 ] ; then
           cd $DATA
           rm -rf $YMDH
