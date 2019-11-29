@@ -113,13 +113,13 @@ if [ $dohpssanl = "YES" ] ; then
   typelist24="noahgrb.lis"
 
   # 00,06,12,18 files
-  typelistv="adpsfc.anl sfcshp.anl adpupa.mand.anl aircar.anl aircft.anl f00.acar f06.acar f00.acft f06.acft f00.raob f06.raob f00.sfc f06.sfc"
+  # typelistv="adpsfc.anl sfcshp.anl adpupa.mand.anl aircar.anl aircft.anl f00.acar f06.acar f00.acft f06.acft f00.raob f06.raob f00.sfc f06.sfc"
 
   # Just 00 and 12
-  typelistv2="prepqf adpsfc.fcs sfcshp.fcs adpupa.mand.fcs aircar.fcs aircft.fcs"
+  # typelistv2="prepqf adpsfc.fcs sfcshp.fcs adpupa.mand.fcs aircar.fcs aircft.fcs"
 
   # 12,24,36,48Z files
-  typelistv48="acar acft raob sfc"
+  # typelistv48="acar acft raob sfc"
 
   CDAY=$YYYYMMDD
 
@@ -203,83 +203,83 @@ if [ $dohpssanl = "YES" ] ; then
   done   # typelist24
 
 
-  # Verification types
-  for type in $typelistv
-  do
-
-    for hh in $hhlist
-    do
-      file=$type.$CDAY$hh
-      if [ -s $file ] ; then
-        echo $file >> $hpsslist
-
-        # Check file size
-        #$CHKFILEANLSH $type $file
-        #((rw+=$?))
-
-      else
-        echo "ERROR: $file not found for $CDAY$hh"
-        ((rc+=1))
-      fi
-    done
-  done # typelistv
-
-
-
-  # Verification types 00Z and 12Z only
-  for type in $typelistv2
-  do
-
-    for hh in $hhlist2
-    do
-
-      if [ $type = "prepqf" ] ; then
-        #cdas1.t00z.prepqf
-        file=$CDAS.t${hh}z.${type}
-      else
-        file=$type.$CDAY$hh
-      fi
-
-      if [ -s $file ] ; then
-        echo $file >> $hpsslist
-
-        # Check file size
-        #$CHKFILEANLSH $type $file
-        #((rw+=$?))
-
-      else
-        echo "ERROR: $file not found for $CDAY$hh"
-        ((rc+=1))
-      fi
-    done
-  done # typelistv2
+# # Verification types
+# for type in $typelistv
+# do
+#
+#   for hh in $hhlist
+#   do
+#     file=$type.$CDAY$hh
+#     if [ -s $file ] ; then
+#       echo $file >> $hpsslist
+#
+#       # Check file size
+#       #$CHKFILEANLSH $type $file
+#       #((rw+=$?))
+#
+#     else
+#       echo "ERROR: $file not found for $CDAY$hh"
+#       ((rc+=1))
+#     fi
+#   done
+# done # typelistv
 
 
 
-  # Verification types 12,24,36,48
-  for type in $typelistv48
-  do
+# # Verification types 00Z and 12Z only
+# for type in $typelistv2
+# do
+#
+#   for hh in $hhlist2
+#   do
+#
+#     if [ $type = "prepqf" ] ; then
+#       #cdas1.t00z.prepqf
+#       file=$CDAS.t${hh}z.${type}
+#     else
+#       file=$type.$CDAY$hh
+#     fi
+#
+#     if [ -s $file ] ; then
+#       echo $file >> $hpsslist
+#
+#       # Check file size
+#       #$CHKFILEANLSH $type $file
+#       #((rw+=$?))
+#
+#     else
+#       echo "ERROR: $file not found for $CDAY$hh"
+#       ((rc+=1))
+#     fi
+#   done
+# done # typelistv2
 
-    for fhh in $fhlist
-    do
 
-      if [ $fhh -eq 24 -o $fhh -eq 48 ] ; then hh=00 ; else hh=12 ; fi
 
-      file=f$fhh.$type.$CDAY$hh
-
-      if [ -s $file ] ; then
-        echo $file >> $hpsslist
-
-        # Check file size
-        #$CHKFILEANLSH $type $file
-        #((rw+=$?))
-
-      else
-        echo "ERROR: $file not found for $CDAY$fhh"
-        ((rc+=1))
-      fi
-    done
-  done # typelistv48
+# # Verification types 12,24,36,48
+# for type in $typelistv48
+# do
+#
+#   for fhh in $fhlist
+#   do
+#
+#     if [ $fhh -eq 24 -o $fhh -eq 48 ] ; then hh=00 ; else hh=12 ; fi
+#
+#     file=f$fhh.$type.$CDAY$hh
+#
+#     if [ -s $file ] ; then
+#       echo $file >> $hpsslist
+#
+#       # Check file size
+#       #$CHKFILEANLSH $type $file
+#       #((rw+=$?))
+#
+#     else
+#       echo "ERROR: $file not found for $CDAY$fhh"
+#       ((rc+=1))
+#     fi
+#   done
+# done # typelistv48
 
 
   #################
