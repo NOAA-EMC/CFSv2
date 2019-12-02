@@ -287,7 +287,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
           rm -rf $YMDH
         fi
         BREAK_ON_RUN=YES
-        if [ ${DOALL_POSTDEFS:-YES} = YES ] ; then
+        if [ ${DOALL_POSTDEFS:-NO} = YES ] ; then
           BREAK_ON_RUN=NO
         fi
       fi
@@ -316,11 +316,9 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
          ##############################################################################################
          # Run script to concatenate the time-series file and save them in the "time_grib" directory
          ##############################################################################################
-         if [ $SAVE_TIME_45DAYS = YES ]; then
-           end_date=$($NDATE $ENDHOUR $start_date)
-           fh_inc=${INC_HOUR:-360}
-           $USHcfs/cfs_savetimeser.sh $start_date $end_date $fh_inc
-         fi
+         end_date=$($NDATE $ENDHOUR $start_date)
+         fh_inc=${INC_HOUR:-360}
+         $USHcfs/cfs_savetimeser.sh $start_date $end_date $fh_inc
 
          ####################################################
          # Save the necessary files for restart in a tar file
