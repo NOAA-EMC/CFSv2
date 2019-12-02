@@ -1331,7 +1331,7 @@ fi   # dohpssdumps
 ###########################################################
 # OCNDIAG Archive
 ###########################################################
-if [ $doocndiag = "YES" ] ; then
+if [ $doocndiag = "YES" -a $cyc -eq 00 ] ; then
 
   name=ocndiag
   fout=24
