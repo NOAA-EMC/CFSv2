@@ -12,7 +12,7 @@ echo make-ing ${make%.*}
 echo
 
 make -f Makefile
-mv ${make%.*} ..
+mv ${make%.*} ../../exec
 rm -f *.o *.mod
 
 

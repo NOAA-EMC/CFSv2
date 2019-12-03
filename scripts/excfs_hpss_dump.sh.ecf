@@ -42,7 +42,7 @@ hour=$(echo $CDATE|cut -c 9-10)
 txxz=t${hour}z
 
 cd $COMOUT ||exit 99
-htar -xvf /NCEPPROD/hpssprod/runhistory/cfs$year/$year$mnth/$year$mnth$days/Analysis/cfs.dumps.$PDY.tar  \*$txxz\*
+htar -xvf /NCEPPROD/hpss${envir}/runhistory/cfs$year/$year$mnth/$year$mnth$days/Analysis/cfs.dumps.$PDY.tar  \*$txxz\*
 rm -f cdas1.$txxz.cmapgrb
 
 [[ ! -s ${COMSP}adpupa.tm00.bufr_d ]] && exit 99

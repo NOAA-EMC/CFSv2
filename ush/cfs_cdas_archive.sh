@@ -514,7 +514,7 @@ if [ $dohpsslic = "YES" ] ; then
   rstlistf='sigf sfcf noah.rst'   # fXX types, 00Z only
 
   # From COMANALYSIS
-  rstlistg='abias abias_pc'
+  rstlistg='abias'  
 
   for hh in $hhlist
   do
@@ -1254,8 +1254,8 @@ if [ $dohpssdumps = "YES" ] ; then
         /bin/ls -1 $file >> $hpsslist
       else
 
-        # cmapgrb is only there if updated by CPC
-        if [[ $type == "cmapgrb" ]] ; then
+        # cmapgrb is only there if updated by CPC - tmpprf and salprf ocean data only at 00z
+        if [[ $type == "cmapgrb" || $type == "tmpprf.tar" || $type == "salprf.tar" ]] ; then
           echo "WARNING: $file not found."
         else
           echo "ERROR: $file not found."
@@ -1331,7 +1331,7 @@ fi   # dohpssdumps
 ###########################################################
 # OCNDIAG Archive
 ###########################################################
-if [ $doocndiag = "YES" -a $cyc -eq 00 ] ; then
+if [ $doocndiag = "YES" ] ; then
 
   name=ocndiag
   fout=24
@@ -1346,7 +1346,7 @@ if [ $doocndiag = "YES" -a $cyc -eq 00 ] ; then
   hpsslist=$TEMPDIR/$name.$CDAY.hpsslist
   > $hpsslist
 
-  for hh in $hhlist
+  for hh in 00  ##$hhlist ocean analysis only done at 00z
   do
 
     indate=${CDAY}$hh

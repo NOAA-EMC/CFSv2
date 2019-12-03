@@ -21,7 +21,7 @@
 
 [[ $VERBOSE != NO ]] && set -x
 
-export pgm=$(basebame $0)
+export pgm=$(basename $0)
 
 YYYYMM=${1:-${YYYYMM:-201005}}
 
@@ -41,10 +41,10 @@ MM=`echo $rundate | cut -c5-6`
 
 COMROT=${COMROT:-$COMROOT/cfs/prod}
 
-HPSSROT=${HPSSROT:-/NCEPPROD/hpssprod/runhistory}
+HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM}
 
-export TEMPDIR=$DATA/monthly_analysis.$$}             # stmp unique directory for temp files
+export TEMPDIR=$DATA/monthly_analysis.$$             # stmp unique directory for temp files
 mkdir -p $TEMPDIR
 
 export TIMEAVGEXEC=${TIMEAVGEXEC:-$EXECcfs/cfs_mpi_timavg_3d}

@@ -86,7 +86,7 @@ do
     # 6 hourly output
     HRLY6DIR=$COMFCST/6hrly_grib_$member
 
-    HPSSROT=${HPSSROT:-/NCEPPROD/hpssprod/runhistory}
+    HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 
     # Member 1 is in permanent archive
     # Members 2,3,4 are in 2year archive; Move to permanent archive on 20170913 06z
