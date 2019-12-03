@@ -551,18 +551,10 @@ export FILESTYLE=${FILESTYLE:-'L'}
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
 export MEMBER_NAMES=${MEMBER_NAMES:-''}
-if [ $machine = IBMP6 ] ; then
-  export BIND_TASKS=${BIND_TASKS:-no}
-  typeset -L1 l=$PGMOUT
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDOUT=${REDOUT:-'1>'$a}
-  typeset -L1 l=$PGMERR
-  [[ $l = '&' ]]&&a=''||a='>'
-  export REDERR=${REDERR:-'2>'$a}
-else
-  export REDOUT=${REDOUT:-'1>'}
-  export REDERR=${REDERR:-'2>'}
-fi
+
+export REDOUT=${REDOUT:-'1>'}
+export REDERR=${REDERR:-'2>'}
+
 ################################################################################
 #  Preprocessing
 $INISCRIPT
