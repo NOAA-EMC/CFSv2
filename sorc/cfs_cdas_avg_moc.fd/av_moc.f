@@ -12,7 +12,7 @@
 
       integer jm,km,nreg,nfiles
       CHARACTER*10 kjm,kkm,knreg,knfiles
-      character*120 avmocfile
+      character*250 avmocfile
 
 !
       call getenv("jm",kjm)
@@ -49,7 +49,7 @@
       real*8 divid
       real*8, dimension(jm,km,nreg)  :: davmoc,dvmoc
       real, dimension(jm,km,nreg)  :: avmoc,vmoc
-      character*120 avmocfile,mocfile(nfiles)
+      character*250 avmocfile,mocfile(nfiles)
 !
       davmoc=0.
       divid=1.0/float(nfiles)

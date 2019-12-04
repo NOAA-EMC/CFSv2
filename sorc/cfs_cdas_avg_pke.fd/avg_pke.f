@@ -2,7 +2,7 @@
       implicit none
       integer, parameter :: komax=200, kom37=komax-37
 
-      CHARACTER*120 indir,iname,index,indxdir
+      CHARACTER*250 indir,iname,index,indxdir
       CHARACTER*10 cdump
       real dlat
 !
@@ -76,8 +76,8 @@
       logical fcst_avrg
       integer idim, jdim,  kdim, ifhr, isyr, ismth, isday, iscy
      &,        ieyr, iemth, ieday, iecy, idcy, idbug
-      CHARACTER*120 inputdir,iname,ingrib,indfile,index,indexx,indxdir
-      CHARACTER*120 dgout
+      CHARACTER*250 inputdir,iname,ingrib,indfile,index,indexx,indxdir
+      CHARACTER*250 dgout
       character*4  cycl(25),cyclx
       CHARACTER*10 indate
       CHARACTER*10 cdump
