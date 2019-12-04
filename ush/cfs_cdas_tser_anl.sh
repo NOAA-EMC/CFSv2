@@ -127,20 +127,13 @@ SUFOUT=${SUFOUT:-$SUFIN.$yyyymm}
 echo "SUFIN is $SUFIN"
 echo "SUFOUT is $SUFOUT"
 
-if [ $machine = IBM ]; then
-  nprocs=`poe hostname | wc -w`
-elif [ $machine = WCOSS ]; then
-  if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-     nprocs=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-  elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-     nprocs=$LSB_DJOB_NUMPROC
-  else
-     nprocs=1
-  fi
+if [ -n "$LSB_DJOB_NUMPROC" ]; then
+   nprocs=$LSB_DJOB_NUMPROC
+   ntasks=$LSB_DJOB_NUMPROC
 else
-  echo "nprocs has not been defined for platform $machine"
+   echo "nprocs not defined for this platform"
+   export err=99; err_chk
 fi
-
 
 # Create array outfile names
 nvar=0
@@ -218,22 +211,6 @@ if [ $maketim = 1 ] ;then
   date
 
   if [ -s cmdfile_0 ] ; then
-
-    if [ $machine = IBM ]; then
-      ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-      # only valid if count .le. 128
-      [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-    elif [ $machine = WCOSS ]; then
-      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-        ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-        ntasks=$LSB_DJOB_NUMPROC
-      else
-        ntasks=1
-      fi
-    else
-      echo "ntasks has not been defined for platform $machine"
-    fi
 
     remainder=$((($ntasks-$(cat cmdfile_$ncmd|wc -l))%$ntasks))
     n=0
@@ -327,21 +304,6 @@ if [ $maketim = 1 ] ;then
   echo Before POE
   date
   if [ -s cmdfile_$ncmd ] ; then
-    if [ $machine = IBM ]; then
-      ntasks=$(echo $LOADL_PROCESSOR_LIST|wc -w)
-      # only valid if count .le. 128
-      [ $ntasks -eq 0 ] && ntasks=$(poe hostname|wc -l)
-    elif [ $machine = WCOSS ]; then
-      if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-        ntasks=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-      elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-        ntasks=$LSB_DJOB_NUMPROC
-      else
-        ntasks=1
-      fi
-    else
-      echo "ntasks has not been defined for platform $machine"
-    fi
 
     remainder=$((($ntasks-$(cat cmdfile_$ncmd|wc -l))%$ntasks))
     n=0
