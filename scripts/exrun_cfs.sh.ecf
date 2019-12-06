@@ -477,10 +477,7 @@ fi
 # Set nhours for the chunk of the forecast in this cycle
 
 export nhours=$((nhourb+FH_CYCL))                                      #### set the end of the next segment
-if [ $nhours -gt $fcsthrs ] ; then                                     #### limit last segment to roughly fcsthours
-   while [[ $((fcsthrs%24)) -ne 0 ]]; do fcsthrs=$((fcsthrs+1)); done  #### round final segment end to a multiple of fhres (24)
-   nhours=$fcsthrs                                                     #### last segment ends at fcsthrs
-fi
+if [ $nhours -gt $fcsthrs ] ; then nhours=$fcsthrs ; fi
 
 export FH_INI=$nhourb
 echo "`date` $0: fcst from $nhourb to $nhours is starting" 
