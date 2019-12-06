@@ -388,9 +388,6 @@ echo `date` executing forecast script
 echo $LD_LIBRARY_PATH
 echo
 
-machine=DELL
-
-export APRUN=${APRUN:-"aprun"}
 export ENS_NUM=${ENS_NUM:-1}
 export FM=${FM:-""}
 
@@ -1258,10 +1255,6 @@ until [ $p_date -gt $end_date ] ; do
   p_date=$($NDATE $hh_inc_ocn $p_date)
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
-
-#set +x
-#module load NetCDF/4.5.0 ## on dell this has the shared load libs for netcdf
-
 set -x
 
 #  mpi_combine the decomposed ocean files into global files
@@ -1270,7 +1263,7 @@ nprocs=$LSB_DJOB_NUMPROC
 ncmds=$(wc -l cmdfile_mpp|sed 's/cmdfile_mpp//')
 [[ $nprocs -lt $ncmds ]] && ncmds=$nprocs
 
-mpirun -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp
+mpirun -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp  
 export err=$?; err_chk
 
 #  adjust the date stamps on the combined files
@@ -1320,8 +1313,6 @@ if [[ $VERBOSE = YES ]] ; then
    echo $(date) EXITING $0 with return code $err >&2
 fi
 
-##exit 000 ## for testing
-
 #------------------------------------------------------------------------------#
 # End post-execution section of OM script (5)
 #------------------------------------------------------------------------------#
@@ -1345,6 +1336,8 @@ rm -f SFC.F*
 rm -f FLX.F*
 rm -f LOG.F*
 rm -f D3D.F*
+rm -f ocn*nc.????
+rm -f ice*nc.????
 
 ################################################################################
 #  Postprocessing
