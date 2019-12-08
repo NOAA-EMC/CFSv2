@@ -506,18 +506,22 @@ until [[ $nhourb -ge $nhours ]] ; do
   fi
   if [[ $FHINI -lt 10 ]] ; then FHINI=0$FHINI ; fi
   export FHMAX=$((nhourb+$INCHOUR))
-  if [ $FHMAX -gt $nhours ] ; then export FHMAX=$nhours ; fi
+  if [[ $FHMAX -gt $nhours ]] ; then export FHMAX=$nhours ; fi
+
   export INCHOUR=$((FHMAX-FHINI))
-#
-  if [ $FHRES -gt 24 -a $(((FHMAX/FHRES)*FHRES)) -ne $FHMAX ] ; then
+  if [[ $INCHOUR -lt 24 ]] ; then FHRES=$FHMAX ; fi
+
+  if [[ $FHRES -gt 24 && $(((FHMAX/FHRES)*FHRES)) -ne $FHMAX ]] ; then
     export FHRES=$FHMAX
   fi
-  if [ $(((FHMAX*3600/dt_rstrt)*(dt_rstrt/3600))) -ne $FHMAX ] ; then
+
+  if [[ $(((FHMAX*3600/dt_rstrt)*(dt_rstrt/3600))) -ne $FHMAX ]] ; then
     dt_rstrt=$((FHMAX*3600))
     export INCHOUR=$((FHMAX-FHINI))
   fi
+
   if [[ $FHMAX -lt 10 ]] ; then export FHMAX=0$FHMAX ; fi
-#
+
 ###########################################################################
 # export FNTSFA=$sst_filename         ;# Observed or predicted SST grib file
 ## export FTSFS=99999.0                ;# e-folding time for SST
