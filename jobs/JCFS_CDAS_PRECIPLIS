@@ -6,7 +6,7 @@ set -xa
 # Specify NET and RUN Name and model
 ####################################
 export NET=cfs
-export RUN=cmap
+export RUN=cdas
 
 export host=${host:-`hostname | cut -c1`}
 export jlogfile=${jlogfile:-/dev/null}
