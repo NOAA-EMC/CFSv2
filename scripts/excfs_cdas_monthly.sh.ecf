@@ -1193,7 +1193,7 @@ if [ $dohpssmeans = "YES" ] ; then
           export err=$rc; err_chk
         fi
 
-        cnt=`$WGRIB2 -s $file | wc -l`
+        cnt=`$WGRIB2  -set_version_ftime 1 -s $file | wc -l`
         if [[ $cnt -ne $excnt ]] ; then
           echo "ERROR: $file contains $cnt records - expected $excnt"
           ((rc+=1))
@@ -1241,7 +1241,7 @@ if [ $dohpssmeans = "YES" ] ; then
             export err=$rc; err_chk
           fi
 
-          cnt=`$WGRIB2 -s $file | wc -l`
+          cnt=`$WGRIB2  -set_version_ftime 1 -s $file | wc -l`
           if [[ $cnt -ne $excnt ]] ; then
             echo "ERROR: $file contains $cnt records - expected $excnt"
             ((rc+=1))
@@ -1415,7 +1415,7 @@ if [ $dohpsstime = "YES" ] ; then
         export err=$rc; err_chk
       fi
 
-      cnt=`$WGRIB2 -s $file | wc -l`
+      cnt=`$WGRIB2  -set_version_ftime 1 -s $file | wc -l`
       if [[ $cnt -ne $excnt ]] ; then
         echo "ERROR $file contains $cnt records - expected $excnt"
         ((rc+=1))
@@ -1432,7 +1432,7 @@ if [ $dohpsstime = "YES" ] ; then
         export err=$rc; err_chk
       fi
 
-      cnt=`$WGRIB2 -s $file | wc -l`
+      cnt=`$WGRIB2  -set_version_ftime 1 -s $file | wc -l`
       if [[ $cnt -ne $excnt ]] ; then
         echo "ERROR $file contains $cnt records - expected $excnt"
         ((rc+=1))
