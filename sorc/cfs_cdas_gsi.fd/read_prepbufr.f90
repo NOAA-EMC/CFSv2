@@ -152,7 +152,7 @@ subroutine read_prepbufr(nread,ndata,nodata,infile,obstype,lunout,twindin,sis,&
   real(r_kind),parameter:: bmiss= 10.e10_r_kind
 
   integer(i_kind),parameter:: mxtb=5000000_i_kind
-  integer(i_kind),parameter:: nmsgmax=10000_i_kind ! max message count
+  integer(i_kind),parameter:: nmsgmax=15000_i_kind ! max message count
 
 ! Declare local variables
   logical tob,qob,uvob,spdob,sstob,pwob,psob
