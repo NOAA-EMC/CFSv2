@@ -137,6 +137,7 @@ export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
 
 # recent version of prepacqc
 export AQCX=${AQCX:-/gpfs/dell1/nco/ops/nwprod/obsproc_prep.v5.2.0/exec/prepobs_prepacqc}
+export SYNDX=${SYNDX:-/gpfs/dell1/nco/ops/nwprod/obsproc_prep.v5.2.0/exec/syndat_syndata}
 
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
 export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     
