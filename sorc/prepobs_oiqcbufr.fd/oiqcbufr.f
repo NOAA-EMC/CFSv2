@@ -4453,10 +4453,10 @@ C  -----------------------------
                            WRITE(6,'(A80)')
       ENDIF
  
-101   FORMAT('TOTAL RECORDS: ',I6)
-102   FORMAT('TOTAL REPORTS: ',I6,'  ---  STORED: ',I6)
-103   FORMAT('TOTAL OBS    : ',I6,'  ---  STORED: ',I6)
-104   FORMAT('MAX OBS/PRFLE: ',I6)
+101   FORMAT('TOTAL RECORDS: ',I8)
+102   FORMAT('TOTAL REPORTS: ',I8,'  ---  STORED: ',I8)
+103   FORMAT('TOTAL OBS    : ',I8,'  ---  STORED: ',I8)
+104   FORMAT('MAX OBS/PRFLE: ',I8)
 105   CONTINUE
  
       RETURN

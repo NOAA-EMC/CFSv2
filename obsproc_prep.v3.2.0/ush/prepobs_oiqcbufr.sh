@@ -82,48 +82,27 @@ export FORT81=obogram.out
 export FORT82=obogram.bin
 
 mpirun -n 28 $OIQCX > outout 2> errfile
-export err=$?; err_chk  
+export err=$?
+
+if [[ $err -eq 4 ]] ; then
+  echo "WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT --> non-fatal"
+  export err=0
+else
+  err_chk
+fi
 
 cat errfile >> outout
-cat outout >> oiqcbufr.out
+cat outout  >> oiqcbufr.out
 cp outout obcnt.out
-set +u
 [ -n "$pgmout" ]  &&  cat outout >> $pgmout
-set -u
 rm outout
+
 set +x
 echo
 echo 'The foreground exit status for PREPOBS_OIQCBUFR is ' $err
 echo
 set -x
-if [ "$err" -eq '4' ]; then
-msg="WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT \
---> non-fatal"
-   set +x
-   echo
-   echo "$msg"
-   echo
-   set -x
-   set +u
-   [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
-   set -u
-   err=0
-fi
-if [ -s $DATA/err_chk ]; then
-   $DATA/err_chk
-else
-   if test "$err" -gt '0'
-   then
-######kill -9 ${qid} # need a WCOSS alternative to this even tho commented out
-                     #  in ops
-      exit 555
-   fi
-fi
 
-if [ "$err" -gt '0' ]; then
-   exit 9
-else
-   mv $PRPI.oiqcbufr $PRPI
-fi
+mv $PRPI.oiqcbufr $PRPI
 
-exit 0
+exit $err
