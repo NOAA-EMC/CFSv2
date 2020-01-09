@@ -353,7 +353,7 @@
 ! GFS has the same accumulation bucket for precipitation and fluxes and it is written to header
 ! the header has the start hour information so post uses it to recontruct bucket
         tprec   = 6.
-        if(ifhr>240)tprec=12.
+        !!!!!!!!!!!!!!!!!!!!!!!!!if(ifhr>240)tprec=12.
         tclod   = tprec
         trdlw   = tprec
         trdsw   = tprec
