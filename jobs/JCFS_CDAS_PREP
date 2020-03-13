@@ -136,8 +136,9 @@ export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
                       # should be set to NO only as a last resort!!!
 
 # recent version of prepacqc
-export AQCX=${AQCX:-/gpfs/dell1/nco/ops/nwprod/obsproc_prep.v5.2.0/exec/prepobs_prepacqc}
-export SYNDX=${SYNDX:-/gpfs/dell1/nco/ops/nwprod/obsproc_prep.v5.2.0/exec/syndat_syndata}
+export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
+export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
+export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
 
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
 export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     

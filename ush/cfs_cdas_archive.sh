@@ -1455,7 +1455,8 @@ if [ $doocndiag = "YES" ] ; then
 
     #---------------------------------------------------------
     file=ocn_${oyyyy}_${omm}_${odd}_${ohh}.$CDUMP.${indate}m.nc
-    expsize=390862868
+#   expsize=390862868
+    expsize=390862884
 
     if [[ -s $file ]] ; then
       /bin/ls $file >> $hpsslist
@@ -1471,7 +1472,8 @@ if [ $doocndiag = "YES" ] ; then
 
     #---------------------------------------------------------
     file=ice_${oyyyy}_${omm}_${odd}_${ohh}.$CDUMP.${indate}m.nc
-    expsize=22454900
+#   expsize=22454900
+    expsize=22454916
 
     if [[ -s $file ]] ; then
       /bin/ls $file >> $hpsslist

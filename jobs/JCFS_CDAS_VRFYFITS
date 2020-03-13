@@ -60,7 +60,7 @@ sh setpdy.sh
 . ./PDY
 
 export CDATE=${CDATE:-${PDY}$cyc}
-
+export YYYY=`echo $PDY |cut -c1-4`
 ##############################################
 # Define COM directories
 ##############################################
@@ -114,7 +114,7 @@ err=$?; err_chk
 # tar up the fits and save in COMROT/fit2obs
 
 cd $ARCDIR
-FITARC=$COMROT/fit2obs; mkdir -p $FITARC
+FITARC=$COMROT/fit2obs/${EXPNAM}.fits/${YYYY}; mkdir -p $FITARC
 tar -cf $FITARC/$EXPNAM.fits.$CDATE *
 err=$?; err_chk
 

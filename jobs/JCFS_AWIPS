@@ -41,13 +41,14 @@ sh setpdy.sh
 
 # Input file size to check, usually file size with full records is around 38000KB to 49000KB
 export MINIMUM_SIZE=30000
+cfs_day=$PDY
 
 # Check for the latest data to use 
-if [ $cyc -eq 00 -o $cyc -eq 12 ]; then
-  cfs_day=$PDY
-else
-  cfs_day=$PDYm1
-fi
+#if [ $cyc -eq 00 -o $cyc -eq 12 ]; then
+#  cfs_day=$PDY
+#else
+#  cfs_day=$PDYm1
+#fi
   
 ##########################################################
 # define cfs directories/scripts/executables            

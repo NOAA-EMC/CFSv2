@@ -51,8 +51,6 @@ export FIXcfs=$HOMEcfs/fix
 ##############################################
 export COMROT=$COMROOT/${NET}/${envir}
 export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-mkdir -m775 -p $COMOUT
 
 ##############################################
 # Define GES directories

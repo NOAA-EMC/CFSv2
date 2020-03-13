@@ -84,6 +84,19 @@ echo '--------------------------------------------------------------------------
 echo
 set -x
 
+#########################################################
+##  generate sstgrb index file
+#########################################################
+   [ -f errfile ] && rm errfile
+   $GRBINDEX ${COMSP}sstgrb ${COMSP}sstgrb.index 2> errfile
+   errindx=$?
+   [ "$errindx" -ne '0' ] && cat errfile
+   [ -f errfile ] && rm errfile
+
+   if [ $SENDDBN = YES ]; then
+     $DBNROOT/bin/dbn_alert MODEL CDAS1_SSTOIQD_GRB $job ${COMSP}sstgrb
+   fi
+
 pgm=$(basename $0)
 
 ########################################################
@@ -178,45 +191,6 @@ pgm=$(basename $0)
       err_exit
    fi
 
-########################################################
-########################################################
-#  copy sstgrb           from $COM_SSTOIQD
-#  generate sstgrb index file
-########################################################
-########################################################
-   sstgrb=${COM_SSTOIQD}.$PDY/sstoiqd.sst.grb
-   sstold=${COM_SSTOIQD}.$PDYm1/sstoiqd.sst.grb
-
-   if [ -s $sstgrb ]; then
-      cp $sstgrb ${COMSP}sstgrb.oisst
-      msg="todays sst grib file located and copied to /com"
-      postmsg "$jlogfile" "$msg"
-   elif [ -s $sstold ]; then
-      cp $sstold ${COMSP}sstgrb.oisst
-      msg="**todays sst grib file not located - copy 1-day old file"
-      postmsg "$jlogfile" "$msg"
-   else
-      set +x
-      echo " "
-      echo " #########################################"
-      echo " cannot locate oisst grib file            "
-      echo " #########################################"
-      echo " "
-      set -x
-      ##msg="**CANNOT LOCATE SST GRIB FILE --> EXIT DATA DUMP"
-      ##postmsg "$jlogfile" "$msg"
-      ##err_exit
-   fi
-
-   [ -f errfile ] && rm errfile
-   $GRBINDEX ${COMSP}sstgrb ${COMSP}sstgrb.index 2> errfile
-   errindx=$?
-   [ "$errindx" -ne '0' ] && cat errfile
-   [ -f errfile ] && rm errfile
-
-   if [ $SENDDBN = YES ]; then
-     $DBNROOT/bin/dbn_alert MODEL CDAS1_SSTOIQD_GRB $job ${COMSP}sstgrb
-   fi
 fi   #  endif $PROCESS_GRIBFLDS
 
 

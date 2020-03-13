@@ -127,7 +127,7 @@ mkdir -m 775 -p $COMOUT
 ##############################################
 # Define GES directories
 ##############################################
-export GESdir=$GESROOT/cdas.$PDY
+export GESdir=$GESROOT/$envir/cdas.$PDY
 mkdir -m 775 -p $GESdir
 ####################################
 # Specify Special Fcst Vars

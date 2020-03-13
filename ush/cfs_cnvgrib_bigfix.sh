@@ -81,6 +81,18 @@ if [ $fsize -gt $TWOGBS ] ; then
   parts=$(($fsize / $TWOGBS + 1))
   echo "parts: $parts"
 
+  ###
+  evenlrec=$((lrec % 2))             # is lrec even
+  evenparts=$((parts % 2))          # is parts even
+
+  if [ $evenlrec -eq 0 ] ; then     # if even number of records
+    if [ $evenparts -ne 0 ] ; then   # and odd number of parts
+      ((parts+=1))                       # make even number of parts
+      echo "even/odd mismatch: added 1 to parts: $parts"
+    fi
+  fi
+  ###
+
   segsz=$(($lrec / $parts))
   segmod=$(($lrec % $parts))    # if segmod = 0 then no additional end part
   echo "segsz: $segsz, segmod: $segmod"

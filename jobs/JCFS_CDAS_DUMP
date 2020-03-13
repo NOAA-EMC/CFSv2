@@ -71,7 +71,6 @@ export DCOMROOT=/gpfs/dell1/nco/ops/dcom/prod   ## dells dcom
 export TANK_GRIBFLDS=${TANK_GRIBFLDS:-$DCOMROOT}             
 export COM_GDAS=${COM_GDAS:-$(compath.py com/gfs/prod)}
 export COM_ENGICE=${COM_ENGICE:-$(compath.py com/omb/prod/sice)}       ## after 20190613
-export COM_SSTOIQD=${COM_SSTOIQD:-$(compath.py com/omb/prod/sstoiqd)}  ## will this go away ??
 export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc}
 export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc}
 
