@@ -45,11 +45,11 @@ export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY/$cyc} # GDAS file directory
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
 postmsg "$jlogfile" "$msg"
 
-# 
 [ "$SENDCOM" = 'NO' ]  &&  COMSP=$DATA/
 
-
 # get grib fields
+# ---------------
+
 if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
 
 # create snowdepth.global.grb from AFWA snow fields
@@ -87,6 +87,7 @@ set -x
 #########################################################
 ##  generate sstgrb index file
 #########################################################
+
    [ -f errfile ] && rm errfile
    $GRBINDEX ${COMSP}sstgrb ${COMSP}sstgrb.index 2> errfile
    errindx=$?
@@ -101,69 +102,10 @@ pgm=$(basename $0)
 
 ########################################################
 ########################################################
-#  copy snogrb (0.5 deg) from $TANK_GRIBFLDS
-#  copy snogrb_t574      from $TANK_GRIBFLDS
 #  copy engicegrb        from $COM_ENGICE
 ########################################################
 ########################################################
 
-   #snogrb=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.global.grb
-   #snoold=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.global.grb
-
-   snogrb=$COMOUT/snowdepth.global.grb_$cyc
-   snoold=$COMOUT/snowdepth.global.grb_$cyc
-
-   if [ -s $snogrb ]; then
-      cp $snogrb ${COMSP}snogrb
-      msg="todays 0.5 degree snow grib file located and copied to /com"
-      postmsg "$jlogfile" "$msg"
-   elif [ -s $snoold ]; then
-      cp $snoold ${COMSP}snogrb
-      msg="**todays 0.5 degree snow grib file not located - copy 1-day old file"
-      postmsg "$jlogfile" "$msg"
-   elif [ -s  $COMGDAS/$gdas1.t${cyc}z.snogrb ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb ${COMSP}snogrb
-   else
-      set +x
-      echo " "
-      echo " #####################################################"
-      echo " cannot locate 0.5 degree snow grib file - fatal error"
-      echo " #####################################################"
-      echo " "
-      set -x
-      msg="**CANNOT LOCATE 0.5 DEGREE SNOW GRIB FILE --> EXIT DATA DUMP"
-      postmsg "$jlogfile" "$msg"
-      err_exit
-   fi
-
-   #snogrb_t574=$TANK_GRIBFLDS/$PDY/wgrbbul/snowdepth.t574.grb
-   #snoold_t574=$TANK_GRIBFLDS/$PDYm1/wgrbbul/snowdepth.t574.grb
-
-   snogrb_t574=$COMOUT/snowdepth.t574.grb_$cyc ## t574 snowdepth file
-   snoold_t574=$COMOUT/snowdepth.t574.grb_$cyc ## t574 snowdepth file
-
-   if [ -s $snogrb_t574 ]; then
-      cp $snogrb_t574 ${COMSP}snogrb_t574
-      msg="todays T574 snow grib file located and copied to /com"
-      postmsg "$jlogfile" "$msg"
-   elif [ -s $snoold_t574 ]; then
-      cp $snoold_t574 ${COMSP}snogrb_t574
-      msg="**todays T574 snow grib file not located - copy 1-day old file"
-      postmsg "$jlogfile" "$msg"
-   elif [ -s $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ]; then
-      cp $COMGDAS/$gdas1.t${cyc}z.snogrb_t574 ${COMSP}snogrb_t574
-   else
-      set +x
-      echo " "
-      echo " ###############################################"
-      echo " cannot locate T574 snow grib file - fatal error"
-      echo " ###############################################"
-      echo " "
-      set -x
-      msg="**CANNOT LOCATE T574 SNOW GRIB FILE --> EXIT DATA DUMP"
-      postmsg "$jlogfile" "$msg"
-      err_exit
-   fi
 
    engicegrb=${COM_ENGICE}.$PDY/engice.t00z.grb
    engiceold=${COM_ENGICE}.$PDYm1/engice.t00z.grb
@@ -192,7 +134,6 @@ pgm=$(basename $0)
    fi
 
 fi   #  endif $PROCESS_GRIBFLDS
-
 
 # get gdas files
 if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
