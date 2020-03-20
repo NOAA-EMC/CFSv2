@@ -6,10 +6,7 @@ set -uax
 # Specify directory paths for this job
 ######################################
 
-export TANKDIR=${DCOMROOT}
-
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOLD=$COMROOT/${NET}/${envir}/${RUN}.${PDYm1}
+export TANKDIR=${DCOMROOT}/prod
 
 export HOMEgrib=$HOMEcfs/EMC_land_utilities
 export EXECgrib=$HOMEgrib/exec

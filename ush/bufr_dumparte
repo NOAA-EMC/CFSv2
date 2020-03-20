@@ -9,7 +9,7 @@ if [[ $3 = tesac && $# -eq 3 ]]; then
 
   export DUPC=OFF
   export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-  export ARGOTANK=${ARGOTANK:-$DCOMROOT} 
+  export ARGOTANK=${ARGOTANK:-$DCOMROOT/prod} 
   export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
 
   rm -f tesac.ibm tesac.org argomods

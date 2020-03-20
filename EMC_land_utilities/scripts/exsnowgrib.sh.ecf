@@ -5,8 +5,7 @@ echo "JSNOWGRB - This jobs runs the Snow Depth Analyses "
 echo "History: - 01 Mar 2000 - converted to run on the IBM SP"
 #############################################################
 
-COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-COMOLD=$COMROOT/${NET}/${envir}/${RUN}.${PDYm1}
+COMOLD=${COMOLD:-${COMINm1:?}}
 
 # this function is invoked if there is a problem creating
 # gaussian snow data.  in this case, the previous days
@@ -175,8 +174,8 @@ then
         cp $OUTPUT_FILE       $COMOUT                      
         cp $OUTPUT_FILE.grib2 $COMOUT                         
       fi
-      if [ -e ${COMOUT}/$OUTPUT_FILE.grib2 ] ; then
-        if test "$SENDDBN_GB2" = 'YES'
+      if [ -e ${COMOUT}/$OUTPUT_FILE.grib2 -a $cyc = 18 ] ; then
+        if test "$SENDDBN" = 'YES'
         then
           $DBNROOT/bin/dbn_alert MODEL SNOW_GB_GB2 $job ${COMOUT}/${OUTPUT_FILE}.grib2
         fi
@@ -273,11 +272,10 @@ echo "The date of the snowdepth.global.grb file is $snow_date"
 echo
 set -x
 
-diff_date=$PDYm5
-
 # abort the job if snow date earlier than -5days
 # ----------------------------------------------
 
+diff_date=$PDYm5
 if [ "$snow_date" -lt "$diff_date" ];then
     msg=" date of snowdepth.global.grb file is BAD; abort"
     postmsg "$jlogfile" "$msg"
@@ -285,7 +283,7 @@ if [ "$snow_date" -lt "$diff_date" ];then
 fi
 
 if [ "$err" -ne '0' ]; then
-    msg="$pgm r.c.=$err; copy most recent snowdepth.global.grb file into todays wgrbbul tank"
+    msg="WARNING: $pgm r.c.=$err; copy most recent snowdepth.global.grb file into todays COMOUT"
     postmsg "$jlogfile" "$msg"
 else
   msg="0.5 DEGREE GLOBAL SNOW DATA PROGRAM COMPLETED NORMALLY"
@@ -311,15 +309,5 @@ then
   export err=99; err_chk 
 fi
 
-####################################################################
-# GOOD RUN
-set +x
-echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
-echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
-echo "************** JOB COMPLETED NORMALLY ON THE IBM SP "
-set -x
-#####################################################################
-
-msg="JOB COMPLETED NORMALLY"
-echo $msg
+msg="$0 completed normally"
 postmsg "$jlogfile" "$msg"

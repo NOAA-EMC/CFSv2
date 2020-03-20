@@ -335,10 +335,9 @@ while [ $cymd -le $cymd2 ] ; do
 
 #--Build dcom file spec
 
-    [ -z "$DCOMROOT" ] && DCOMROOT=/dcom
-    DCOM=${DCOMROOT}
+    DCOM=${DCOMROOT}/prod
 
-    TANK=$DCOM ####/us007003
+    TANK=$DCOM 
     [ -n "$userTANK" ] && TANK=$userTANK
 
 

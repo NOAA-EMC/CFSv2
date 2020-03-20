@@ -78,7 +78,7 @@ set -xua
 
 ARCHSYND=${ARCHSYND:-$COMROOT/arch/prod/syndat}
 HOMENHC=${HOMENHC:-/nhc/save/guidance/storm-data/ncep}
-TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/us007003}
+TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/prod}
 slmask=${slmask:-$FIXSYND/syndat_slmask.t126.gaussian}
 copy_back=${copy_back:-YES}
 SENDCOM=${SENDCOM:-YES}
