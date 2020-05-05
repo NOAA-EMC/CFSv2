@@ -232,7 +232,7 @@ until [[ $date -gt $edate ]] ; do
 done
 
 if [ -s $cmd ] ; then
-  mpirun cfp $cmd  |grep 'CFP RANK'
+  mpirun -l cfp $cmd  |grep 'CFP RANK'
   export err=$?; err_chk
 fi
 #

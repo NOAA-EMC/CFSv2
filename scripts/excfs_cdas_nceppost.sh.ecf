@@ -440,10 +440,10 @@ if [ $SENDDBN = YES ]; then
    for fhr in 01 02 03 04 05 06 06m 07 08 09; do 
      $DBNROOT/bin/dbn_alert MODEL ${run}_OCNH $job $COMOUT/${RUN}.${cycle}.ocngrbh${fhr}.grib2
      $DBNROOT/bin/dbn_alert MODEL ${run}_OCN $job $COMOUT/${RUN}.${cycle}.ocngrbf${fhr}.grib2
-#    $DBNROOT/bin/dbn_alert MODEL ${run}_OCNL $job $COMOUT/${RUN}.${cycle}.ocngrbl${fhr}.grib2
+     $DBNROOT/bin/dbn_alert MODEL ${run}_OCNL $job $COMOUT/${RUN}.${cycle}.ocngrbl${fhr}.grib2
      $DBNROOT/bin/dbn_alert MODEL ${run}_OCNH_WIDX $job $COMOUT/${RUN}.${cycle}.ocngrbh${fhr}.grib2.idx
      $DBNROOT/bin/dbn_alert MODEL ${run}_OCN_WIDX $job $COMOUT/${RUN}.${cycle}.ocngrbf${fhr}.grib2.idx
-#    $DBNROOT/bin/dbn_alert MODEL ${run}_OCNL_WIDX $job $COMOUT/${RUN}.${cycle}.ocngrbl${fhr}.grib2.idx
+     $DBNROOT/bin/dbn_alert MODEL ${run}_OCNL_WIDX $job $COMOUT/${RUN}.${cycle}.ocngrbl${fhr}.grib2.idx
    done
 fi
 ########################################################

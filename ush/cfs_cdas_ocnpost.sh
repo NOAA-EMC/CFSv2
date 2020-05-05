@@ -26,26 +26,39 @@ if [ $DO_POST = YES ] ; then
   hh=$(echo $date | cut -c9-10)
 
 
+# define the ocn and ice netcdf files
+
   export ocnfile=$OCNDIR/ocn_${yyyy}_${mm}_${dd}_${hh}${SUFOUT}$TM.nc
-  if [ ! -s $ocnfile ] ; then
-    if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-      msg="Hourly Ocean File is not available"
-      postmsg "$jlogfile" "$msg"
-      export err=1; err_chk
-    else
-      $PERR ; exit 1
-    fi
-  fi
   export icefile=$OCNDIR/ice_${yyyy}_${mm}_${dd}_${hh}${SUFOUT}$TM.nc
-  if [ ! -s $icefile ] ; then
-    if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-      msg="Hourly Ocean File is not available"
-      postmsg "$jlogfile" "$msg"
-      export err=1; err_chk
-    else
-      $PERR ; exit 1
-    fi
+
+# connect the ocnfile or time out
+
+  nslp=0
+  until [[ -s $ocnfile ]] ; do 
+  sleep 30
+  nslp=$((nslp+1))
+  if [[ $nslp -gt 20 ]]; then
+     msg="Hourly Ocean File is not available"
+     postmsg "$jlogfile" "$msg"
+     export err=1; err_chk
   fi
+  done
+
+# connect the icefile or time out
+
+  nslp=0
+  until [[ -s $icefile ]] ; do
+  sleep 30
+  nslp=$((nslp+1))
+  if [[ $nslp -gt 20 ]]; then
+     msg="Hourly Ice File is not available"
+     postmsg "$jlogfile" "$msg"
+     export err=1; err_chk
+  fi
+  done
+
+  sleep 10 ## make sure the connected files have copied completely
+
   export outfile=$DATA/ocn${SUFO}${FH}${TM}$SUFOUT
   if [ $mkmoc -eq 1 ] ; then
     export mocfile=$DATA/moc${SUFO}${FH}${TM}$SUFOUT
