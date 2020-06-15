@@ -194,8 +194,42 @@ until [[ $date -gt $edate ]] ; do
   dd=`echo $date | cut -c7-8`
   hh=`echo $date | cut -c9-10`
 
+#------------------begin nc file wait from the model-------------------------------------
+
+# define the ocn and ice netcdf files from the model
+
   export ocnfile=$OCNDIR/ocn_${yyyy}_${mm}_${dd}_${hh}$SUFOUT.nc
   export icefile=$OCNDIR/ice_${yyyy}_${mm}_${dd}_${hh}$SUFOUT.nc
+
+# connect the ocnfile or time out
+
+  nslp=0
+  until [[ -s $ocnfile ]] ; do
+  sleep 30
+  nslp=$((nslp+1))
+  if [[ $nslp -gt 20 ]]; then
+     msg="Hourly Ocean File is not available"
+     postmsg "$jlogfile" "$msg"
+     export err=1; err_chk
+  fi
+  done
+
+# connect the icefile or time out
+
+  nslp=0
+  until [[ -s $icefile ]] ; do
+  sleep 30
+  nslp=$((nslp+1))
+  if [[ $nslp -gt 20 ]]; then
+     msg="Hourly Ice File is not available"
+     postmsg "$jlogfile" "$msg"
+     export err=1; err_chk
+  fi
+  done
+
+  sleep 10 ## make sure the connected files have copied completely
+
+#------------------end of nc file wait---------------------------------------
 
   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
     ofile=$COMOUT/${RUN1}.t${cyc}z.ocngrb${SUFO}${FH}
@@ -235,9 +269,8 @@ if [ -s $cmd ] ; then
   mpirun -l cfp $cmd  |grep 'CFP RANK'
   export err=$?; err_chk
 fi
-#
-################################################################################
 
+################################################################################
 ################################################################################
 # Exit gracefully
 
