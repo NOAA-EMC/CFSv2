@@ -1,0 +1,29 @@
+CFS TRUNK UPDATED TO VERSION 2.2.5
+	
+Mon, Apr 13, 11:43 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r124 | diane.stokes@noaa.gov | 2020-04-13 15:36:24 +0000 (Mon, 13 Apr 2020) | 1 line
+Changed paths:
+   A /trunk/EMC_land_utilities/fix/global_latitudes.t382.grb
+   A /trunk/EMC_land_utilities/fix/global_longitudes.t382.grb
+   A /trunk/EMC_land_utilities/fix/global_slmask.t382.grb
+   M /trunk/EMC_land_utilities/scripts/exsnowgrib.sh.ecf
+   M /trunk/global_shared_cfs/ush/syndat_qctropcy.sh
+   M /trunk/jobs/JCFS_CDAS_DUMP
+   D /trunk/jobs/JCFS_CDAS_VRFYFITS.org
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+   M /trunk/ush/bufr_dumparte
+   M /trunk/ush/bufr_dumpmb
+   D /trunk/ush/cfs_cdas_archive.sh.P1
+   M /trunk/ush/cfs_cnvgrib_bigfix.sh
+   M /trunk/ush/cfs_snowdepth.sh
+
+Produce snowdepth grib files previously created by JISNI for public disemination (part of RFC 6652 and decommissioning of IBM phase 1&2)
+------------------------------------------------------------------------
+
+	
+	
+	
+

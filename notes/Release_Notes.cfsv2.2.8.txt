@@ -1,0 +1,13 @@
+cfs trunk updated to version 2.2.8
+	
+Wed, Jul 1, 7:10 PM (11 hours ago)
+	
+SVN Log:
+-----------------------------------------------------------------------------------------
+r128 | william.boggs@noaa.gov | 2020-07-01 23:07:58 +0000 (Wed, 01 Jul 2020) | 1 line
+Changed paths:
+   M /trunk/ush/cfs_cdas_ocnp.sh
+   M /trunk/ush/cfs_cdas_ocnpost.sh
+
+Modify timeouts for CFS CDAS (RFC 7006)
+-----------------------------------------------------------------------------------------

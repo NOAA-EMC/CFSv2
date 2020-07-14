@@ -1,0 +1,12 @@
+CFS TRUNK UPDATED TO VERSION 2.2.6
+	
+Apr 28, 2020, 8:16 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r126 | simon.hsiao@noaa.gov | 2020-04-29 00:14:07 +0000 (Wed, 29 Apr 2020) | 1 line
+Changed paths:
+   M /trunk/scripts/excfs_cdas_nceppost.sh.ecf
+
+RFC #6785 Turn back on alert for cdas1.tCCz.ocngrblHH.grib2
+------------------------------------------------------------------------

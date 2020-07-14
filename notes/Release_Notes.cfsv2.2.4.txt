@@ -1,0 +1,12 @@
+CFS TRUNK UPDATED TO VERSION 2.2.4
+	
+Wed, Mar 18, 10:41 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r120 | simon.hsiao@noaa.gov | 2020-03-18 14:36:35 +0000 (Wed, 18 Mar 2020) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_GDASANAL
+
+RFC 6546 - WCOSS update dev jcfs_cleanup job and correct GESdir
+------------------------------------------------------------------------

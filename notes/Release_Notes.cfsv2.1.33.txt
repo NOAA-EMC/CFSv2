@@ -1,0 +1,15 @@
+CFS TRUNK UPDATED TO VERSION 2.1.33
+
+Thu, Dec 26, 2019 at 5:59 PM
+
+SVN Log:
+------------------------------------------------------------------------
+r112 | simon.hsiao@noaa.gov | 2019-12-26 22:55:47 +0000 (Thu, 26 Dec 2019) | 1 line
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2018.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2019.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2020.txt_proj
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2020.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2019.txt
+
+ ARFC 2020 CO2 prediction files updates
+------------------------------------------------------------------------

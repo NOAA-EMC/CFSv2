@@ -1,0 +1,14 @@
+CFS TRUNK UPDATED TO VERSION 2.2.3
+	
+Thu, Feb 20, 10:15 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r118 | diane.stokes@noaa.gov | 2020-02-20 15:14:23 +0000 (Thu, 20 Feb 2020) | 1 line
+Changed paths:
+   M /trunk/jobs/JCFS_CDAS_DUMP
+   M /trunk/scripts/excfs_cdas_dump.sh.ecf
+
+Remove attempts to pick up sstoiqd as part of replacing rtgssthr, gdas_sstoi, sstoiqd with NSST (RFC 6527)
+------------------------------------------------------------------------
+

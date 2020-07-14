@@ -1,0 +1,12 @@
+CFS TRUNK UPDATED TO VERSION 2.2.4.1
+	
+Mon, Apr 13, 11:01 AM
+	
+SVN Log:
+------------------------------------------------------------------------
+r122 | diane.stokes@noaa.gov | 2020-04-13 14:59:32 +0000 (Mon, 13 Apr 2020) | 1 line
+Changed paths:
+   M /trunk/fix/cfs_fix_cdas/global_satinfo.txt
+
+Turn off Metop-A MHS data in models (ARFC 20Feb2020)
+------------------------------------------------------------------------

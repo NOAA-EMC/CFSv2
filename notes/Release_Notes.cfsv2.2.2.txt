@@ -1,0 +1,18 @@
+CFS TRUNK UPDATED TO VERSION 2.2.2
+	
+Tue, Jan 14, 7:47 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r116 | simon.hsiao@noaa.gov | 2020-01-15 00:40:38 +0000 (Wed, 15 Jan 2020) | 1 line
+Changed paths:
+   A /trunk/Fit2Obs/ush/cfs_prevmpi.sh~
+   A /trunk/global_shared_cfs/CRTMv206/libcrtm_v2.0.6.a
+   M /trunk/global_shared_cfs/exec/ncep_post
+   M /trunk/global_shared_cfs/sorc/ncep_post.fd/INITPOST_GFS_SIGIO.f
+   A /trunk/global_shared_cfs/sorc/ncep_post.fd/INITPOST_GFS_SIGIO.f.bad
+
+ARFC: WCOSS fix the CFS precip accumulation in pgb grb2 products
+------------------------------------------------------------------------
+
+
