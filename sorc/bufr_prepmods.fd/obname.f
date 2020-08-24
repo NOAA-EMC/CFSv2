@@ -28,6 +28,7 @@ C  ---------------------------------------------
          NAMES(000,007) = 'METAR   '
          NAMES(001,001) = 'SHIPS   '
          NAMES(001,002) = 'DBUOY   '
+         NAMES(001,103) = 'DBUOY   '
          NAMES(001,003) = 'MBUOY   '
          NAMES(001,004) = 'LCMAN   '
          NAMES(001,005) = 'TIDEG   '

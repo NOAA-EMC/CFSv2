@@ -45,19 +45,9 @@ C-----------------------------------------------------------------------
          NEMOS(6)='DOMO DROT DROD HPLE DLATH DLONH                  '
          NEMOS(7)='CALT BUYT ANHT AHAC ANTP  MSDM                   '
          NEMOS(8)='CORN TOST TIWM MSST                              '
-         NEMOS(9)='MRMV DTCC QMST SST1                              '
-c
-c Sub surface DBUOY (DCOM b001-002) are stored in MODS DBUOY for now. 
-c  When reports are split between DBUOY & DBUOYSUB, DBUOY can be a 
-c  compressed MODS type.  For now, must be COMPRESS = .FALSE. and needs 
-c  to have NEMS = 10
-c
-c        COMPRESS = .TRUE.
-c        NEMS = 9
-         NEMOS(10)='DBSS STMP SALN DROC SPOC                        '
+         NEMOS(9)='MRMV DTCC QMST                                   '
          COMPRESS = .FALSE.
-         NEMS = 10
-c
+         NEMS = 9
       ELSEIF(SUBSET.EQ.'DBUOYSUB') THEN
          NEMOS(1)='RPID SELV YEAR MNTH DAYS HOUR MINU               '
          NEMOS(2)='RCYR RCMO RCDY RCHR RCMI                         '

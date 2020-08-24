@@ -2,15 +2,14 @@
 set -uxa
 
 export DUMPOPS=${DUMPJB:-$HOMEdump/ush/dumpjb}
+export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
+export ARGOTANK=${ARGOTANK:-$DCOMROOT/prod} 
+export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
+export DUPC=OFF
 
 if [[ $3 = tesac && $# -eq 3 ]]; then
 
   # make argo dump look like tesacs and cat with other tesacs
-
-  export DUPC=OFF
-  export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-  export ARGOTANK=${ARGOTANK:-$DCOMROOT/prod} 
-  export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
 
   rm -f tesac.ibm tesac.org argomods
 
@@ -31,6 +30,14 @@ if [[ $3 = tesac && $# -eq 3 ]]; then
   ls -l argomods 
   ls -l tesac.ibm
   echo
+
+elif [[ $3 = dbuoy && $# -eq 3 ]]; then
+
+  # dump marine subtypes 002 and 103 into dbuoy collective    
+
+  $DUMPOPS $1 $2 001 103 >/dev/null 2>&1  
+
+  mv 001.ibm dbuoy.ibm            
 
 else
   $DUMPOPS $*

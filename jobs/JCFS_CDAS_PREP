@@ -43,8 +43,7 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush  
 export FIXcfs=$HOMEcfs/fix  
 
-export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
-export HOMEobsproc_prep=$HOMEprep
+export HOMEobsproc_prep=${HOMEobsproc_prep:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
 
 export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
@@ -136,24 +135,24 @@ export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
                       # should be set to NO only as a last resort!!!
 
 # recent version of prepacqc
-export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
-export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
-export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
+#export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
+#export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
+#export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
 
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
 export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     
 export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
-export GETGES_COM=$COMROOT
-
-export NET=gdas
-export RUN=$RUN1 # for the obsproc script
+export USHOIQC=$HOMEcfs/obsproc_prep.v3.2.0/ush  
 export network_getges=cfs-cdas
+export GETGES_COM=$COMROOT
 
 env
 
 #############################################################
-# execute the script
+# execute the script - use CFS versions of makeprepbufr
 #############################################################
+
+export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
 ${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh.ecf} 
 export err=$?; err_chk
 

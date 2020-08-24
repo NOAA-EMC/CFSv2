@@ -974,7 +974,7 @@ if [ "$RELOCATION_HAS_RUN" != 'YES' -a "$GETGUESS" != 'NO' ]; then
 #   (NOTE 3: This is not done if GETGUESS is NO)
 #
 
-   if [ "$NET" = 'gfs' -o "$NET" = 'gdas' ]; then
+   if [ "$NET" = 'gfs' -o "$NET" = 'gdas' -o "$NET" = 'cfs' ]; then
       for fhr in -3 +3 ;do
          if [ $fhr = "-3" ] ; then
             sges=sgm3prep
@@ -1035,7 +1035,7 @@ elif [ "$RELOCATION_HAS_RUN" = 'YES' ]; then
 
    qual_last=".$tmmark"  # need this because gfs and gdas don't add $tmmark
                          #  qualifer to end of output sigma guess files
-   [ $NET = gfs -o $NET = gdas ]  &&  qual_last=""
+   [ $NET = gfs -o $NET = gdas -o $NET = cfs ]  &&  qual_last=""
    for file in sgm3prep sgesprep sgp3prep tcvitals.relocate.$tmmark; do
       [ $file = tcvitals.relocate.$tmmark ]  && qual_last="" # already has
                                                              #  $tmmark at end

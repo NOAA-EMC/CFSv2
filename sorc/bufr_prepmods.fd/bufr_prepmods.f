@@ -70,11 +70,12 @@ C$$$
  
       COMMON /MNEMONIC/ NEMOS(10),NEMS,COMPRESS
  
-      CHARACTER*80 NEMOS
+      CHARACTER*80 NEMOS,DBNEM
       CHARACTER*8  SUBSET,NCOSET,NCOSET0,OBNAME
       LOGICAL      COMPRESS
       REAL*8       DATES(5),ARR(MAX1,MAX2),DTCC(2)
-      REAL*8       SUBS,CLONH,CLATH
+      REAL*8       stsl(3,max2),curr(3,max2)
+      REAL*8       SUBS,CLONH,CLATH,bmiss
  
       DATA LUBFR/20/
       DATA LUNDX/21/
@@ -90,6 +91,10 @@ C-----------------------------------------------------------------------
      &           ' (WCOSS implementation)'
 
       print *
+
+      bmiss=10e10; call setbmiss(bmiss)
+
+      open(6,recl=150)
 
 C  OPEN THE INPUT AND OUTPUT BUFR FILES
 C  ------------------------------------
@@ -171,28 +176,58 @@ C  -------------------------------------------------
       CALL UFBINT(LUBFR,ARR,MAX1,MAX2,LEV2,NEMOS(N))
       if(lev2.gt.0) CALL UFBINT(LUBFO,ARR,MAX1,LEV2,IRET,NEMOS(N))
       ENDDO
+
+c  dbouy type has two possible sources of sub-surface data
+c  -------------------------------------------------------
+
+      DBNEM='DBSS STMP SALN DROC SPOC'
+
+      if(subset=='DBUOY'.and.ncoset=='NC001002') then
+         CALL UFBINT(LUBFR,ARR,MAX1,MAX2,LEV2,DBNEM)
+         IF(LEV2>0) CALL UFBINT(LUBFO,ARR,MAX1,LEV2,IRET,DBNEM)
+      endif
+
+      if(subset=='DBUOY'.and.ncoset=='NC001103') then
+         call ufbseq(lubfr,stsl,3,max2,lev0,'BBYSTSL')
+         call ufbseq(lubfr,curr,3,max2,lev1,'BBYCURR')
+         lev2=lev0+lev1
+         if(lev2>0) then
+            arr=bmiss
+            do lev=1,lev0
+            arr(1,lev)=stsl(1,lev)
+            arr(2,lev)=stsl(2,lev)
+            arr(3,lev)=stsl(3,lev)
+            enddo
+            do lev=1,lev1
+            arr(1,lev0+lev)=curr(1,lev)
+            arr(4,lev0+lev)=curr(2,lev)
+            arr(5,lev0+lev)=curr(3,lev)
+            enddo
+            if(lev2>bmiss) then
+             do lev=1,lev2
+             write(6,'(5f16.2)') arr(1:5,lev)  
+             enddo
+             pause; print*
+            endif
+            CALL UFBINT(LUBFO,ARR,MAX1,LEV2,IRET,DBNEM)
+         endif
+      endif
+
+c  tesac has a weird dtcc situation
+c  --------------------------------
  
-      IF(SUBSET.EQ.'TESAC') THEN ! TESAC HAS A WEIRD DTCC SITUATION
+      IF(SUBSET.EQ.'TESAC') THEN 
          CALL UFBINT(LUBFR,DTCC,2,1,IRET,'DTCC')
          IF(DTCC(1).NE.19) IDTCC = 1
          IF(DTCC(2).NE.19) IDTCC = 2
          CALL UFBINT(LUBFO,DTCC(IDTCC),1,1,IRET,'DTCC')
       ENDIF
  
-c Disable compression (due to problem porting to Cirrus; fails on wrcmps)
-c  (this should be revisited after update to Cirrus BLib)
-ccc   IF(.NOT.COMPRESS) CALL WRITSB(LUBFO)
-ccc   IF(     COMPRESS) CALL WRITCP(LUBFO)
-      CALL WRITSB(LUBFO)
- 
-C  CHECK FOR POSSIBLE WAVE DATA
-C  ----------------------------
- 
-C     CALL WAVES(LUBFR,IDATE,IWAVE)
- 
 C  END OF READ AND CONVERT LOOPS
 C  -----------------------------
  
+      CALL WRITSB(LUBFO)
+
       ENDDO  !  end of readSB loop
       NCOSET0 = NCOSET
       ENDDO  !  end of readMG loop

@@ -21,6 +21,8 @@ cat break > $pgmout
 
 CHGRP_RSTPROD=${CHGRP_RSTPROD:-YES}
 
+[[ $NET=cfs ]] && RUN=cdas1
+
 export COMSP=${COMSP:-$COMIN/${RUN}.${cycle}.}
 
 
