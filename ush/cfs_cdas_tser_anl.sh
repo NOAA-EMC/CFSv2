@@ -118,7 +118,7 @@ cd $RUNDIR
 
 
 SUFIN=${SUFIN:-.$CDUMP}
-SUFOUT=${SUFOUT:-$SUFIN.$yyyymm}
+SUFOUT=$SUFIN.$yyyymm
 [ $inp_file = pgbl ] && SUFOUT=".l$SUFOUT"
 [ $inp_file = flxl ] && SUFOUT=".l$SUFOUT"
 [ $inp_file = ocnl ] && SUFOUT=".l$SUFOUT"

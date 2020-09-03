@@ -385,7 +385,7 @@ export CTL=`basename $CTLFILE`
 ln -sf griddef.out fort.110
 ###cp ${PARMglobal}/nam_micro_lookup.dat ./eta_micro_lookup.dat
 
-mpirun -n 28 $POSTGPEXEC < itag > outpost_gfs_${VDATE}_${CTL} 2>&1
+mpirun -n $LSB_DJOB_NUMPROC $POSTGPEXEC < itag > outpost_gfs_${VDATE}_${CTL} 2>&1
 
 export ERR=$?
 export err=$ERR
