@@ -1,0 +1,29 @@
+set -eua
+
+export date=$1
+
+export day=$(echo $date|cut -c 1-8)
+export our=$(echo $date|cut -c 9-10)
+
+export RUN_ENVIR=cfs    
+
+export CUE2RUN=dev
+
+export ACCOUNT=CFS-T2O
+
+export ARCDIR=/gpfs/dell2/ptmp/Jack.Woollen/gdas/archive
+
+export COMDAY=$PWD/outputs; mkdir -p $COMDAY
+
+export HYBLEVS=/gpfs/dell1/nco/ops/nwprod/gfs.v15.2.6/fix/fix_am/global_hyblev.l65.txt
+
+export COM_INA=/gpfs/tp1/nco/ops/com/cfs/prod/gdas.$day
+export COM_INF=/gpfs/tp1/nco/ops/com/cfs/prod/cfs 
+
+export CONVNETC=NO 
+
+FITDIR=/gpfs/dell2/emc/verification/noscrub/Jack.Woollen/newnetc/Fit2Obs
+
+$PWD/subfits_dell gdas $date          
+
+

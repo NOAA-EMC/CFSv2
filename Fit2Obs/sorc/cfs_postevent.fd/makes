@@ -1,0 +1,21 @@
+#!/bin/sh
+set -aeu
+
+
+export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4"
+export NETS="$NETCDF_INCLUDE $NETCDF_LDFLAGS "
+export FFLAGS="-O3 -g -traceback"
+export FCMP="mpiifort"
+
+
+make -f Makefile_convnetc
+
+make -f Makefile_convdiag
+
+make -f Makefile_duprep
+
+make -f Makefile_combfr  
+
+make -f Makefile_splitac
+
+make -f Makefile_rembfr   

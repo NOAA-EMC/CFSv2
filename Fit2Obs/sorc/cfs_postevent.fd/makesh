@@ -1,0 +1,3 @@
+set -euax
+
+cd ..; makes dell cfs_postevent.fd

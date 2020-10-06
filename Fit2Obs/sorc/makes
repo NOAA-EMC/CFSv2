@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -u
+
+plat=$1; mkdir -p ../exec
+
+if [ $# -lt 1 ]; then
+    echo '***ERROR*** must specify machine'
+    echo ' Syntax: makes ( cray | dell | theia )'
+    exit 1
+fi
+
+if [ $plat = cray ];then
+ module load PrgEnv-intel/5.2.56
+ module load intel
+ module load sigio-intel/2.0.1
+ module load bufr-intel/11.2.0
+ module load bacio-intel/2.0.2  
+ module load w3emc-intel/2.3.0  
+ module load w3nco-intel/2.0.6  
+ module load sfcio-intel/1.0.0  
+ module load nemsio-intel/2.2.3 
+ module load sp-intel/2.0.2     
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="ftn"
+elif [ $plat = hera ]; then
+ module load intel/18.0.5.274
+ module load impi/2018.0.4
+ module use /scratch2/NCEPDEV/nwprod/NCEPLIBS/modulefiles
+ module load hdf5_parallel/1.10.6
+ module load netcdf_parallel/4.7.4
+ module load bacio/2.0.3
+ module load bufr/11.3.0
+ module load nemsio/2.2.4
+ module load sfcio/1.1.1
+ module load sigio/2.1.1
+ module load sp/2.0.3
+ module load w3emc/2.3.1
+ module load w3nco/2.0.7
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = dell ] ; then
+ module purge
+ module load EnvVars/1.0.2
+ module load lsf/10.1
+ module load ips/18.0.1.163
+ module load impi/18.0.1
+ module load sigio/2.1.0
+ module load bufr/11.2.0
+ module load bacio/2.0.2
+ module load w3emc/2.3.0
+ module load w3nco/2.0.6
+ module load sfcio/1.0.0
+ module load nemsio/2.2.3
+ module load NetCDF/4.5.0 
+ module load sp/2.0.2
+ module load w3nco 
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+elif [ $plat = orion ]; then
+ module load intel/2018.4
+ module load impi/2018.4
+ module use  /apps/contrib/NCEPLIBS/orion/modulefiles
+ module load hdf5_parallel/1.10.6
+ module load netcdf_parallel/4.7.4
+ module load sigio/2.2.0
+ module load bufr/11.3.0
+ module load bacio/2.2.0
+ module load w3emc/2.5.0
+ module load w3nco/2.1.0
+ module load sfcio/1.2.0
+ module load nemsio/2.3.0
+ module load sp/2.1.0
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="mpiifort"
+else
+ echo no recognised platform
+ exit 99
+fi
+
+module list
+
+[[ $# = 2 ]] && dirs=$2           
+[[ $# = 2 ]] || dirs="cfs_fit2obs.fd  cfs_postevent.fd  cfs_prevmpi.fd  ndate.fd"
+echo $dirs
+
+for sorc in  $dirs  
+do
+echo; echo "-------------------------------- making $sorc on $plat --------------------------------"; echo
+(cd $sorc; ./makes $plat)      
+done
+

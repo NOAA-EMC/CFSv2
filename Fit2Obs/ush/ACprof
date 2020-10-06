@@ -1,0 +1,35 @@
+set -eua
+
+COMROT=$(dirname $PRPI)            
+COMPRP=$DATA/ACprofwork; mkdir -p $COMPRP; cd $COMPRP
+
+#  locate the base files 
+
+BASE=$(basename $PRPI); [ $(echo $BASE|cut -c1-6) = prepqc ] && base=prepqc || base=prepbufr
+PRPA=$(echo $PRPI|sed -e "s/$base/prepbufr.acft_profiles/")
+[ -s $PRPI -a -s $PRPA ] || { echo $0 missing $PRPI or $PRPA; exit 999; }
+
+#  remove aircft and aircar data from prepqc and replace with rewritten profile data
+
+rm -f $BASE*
+
+ln -sf $PRPI          fort.20
+ln -sf $BASE.a        fort.50
+ln -sf /dev/null      fort.51
+echo AIRCFT|$EXECcfs/rembfr 
+
+ln -sf $BASE.a        fort.20
+ln -sf $BASE.b        fort.50
+ln -sf /dev/null      fort.51
+echo AIRCAR|$EXECcfs/rembfr 
+
+#  split the aircraft profiles back into single levels
+
+ln -sf $PRPA   fort.20
+ln -sf $BASE.c fort.50
+$EXECcfs/splitac
+
+cat $BASE.b $BASE.c > $BASE
+
+echo $PWD/$BASE
+

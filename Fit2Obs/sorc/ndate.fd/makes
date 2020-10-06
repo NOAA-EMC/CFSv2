@@ -1,0 +1,10 @@
+#!/bin/sh
+set -aeu
+
+export LIBD=/scratch2/NCEPDEV/nwprod/NCEPLIBS
+export LIBS="$W3NCO_LIB4 $BUFR_LIB4"
+export FFLAGS="-O3 -g -traceback"
+export FCMP="ifort"
+
+make -f Makefile
+
