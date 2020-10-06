@@ -1,8 +1,0 @@
-SRCS=   rembfr.f
-OBJS=   rembfr.o
-FC=     $(FCMP)
-CMD=    rembfr    
-all:    $(CMD)
-$(CMD): $(SRCS)
-	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 
-	mv $(CMD) ../../exec

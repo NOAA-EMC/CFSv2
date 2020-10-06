@@ -1,8 +1,0 @@
-SRCS=  	  combfr.f
-OBJS=  	  combfr.o
-FC=	$(FCMP)
-CMD=	cfs_combfr    
-all:	$(CMD)
-$(CMD):	$(SRCS)
-	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 
-	mv $(CMD) ../../exec

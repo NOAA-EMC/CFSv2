@@ -1,9 +1,0 @@
-SRCS=	read_convdiag2.f convdiag.f
-OBJS=	read_convdiag2.o convdiag.o
-FC=	$(FCMP) -FR 
-CMD=	cfs_post_convdiag    
-
-all:	$(CMD)
-$(CMD):	$(SRCS)
-	$(FC)  -o $(@) $(SRCS) $(FFLAGS) $(LIBS)
-	mv $(CMD) ../../exec

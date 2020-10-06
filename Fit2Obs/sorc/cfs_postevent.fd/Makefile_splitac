@@ -1,8 +1,0 @@
-SRCS=   splitac.f  
-OBJS=   splitac.o  
-FC=	$(FCMP)
-CMD=    splitac   
-all:    $(CMD)
-$(CMD): $(SRCS)
-	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 
-	mv $(CMD) ../../exec

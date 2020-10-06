@@ -1,8 +1,0 @@
-SRCS=    duprep.f
-OBJS=    duprep.o
-FC=	$(FCMP)
-CMD=      cfs_duprep    
-all:      $(CMD)
-$(CMD):   $(SRCS)
-	$(FC)    -o $(@) $(SRCS) $(FFLAGS) $(LIBS) 
-	mv $(CMD) ../../exec
