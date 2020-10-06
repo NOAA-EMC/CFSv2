@@ -11,7 +11,7 @@ module load bacio/2.0.2
 module load nemsio/2.2.3
 module load sp/2.0.2
 module load NetCDF/3.6.3
-module load bufr/11.2.0
+module load bufr/11.3.0
 module load ip/3.0.1
 module load sfcio/1.0.0
 module load sigio/2.0.1
