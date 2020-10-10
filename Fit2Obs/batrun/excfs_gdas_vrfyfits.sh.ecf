@@ -60,8 +60,9 @@ if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
   export sfc1=$COMLIC/gdas.t${hh}z.atmanl.$suffix
   export CNVS=$COMLIC/gdas.t${hh}z.cnvstat
 elif [[ $RUN_ENVIR = cfs ]]; then
+  tzz=t${hh}z
   export PRPI=$COMLIC/cdas1.$tzz.prepbufr       
-  export PRPO=$COMLOX/cdas1.$tzz.prepqa           
+  export PRPO=$COMLIC/cdas1.$tzz.prepqa           
   export PRPF=$COMLOX/cdas1.$tzz.prepqf
   export sig1=$COMLIC/cdas1.$tzz.sanl               
   export sfc1=$COMLIC/cdas1.$tzz.sfcanl 

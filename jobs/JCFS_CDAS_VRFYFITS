@@ -85,28 +85,64 @@ env
 # execute the updated fit script for cfs and gfs
 #############################################################
 
-fitdir=$HOMEcfs/Fit2Obs/batrun
-TMPDIR=$DATAROOT/fit2obs.$$; mkdir -p $TMPDIR
+HOMEf2o=$HOMEcfs/Fit2Obs
+EXECf2o=$HOMEf2o/exec
+fitdir=$HOMEf2o/batrun
 
+TMPDIR=$DATAROOT/fit2obs.$$; mkdir -p $TMPDIR
 export OMP_NUM_THREADS=${FITOMP:-1}
 export MPIRUN="mpirun -n 3"
 export KMP_AFFINITY=disabled
 
-export KEEPDATA=YES 
+export KEEPDATA=${KEEPDATA:-NO}
 
 export NEMS=${NEMS:-YES}   
 export PRVT=${PRVT:-$HOMEcfs/fix/cfs_fix_cdas/prepobs_errtable.global}
 export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 
-##############################################################
-# run the fits for this time for the CFS and the GFS models 
-##############################################################
+################################################################
+# Run the fits for this time for the CFS and the GFS models 
+# --------------------------------------------------------------
+# The vars COM_INA and COM_INF are quoted strings which evaluate
+# at runtime in Fit2Obs processing. They are 
+# pathname templates which may need to be changed. Also the tags
+# which cycle EXPNAM are preset configs for different models
+# and they might be adjusted too.
+#################################################################
 
-for EXPNAM in CFS GFS; do
-[[ $EXPNAM = GFS ]] && COMFIT=$COMROOT/gfs/prod
-[[ $EXPNAM = GFS ]] && ACPROFit=YES  
-[[ $EXPNAM = CFS ]] && COMFIT=$COMROOT/cfs/${envir}
-[[ $EXPNAM = CFS ]] && ACPROFit=NO 
+for EXPNAM in CFS GFS ; do
+
+if [[ $EXPNAM = GFS ]] ; then
+   COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc'
+   COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz'
+   PREX=$EXECf2o/cfs_prevmpi
+   COMFIT=$COMROOT/gfs/prod
+   OMP_NUM_THREADS=1
+   RUN_ENVIR=nemsio
+   ACPROFit=YES  
+   CONVNETC=NO
+fi
+if [[ $EXPNAM = GFS16 ]] ; then
+   COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc/atmos'
+   COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz/atmos'
+   PREX=$EXECf2o/cfs_prevmpi
+   COMFIT=$COMROOT/gfs/prod
+   OMP_NUM_THREADS=1
+   RUN_ENVIR=netcdf
+   ACPROFit=YES  
+   CONVNETC=YES
+fi
+if [[ $EXPNAM = CFS ]] ; then
+   COM_INA='$COMROOT/cfs/prod/cdas.$PDY'
+   COM_INF='$COMROOT/cfs/prod/cfs/cfs.$fdy/$fzz/6hrly_grib_01'
+   PREX=$EXECcfs/cfs_prevmpi
+   COMFIT=$COMROOT/cfs/prod
+   OMP_NUM_THREADS=10
+   RUN_ENVIR=cfs 
+   ACPROFit=NO   
+   CONVNETC=NO
+fi
+
 ARCDIR=$DATA/$EXPNAM.fits
 time $fitdir/runfits $EXPNAM $CDATE $COMFIT
 err=$?; err_chk
