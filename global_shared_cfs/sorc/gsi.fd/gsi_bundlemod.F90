@@ -4,6 +4,9 @@
 ! !MODULE:  GSI_BundleMod --- GSI Bundle
 !
 ! !INTERFACE:
+! ! program change log:
+! ! 2018-01-18 G. Ge: change pointer,intent(out) to pointer,intent(inout)
+! !                   to solve the GSI crash under INTEL v18+
 
 module GSI_BundleMod
    
@@ -1921,7 +1924,7 @@ CONTAINS
 
 ! !OUTPUT PARAMETERS:
 
-    real(r_double),pointer,intent(out) :: pntr(:,:)  ! actual pointer to individual field
+    real(r_double),pointer,intent(inout) :: pntr(:,:)  ! actual pointer to individual field
     integer(i_kind),       intent(out) :: istatus  ! status error code
 
 ! !DESCRIPTION: Retrieve pointer to specific rank-2 field.
@@ -1962,7 +1965,7 @@ CONTAINS
 
 ! !OUTPUT PARAMETERS:
 
-    real(r_single),pointer,intent(out) :: pntr(:,:)  ! actual pointer to individual field
+    real(r_single),pointer,intent(inout) :: pntr(:,:)  ! actual pointer to individual field
     integer(i_kind),intent(out) :: istatus  ! status error code
 
 ! !DESCRIPTION: Retrieve pointer to specific rank-2 field.
@@ -2002,7 +2005,7 @@ CONTAINS
 
 ! !OUTPUT PARAMETERS:
 
-    real(r_double),pointer,intent(out) :: pntr(:,:,:)  ! actual pointer to individual field
+    real(r_double),pointer,intent(inout) :: pntr(:,:,:)  ! actual pointer to individual field
     integer(i_kind),intent(out) :: istatus  ! status error code
 
 ! !DESCRIPTION: Retrieve pointer to specific rank-3 field.
@@ -2042,7 +2045,7 @@ CONTAINS
 
 ! !OUTPUT PARAMETERS:
 
-    real(r_single),pointer,intent(out) :: pntr(:,:,:)  ! actual pointer to individual field
+    real(r_single),pointer,intent(inout) :: pntr(:,:,:)  ! actual pointer to individual field
     integer(i_kind),intent(out) :: istatus  ! status error code
 
 ! !DESCRIPTION: Retrieve pointer to specific rank-3 field.

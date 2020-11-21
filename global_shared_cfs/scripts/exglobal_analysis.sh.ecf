@@ -538,15 +538,19 @@ export ABIASPC=${12:-${ABIASPC}}
 export ABIASAIR=${13:-${ABIASAIR}}
 export IGEN=${14:-${IGEN:-0}}
 export ABIASe=${15:-${ABIASe:-satbias_int.out}}
+
 #  Directories.
-export FIXgsm=${FIXgsm:-$HOMEgsm/fix/fix_am}
+export FIXgsm=${FIXgsm:-$HOMEgsm/fix}
 export EXECgsm=${EXECgsm:-$HOMEgsm/exec}
 export USHgsm=${USHgsm:-$HOMEgsm/ush}
 export FIXgsi=${FIXgsi:-$HOMEgsi/fix}
-export EXECgsi=${EXECgsi:-$HOMEgsi/exec/exec}
+export EXECgsi=${EXECgsi:-$HOMEgsi/exec}
+
 export DATA=${DATA:-/dev/null}
 export COMIN=${COMIN:-/dev/null}
 export COMOUT=${COMOUT:-/dev/null}
+export COMINcfs_cdas=$COMIN
+
 #  Set script / GSI control parameters
 NST_GSI=${NST_GSI:-0}                                # NSST:  indicator to control the Tr Analysis mode
 NST_TZR=${NST_TZR:-0}                                # NSST:  indicator to control the Tzr_QC mode
@@ -820,9 +824,6 @@ $ERRSCRIPT||exit 11
 
 ################################################################################
 #  Make atmospheric analysis
-if [ $machine = IBMP6 ] ; then
- export XLSMPOPTS="parthds=$NTHREADS_GSI:stack=$NTHSTACK_GSI"
-fi
 export OMP_NUM_THREADS=$NTHREADS_GSI
 export PGM='$APRUN $DATA/$(basename $GSIEXEC)'
 export pgm=$PGM

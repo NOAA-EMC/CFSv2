@@ -1,5 +1,5 @@
 #!/bin/sh
-target=${1:-wcoss}
+target=${1:-dell}
 set -x -e
 EXECdir=../exec
 [ -d $EXECdir ] || mkdir $EXECdir
