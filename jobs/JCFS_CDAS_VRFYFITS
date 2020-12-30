@@ -110,12 +110,11 @@ export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 # and they might be adjusted too.
 #################################################################
 
-for EXPNAM in CFS GFS ; do
+for EXPNAM in CFS22 GFS15 ; do
 
-if [[ $EXPNAM = GFS ]] ; then
+if [[ $EXPNAM = GFS15 ]] ; then
    COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc'
    COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz'
-   PREX=$EXECf2o/cfs_prevmpi
    COMFIT=$COMROOT/gfs/prod
    OMP_NUM_THREADS=1
    RUN_ENVIR=nemsio
@@ -125,19 +124,17 @@ fi
 if [[ $EXPNAM = GFS16 ]] ; then
    COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc/atmos'
    COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz/atmos'
-   PREX=$EXECf2o/cfs_prevmpi
    COMFIT=$COMROOT/gfs/prod
    OMP_NUM_THREADS=1
    RUN_ENVIR=netcdf
    ACPROFit=YES  
    CONVNETC=YES
 fi
-if [[ $EXPNAM = CFS ]] ; then
+if [[ $EXPNAM = CFS22 ]] ; then
    COM_INA='$COMROOT/cfs/prod/cdas.$PDY'
    COM_INF='$COMROOT/cfs/prod/cfs/cfs.$fdy/$fzz/6hrly_grib_01'
-   PREX=$EXECcfs/cfs_prevmpi
    COMFIT=$COMROOT/cfs/prod
-   OMP_NUM_THREADS=10
+   OMP_NUM_THREADS=9 
    RUN_ENVIR=cfs 
    ACPROFit=NO   
    CONVNETC=NO

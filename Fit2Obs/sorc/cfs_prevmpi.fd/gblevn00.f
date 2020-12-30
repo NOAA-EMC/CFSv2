@@ -580,6 +580,7 @@ C  ------------------------------------------------------------------
 
             iunitf=20
             CALL SELECTFILE(IUNITF,INPTYP)
+            if(inptyp==0) call bort('bad inptyp from selectfile')
             rsfc=(rsfc.and.inptyp==1)
 
             DO KBAK=1,NBAK

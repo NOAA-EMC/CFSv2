@@ -508,8 +508,8 @@ set -x
 
 
 # save standard output
-cat break $pgmout break > allout
-cat allout
+# cat break $pgmout break > allout
+# cat allout
 # rm allout
 
 sleep 10

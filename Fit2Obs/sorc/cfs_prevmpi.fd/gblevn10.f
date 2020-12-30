@@ -16,10 +16,10 @@ C***********************************************************************
       TYPE(SIGIO_DATM) :: DATM
 
       INTEGER*4 IDVC,IDSL,NVCOORD,SFCPRESS_ID,THERMODYN_ID
-      INTEGER*4 IRET,IRET1,IRETS,IMJM4,KM4,IDVM,NTRAC,IUNIT4(2)
+      INTEGER*4 IRET,IRET1,IRETS,IMJM,KM4,IDVM,NTRAC,IUNIT4(2)
 
       INTEGER KFILES,IFILE,JFILE,IDATGS_COR,JCAP,JCAP1,JCAP2,JCAP1X2,
-     $ MDIMA,MDIMB,MDIMC,IROMB,MAXWV,IDIR,NS,I,J,K,L,II,JJ,IB,IE
+     $ MDIMA,MDIMB,MDIMC,IROMB,MAXWV,IDIR,NS,I,J,K,L,II,JJ,KK,IB,IE
      $ ,latb,lonb  
 
       INTEGER IDATE(8,2),JDATE(8,2),KDATE(8,2),KINDX(2)
@@ -31,14 +31,15 @@ C***********************************************************************
 
       DATA COORD /'SIGMA ','HYBRID','GENHYB'/
 
-      REAL,         ALLOCATABLE :: cofs(:,:),     cofv(:,:,:)
-      REAL,         ALLOCATABLE :: cofs_f(:,:,:), cofv_f(:,:,:,:)
-      REAL (KIND=4),ALLOCATABLE :: grds(:,:,:),   grdv(:,:,:,:),
-     $                             wrk1(:,:),     wrk2(:,:)
+      REAL, ALLOCATABLE :: cofs(:,:),     cofv(:,:,:)
+      REAL, ALLOCATABLE :: cofs_f(:,:,:), cofv_f(:,:,:,:)
+      REAL, ALLOCATABLE :: grds(:,:,:),   grdv(:,:,:,:)
+      REAL, ALLOCATABLE :: wrk1(:,:),     wrk2(:,:)
+      REAL, ALLOCATABLE :: dprs(:,:),ak5(:),bk5(:)
 
-      IMAX  = IM
-      JMAX  = JM
-      IMJM4 = IM*JM
+      IMAX = IM
+      JMAX = JM
+      IMJM = IM*JM
       IUNIT4(:) = IUNITF(:)
 
       IF(NBAK/=2)  THEN
@@ -147,12 +148,35 @@ C  -------------------
       if(imax<=0) then
          IMAX  = min(2304,lonb)
          JMAX  = min(1152,latb)
-         IMJM4 = IMax*JMax
-         print*,'latb,lonb=',latb,lonb
+         IMJM  = IMax*JMax
+      endif
+
+      if(kbak==1) then
+         print*
+         print*,'jcap =',jcap
+         print*,'kmax =',kmax
+         print*,'lonb =',lonb
+         print*,'latb =',latb
+         print*,'km4  =',km4 
+         print*,'idvc =',idvc
+         print*,'idvm =',idvm
+         print*,'idrt =',idrt
+         print*,'ntrac=',ntrac
+         print*
+         !!do i=1,kmax+1
+         !!print*,'a,b',i,vcoord(i,:)
+         !!enddo
+         !!print*
       endif
 
       SFCPRESS_ID  = MOD(HEAD(1)%IDVM,TEN)
       THERMODYN_ID = MOD(HEAD(1)%IDVM/TEN,TEN)
+
+      print*
+      print*,'sfcpress_id=' ,sfcpress_id
+      print*,'thermodyn_id=',thermodyn_id
+      print*
+
       IF(IDVC == 3 .AND. THERMODYN_ID == 3) THEN
          KMAXS = (NTRAC+1)*KMAX + 2
       ELSE
@@ -160,18 +184,12 @@ C  -------------------
          NTRAC = 1
       ENDIF
 
-      print*,'allocate',imax,jmax,kmax
-      ALLOCATE (iar12z(imax,jmax), iar13p(imax,jmax))
-      ALLOCATE (iar14t(imax,jmax,kmax),  iar15u(imax,jmax,kmax),
-     $          iar16v(imax,jmax,kmax),  iar17q(imax,jmax,kmax),
-     $          iarpsl(imax,jmax,kmax),  iarpsi(imax,jmax,kmax+1))
+!  allocate the background grids
 
-
-      if(idvc.eq.0)  idvc = 1  ! Reset IDVC=0 to 1 (sigma coord.)
-      IF(IDVC < 0 .or. IDVC > 3) THEN
-         PRINT *, '##GBLEVENTS/GBLEVN10: INVALID VERT COORD ID (=',IDVC
-      ENDIF
-
+      ALLOCATE (iar12z(imax,jmax)     ,  iar13p(imax,jmax)       )
+      ALLOCATE (iar14t(imax,jmax,kmax),  iar15u(imax,jmax,kmax)  )
+      ALLOCATE (iar16v(imax,jmax,kmax),  iar17q(imax,jmax,kmax)  )
+      ALLOCATE (iarpsl(imax,jmax,kmax),  iarpsi(imax,jmax,kmax+1))
 
 C  DEFINE THE OTHER RESOLUTION PARAMETERS
 C  --------------------------------------
@@ -182,8 +200,6 @@ C  --------------------------------------
       MDIMA   = JCAP1*JCAP2
       MDIMB   = MDIMA/2+JCAP1
       MDIMC   = MDIMB*2
-      !IMAX    = 384
-      !JMAX    = IMAX/2+1
  
       DLAT  = 180./(JMAX-1)
       DLON  = 360./IMAX
@@ -277,14 +293,6 @@ C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
          KFILES = 2
       ENDIF
 
-C  Allocate for sigio read
-C  -----------------------
-
-      SFCPRESS_ID  = MOD(HEAD(1)%IDVM,TEN)
-      THERMODYN_ID = MOD(HEAD(1)%IDVM/TEN,TEN)
-
-!     print *,' sfcpress_id=',sfcpress_id,' thermodyn_id=',
-!    $ thermodyn_id,' cpi(0)=',head(1)%cpi(1)
 
 !  copy the spectral coefficients into memory
 
@@ -305,15 +313,14 @@ C  -----------------------
 
          if(kbak==1) call prttime('sigio')
 
-!  store coefficients in working memory
+!  store coefficients in allocated working memory
 
       ALLOCATE (COFS(MDIMA,KMAXS),     COFV(MDIMA,KMAX,2))
       ALLOCATE (GRDS(imax,jmax,KMAXS), GRDV(imax,jmax,KMAX,2))
-      ALLOCATE (WRK1(imax*jmax,KMAX),  WRK2(imax*jmax,KMAX+1))
+      ALLOCATE (WRK1(imax*jmax,KMAX),  WRK2(imax,jmax))
 
       COFS(:,1) = DATS%HS(:)
       COFS(:,2) = DATS%PS(:)
-!$OMP PARALLEL DO PRIVATE(k)                  
       do k=1,kmax
       cofs(:,2+k)      = datm%t(:,k)
       cofs(:,kmax+2+k) = datm%q(:,k,1)
@@ -321,78 +328,79 @@ C  -----------------------
       cofv(:,k,2)      = datm%z(:,k)
       enddo
          
-!  run the transform
+!  run the transforms
 
       CALL SPTEZM(IROMB,MAXWV,IDRT,IMAX,JMAX,KMAXS,COFS,GRDS,IDIR)
       if(kbak==1) call prttime('sptezm') 
 
       CALL SPTEZMV(IROMB,MAXWV,IDRT,IMAX,JMAX,KMAX,
      &         COFV(1,1,1),COFV(1,1,2),GRDV(1,1,1,1),GRDV(1,1,1,2),IDIR)
+
       if(kbak==1) call prttime('sptezmv') 
 
-!  copy the grids to working memory
-
-      IF( SFCPRESS_ID == 2 ) THEN   ! for enthalpy version
-         GRDS(:,:,2) = 1000.0*GRDS(:,:,2)         ! Now in Pa
-      ELSE
-         GRDS(:,:,2) = 1000.0*EXP(GRDS(:,:,2))    ! Now in Pa
-      ENDIF
+!  reverse poles in the grids
 
       DO NS=1, KMAXS
-         CALL GBLEVN11(IMAX,JMAX,GRDS(1,1,NS))
+      CALL GBLEVN11(IMAX,JMAX,GRDS(1,1,NS))
       ENDDO
-      DO J=1,JMAX
-         DO I=1,IMAX
-            IAR12Z(I,J) = GRDS(I,J,1)         ! Orography
-            IAR13P(I,J) = GRDS(I,J,2) * 0.01  ! Surface Pressure in hPa
-         ENDDO
-      ENDDO
-
-      IF(THERMODYN_ID == 3 .AND. IDVC == 3) THEN
-         GRDS(:,:,3:2+KMAX) = GRDS(:,:,3:2+KMAX) / HEAD(1)%CPI(1)
-      ENDIF
-      CALL SIGIO_MODPR(IMJM4,IMJM4,KM4,NVCOORD,IDVC,IDSL,VCOORD,IRET,
-     $                 GRDS(1,1,2),GRDS(1,1,3),PM=WRK1,PD=WRK2(1,2))
-
-      DO J=1,JMAX
-         JJ = (J-1)*IMAX
-         DO I=1,IMAX
-            WRK2(I+JJ,1) = GRDS(I,J,2)                     ! in Pa
-         ENDDO
-      ENDDO
-      DO L=1,KMAX
-         WRK2(:,L+1) = WRK2(:,L) - WRK2(:,L+1)             ! in Pa
-      ENDDO
-
-      IF(THERMODYN_ID == 3 .AND. IDVC == 3) THEN
-                                 ! Convert from enthalpy to temperature
-         GRDS(:,:,3:2+KMAX) = GRDS(:,:,3:2+KMAX) * HEAD(1)%CPI(1)
-         CALL SIGIO_CNVTDV(IMJM4,IMJM4,KM4,IDVC,IDVM,NTRAC,IRET,
-     $                     GRDS(1,1,3),GRDS(1,1,3+KMAX),HEAD(1)%CPI,1_4)
-                                 ! Convert back to virtual temperature
-         GRDS(:,:,3:KMAX+2) = GRDS(:,:,3:KMAX+2) *
-     $            (1.+(461.50/287.05-1)*GRDS(:,:,3+KMAX:2+KMAX*2))
-      ENDIF
 
       DO L=1,KMAX
       CALL GBLEVN11(IMAX,JMAX,GRDV(1,1,L,1))
       CALL GBLEVN11(IMAX,JMAX,GRDV(1,1,L,2))
       ENDDO
 
+!  process orography and surface pressure
+
+      IF( SFCPRESS_ID == 2 ) GRDS(:,:,2) = 1000.0*GRDS(:,:,2)   
+      IF( SFCPRESS_ID /= 2 ) GRDS(:,:,2) = 1000.0*EXP(GRDS(:,:,2))   
+
+      IAR12Z(:,:) = GRDS(:,:,1)         ! Orography
+      IAR13P(:,:) = GRDS(:,:,2) * 0.01  ! Surface Pressure in hPa
+
+!  possibly process virtual temperature 
+
+      IF(THERMODYN_ID == 3 .AND. IDVC == 3) THEN 
+         ! Convert back to sensible temperature
+         CALL SIGIO_CNVTDV(IMJM,IMJM,KM4,IDVC,IDVM,NTRAC,IRET,
+     .   GRDS(1,1,3),GRDS(1,1,3+KMAX),HEAD(1)%CPI,1_4)
+         ! Convert back to virtual temperature
+         GRDS(:,:,3:KMAX+2) = GRDS(:,:,3:KMAX+2) *
+     .   (1.+(461.50/287.05-1)*GRDS(:,:,3+KMAX:2+KMAX*2))
+      ENDIF
+
+!  use gsm routine to derive mid layer pressures
+
+      allocate (ak5(kmax+1),bk5(kmax+1),dprs(imjm,kmax))
+
+      do k=1,kmax+1
+      kk = (kmax+1)-(k-1)
+      ak5(kk) = vcoord(k,1) * 0.001
+      bk5(kk) = vcoord(k,2) 
+      end do
+
+      wrk2(:,:)=IAR13P(:,:)
+      call hyb2pres(imjm,kmax,ak5,bk5,wrk2,wrk1,dprs)
+      if(kbak==1) call prttime('hyb2pres')
+
+      !!print*,wrk2(1,1)
+      !!print*,wrk1(1,:)
+
+!  copy grids to working memory
+
       DO L=1,KMAX; J=1
-!$OMP PARALLEL DO PRIVATE(i)                  
       DO I=1,IMAX*jmax
       IAR14T(I,J,L) = GRDS(I,J,2+L)                     ! Temp (virtual)
       IAR15U(I,J,L) = GRDV(I,J,L,1)                     ! U component
       IAR16V(I,J,L) = GRDV(I,J,L,2)                     ! V component
       IAR17Q(I,J,L) = MAX(0.0,GRDS(I,J,2+KMAX+L)*1.0E6) ! specific humidity
-      IARPSL(I,J,L) = WRK1(I,L)*0.01                    ! 3D layer pres(hPa)
+      IARPSL(I,J,L) = WRK1(I,L)                         ! 3D layer pres(hPa)
       ENDDO
+      !!print*,iarpsl(1,1,l)
       ENDDO
-
 
       DEALLOCATE (COFS, COFV)
       DEALLOCATE (GRDS, GRDV, WRK1, WRK2)
+      DEALLOCATE ( ak5,  bk5, dprs)
 
       print *,' RETURNING from GBLENV10'
 

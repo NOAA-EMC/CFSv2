@@ -1,13 +1,86 @@
 
- &nrlacqcinput
-  trad = 3.0, 
-  l_otw = .true., 
-  l_nhonly = .false., 
-  l_doprofiles = .false.,
-  l_allev_pf = .false.,
-  l_prof1lvl  = .false.
+ &NRLACQCINPUT 
+ TRAD    = 3.000000       ,
+ L_OTW   = T,
+ L_NHONLY        = F,
+ L_DOPROFILES    = T,
+ L_ALLEV_PF      = F,
+ L_PROF1LVL      = T,
+ L_MANDLVL       = F,
+ TSPLINES        = T
  /
 
-  Cards for PREPACQC -- Version 08 May 2012
-  Here: GDAS Runs - Effective:  ********** to present
 
+c Cards for PREPACQC -- Version 04 Dec 2020
+c   Remarks:
+c      Input Namelist switches (namelist &nrlacqcinput)):
+c            trad           - time window radius in hours for outputting reports (if l_otw=T)
+c                             (default=3.0)
+c            l_otw          - logical:
+c                                 TRUE  - eliminate reports outside the time window radius
+c                                         +/- trad when writing out reports
+c                                   
+c                                 FALSE - DO NOT eliminate reports outside the time window
+c                                         radius +/- trad when writing out reports
+c                                 (default=FALSE)
+c            l_nhonly       - logical:
+c                                 TRUE  - eliminate reports outside tropics & N. Hemisphere
+c                                         when writing out reports
+c                                 FALSE - DO NOT eliminate reports outside tropics & N.
+c                                         Hemisphere when writing out reports
+c                                 (default=FALSE)
+c            l_doprofiles   - logical:
+c                                 TRUE  - create merged raob lookalike QC'd profiles from
+c                                         aircraft ascents and descents (always) and output
+c                                         these as well as QC'd merged single(flight)-level
+c                                         aircraft reports not part of any profile (when
+c                                         l_prof1lvl=T) to a PREPBUFR-like file
+c                                         **CAUTION: Will make code take quite a bit longer
+c                                                    to run!
+c                                 FALSE - SKIP creation of merged raob lookalike QC'd
+c                                         profiles from aircraft ascents and descents into
+c                                         PREPBUFR-like file
+c                                 (default=FALSE)
+c            l_allev_pf     - logical:
+c                                 TRUE  - process latest (likely NRLACQC) events plus all
+c                                         prior events into profiles PREPBUFR-like file
+c                                         **CAUTION: More complete option, but will make code
+c                                                    take longer to run!
+c                                 FALSE - process ONLY latest (likely NRLACQC) events into
+c                                         profiles PREPBUFR-like file
+c                                 (Note 1: Hardwired to FALSE if l_doprofiles=FALSE)
+c                                 {Note 2: All pre-existing events plus latest (likely
+c                                          NRLACQC) events are always encoded into full
+c                                          PREPBUFR file}
+c                                 (default=FALSE)
+c            l_prof1lvl     - logical:
+c                                 TRUE  - encode merged single(flight)-level aircraft reports
+c                                         with NRLACQC events that are not part of any
+c                                         profile into PREPBUFR-like file, along with merged
+c                                         profiles from aircraft ascents and descents
+c                                         **CAUTION: Will make code take a bit longer to run!
+c                                 FALSE - DO NOT encode merged single(flight)-level aircraft
+c                                         reports with NRLACQC events that are not part of
+c                                         any profile into PREPBUFR-like file
+c                                         - only merged profiles from aircraft ascents and
+c                                         descents will be encoded into this file
+c                                 (Note:  Applicable only when l_doprofiles=TRUE)
+c                                 (default=FALSE)
+c            l_mandlvl      - logical:
+c                                 TRUE  - interpolate obs data to mandatory levels in profile
+c                                         generation
+c                                 FALSE - DO NOT interpolate obs data to mandatory levels in
+c                                         profile generation
+c                                 (Note:  Applicable only when l_doprofiles=TRUE)
+c                                 (default=TRUE)
+c            tsplines       - logical:
+c                                 TRUE  - use Jim Purser's tension-spline interpolation
+c                                         utility to generate aircraft vertical velocity rate
+c                                         in profile generation
+c                                 FALSE - use finite-difference method based on nearest
+c                                         neighboring pair of obs which are at least one
+c                                         minute apart to generate aircraft vertical velocity
+c                                         rate in profile generation
+c                                 (Note:  Applicable only when l_doprofiles=TRUE)
+c                                 (default=TRUE)
+c

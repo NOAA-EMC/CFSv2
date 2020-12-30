@@ -53,15 +53,14 @@ elif [ $plat = dell ] ; then
  module load nemsio/2.2.3
  module load NetCDF/4.5.0 
  module load sp/2.0.2
- module load w3nco 
  export FLAGS="-O3 -g -traceback"
  export FCMP="mpiifort"
 elif [ $plat = orion ]; then
- module load intel/2018.4
- module load impi/2018.4
+ module purge
+ module load intel/2020.2
+ module load impi/2020.2
+ module load netcdf/4.7.4
  module use  /apps/contrib/NCEPLIBS/orion/modulefiles
- module load hdf5_parallel/1.10.6
- module load netcdf_parallel/4.7.4
  module load sigio/2.2.0
  module load bufr/11.3.0
  module load bacio/2.2.0
@@ -70,6 +69,8 @@ elif [ $plat = orion ]; then
  module load sfcio/1.2.0
  module load nemsio/2.3.0
  module load sp/2.1.0
+ export export NETCDF_INCLUDE="-I $NETCDF/include"
+ export export NETCDF_LDFLAGS="-L $NETCDF/lib -lnetcdf -lnetcdff"
  export FLAGS="-O3 -g -traceback"
  export FCMP="mpiifort"
 else

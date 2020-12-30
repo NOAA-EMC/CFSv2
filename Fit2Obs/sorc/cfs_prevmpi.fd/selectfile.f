@@ -30,15 +30,6 @@
          inptyp=3 ; return
       endif 
 
-! check for nemsio file
-
-      CALL NEMSIO_OPEN(GFILE,trim(CFILE),'read',IRET=IRET)
-      IF(IRET == 0) THEN
-         CALL NEMSIO_CLOSE(GFILE,IRET=IRET)
-         print *,' ===> GFS FCST/ANAL INPUT IS NEMSIO'
-         inptyp=2 ; return
-      ENDIF
-
 ! check for sigio file
 
       CALL SIGIO_RROPEN(IUNITF,CFILE,IRET)
@@ -48,6 +39,15 @@
          CALL SIGIO_SCLOSE(IUNITF,IRET)
          inptyp=1 ; return
       endif
+
+! check for nemsio file (this has a bomb in it - put it last)
+
+      CALL NEMSIO_OPEN(GFILE,trim(CFILE),'read',IRET=IRET)
+      IF(IRET == 0) THEN
+         CALL NEMSIO_CLOSE(GFILE,IRET=IRET)
+         print *,' ===> GFS FCST/ANAL INPUT IS NEMSIO'
+         inptyp=2 ; return
+      ENDIF
 
       if(inptyp==0) call bort('selecetfile cannot id filetype')
 

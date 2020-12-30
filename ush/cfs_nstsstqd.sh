@@ -25,7 +25,7 @@ while [[ $date -ge $dend ]]; do
 day=$(echo $date|cut -c 1-8)
 our=$(echo $date|cut -c 9-10)
 
-rtgfle=$COMGDAS/gdas.t${our}z.rtgssthr.grb    # note COMGDAS must be defined in dumo job script  
+rtgfle=$COM_GDAS/gdas.$day/$our/gdas.t${our}z.rtgssthr.grb    # note COM_GDAS must be defined in dump job script  
 
 if [[ ! -s $rtgfle ]] ; then    
    date=$($NDATE -$inc $date)                                           # if no sfcanl try 6 hours earlier 
