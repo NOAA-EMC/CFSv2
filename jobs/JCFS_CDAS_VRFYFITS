@@ -147,8 +147,9 @@ err=$?; err_chk
 # tar up the fits and save in COMROT/fit2obs
 
 cd $ARCDIR
-FITARC=$COMROT/fit2obs/${EXPNAM}.fits/${YYYY}; mkdir -p $FITARC
-tar -cf $FITARC/$EXPNAM.fits.$CDATE *
+EXP=$echo $EXPNAM|cut -c 1-3)
+FITARC=$COMROT/fit2obs/${EXP}.fits/${YYYY}; mkdir -p $FITARC
+tar -cf $FITARC/$EXP.fits.$CDATE *
 err=$?; err_chk
 
 done
