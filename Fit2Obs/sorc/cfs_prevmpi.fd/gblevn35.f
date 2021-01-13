@@ -19,7 +19,6 @@ C-----------------------------------------------------------------------
       equivalence  (sid,cid)
       logical      newxyt,windp,windz,geomz
 
-      DATA FMISS / 10E10 /
       DATA TZERO / 273.15 /
       DATA BETAP / .0552  /
       DATA BETA  / .00650 /
@@ -34,11 +33,12 @@ C  -------------------------------------------
 
       CALL HTERPS(xob,yob,dhr,iarps,psi);psg01=psi
 
-      xdx=bmiss; ydx=bmiss; tdx=bmiss
+      ! bmiss is defined in gblevn00
 
       BAK = BMISS
       OBX = BMISS; OBL = .false.
       S10 = 1. ! default value
+      xdx=bmiss; ydx=bmiss; tdx=bmiss
 
 C  INTERPOLATE GUESS PROFILES TO OB PRESSURES
 C  ------------------------------------------
@@ -67,7 +67,7 @@ c  x,y,t may be stored as profile values, or not
 
          IF(POB.LE.0. .OR. POB.GE.BMISS) GOTO 10
          xdr=xyt(1,l); ydr=xyt(2,l); tdr=xyt(3,l)
-         if(max(xdr,ydr,tdr)>=fmiss) then
+         if(max(xdr,ydr,tdr)>=bmiss) then
             xdr=xob;ydr=yob;tdr=dhr
          endif
 
@@ -93,7 +93,7 @@ c  given x,y,t generate some interpolated coordinates needed for the process
 
 C  SURFACE PRESSURE
 
-         IF(CAT.EQ.0 .AND. ZOB.LT.FMISS) THEN 
+         IF(CAT.EQ.0 .AND. ZOB.LT.BMISS) THEN 
             DZ = ZOB-ZS
             TO = TS-DZ*BETA
             IF(TOB<BMISS) THEN
@@ -142,15 +142,15 @@ C  U AND V COMPONENTS
             endif
          else if(kx >= 221.and.kx <= 229) then
             if(selev >= oelev) oelev=10+selev
-         end if; zob=oelev
+         end if; zow=oelev
 
          ! decide whether to interpolate in height (geop or geom) or pressure
          windz = (typ>=221.and.typ<=229).or.(typ>=280.and.typ<300)
          geomz = (typ>=223.and.typ<=228).or.(typ>=280.and.typ<300)
-         windz = windz .and. zob<bmiss
+         windz = windz .and. zow<bmiss
          windp = .not. windz; swt=1. 
 
-         !if(cid=='94638')print*,cid,pob,zob,uob,vob
+         !if(cid=='94638')print*,cid,pob,zow,uob,vob
 
          IF(max(uob,vob)<bmiss .and. windp ) THEN ! interpolate in pressure
             CALL HTERPTZ(xdr,ydr,tdr,pwt,iaruu,ufc)
@@ -168,31 +168,27 @@ C  U AND V COMPONENTS
             ! Subtract off combination of surface station elevation and
             ! model elevation depending on how close to surface
             fact = 0.0   
-            if(zob-selev > 10.)then
-               if(zob-selev > 1000)then
+            if(zow-selev > 10.)then
+               if(zow-selev > 1000)then
                   fact = 1.0 
                else
-                  fact=(zob-selev)*.001  
+                  fact=(zow-selev)*.001  
                end if
             end if
-            zob=zob-(selev+fact*(zs-selev)) ! zob and zlev are now height above the surface
+            zow=zow-(selev+fact*(zs-selev)) ! zow and zlev are now height above the surface
 
-            zwt=zilnlnpw(zob,zlev,kmax)
+            zwt=zilnlnpw(zow,zlev,kmax)
             CALL HTERPTZ(xdr,ydr,tdr,zwt,iaruu,ufc)
             CALL HTERPTZ(xdr,ydr,tdr,zwt,iarvv,vfc)
 
-            CALL HTERPZ(zob,zwt,zlev,ps,plev,pob) ! store any pressure adjustments
-            obx(1,l)=pob;obx(2,l)=qms(1,l)        ! to write into the output file 
-            obl=.true.
+            !!CALL HTERPZ(zow,zwt,zlev,ps,plev,pob) ! store any pressure adjustments
+            !!obx(1,l)=pob;obx(2,l)=qms(1,l)        ! to write into the output file 
+            !!obl=.true.
 
-            if(zob<zlev(1)) then ! interpolate between sig01 and the surface if need be
-               if (zob <= 10.) then
-                  term = max(zob,0.)/10.   
-                  swt=s10*term            
-               else
-                  term = (zlev(1)-zob)/(zlev(1)-10.)        
-                  swt=1.+(s10-1.)*term 
-               end if
+            if(zow<zlev(1)) then ! interpolate between sig01 and the surface if need be
+               zow=max(zow,10.)              
+               term = (zlev(1)-zow)/(zlev(1)-10.)        
+               swt=1.+(s10-1.)*term 
             endif
 
          endif

@@ -476,12 +476,12 @@ C$$$
 C----------------------------------------------------------------------
 C----------------------------------------------------------------------
 
-      IF(IFIRST.EQ.0)  THEN
-
 C -------------------------------
 C FIRST TIME IN DO A FEW THINGS...
 C -------------------------------
-         bmiss=10e10; call setbmiss(bmiss)
+
+      IF(IFIRST.EQ.0)  THEN
+         !BMISS INITIALIZED IN PREVENT MAIN PROGRAM
          call mpi_comm_rank(MPI_COMM_WORLD,myid,ierr)
          IFIRST = 1
          if(myid==0)PRINT 700
@@ -733,8 +733,7 @@ C  -----------------------------------------------------------------
                IF(FITS) RETURN
             ELSE
                CALL UFBINT(IUNITP,BAK,12,NLEV,IRET,ANSTR)
-               IF(OBL)CALL UFBINT(IUNITP,OBX,15,NLEV,IRET,'POB PQM')
-               OBL=.FALSE.;RETURN
+               RETURN
             ENDIF
          ENDIF
       ENDIF

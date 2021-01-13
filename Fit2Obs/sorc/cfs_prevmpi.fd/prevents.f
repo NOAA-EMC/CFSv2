@@ -112,6 +112,8 @@ C$$$
 
       PROGRAM PREPOBS_PREVENTS
 
+      use gblevn_module, only : bmiss
+
       character(80) filo
       CHARACTER(8)  SUBSET,LAST
 
@@ -125,6 +127,8 @@ C$$$
       call mpi_init(ierr)
       call mpi_comm_rank(MPI_COMM_WORLD,myid,ierr)
       call mpi_comm_size(MPI_COMM_WORLD,nprc,ierr)
+!--------------------------------------------------------------------------
+      bmiss=10e10; call setbmiss(10e10)
 !--------------------------------------------------------------------------
 
       if(myid==0)then
