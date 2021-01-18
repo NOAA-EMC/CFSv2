@@ -40,7 +40,7 @@ elif [ $plat = hera ]; then
  export FCMP="mpiifort"
 elif [ $plat = dell ] ; then
  module purge
- module load EnvVars/1.0.2
+ module load EnvVars/1.0.3
  module load lsf/10.1
  module load ips/18.0.1.163
  module load impi/18.0.1
