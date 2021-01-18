@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euax
+
+export CDATE=$1; source homerun
+
+cat<<eof | bsub
+#BSUB -J jcfs_cdas_vrfy_$CDATE
+#BSUB -o $outs/cfs_cdas_vrfy_$CDATE.o%J
+#BSUB -e $outs/cfs_cdas_vrfy_$CDATE.o%J
+#BSUB -q dev2
+#BSUB -W 01:30
+#BSUB -P CFS-T2O
+#BSUB -n 3 
+#BSUB -R span[ptile=3]
+#BSUB -x 
+
+set -euax  # print commands as they are executed and enable signal trapping
+
+set +x
+source homerun $CDATE
+module purge
+module load EnvVars/1.0.2
+module load lsf/10.1
+module load ips/18.0.1.163
+module load impi/18.0.1
+module load prod_util/1.1.0
+module load grib_util/1.1.0
+module load NetCDF/4.5.0
+module load CFP/2.0.1
+set -x
+
+export expnams='GFS15'
+export COMROOT=/gpfs/dell1/nco/ops/com    
+
+export HOMEcfs=$de6/cfs12/nco.v2.2.12 
+export HOMEcfs=$de6/cfs12/cfsv2_prod_dev_repository
+
+\$HOMEcfs/jobs/JCFS_CDAS_VRFYFITS
+
+eof
+

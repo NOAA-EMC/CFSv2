@@ -1,4 +1,4 @@
-set -eua
+set -euax
 
 export date=$1
 
@@ -16,12 +16,12 @@ export COMDAY=$PWD/outputs; mkdir -p $COMDAY
 export HYBLEVS=/gpfs/dell1/nco/ops/nwprod/gfs.v15.2.6/fix/fix_am/global_hyblev.l65.txt
 
 export COM_INA=/gpfs/dell1/nco/ops/com/gfs/prod/gdas.$day/$our
-export COM_INF=/gpfs/dell1/nco/ops/com/gfs/prod  
+export COM_INF='/gpfs/dell1/nco/ops/com/gfs/prod/gfs.$fdy/$fzz'
 
 export RUN_ENVIR=nemsio 
 export CONVNETC=NO 
 
-FITDIR=/gpfs/dell2/emc/verification/noscrub/Jack.Woollen/newnetc/Fit2Obs
+FITDIR=$(dirname $PWD) 
 
 $PWD/subfits_dell gdas $date          
 

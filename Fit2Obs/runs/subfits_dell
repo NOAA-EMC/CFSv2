@@ -3,11 +3,13 @@ set -eua
 
 ptmp=/gpfs/dell2/ptmp
 
-EXPNAM=$1 CDATE=$2 COMROT=${3:-${COMROT:-$ptmp/$USER}} ARCDIR=${4:-${ARCDIR:-$COMROT/archive}} TMPDIR=${5:-${TMPDIR:-$ptmp/$USER/f2o/tmpdir}}
+EXPNAM=$1 CDATE=$2 COMROT=${3:-${COMROT:-$ptmp/$USER}} ARCDIR=${4:-${ARCDIR:-$COMROT/archive}} TMPDIR=${5:-${TMPDIR:-$ptmp/$USER/f2o/wrkdir.$$}}
 
 FITDIR=$(cd $FITDIR; pwd); fitdir=$FITDIR/batrun
 
 COMDAY=${COMDAY:-$COMROT}
+
+WRKDIR=$TMPDIR; unset TMPDIR
 
 set +x
 echo -------------------------------------------------------------------------------------------------------------------
@@ -17,7 +19,7 @@ echo "EXPNAM    " $EXPNAM       # argument 1 - experiment name    - required
 echo "CDATE     " $CDATE        # argument 2 - date of validation - required
 echo "COMROT    " $COMROT       # argument 3 - COMROT directory   - optional - defaults to $ptmp/$USER  
 echo "ARCDIR    " $ARCDIR       # argument 4 - ARCDIR directory   - optional - defaults to $COMROT/archive
-echo "TMPDIR    " $TMPDIR       # argument 5 - TMPDIR directory   - optional - defaults to /ptmp/$USER/tmpdir
+echo "WRKDIR    " $WRKDIR       # argument 5 - WRKDIR directory   - optional - defaults to $ptmp/$USER/f2o/wrkdir.$$
 echo "COMDAY    " $COMDAY       # inheirited - dayfile directory  - optional - defaults to $COMROT     
 echo "FITDIR    " $FITDIR       # inheirited - Fit2obs batrun dir - optional - defaults to $(dirname $0)
 echo "ACCOUNT   " $ACCOUNT      # inheirited - project code       - required - defaults to nothing
@@ -34,7 +36,7 @@ cat<<eof | bsub
 #BSUB -J FITS.$EXPNAM.$CDATE
 #BSUB -P $ACCOUNT
 #BSUB -n 3
-#BSUB -R span[ptile=1]
+#BSUB -R span[ptile=3]
 #BSUB -R affinity[core(1):distribute=balance]
 #BSUB -W ${TIMELIM:-02:00}
 #BSUB -q ${CUE2RUN:-dev}
@@ -44,7 +46,7 @@ set -euax
 
 set +x
 module purge
-module load EnvVars/1.0.2
+module load EnvVars/1.0.3
 module load lsf/10.1
 module load ips/18.0.1.163
 module load impi/18.0.1
@@ -56,9 +58,10 @@ export OMP_NUM_THREADS=${FITOMP:-1}
 export KMP_AFFINITY=disabled
 export MPIRUN="mpirun -n 3"
 
+export WRKDIR=$WRKDIR 
 export ARCDIR=$ARCDIR
-export TMPDIR=$TMPDIR
 export fitdir=$fitdir
+export COMOUT=$WRKDIR 
 
 time $fitdir/runfits $EXPNAM $CDATE $COMROT
 

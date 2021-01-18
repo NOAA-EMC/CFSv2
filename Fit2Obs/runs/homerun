@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+#set -euax
+
+
+homejsw=$(pwd)
+outs=$(pwd)/outputs; mkdir -p $outs
+ptmp=/gpfs/dell2/ptmp/$USER/Jack/$(basename $homejsw)
+stmp=/gpfs/dell3/stmp/$USER/Jack/$(basename $homejsw)
+homecfs=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository
+
+mkdir -p $stmp/cfsv2
+mkdir -p $ptmp/cfs/prod
+mkdir -p $ptmp/nwges/prod
+
+echo $stmp
+echo $ptmp/cfs/prod
+echo $ptmp/nwges/prod
+
+##CDATE=$1 
+
+pdy=$(echo  $CDATE|cut -c1-8)
+cyc=$(echo  $CDATE|cut -c9-10)
+tzz=t$(echo $CDATE|cut -c9-10)z
+
+export PDY=$pdy
+
+[ -h $ptmp/cfs/prod/cmap ] || ln -sf /gpfs/dell1/nco/ops/com/cfs/prod/cmap $ptmp/cfs/prod/cmap
+
+set +x # keep quiet when loading modules
+#MODULE_VERSION=""
+#. /usrx/local/Modules/default/init/ksh
+#module purge
+#module load ics/15.0.6 ibmpe lsf GrADS hpss HDF5 NetCDF
+#module load /nwprod2/modulefiles/prod_util/v1.0.28
+#module load /nwprod2/modulefiles/grib_util/v1.1.0
+#module list
+
+COMDATEROOT=$ptmp/cfsv2/cdate-$pdy
+mkdir -p $COMDATEROOT/date
+echo "date  $CDATE" > $COMDATEROOT/date/$tzz
+
+export KMP_STACKSIZE=2048m
+export MPICH_ALLTOALL_THROTTLE=0
+export MP_EAGER_LIMIT=65536
+export MP_SINGLE_THREAD=yes
+export MP_USE_BULK_XFER=yes
+export MP_COLLECTIVE_OFFLOAD=no
+export MP_SHARED_MEMORY=yes
+export MP_MPILIB=mpich2
+export MP_LABELIO=yes
+
+export PATH=.:$PATH
+
+export RUN=cfs
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+export envir=prod
+export SENDDBN=NO
+export GETGES_COM=$ptmp
+export TMPDIR=$ptmp/tmpdir
+export DATAROOT=$stmp/cfsv2
+export COMDATEROOT=$COMDATEROOT
+export COMROOT=$ptmp
+export COMROOTp1=/gpfs/tp1/nco/ops/com
+export COMROOTp2=/gpfs/tp2/nco/ops/com2
+export GESROOT=$ptmp/nwges
+export NWROOT=/nwprod
+export NWROOTp1=$NWROOT
+export jlogfile=$homejsw/jlogfile
+export userid=$USER
+export model_ver=v2.2.0
+export job=cdas1
+export cycle=t${cyc}z
+export cyc=$cyc
+
+export SENDCOM=YES
+export SENDECF=NO
+export SENDDBN=NO
+export SENDWEB=NO
+
+export machine=WCOSS
+export VERBOSE=YES
+
+###############################################################################
+# Specify shared vertical structure version numbers
+###############################################################################
+
+export HOMEcfs=$homecfs # for testing
+
+#export EXECcfs=$HOMEcfs/exec
+#export PARMcfs=$HOMEcfs/parm
+#export USHcfs=$HOMEcfs/ush
+#export FIXcfs=$HOMEcfs/fix
+
+#export HOMEdump=$HOMEcfs
+#export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
+#export HOMEglob=$HOMEcfs/global_shared_cfs
+#export HOMEpost=$HOMEglob
+#export HOMEgsm=$HOMEglob
+#export HOMEgsi=$HOMEglob
+
+echo end of homerun
+

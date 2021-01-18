@@ -1,0 +1,25 @@
+set -euax
+
+pt=$1; set +ex
+echo
+echo checking prepbufr_in_old_post against input prepbufr 
+echo
+difbqm $pt/prepbufr_in_old_post $pt/ACprofwork/*prepbufr
+echo
+echo checking prepbufr_in_old_post against prepqa
+echo
+difbqm $pt/prepbufr_in_old_post $pt/fitx/*prepqa >diffout             
+grep ' 120 ' diffout
+echo
+grep ' 220 ' diffout
+echo
+grep ' 230 ' diffout
+echo
+grep ' 180 ' diffout
+echo
+grep ' 280 ' diffout
+echo
+echo checking prepqa against prepqf 
+echo
+difbqm $pt/fitx/*prepqa $pt/fitx/*prepqf
+echo
