@@ -110,7 +110,9 @@ export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 # and they might be adjusted too.
 #################################################################
 
-for EXPNAM in CFS22 GFS15 ; do
+expnams=${expnams:-'GFS16 CFS22'}
+
+for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS15 ]] ; then
    COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc'
@@ -147,8 +149,8 @@ err=$?; err_chk
 # tar up the fits and save in COMROT/fit2obs
 
 cd $ARCDIR
-EXP=$echo $EXPNAM|cut -c 1-3)
-FITARC=$COMROT/fit2obs/${EXP}.fits/${YYYY}; mkdir -p $FITARC
+EXP=$(echo $EXPNAM|cut -c 1-3)
+FITARC=${FITARC:-$COMROT/fit2obs/${EXP}.fits/${YYYY}}; mkdir -p $FITARC
 tar -cf $FITARC/$EXP.fits.$CDATE *
 err=$?; err_chk
 
