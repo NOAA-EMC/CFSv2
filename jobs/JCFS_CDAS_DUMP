@@ -71,8 +71,8 @@ export COMINm1=${COMINm1:-$COMROOT/${NET}/${envir}/${RUN}.${PDYm1}}  # for prev 
 
 export COM_GDAS=${COM_GDAS:-$(compath.py com/gfs/prod)}
 export COM_ENGICE=${COM_ENGICE:-$(compath.py com/omb/prod/sice)}       ## after 20190613
-export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc}
-export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc}
+export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc/atmos}
+export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc/atmos}
 
 ########################################################################
 # execute the script
