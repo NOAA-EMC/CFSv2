@@ -128,7 +128,7 @@ C$$$
       call mpi_comm_rank(MPI_COMM_WORLD,myid,ierr)
       call mpi_comm_size(MPI_COMM_WORLD,nprc,ierr)
 !--------------------------------------------------------------------------
-      bmiss=10e10; call setbmiss(10e10)
+      bmiss=10e10; call setbmiss(bmiss)
 !--------------------------------------------------------------------------
 
       if(myid==0)then
