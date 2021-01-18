@@ -52,18 +52,18 @@ export err=$?; ##$DATA/err_chk
 
 #combine the postevents outp messages together
 
-$COMBFRSH preppost_* prep_w_dups ; rm -f preppost_*
-
-set -x
+cat preppost_* > prep_w_dups ; rm -f preppost_*
 
 #run the duplicate elimination
-delxy=.005 # this is the lat/lon tolerance in degrees
-delhr=.001 # this is the ob time tolerance in hundredths of an hour
-delelv=1    # this is the elevation tolerance in meters
+#delxy=.005 # this is the lat/lon tolerance in degrees
+#delhr=.001 # this is the ob time tolerance in hundredths of an hour
+#delelv=1    # this is the elevation tolerance in meters
+#
+#echo prep_w_dups            >dupinp
+#echo $preppost             >>dupinp
+#echo $delxy $delhr $delelv >>dupinp
+#cat dupinp|$DUPREPEXEC
 
-echo prep_w_dups            >dupinp
-echo $preppost             >>dupinp
-echo $delxy $delhr $delelv >>dupinp
-cat dupinp|$DUPREPEXEC
+cp prep_w_dups $preppost # disable the dup check
 
-rm -f diag_conv_anl_* diag_conv_ges_* prep_w_dups fort.*
+rm -f diag_conv_anl_* diag_conv_ges_* fort.*
