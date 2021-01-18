@@ -40,7 +40,6 @@ export PROCESS_GRIBFLDS=${PROCESS_GRIBFLDS:-YES}
 export PROCESS_GDAS_DUMP=${PROCESS_GDAS_DUMP:-YES}
 export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
 export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}         # preferred, but don't know how RUN will be set in J-Script
-export COMGDAS=${COMGDAS:-/com2/gfs/prod/gdas.$PDY/$cyc} # GDAS file directory
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
 postmsg "$jlogfile" "$msg"
