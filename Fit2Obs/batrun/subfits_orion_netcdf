@@ -24,39 +24,32 @@ echo "KEEPDATA  " $KEEPDATA     # inherited  - retain rundir      - optional - d
 echo -------------------------------------------------------------------------------------------------------------------
 
 fitdir=$(dirname $0); fitdir=$(cd $fitdir; pwd)
-
 COMDAY=${COMDAY:-$COMROT/logs/$CDATE}
 
 set -euax          
 
-cat<<EOF | bsub 
-#!/bin/bash
-#BSUB -o $COMDAY/fit2obs.log
-#BSUB -J FITS.$EXPNAM.$CDATE
-#BSUB -P $ACCOUNT       
-#BSUB -n 3 
-#BSUB -R span[ptile=1]
-#BSUB -R affinity[core(28):distribute=balance]
-#BSUB -W ${TIMELIM:-02:00}
-#BSUB -q $QUEUE
+cat<<EOF | sbatch
+#!/bin/bash --login
+#SBATCH --job-name=FITS.$EXPNAM.$CDATE --time=20:00
+#SBATCH --nodes=1 --ntasks=3
+#SBATCH --output=$COMDAY/FITS.$EXPNAM.$CDATE.$$
+#SBATCH --account=$ACCOUNT
+#SBATCH --partition=debug
+#SBATCH -q debug
 
+#!/usr/bin/env bash
 set -euax
 
 set +x
-module purge
-module load EnvVars/1.0.2
-module load lsf/10.1
-module load ips/18.0.1.163
-module load impi/18.0.1
-module load prod_util/1.1.0
-module load prod_envir/1.0.2
-module load NetCDF/4.5.0
-module list
+ module purge
+ module load intel/2020.2
+ module load impi/2020.2
+ module load netcdf/4.7.4
+ module list
 set -x
 
-
 export OMP_NUM_THREADS=${FITOMP:-1}
-export MPIRUN="mpirun -n 3"
+export MPIRUN="srun --export=ALL -n 3"
 export KMP_AFFINITY=disabled
 
 export CDATE=$CDATE

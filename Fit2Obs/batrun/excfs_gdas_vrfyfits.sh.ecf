@@ -26,6 +26,7 @@ export CNVDIAGEXEC=${CNVDIAGEXEC:-$EXECcfs/${cfsp}post_convdiag}
 export COMLOC=${COMLOC:-$COMROT}
 export COMANL=${COMANL:-$COMROT}
 export COMLOX=${COMLOX:-$DATA}   
+export COMOUT=${COMOUT:-$DATA}   
 export SAVEPREP=${SAVEPREP:-NO}
 
 ##[ $NEMS = YES ] && { sig=gfn; sfc=sfn; } || { sig=sig; sfc=sfc; }
@@ -47,8 +48,10 @@ postmsg "$jlogfile" "$msg"
 # make bufr convdiag postevents for analysis only...
 fh1=06
 fh2=00
+pdy=$(echo $CDATE | cut -c1-8)
 hh=$(echo $CDATE | cut -c9-10)
-yyyymmdd=$(echo $CDATE | cut -c1-8)
+cyc=$hh
+
 eval COMLIC=$COM_INA
 
 if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
@@ -62,7 +65,7 @@ if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
 elif [[ $RUN_ENVIR = cfs ]]; then
   tzz=t${hh}z
   export PRPI=$COMLIC/cdas1.$tzz.prepbufr       
-  export PRPO=$COMLIC/cdas1.$tzz.prepqa           
+  export PRPO=$COMOUT/cdas1.$tzz.prepqa           
   export PRPF=$COMLOX/cdas1.$tzz.prepqf
   export sig1=$COMLIC/cdas1.$tzz.sanl               
   export sfc1=$COMLIC/cdas1.$tzz.sfcanl 
@@ -132,7 +135,6 @@ if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
 elif [[ $RUN_ENVIR = cfs ]]; then
   CDAM3=$($NDATE -$tspan  $CDATE)
   CDAP3=$($NDATE +$tspan  $CDATE)
-  fdy=$(echo $FDATE|cut -c1-8); fzz=$(echo $FDATE|cut -c9-10)
   export sig1=$COMLICF/sigf${CDAM3}.01.$FDATE
   export sig2=$COMLICF/sigf${CDATE}.01.$FDATE
   export sig3=$COMLICF/sigf${CDAP3}.01.$FDATE

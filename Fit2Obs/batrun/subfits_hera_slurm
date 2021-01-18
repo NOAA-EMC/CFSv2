@@ -1,6 +1,6 @@
 set -euax
 
-EXPNAM=$1 CDATE=$2 COMROT=${3:-$STMP/$USER} ARCDIR=${4:-$COMROT/archive} TMPDIR=${5:-$STMP/$USER/tmpdir}
+EXPNAM=$1 CDATE=$2 COMROT=${3:-$STMP/$USER} ARCDIR=${4:-$COMROT/archive} TMPDIR=${5:-$STMP/$USER/WRKDIR}
 
 ACCOUNT=${ACCOUNT:-CFS-T2O}
 CUE2RUN=${CUE2RUN:-dev}
@@ -9,6 +9,8 @@ KEEPDATA=${KEEPDATA:-NO}
 vday=$(echo $CDATE | cut -c1-8)
 vcyc=$(echo $CDATE | cut -c9-10)
 
+WRKDIR=$TMPDIR; unset TMPDIR
+
 echo -------------------------------------------------------------------------------------------------------------------
 echo Starting the runfits for:
 echo -------------------------------------------------------------------------------------------------------------------
@@ -16,7 +18,7 @@ echo "EXPNAM    " $EXPNAM       # argument 1 - experiment name    - required  (c
 echo "CDATE     " $CDATE        # argument 2 - date of validation - required 
 echo "COMROT    " $COMROT       # argument 3 - COMROT directory   - optional - defaults to /stmp/$USER
 echo "ARCDIR    " $ARCDIR       # argument 4 - ARCDIR directory   - optional - defaults to $COMROT/archive 
-echo "TMPDIR    " $TMPDIR       # argument 5 - TMPDIR directory   - optional - defaults to /stmp/$USER/tmpdir
+echo "WRKDIR    " $WRKDIR       # argument 5 - WRKDIR directory   - optional - defaults to $STMP/$USER/WRKDIR
 echo "ACCOUNT   " $ACCOUNT      # inherited  - project code       - required - defaults to nothing  
 echo "KEEPDATA  " $KEEPDATA     # inherited  - retain rundir      - optional - defaults to NO (rmdir)
 echo -------------------------------------------------------------------------------------------------------------------
@@ -25,9 +27,6 @@ fitdir=$(dirname $0); fitdir=$(cd $fitdir; pwd)
 COMDAY=${COMDAY:-$COMROT/logs/$CDATE}
 
 set -euax          
-
-vrfytmpdiris=$TMPDIR
-unset TMPDIR
 
 cat<<EOF | sbatch
 #!/bin/bash --login
@@ -63,11 +62,13 @@ export COM_INA=$ROTDIR/gdas.$vday/$vcyc/$COMPONENT
 export COM_INF=$ROTDIR/vrfyarch
 export KEEPDATA=$KEEPDATA
 
+export RUN_ENVIR=netcdf
+export CONVNETC=YES
+export ACPROFit=YES
+
 export fitdir=$fitdir
 export ARCDIR=$ARCDIR
-export TMPDIR=$vrfytmpdiris
-export ACPROFit=${ACPROFit:-YES}
-export NEMS=${NEMS:-YES}   
+export WRKDIR=$WRKDIR 
 export PRVT=${PRVT:-$HOMEgfs/fix/fix_gsi/prepobs_errtable.global}
 export HYBLEVS=${HYBLEVS:-$HOMEgfs/fix/fix_am/global_hyblev.l65.txt}
 

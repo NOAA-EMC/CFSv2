@@ -13,7 +13,8 @@ echo $ARCDIR                 ; mkdir -p $ARCDIR
 export FIT_DIR=$ARCDIR/fits  ; mkdir -p $FIT_DIR
 export HORZ_DIR=$ARCDIR/horiz; mkdir -p $HORZ_DIR
 
-export DATA=$TMPDIR/$exp.$CDATE.fit2obstmp; rm -rf $DATA; mkdir -p $DATA
+export DATA=${DATA:-$WRKDIR}
+export DATA=$DATA/$exp.$CDATE.fit2obstmp; rm -rf $DATA; mkdir -p $DATA
 export COMLOX=$DATA/fitx; mkdir -p $COMLOX
 
 echo "echo err_chk">$DATA/err_chk; chmod 755 $DATA/err_chk
