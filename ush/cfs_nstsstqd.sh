@@ -21,11 +21,14 @@ set -euax
 
 date=$1; dend=$($NDATE -24 $date); inc=6  # date is the date for COMGDAS
 
+component=${component:-atmos} ## node name for COMIN
+[[ $component = v15 ]] && component=''
+
 while [[ $date -ge $dend ]]; do
 day=$(echo $date|cut -c 1-8)
 our=$(echo $date|cut -c 9-10)
 
-rtgfle=$COM_GDAS/gdas.$day/$our/atmos/gdas.t${our}z.rtgssthr.grb        # note COM_GDAS must be defined in dump job script  
+rtgfle=$COM_GDAS/gdas.$day/$our/$component/gdas.t${our}z.rtgssthr.grb   # note COM_GDAS must be defined in dump job script  
 
 if [[ ! -s $rtgfle ]] ; then    
    date=$($NDATE -$inc $date)                                           # if no sfcanl try 6 hours earlier 
