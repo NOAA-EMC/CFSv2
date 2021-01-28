@@ -185,11 +185,11 @@ cp $COMLOX/f*.sfc.$CDATE   $FIT_DIR
 for typ in anl fcs
 do
 mkdir -p $HORZ_DIR/$typ   
-cp $COMLOX/adpupa.mand.$typ.$CDATE  $HORZ_DIR/$typ/adpupa.mand.$CDATE 
-cp $COMLOX/adpsfc.$typ.$CDATE       $HORZ_DIR/$typ/adpsfc.$CDATE      
-cp $COMLOX/sfcshp.$typ.$CDATE       $HORZ_DIR/$typ/sfcshp.$CDATE      
-cp $COMLOX/aircar.$typ.$CDATE       $HORZ_DIR/$typ/aircar.$CDATE      
-cp $COMLOX/aircft.$typ.$CDATE       $HORZ_DIR/$typ/aircft.$CDATE      
+cp -p $COMLOX/adpupa.mand.$typ.$CDATE  $HORZ_DIR/$typ/adpupa.mand.$CDATE 
+cp -p $COMLOX/adpsfc.$typ.$CDATE       $HORZ_DIR/$typ/adpsfc.$CDATE      
+cp -p $COMLOX/sfcshp.$typ.$CDATE       $HORZ_DIR/$typ/sfcshp.$CDATE      
+cp -p $COMLOX/aircar.$typ.$CDATE       $HORZ_DIR/$typ/aircar.$CDATE      
+cp -p $COMLOX/aircft.$typ.$CDATE       $HORZ_DIR/$typ/aircft.$CDATE      
 done
 
 ################## END OF SCRIPT #######################
