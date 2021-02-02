@@ -13,3 +13,4 @@ echo
 echo
 ./build_tropcy.sh
 echo
+./build_gsm_wcoss.sh
