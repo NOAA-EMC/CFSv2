@@ -143,14 +143,15 @@ if [[ $EXPNAM = CFS22 ]] ; then
 fi
 
 ARCDIR=$DATA/$EXPNAM.fits
+COMFIT=${COMFIT:-$COMROT/fit2obs}
 time $fitdir/runfits $EXPNAM $CDATE $COMFIT
 err=$?; err_chk
 
-# tar up the fits and save in COMROT/fit2obs
+# tar up the fits and save in FITARC           
 
 cd $ARCDIR
 EXP=$(echo $EXPNAM|cut -c 1-3)
-FITARC=${FITARC:-$COMROT/fit2obs/${EXP}.fits/${YYYY}}; mkdir -p $FITARC
+FITARC=$COMFIT/${EXP}.fits/${YYYY}; mkdir -p $FITARC
 tar -cf $FITARC/$EXP.fits.$CDATE *
 chgrp rstprod $FITARC/$EXP.fits.$CDATE
 chmod 640     $FITARC/$EXP.fits.$CDATE
