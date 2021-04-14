@@ -209,7 +209,7 @@ c  -------------------------------------------------------
              enddo
              pause; print*
             endif
-            CALL UFBINT(LUBFO,ARR,MAX1,LEV2,IRET,DBNEM)
+            CALL UFBINT(LUBFO,ARR,MAX1,LEV0,IRET,DBNEM)
          endif
       endif
 
