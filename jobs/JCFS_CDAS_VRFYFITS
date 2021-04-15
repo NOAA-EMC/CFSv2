@@ -114,15 +114,6 @@ expnams=${expnams:-'GFS16 CFS22'}
 
 for EXPNAM in $expnams ; do
 
-if [[ $EXPNAM = GFS15 ]] ; then
-   COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc'
-   COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz'
-   COMFIT=$COMROOT/gfs/prod
-   OMP_NUM_THREADS=1
-   RUN_ENVIR=nemsio
-   ACPROFit=YES  
-   CONVNETC=NO
-fi
 if [[ $EXPNAM = GFS16 ]] ; then
    COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc/atmos'
    COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz/atmos'
@@ -143,15 +134,14 @@ if [[ $EXPNAM = CFS22 ]] ; then
 fi
 
 ARCDIR=$DATA/$EXPNAM.fits
-COMFIT=${COMFIT:-$COMROT/fit2obs}
 time $fitdir/runfits $EXPNAM $CDATE $COMFIT
 err=$?; err_chk
 
-# tar up the fits and save in FITARC           
+# tar up the fits and save in COMROT/fit2obs
 
 cd $ARCDIR
 EXP=$(echo $EXPNAM|cut -c 1-3)
-FITARC=$COMFIT/${EXP}.fits/${YYYY}; mkdir -p $FITARC
+FITARC=$COMROT/fit2obs/${EXP}.fits/${YYYY}; mkdir -p $FITARC
 tar -cf $FITARC/$EXP.fits.$CDATE *
 chgrp rstprod $FITARC/$EXP.fits.$CDATE
 chmod 640     $FITARC/$EXP.fits.$CDATE
