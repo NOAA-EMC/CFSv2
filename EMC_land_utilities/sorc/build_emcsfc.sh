@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #------------------------------------------------------------
 # Build all "emcsfc" programs.
@@ -7,29 +7,17 @@
 # program sub-directory.
 #------------------------------------------------------------
 
-#set -x
+set -euax
 
 mkdir -p ../exec # place for executables
 
 for directory in emcsfc_snow2mdl.fd  emcsfc_grib_snowgrib.fd  ## only compile the snow programs
 do
-  case $directory in
-    *gridgen_sfc.fd)
-      cd $directory/lib
-      make clean
-      make.sh
-      cd ../driver
-      make clean
-      make.sh
-      cd ../.. ;;
-    *)
-      cd $directory
-      make clean
-      ./make.sh
-      rm -f *.o *.mod
-      cd .. ;;
-  esac
-
+echo
+cd $directory
+makefile.sh           
+cd ..
+echo
 done
 
 echo; echo DONE BUILDING EMCSFC PROGRAMS

@@ -5,8 +5,6 @@
 #  README.build file for details.
 #-------------------------------------------------------------------------------
 
-SHELL=	/bin/sh
-
 CMD=  emcsfc_grib_snowgrib
 
 OBJS= snowgrib.o	
@@ -23,16 +21,13 @@ LIBS=${G2_LIB4} \
 $(CMD):	$(OBJS)
 	$(FCOMP) $(FFLAGS) -o $(CMD) $(OBJS) $(LDFLAGS) $(LIBS)
 
-$(OBJS):  makefile
-
 .f.o:
-	$(FCOMP) -c $(FFLAGS) -I$(G2_INC4) $*.f
+	$(FCOMP) -c $(FFLAGS) -I$(G2_INC4) -I$(IP_INC4) $*.f
 
 clean:
 	rm -f $(OBJS) $(CMD)
+
 install:
 	/usr/bin/install -c -d ../../exec
 	/usr/bin/install -c $(CMD) ../../exec
-check_prereqs:
-	/nwprod/spa_util/check_libs.bash $(LIBS)
-#       /nwprod/spa_util/check_incs.bash $(G2_INC4)
+

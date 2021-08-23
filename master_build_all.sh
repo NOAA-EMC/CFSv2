@@ -12,7 +12,7 @@ export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
 
 [[ $# -eq 0 || $1 = shr ]] && { cd $REPOROOT/global_shared_cfs/sorc; mkdir -p ../exec; ./build_cfs_wcoss.sh; }
 
-[[ $# -eq 0 || $1 = prp ]] && { cd $REPOROOT/obsproc_prep.v3.2.0/sorc; mkdir -p ../exec; ./build_dell; }
+###[[ $# -eq 0 || $1 = prp ]] && { cd $REPOROOT/obsproc_prep.v3.2.0/sorc; mkdir -p ../exec; ./build_dell; }
 
 [[ $# -eq 0 || $1 = nst ]] && { cd $REPOROOT/nstrtg.v1.1.1/sorc; mkdir -p ../exec; ./build_nstrtg.sh; }
 

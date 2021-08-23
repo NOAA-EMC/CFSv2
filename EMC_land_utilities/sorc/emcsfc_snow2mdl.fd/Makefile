@@ -6,14 +6,14 @@ SHELL=	/bin/sh
 #  Before invoking, read the README.build file for details.
 #------------------------------------------------------------------------
 
-CMD= emcsfc_snow2mdl
+CMD=	emcsfc_snow2mdl
 
-OBJS = driver.o \
-       program_setup.o \
-       snowdat.o \
-       model_grid.o \
-       grib_utils.o \
-       snow2mdl.o 
+OBJS=	driver.o \
+        program_setup.o \
+        snowdat.o \
+        model_grid.o \
+        grib_utils.o \
+        snow2mdl.o 
 
 LIBS= $(G2_LIBd) $(IP_LIBd) $(SP_LIBd) $(LANDSFCUTIL_LIBd) $(BACIO_LIB4) \
       $(W3NCO_LIBd) $(JASPER_LIB) $(PNG_LIB) $(Z_LIB)
@@ -33,13 +33,8 @@ snow2mdl.o: snowdat.o program_setup.o model_grid.o snow2mdl.f
 	$(FCOMP) $(FFLAGS) -I$(IP_INCd) -I$(LANDSFCUTIL_INCd) -I$(G2_INCd) -c snow2mdl.f
 grib_utils.o: grib_utils.f
 	$(FCOMP) $(FFLAGS) -I$(G2_INCd) -c grib_utils.f
-all: check_prereqs $(CMD)
 clean:
 	rm -f *.o *.mod $(CMD) 
 install:
 	/usr/bin/install -c -d ../../exec
 	/usr/bin/install -c $(CMD) ../../exec
-check_prereqs:
-	/nwprod/spa_util/check_libs.bash $(LIBS)
-	/nwprod/spa_util/check_incs.bash $(G2_INCd)/grib_mod.mod $(LANDSFCUTIL_INCd)/consts.mod
-	/nwprod/spa_util/check_incs.bash $(IP_INCd)/gdswzd_mod.mod

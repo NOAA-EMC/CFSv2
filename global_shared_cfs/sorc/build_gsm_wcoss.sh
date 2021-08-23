@@ -7,11 +7,10 @@ set -x
 ##################################################################
 
 set +x
-module purge
-source ./dell-mods.sh
+source ./corn-mods.sh
 set -x
 
-curdir=$PWD  
+curdir=$PWD; mkdir -p ../exec
 
 cd ${curdir}/global_chgres.fd
 ./makefile.sh
