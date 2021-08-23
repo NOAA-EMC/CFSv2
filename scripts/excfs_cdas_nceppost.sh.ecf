@@ -358,7 +358,7 @@ done
 
 # run the cfp mpmd process
 
-mpirun cfp poescript.grb2 |grep 'CFP RANK'
+mpiexec -n 20 cfp poescript.grb2 |grep 'CFP RANK'
 export err=$?; err_chk
 
 # Copy all the grib2 files to COMOUT

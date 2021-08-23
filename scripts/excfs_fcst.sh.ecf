@@ -1202,8 +1202,9 @@ EOF
 # run the coupled model
 #------------------------------------------------------------------------------#
 
-export OMP_NUM_THREADS=2
-mpirun -mxm -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
+export OMP_NUM_THREADS=1
+#pirun -mxm -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
+mpiexec     -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
 export ERR=$?; export err=$ERR; err_chk
 
 #------------------------------------------------------------------------------#
@@ -1259,11 +1260,11 @@ set -x
 
 #  mpi_combine the decomposed ocean files into global files
 
-nprocs=$LSB_DJOB_NUMPROC
+nprocs=128 ###$LSB_DJOB_NUMPROC
 ncmds=$(wc -l cmdfile_mpp|sed 's/cmdfile_mpp//')
 [[ $nprocs -lt $ncmds ]] && ncmds=$nprocs
 
-mpirun -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp  
+mpiexec -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp  
 export err=$?; err_chk
 
 #  adjust the date stamps on the combined files

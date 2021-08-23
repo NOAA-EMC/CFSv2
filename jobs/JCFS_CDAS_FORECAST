@@ -1,4 +1,4 @@
-#!/bin/ksh 
+#!/bin/bash
 
 if [ $# -ne 1 ] ; then
      echo " No argument passed - forecast with default config file will be done"
@@ -96,9 +96,9 @@ set -u
 #############################################
 # Set the number of cores per model         
 #############################################
-export CPROCS=1
-export OPROCS=56
-export APROCS=195
+export CPROCS=${CPROCS:-1}
+export OPROCS=${OPROCS:-56}
+export APROCS=${APROCS:-195}
 
 env
 
@@ -216,9 +216,8 @@ export FHINI=0
 export VDATE=$($NDATE $FHINI $start_date)
 export EXEC_OMD=${EXEC_OMD:-HOMEcfs/exec}
 export FCSTEXEC=${AM_EXEC:-$HOMEcfs/exec/cfs_cdas_atmos_fcst}
-$FORECASTSH \
-    - $DATA $VDATE $EXEC_OMD $COMOUT \
-    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
+$FORECASTSH - $DATA $VDATE $EXEC_OMD $COMOUT \
+###    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
 rc=$?
 
 cat $(basename $FORECASTSH).out.$FHINI >> $pgmout

@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh  
 #------------------------------------------------------------------------------#
 #### MLC AM/OM/Coupler script ##################################################
 #  
@@ -578,15 +578,15 @@ startmsg
 $NCP $AM_EXEC $DATA
 rm -f NULL
 FH=$((10#$FHINI))
-[[ $FH -lt 10 ]]&&FH=0$FH
-if [[ $FHINI -gt 0 ]] ; then
+[ $FH -lt 10 ]&&FH=0$FH
+if [ $FHINI -gt 0 ] ; then
    FH=$((10#$FHINI+10#$FHOUT))
-   [[ $FH -lt 10 ]]&&FH=0$FH
+   [ $FH -lt 10 ]&&FH=0$FH
 fi
-while [[ $FH -le $FHMAX ]] ; do
+while [ $FH -le $FHMAX ] ; do
    eval rm -f $LOGO
    ((FH=10#$FH+10#$FHOUT))
-   [[ $FH -lt 10 ]]&&FH=0$FH
+   [ $FH -lt 10 ]&&FH=0$FH
 done
 if [[ $FILESTYLE = "L" ]] ; then
    ln -fs $CO2CON fort.15
@@ -634,26 +634,26 @@ export FCSTVARS="IEMS=$IEMS,ISOL=$ISOL,IAER=$IAER,ICO2=$ICO2,$FCSTVARS"
 #
 #     For one member case i.e. control
 #
-if [[ $ENS_NUM -le 1 ]] ; then
+if [ $ENS_NUM -le 1 ] ; then
   FH=$((10#$FHINI))
-  [[ $FH -lt 10 ]]&&FH=0$FH
-  if [[ $FHINI -gt 0 ]] ; then
+  [ $FH -lt 10 ]&&FH=0$FH
+  if [ $FHINI -gt 0 ] ; then
     FH=$((10#$FHINI+10#$FHOUT))
-    [[ $FH -lt 10 ]]&&FH=0$FH
+    [ $FH -lt 10 ]&&FH=0$FH
   fi
 #        For Initial Conditions
   ln -fs $SIGI sig_ini
   ln -fs $SFCI sfc_ini
   ln -fs $SIGI2 sig_ini2
 #        For output
-  while [[ $FH -le $FHMAX ]] ; do
+  while [ $FH -le $FHMAX ] ; do
     eval ln -fs $SIGO SIG.F${FH}
     eval ln -fs $SFCO SFC.F${FH}
     eval ln -fs $FLXO FLX.F${FH}
     eval ln -fs $LOGO LOG.F${FH}
     eval ln -fs $D3DO D3D.F${FH}
     ((FH=10#$FH+10#$FHOUT))
-    [[ $FH -lt 10 ]]&&FH=0$FH
+    [ $FH -lt 10 ]&&FH=0$FH
   done
   ln -fs $SIGR1 SIGR1
   ln -fs $SIGR2 SIGR2
@@ -674,19 +674,19 @@ else
 #        For output
 
     FH=$((10#$FHINI))
-    [[ $FH -lt 10 ]]&&FH=0$FH
-    if [[ $FHINI -gt 0 ]] ; then
+    [ $FH -lt 10 ]&&FH=0$FH
+    if [ $FHINI -gt 0 ] ; then
       FH=$((10#$FHINI+10#$FHOUT))
-      [[ $FH -lt 10 ]]&&FH=0$FH
+      [ $FH -lt 10 ]&&FH=0$FH
     fi
-    while [[ $FH -le $FHMAX ]] ; do
+    while [ $FH -le $FHMAX ] ; do
       eval ln -fs $SIGO SIG.F${FH}${MN}
       eval ln -fs $SFCO SFC.F${FH}${MN}
       eval ln -fs $FLXO FLX.F${FH}${MN}
       eval ln -fs $LOGO LOG.F${FH}${MN}
       eval ln -fs $D3DO D3D.F${FH}${MN}
       ((FH=10#$FH+10#$FHOUT))
-      [[ $FH -lt 10 ]]&&FH=0$FH
+      [ $FH -lt 10 ]&&FH=0$FH
     done
     eval ln -fs ${SIGR1}${MN} SIGR1${MN}
     eval ln -fs ${SIGR2}${MN} SIGR2${MN}
@@ -1157,13 +1157,48 @@ EOF
   export nhourb=${nhourb:-$FHINI}
   export OMP_NUM_THREADS=${OMP_NUM_THREADS:-$NTHREADS}
 
-  mpirun  -mxm --tag-output -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am
-  export ERR=$?; export err=$ERR; err_chk
+mpmd=yes; MP_CMDFILE=mp_cmdfile
+
+set +x; echo making cmdfile for mpmd execution
+if [ $mpmd = yes ] ; then
+  rm -f $MP_CMDFILE
+  i=1
+  while [ $i -le $NPROCS_c ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_c"
+    echo $PGM_c>>$MP_CMDFILE
+    i=$((i+1))
+  done
+  j=1
+  while [ $j -le $NPROCS_o ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_oc"
+    echo $PGM_oc>>$MP_CMDFILE
+    j=$((j+1))
+    i=$((i+1))
+  done
+  j=1
+  while [ $j -le $NPROCS_a ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_am"
+    echo $PGM_am>>$MP_CMDFILE
+    j=$((j+1))
+    i=$((i+1))
+  done
+  nprocs1=`cat $MP_CMDFILE|wc -w`
+  nprocst=$((NPROCS_c+NPROCS_o+NPROCS_a))
+  if [ $nprocs1 -ne $nprocst ] ; then echo "Bad $MP_CMDFILE, exiting..."; export err=1; err_chk ; fi
+fi
+set -x
+
+##cat $MP_CMDFILE
+##mpiexec -n $nprocst  cfp $MP_CMDFILE ###| grep "CFP RANK" # run the cmdfile processor
+
+eval $mpie  
+
+export err=$?; err_chk
   
 #------------------------------------------------------------------------------#
 # End MPMD execution section (4)
 #------------------------------------------------------------------------------#
-
+set +x
 #------------------------------------------------------------------------------#
 # Begin post-execution section of OM script (5)
 #------------------------------------------------------------------------------#
@@ -1213,7 +1248,7 @@ until [ $p_date -gt $end_date ] ; do
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
 
-mpirun -n 28 cfp cmdfile_mpp | grep "CFP RANK" # run the cmdfile processor
+mpiexec -n 28 cfp cmdfile_mpp | grep "CFP RANK" # run the cmdfile processor
 export err=$?; err_chk
 
 # rename the ocn and ice files to reflect the correct time
