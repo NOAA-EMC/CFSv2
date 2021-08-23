@@ -1,29 +1,8 @@
 #!/bin/bash
-
-set +x
-echo
-module purge
-module load EnvVars/1.0.2
-module load ips/18.0.1.163
-module load smpi/10.1.1.0
-module load ESMF/4_0_0rp2
-module load NetCDF/3.6.3
-module load bacio/2.0.2
-module load nemsio/2.2.3
-module load sp/2.0.2
-module load w3emc/2.3.0
-module load w3nco/2.0.6
-module load bufr/11.3.0
-module load ip/3.0.1
-module load sfcio/1.0.0
-module load sigio/2.0.1
-module load gfsio/1.1.0
-module load landsfcutil/2.1.0
-module list
-echo
-set -x
+set -euax
 
 machine=wcoss
+ptmp="/lfs/h1/emc/ptmp/$LOGNAME/cfsv2"   ###/makefcst
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian
@@ -35,8 +14,7 @@ sorc_dir=$(pwd)
 exec_dir=$(pwd)
 mkdir -p $exec_dir
 
-ptmp=/gpfs/dell2/ptmp/$USER/Jack/makefcst
-make_dir=$ptmp/branch/sorc/$(basename $sorc_dir)
+make_dir=$ptmp/$(basename $sorc_dir)
 
 #####################################################################
 if [ $make_dir = $(pwd) ] ; then
@@ -46,10 +24,12 @@ if [ $make_dir = $(pwd) ] ; then
 fi
 #####################################################################
 
-rm -rf $make_dir; mkdir -p $make_dir
+mkdir -p $make_dir
 cd $make_dir || exit 99
 [ $? -ne 0 ] && exit 8
 
+rm -f $make_dir/*.o
+rm -f $make_dir/*.mod
 tar -cf- -C$sorc_dir .|tar -xf-
 
 if [ $NATIVE_ENDIAN = YES ] ; then
@@ -67,7 +47,7 @@ export PGSZM=
 export FRRM=-FR
 export FXXM=
 
-export OPTSB="-O1 -convert big_endian -fp-model precise "  
+export OPTSB="-O2 -convert big_endian -fp-model precise -g -traceback"  
 
 export OPTSBT=$OPTSB
 export OPTSIOM="$OPTSBT -r8 "
@@ -77,36 +57,16 @@ export OPTS90M="$OPTSBT   -r8 "
 export OPTS90AM="$OPTSBT  -r8 "
 export LDFLAGSM=$PGSZM
 
-export F77M=mpif90      
-export F90M=mpif90     
+export F77M=ftn ##mpfort    
+export F90M=ftn ##mpfort   
 export F77B=$F77M
-export FCC=mpicc
-export LDRM=mpif90   
+export FCC=cc
+export LDRM=ftn ##mpiifort
 export LDFLAGSM="$PGSZM -qopenmp -mkl"
-export FINC=   #esmf include path found in Makefile
+export FINCS=""   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"
 
-#export ESMFLIBM=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/lib/libO/Linux.intel.64.intelmpi.default/libesmf.a
-#export ESMF_LIB=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/lib/libO/Linux.intel.64.intelmpi.default/libesmf.a
-#export ESMF_MOD=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/mod/modO/Linux.intel.64.intelmpi.default
-#export ESMF_INC=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/mod/modO/Linux.intel.64.intelmpi.default
-#export ESMFMKFILE=/gpfs/gp1/usrx/local/esmf-3.1.0rp2/lib/libO/Linux.intel.64.intelmpi.default/esmf.mk
-###export ESMFMKFILE=/gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository/sorc/esmf.mk
-
-
- export ESMF_LIB=-L$ESMF_LIB
-#export ESMF_MOD=-I$ESMF_MOD
-#export ESMF_INC=-I$ESMF_INC
-
-MODULEPATH_ROOT=/usrx/local/prod/modulefiles
-
-echo
-echo $ESMF_LIB
-echo $ESMF_MOD
-echo $ESMFLIB
-echo
-
-export LIBSM="$ESMF_LIB  $BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd $NETCDF_LDFLAGS_CXX"
+export LIBSM="$BACIO_LIB4 $NEMSIO_LIB $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd -L$ESMF_LIB -L$NETCDF_LIB  -lrt" 
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}

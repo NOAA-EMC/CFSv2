@@ -2,7 +2,7 @@
 set -eua
 
 export machine=wcoss
-export CC=icc
+export CC=cc
 
 export CFLAGSM="-O3"
 export LDFLAGSM=

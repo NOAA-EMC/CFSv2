@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-export FC=mpif90  
+export FC=ftn     
 
 export FFLAGSM="-O0 -convert big_endian -g -traceback"
 export LDFLAGSM="-qopenmp"

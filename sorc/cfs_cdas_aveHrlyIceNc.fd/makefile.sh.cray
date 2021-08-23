@@ -3,7 +3,6 @@ set -x
 
 export machine=wcoss
 export FC=ftn
-#Raj-export FC=ifort
 
 export FFLAGSM="-O3 -free -xHost"
 export LDFLAGSM=

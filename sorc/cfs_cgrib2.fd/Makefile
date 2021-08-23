@@ -13,7 +13,6 @@ OBJS=	params.o gds2gdt.o  pds2pdtcfs.o pds2pdtens.o cfscgrib2.o  cnvcfs12.o   cn
 # CMD		Name of the executable
 # PROFLIB	Library needed for profiling
 #
-FC =            ifort
 
 INC= $(G2_INC4) 
 
@@ -46,7 +45,7 @@ $(CMD).prof:	$(OBJS)
 	$(FC) $(LDFLAGS) -o $(@) $(OBJS) $(PROFLIB) $(LIBS)
 
 clean:
-	-rm -f $(OBJS)
+	-rm -f $(OBJS) *.mod
 
 clobber:	clean
 	-rm -f $(CMD) $(CMD).prof

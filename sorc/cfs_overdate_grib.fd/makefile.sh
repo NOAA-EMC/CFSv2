@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 
+export FC=ftn  
 export machine=wcoss
-export FC=ifort
 export EXE=cfs_overdate_grib
 export LIBS="$W3NCO_LIB4 $BACIO_LIB4"
 

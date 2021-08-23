@@ -1,16 +1,12 @@
-#! /usr/bin/env bash  
-
+#!/bin/bash
 set -eua
-
-module list; set -x
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}
 echo
 
-export FC=ftn 
-
 make -f Makefile
 mv ${make%.*} ../../exec
-rm -f *.o *.mod
+rm -f *.o *.mod 
+rm -f loadmap.txt log.make.cfs_cdas_angupdate
 

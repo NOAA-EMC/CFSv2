@@ -2,8 +2,8 @@
 set -x
 
 export machine=wcoss
-export FC90=ifort
-export FC=ifort
+export FC90=ftn    
+export FC=ftn   
 
 export FFLAGSM="-O3 -free -convert big_endian -traceback"
 export FFLAGSM2="-O3 -free -r8"

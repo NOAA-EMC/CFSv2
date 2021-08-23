@@ -2,7 +2,7 @@
 set -x
 
 machine=wcoss
-ptmp="/gpfs/hps/ptmp//$LOGNAME/cfsv2/makefcst"
+ptmp="/lfs/h1/emc/ptmp/$LOGNAME/cfsv2/makefcst"
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian
@@ -30,7 +30,6 @@ cd $make_dir || exit 99
 
 rm $make_dir/*.o
 rm $make_dir/*.mod
-
 tar -cf- -C$sorc_dir .|tar -xf-
 
 if [ $NATIVE_ENDIAN = YES ] ; then
@@ -49,11 +48,11 @@ export FRRM=-FR
 export FXXM=
 
 #export OPTSB="-O3 -g -ip -static -convert big_endian  -fp-model precise -align all -fno-alias -w -ftz "
-export OPTSB="-O3 -convert big_endian -fp-model precise "  
+export OPTSB="-O3 -convert big_endian -fp-model precise -g -traceback"  
 
 export OPTSBT=$OPTSB
 export OPTSIOM="$OPTSBT -r8 "
-export OPTSM="$OPTSBT -r8 -openmp"
+export OPTSM="$OPTSBT -r8 -qopenmp"
 export OPTS_SERM="$OPTSBT -r8 $ARCHM"
 export OPTS90M="$OPTSBT   -r8 "
 export OPTS90AM="$OPTSBT  -r8 "
@@ -65,11 +64,13 @@ export F77B=$F77M
 export FCC=cc
 export LDRM=ftn
 
-export LDFLAGSM="$PGSZM -openmp -mkl"
-export FINC=   #esmf include path found in Makefile
+export LDFLAGSM="$PGSZM -qopenmp -mkl"
+export FINCS=''   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"
 
-export LIBSM="-L$ESMF_LIB $BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd  -lrt "
+##export LIBSM="-L$ESMF_LIB $BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd  -lrt "
+
+export LIBSM="$BACIO_LIB4 $NEMSIO_LIB $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd -L$ESMF_LIB -L$NETCDF_LIB  -lrt"
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}

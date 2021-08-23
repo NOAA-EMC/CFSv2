@@ -2,7 +2,6 @@
 set -x
 export machine=wcoss
 export FC=ftn
-#Raj-export FC=ifort
 
 export FFLAGSM="-O2 -convert big_endian -assume byterecl -traceback"
 export LDFLAGSM=

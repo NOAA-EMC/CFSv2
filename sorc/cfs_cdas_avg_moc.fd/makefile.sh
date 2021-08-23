@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 export machine=wcoss
-export FC=ifort
+export FC=ftn  
 
 export FFLAGSM="-O2 -convert big_endian -assume byterecl -traceback"
 export LDFLAGSM=
