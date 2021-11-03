@@ -1,7 +1,7 @@
 SHELL=  /bin/sh
 ISIZE = 4
 RSIZE = 8
-COMP=   ifort -nofree
+COMP=   ftn  ### ifort -nofree
 LIBS=   $(W3EMC_LIBd) $(W3NCO_LIBd) $(BACIO_LIB4)  
 LDFLAGS=  
 #FFLAGS= -O2 -xHost -i$(ISIZE) -real-size 32

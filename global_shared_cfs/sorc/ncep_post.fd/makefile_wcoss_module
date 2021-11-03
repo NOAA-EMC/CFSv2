@@ -28,9 +28,9 @@ FREE     = -FR
 #WRFPATH    = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
 #WRFPATH    = /gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
 
-WRFPATH    = /lfs/h1/emc/global/noscrub/Jack.Woollen/wrflib/wrf_shared.v1.1.0
+WRFPATH    = /lfs/h2/emc/global/noscrub/Jack.Woollen/wrflib/wrf_shared.v1.1.0
 WRF_INC    = -I$(WRFPATH)/external/io_quilt -I$(WRFPATH)/frame
-WRF_LIB    =                                       \
+WRF_LIB    =                                \
              $(WRFPATH)/frame/pack_utils.o  \
              $(WRFPATH)/frame/module_internal_header_util.o \
              $(WRFPATH)/external/io_grib1/libio_grib1.a \

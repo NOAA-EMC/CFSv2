@@ -626,17 +626,17 @@ else
    for sges in sgm3prep sgesprep sgp3prep; do
       if [ -s $sges.relocate ] ; then
          mv $sges.relocate $sges
-      else
-
+#     else
+#      
 #  problem: $sges.relocate does not exist
 #  --------------------------------------
-
-         if [ -s $DATA/err_exit ]; then
-            $DATA/err_exit "The file $sges.relocate does not exist"
-         else
-            exit 555
-         fi
-         exit 9
+#      
+#        if [ -s $DATA/err_exit ]; then
+#           $DATA/err_exit "The file $sges.relocate does not exist"
+#        else
+#           exit 555
+#        fi
+#        exit 9
       fi
    done
 

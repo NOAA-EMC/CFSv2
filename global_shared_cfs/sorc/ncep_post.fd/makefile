@@ -6,7 +6,7 @@ TARGET   = ncep_post
 #
 # CPP, Compiler, and Linker Options
 #
-FC       = mpfort -compiler ifort
+FC       = ftn  ##mpfort -compiler ifort
 CPP      = /lib/cpp -P
 CPPFLAGS = -DLINUX 
 OPTS     = -O -fp-model strict

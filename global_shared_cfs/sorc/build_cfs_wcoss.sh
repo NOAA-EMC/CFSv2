@@ -9,8 +9,9 @@ set -euax
 mkdir -p ../exec
 
 echo
-./build_ncep_post.sh
-echo
 ./build_tropcy.sh
 echo
 ./build_gsm_wcoss.sh
+echo
+./build_ncep_post.sh
+echo
