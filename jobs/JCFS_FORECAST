@@ -141,7 +141,7 @@ export cnvgwd=.true.
 
 export NPROCS_c=1
 export NPROCS_o=60
-export NPROCS_a=67
+export NPROCS_a=128
 
 #############################################
 # Get the variables setup from config script

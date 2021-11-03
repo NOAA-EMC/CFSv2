@@ -220,8 +220,11 @@ $FORECASTSH - $DATA $VDATE $EXEC_OMD $COMOUT \
 ###    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
 rc=$?
 
+set +e
 cat $(basename $FORECASTSH).out.$FHINI >> $pgmout
 cp $(basename $FORECASTSH).err.$FHINI  errfile
+set -e
+
 if [[ $rc -ne 0 ]] ; then
   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
      msg="Error in executing the forecast script"

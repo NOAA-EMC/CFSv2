@@ -39,6 +39,7 @@ export cycle=t${cyc}z
 # Specify Execution Areas
 ####################################
 
+export HOMEglob=$HOMEcfs/glo*cfs
 export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEglob}
 export EXECGLOBAL=${EXECGLOBAL:-$HOMEglob/exec}
 export USHGLOBAL=${USHGLOBAL:-HOMEglob/ush}
@@ -46,9 +47,9 @@ export USHGLOBAL=${USHGLOBAL:-HOMEglob/ush}
 export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_am}
 export FIXGSM=${FIXGSM:-$FIXGLOBAL}
 export FIXgsm=${FIXGSM:-$FIXGLOBAL}
-export RTMFIX=${RTMFIX:-$HOMEcrtm/fix}
+export RTMFIX=${RTMFIX:-$CRTM_FIX}
 
-export HOMEGSI=${HOMEGSI:-$HOMEgsi} 
+export HOMEgsi=${HOMEGSI:-$HOMEcfs/global_shared_cfs}
 export EXECGSI=${EXECGSI:-$HOMEgsi/exec}
 export PARMGSI=${PARMGSI:-$HOMEgsi/parm}
 export SCRGSI=${SCRGSI:-$HOMEgsi/scripts}
@@ -385,8 +386,9 @@ export KMP_STACKSIZE=2048m
 export NTHSTACK=1024000000                # stacks for fcst step; default 128000000
 export NTHSTACK_GSI=1024000000            # stack size for anal, default=128000000
 
-export OMP_NUM_THREADS_CY=20 
-export APRUN=" mpirun -n $LSB_DJOB_NUMPROC"
+export LSB_DJOB_NUMPROC=1  
+export OMP_NUM_THREADS_CY=1
+export APRUN=" mpiexec -n $LSB_DJOB_NUMPROC"
 
 env
 

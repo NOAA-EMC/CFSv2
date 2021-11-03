@@ -92,6 +92,9 @@ export cfs_gribchksh=${cfs_gribchksh:-$USHcfs/cfs_grib_checkf.sh}
 export SIGHDR=${SIGHDR:-$EXECcfs/cfs_sighdr}
 export sigavg=${sigavg:-$EXECcfs/cfs_sigavg}
 export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
+
+export LSB_DJOB_NUMPROC=${LSB_DJOB_NUMPROC:-1}
+export cfprun="mpiexec -n $LSB_DJOB_NUMPROC cfp"
 export NCP=${NCP:-/bin/cp}
 
 ####################################
