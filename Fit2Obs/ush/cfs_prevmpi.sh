@@ -47,6 +47,8 @@ qid=$$
 
 cd $DATA
 PRPI=$1; if [ ! -s $PRPI ] ; then exit 1 ;fi
+MPIRUN="mpiexec -n3"
+OMP_NUM_THREADS=1
 CDATE10=$2
 
 rm -f $PRPI.prevents

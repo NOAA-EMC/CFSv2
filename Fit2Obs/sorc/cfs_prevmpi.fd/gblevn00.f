@@ -487,6 +487,7 @@ C -------------------------------
          if(myid==0)PRINT 700
   700 FORMAT(/1X,100('#')/' =====> SUBROUTINE GBLEVENTS INVOKED FOR ',
      $ 'THE FIRST TIME - VERSION LAST UPDATED 2007-09-14'/)
+         print*,'JSW---myid=',myid
 
 C  INITIALIZE NAMELIST SWITCHES TO DEFAULT VALUES
 C  ----------------------------------------------
