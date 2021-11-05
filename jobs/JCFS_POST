@@ -173,8 +173,6 @@ YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
 
 export NTHSTACK=102400000
 
-export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
-
 #############################################
 # Specify the recovery and postjob directries
 #############################################

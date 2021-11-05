@@ -312,7 +312,6 @@ if [ $YYYYSTART -le $YYYYEND ] ; then
    #############################################################
    # Execute the script
    #############################################################
-    APRUNCY=${APRUNCY:-mpirun.lsf}
     SCRIPTDIR=${SCRIPTDIR:-$HOMEcfs/scripts}
     FCST_SCRIPT_DIR=${FCST_SCRIPT_DIR:-$SCRIPTDIR}
     FCST_SCRIPT=${FCST_SCRIPT:-$FCST_SCRIPT_DIR/exrun_cfs.sh.ecf}

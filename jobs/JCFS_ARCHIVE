@@ -66,13 +66,12 @@ export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 
 # Execute the script.
-# mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 
 echo
 cat poescript
 echo
 
-mpirun cfp poescript | grep 'CFP RANK'
+mpiexec -n $NCPUS  cfp poescript | grep 'CFP RANK'
 export err=$?; err_chk
 
 cd $DATA

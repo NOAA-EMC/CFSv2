@@ -91,7 +91,7 @@ fitdir=$HOMEf2o/batrun
 
 TMPDIR=$DATAROOT/fit2obs.$$; mkdir -p $TMPDIR
 export OMP_NUM_THREADS=${FITOMP:-1}
-export MPIRUN="mpirun -n 3"
+export MPIRUN="mpiexec -n 3"
 export KMP_AFFINITY=disabled
 
 export KEEPDATA=${KEEPDATA:-NO}
