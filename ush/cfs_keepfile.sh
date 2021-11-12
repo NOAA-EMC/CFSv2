@@ -12,7 +12,7 @@
 #  $DAY_TO_KEEP is defined in the config script (=45 days)
 #  $HOUR_TO_KEEP is defined in the config script(=1080 hr)
 
-set -x
+#set -x
 if [ $# -ne 6 ] ; then
 	err_exit "`date` $0: argument error"
 fi
@@ -22,8 +22,6 @@ end_forecast_hour=$3
 fh_inc=$4
 dir=$5
 tot_err=$6
-
-export APRUN=${APRUN:-mpirun.lsf}
 
 mkdir -p $DATA/6hrly_grib/$file
 cd $DATA/6hrly_grib/$file
@@ -74,7 +72,7 @@ done
 if [ $convert_grb2 = yes ]
 then
   if [ -s poescript ] ; then
-    mpirun cfp poescript |grep 'CFP RANK'
+    $cfprun poescript |grep 'CFP RANK'
     export err=$?; err_chk
   fi
   

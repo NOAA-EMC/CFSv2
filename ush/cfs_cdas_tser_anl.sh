@@ -10,7 +10,7 @@ set -x
 
 #export MP_STDOUTMODE=ordered
 #export MP_LABELIO=yes
-export APRUN=${APRUN:-mpirun}
+export APRUN=${APRUN:-"mpiexec -n $NCPUS"}
 
 export yyyymm=${1:-${yyyymm:-$yyyy$mm}}
 export inp_file=${2:-${inp_file:-pgbf}}

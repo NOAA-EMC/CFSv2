@@ -1821,7 +1821,7 @@ set -x
 #  --------------------------------------------------------------------------
       if [ "$POE" != 'NO' ]; then
          ###/usr/bin/poe -cmdfile prep_exec.cmd $POE_OPTS
-         mpirun cfp prep_exec.cmd |grep 'CFP RANK'
+         mpiexec -n  28 cfp prep_exec.cmd |grep 'CFP RANK'
       elif [ $BACK = 'YES' ] ; then
          wait
       fi

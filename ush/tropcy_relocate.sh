@@ -636,7 +636,7 @@ else
    export OMP_NUM_THREADS=$RELOX_threads        
    export MP_TASK_AFFINITY=core:$RELOX_threads
 
-   ${APRNRELOC:-mpirun.lsf} $RELOX >stdo.prints
+   mpiexec -n $NCPUS $RELOX >stdo.prints
    errSTATUS=$?
    
 #  copy relocation print output here and there

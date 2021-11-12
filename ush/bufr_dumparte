@@ -27,6 +27,7 @@ if [[ $3 = tesac && $# -eq 3 ]]; then
 
   echo
   ls -l tesac.org 
+  ls -l 031.ibm
   ls -l argomods 
   ls -l tesac.ibm
   echo

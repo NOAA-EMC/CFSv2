@@ -8,7 +8,7 @@ set -xeu
 #       Updated by Patrick Tripp Sept 2010
 #######################################################
 
-export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
+export APRUN="mpiexec -n $NCPUS"
 WINDEX=${WINDEX:-$GRBINDEX}
 #export MP_STDOUTMODE=ordered
 #export MP_LABELIO=yes

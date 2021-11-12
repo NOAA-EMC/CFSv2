@@ -7,7 +7,7 @@ set -x
 #       Originally written by Shrinivas Moorthi
 #       Updated by Patrick Tripp Sept 2010
 ######################################################################
-export APRUN=${APRUN:-mpirun}
+export APRUN=${APRUN:-mpiexec}
 
 # fix for files > 2GB
 
@@ -156,7 +156,7 @@ fi
 # concat the separate cmdfiles and run cfp
 
 cat cmdfile.* >cfpfile
-mpirun cfp cfpfile  >/dev/null 
+$cfprun cfpfile |grep 'CFP RANK'
 export err=$?; err_chk
 
 rm  cfpfile cmdfile.$$* 

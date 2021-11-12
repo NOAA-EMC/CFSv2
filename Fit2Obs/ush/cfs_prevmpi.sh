@@ -47,7 +47,7 @@ qid=$$
 
 cd $DATA
 PRPI=$1; if [ ! -s $PRPI ] ; then exit 1 ;fi
-MPIRUN="mpiexec -n3"
+MPIRUN=${MPIRUN:-"mpiexec -n $NCPUS"}
 OMP_NUM_THREADS=1
 CDATE10=$2
 

@@ -68,9 +68,9 @@ export FORT82=obogram.bin
 
 # find the number of procs
 
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
+if [ -n "$NCPUS" ]; then
    nprocs=$LSB_DJOB_NUMPROC
-   export APRUN="mpirun -n $nprocs"
+   export APRUN="mpiexec -n $nprocs"
 else
    echo "nprocs not defined for this platform"
    export err=99; err_chk

@@ -264,7 +264,7 @@ fi
 
 # find the number of procs
 
-export APRUNC="mpirun -n $LSB_DJOB_NUMPROC"
+export APRUNC="mpiexec -n $NCPUSC"
 
 #  Command line arguments.
 export APRUNC=${APRUNC:-""}

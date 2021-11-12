@@ -274,7 +274,7 @@ if [[ "$VERBOSE" = "YES" ]] ; then
    set -x
 fi
 
-export APRUNC="mpirun -n LSB_DJOB_NUMPROC"
+export APRUNC="mpiexec -n $NCPUS"
 
 #  Command line arguments.
 export APRUNC=${APRUNC:-""}

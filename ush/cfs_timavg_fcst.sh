@@ -6,7 +6,7 @@
 #set -xeu
 set -eu
 
-APRUN="mpirun -n 28"
+APRUN="mpiexec -n 28"
 
 export WINDEX=${WINDEX:-$GRBINDEX}
 

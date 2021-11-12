@@ -15,7 +15,7 @@ export GRIDSPEC=${GRIDSPEC:-$HOMEcfs/fix/${cfsp}fix_om/grid_spec.nc}
 
 # find the number of procs
 
-export APRUN="mpirun -n $LSB_DJOB_NUMPROC"
+export APRUN="mpiexec -n $LSB_DJOB_NUMPROC"
 
 export name=regrid_fice
 export cdate=$1

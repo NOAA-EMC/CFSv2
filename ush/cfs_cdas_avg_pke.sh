@@ -11,9 +11,9 @@ set -x
 
 # find the number of procs
 
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
-   nprocs=$LSB_DJOB_NUMPROC
-   export APRUN="mpirun -n $nprocs" 
+if [ -n "$NCPUS" ]; then
+   nprocs=$NCPUS
+   export APRUN="mpiexec -n $nprocs" 
 else
    echo "nprocs not defined for this platform"
    export err=99; err_chk
@@ -97,7 +97,7 @@ if [ $prefix2 = f -o $prefix2 = h -o $prefix2 = l ] ; then
 
   if [ -s $cmdfile ] ; then
    cat $cmdfile
-   mpirun cfp $cmdfile |grep 'CFP RANK'
+   $APRUN cfp $cmdfile |grep 'CFP RANK'
    export err=$?; err_chk
   fi
 
@@ -143,7 +143,7 @@ else
   done
 
   if [ -s $cmdfile ] ; then
-     mpirun cfp $cmdfile |grep 'CFP RANK'
+     $APRUN cfp $cmdfile |grep 'CFP RANK'
   fi
 
 cat > nampke <<EOF
