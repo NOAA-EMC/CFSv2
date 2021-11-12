@@ -118,10 +118,8 @@ wait_max=180
 while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
 
   wait_count=$((wait_count+1))  
-  defile=$(ls -rt $POSTDEFS/post_def$cyc.* | head -n1)
 
-# while [ -n "$POSTDEFS/post_def$cyc.*" ] ; do
-  while [ -s $POSTDEFS/post_def$cyc.* ] ; do
+  while [ -n "$(ls $POSTDEFS/post_def$cyc.*)" ] ; do
 
       done_count=$((done_count+1))
 
@@ -194,7 +192,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
       fi
 
       ###########################
-      # Run postprocessing job
+      echo jsw  Run postprocessing job
       ###########################
 
       cfs_postscript=${cfs_postscript:-$USHcfs/cfs_post.sh}
@@ -202,7 +200,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
       rc=$?
 
       #############################################
-      # Save the analysis files to 6hrly directory
+      echo jsw Save the analysis files to 6hrly directory
       #############################################
       if [ $FHS -eq 0 ]; then
          $NCP $COM_YMDH/siganl.${ENS_MEM}.$YMDH     $COM_HRLY/.
@@ -230,7 +228,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
       fi
 
       ##################################################################
-      # Save the pgbf, ipvf, ocnf and flxf files to the 6hrly directory
+      echo  jsw Save the pgbf, ipvf, ocnf and flxf files to the 6hrly directory
       ##################################################################
       tot_err=0
       for file in $HRLY_FILES_TO_BE_KEPT ; do
@@ -303,7 +301,7 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
       fi
 
       ######################################################
-      # At the very end of the POST job
+      echo  jsw IF At the very end of the POST job
       ######################################################
 
       if [ $FHE -ge $ENDHOUR ] ; then
@@ -349,12 +347,12 @@ while [ $wait_count -le $wait_max -a $BREAK_ON_RUN = NO ] ; do
          tar -cvf $COM_HRLY/restart.${ENS_MEM}.${start_date}.tar *
          rc=$?
 
-         # End saving the restart files
+         echo jsw End saving the restart files
          cd $DATA 
       fi
 
       ############################################################
-      # rename the post define and delete them if a member run is completed
+      echo jsw rename the post define and delete them if a member run is completed
       ############################################################
       tot_rc=`expr $tot_err + $rc`
       if [ $tot_rc -eq 0 ] ; then

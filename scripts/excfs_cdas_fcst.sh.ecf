@@ -1217,7 +1217,7 @@ echo VDATE = $VDATE after MOM4 run `date`
 #
 export mppnccombine=${mppnccombine:-$EXECcfs/${cfsp}mppnccombine}
 
-if [ $MPMD_PROC = YES ] ; then
+if [ ${MPMD_PROC:-YES}  = YES ] ; then
  > cmdfile_mpp
 fi
 
