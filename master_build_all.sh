@@ -8,7 +8,7 @@ export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
 
 [[ $# -eq 0 || $1 = 206 ]] && { cd $REPOROOT/global_shared_cfs/CRTMv206/sorc; . configure/ifort.setup; cd ..; ./build; }
 
-[[ $# -eq 0 || $1 = cfs ]] && { cd $REPOROOT/sorc; mkdir -p ../exec; ./build_all.dell; }
+[[ $# -eq 0 || $1 = cfs ]] && { cd $REPOROOT/sorc; mkdir -p ../exec; ./build_all.corn; }
 
 [[ $# -eq 0 || $1 = shr ]] && { cd $REPOROOT/global_shared_cfs/sorc; mkdir -p ../exec; ./build_cfs_wcoss.sh; }
 
@@ -18,5 +18,5 @@ export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
 
 [[ $# -eq 0 || $1 = jis ]] && { cd $REPOROOT/EMC_land_utilities/sorc; mkdir -p ../exec; ./build_emcsfc.sh; }
 
-[[ $# -eq 0 || $1 = f2o ]] && { cd $REPOROOT/Fit2Obs/sorc; mkdir -p ../exec; ./makes dell; }
+[[ $# -eq 0 || $1 = f2o ]] && { cd $REPOROOT/Fit2Obs/sorc; mkdir -p ../exec; ./makes corn; }
 
