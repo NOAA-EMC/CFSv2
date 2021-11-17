@@ -3,10 +3,10 @@ set -euax
 
 export REPOROOT=$PWD  
 
-export WRFPATH=/gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
-export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
+##export WRFPATH=/gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
+##export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
 
-[[ $# -eq 0 || $1 = 206 ]] && { cd $REPOROOT/global_shared_cfs/CRTMv206/sorc; . configure/ifort.setup; cd ..; ./build; }
+[[ $# -eq 0 || $1 = 206 ]] && { cd $REPOROOT/global_shared_cfs/CRTMv206/sorc; . configure/ftn.setup; cd ..; ./build; }
 
 [[ $# -eq 0 || $1 = cfs ]] && { cd $REPOROOT/sorc; mkdir -p ../exec; ./build_all.corn; }
 
