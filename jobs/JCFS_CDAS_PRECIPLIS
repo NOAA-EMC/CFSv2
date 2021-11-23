@@ -81,7 +81,7 @@ mkdir -m 775 -p $COMOUTGLDAS $COMOUTCMAP $COMOUTGAGE $COMOUT
 # execute the script
 #############################################################
 
-${PREPCIPLISSSH:-$HOMEcfs/scripts/excfs_cdas_preciplis.sh.ecf}
+${PREPCIPLISSSH:-$HOMEcfs/scripts/excfs_cdas_preciplis.sh}
 err=$?; err_chk
 
 cat $pgmout

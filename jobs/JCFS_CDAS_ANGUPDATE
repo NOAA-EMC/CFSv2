@@ -71,7 +71,7 @@ export cycle=t${cyc}z
 # SENDCOM  - Copy Files From TMPDIR to $COMOUT
 # SENDDBN  - Issue DBNet Client Calls
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output in exglobal_fcst.sh.ecf
+# VERBOSE  - Specify Verbose Output in exglobal_fcst.sh
 ####################################
 export SAVEGES=${SAVEGES:-YES}
 export SENDECF=${SENDECF:-YES}
@@ -218,7 +218,7 @@ env
 
 #############################################################
 # Execute the script
-${ANGUPDATESH:-$HOMEcfs/scripts/excfs_cdas_angupdate.sh.ecf}
+${ANGUPDATESH:-$HOMEcfs/scripts/excfs_cdas_angupdate.sh}
 #############################################################
 
 ##########

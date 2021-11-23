@@ -3,7 +3,7 @@
 
 #####################################################################
 echo "------------------------------------------------"
-echo "exglobal_makeprepbufr.sh.ecf - Global (GDAS, GFS, CDAS) model prepbufr\
+echo "exglobal_makeprepbufr.sh - Global (GDAS, GFS, CDAS) model prepbufr\
  processing"
 echo "------------------------------------------------"
 echo "History: Mar 1 2013 - Original script."

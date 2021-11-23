@@ -157,7 +157,7 @@ export REDERR='2>'
 # Execute the Script
 ###############################
 
-${CFSNCEPPOSTSH:-$HOMEcfs/scripts/excfs_cdas_nceppost.sh.ecf}
+${CFSNCEPPOSTSH:-$HOMEcfs/scripts/excfs_cdas_nceppost.sh}
 err=$?; err_chk
 
 cat $pgmout

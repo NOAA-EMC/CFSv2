@@ -114,7 +114,7 @@ export NET=gdas ## relocte script ignores NET=cdas !!!
 # execute the script
 #############################################################
 export RUN=$RUN1 # needed for vertical structure
-$HOMERELO/scripts/extropcy_qc_reloc.sh.ecf
+$HOMERELO/scripts/extropcy_qc_reloc.sh
 export err=$?; err_chk
 
 #############################################################

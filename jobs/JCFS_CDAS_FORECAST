@@ -57,7 +57,7 @@ export mppnccombine=${mppnccombine:-$EXECcfs/cfs_mppnccombine}
 export AM_EXEC=${AM_EXEC:-${EXEC_AMD:-$EXECcfs}/cfs_cdas_atmos_fcst}
 export OM_EXEC=${OM_EXEC:-${EXEOMD:-$EXECcfs}/cfs_ocean_mom4ice}
 export C_EXEC=${C_EXEC:-${EXEC_CD:-$EXECcfs}/cfs_mlc_coupler}
-export FORECASTSH=${FORECASTSH:-$HOMEcfs/scripts/excfs_cdas_fcst.sh.ecf}
+export FORECASTSH=${FORECASTSH:-$HOMEcfs/scripts/excfs_cdas_fcst.sh}
 export FIXGLOBAL=${FIXGLOBAL:-$FIXcfs/cfs_fix_am}
 export FIXDIR=${FIXDIR:-$FIXcfs/cfs_fix_am}
 export FIXPREP=$FIXcfs/cfs_fix_prep
@@ -72,7 +72,7 @@ export cycle=t${cyc}z
 ####################################
 # SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output in excfs_cdas_fcst.sh.ecf
+# VERBOSE  - Specify Verbose Output in excfs_cdas_fcst.sh
 ####################################
 export SAVEGES=${SAVEGES:-YES}
 export VERBOSE=${VERBOSE:-YES}

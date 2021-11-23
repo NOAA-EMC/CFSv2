@@ -84,7 +84,7 @@ env
 #############################################################
 # execute the script
 
-${CLDASSH:-$HOMEcfs/scripts/excfs_cdas_gldas.sh.ecf}
+${CLDASSH:-$HOMEcfs/scripts/excfs_cdas_gldas.sh}
 
 #############################################################
 cat $pgmout

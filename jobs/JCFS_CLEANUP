@@ -62,7 +62,7 @@ env
 ###############################
 # Execute the Script
 ###############################
-${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_cleanup.sh.ecf}
+${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_cleanup.sh}
 err=$?; err_chk
 
 cat $pgmout

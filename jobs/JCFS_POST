@@ -75,7 +75,7 @@ export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
 
 export POSTGPSH=${POSTGPSH:-$HOMEpost/ush/global_nceppost.sh}
 export POSTGPEXEC=${POSTGPEXEC:-$HOMEpost/exec/ncep_post}
-export POST_SCRIPT=${POST_SCRIPT:-$HOMEcfs/scripts/excfs_post.sh.ecf}
+export POST_SCRIPT=${POST_SCRIPT:-$HOMEcfs/scripts/excfs_post.sh}
 export OCN2GRIBEXEC=${OCN2GRIBEXEC:-$EXECcfs/cfs_tripo2reg}
 
 export cfs_pgbscript=${cfs_pgbscript:-$USHcfs/cfs_pgb.sh}

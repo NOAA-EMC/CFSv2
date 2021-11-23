@@ -396,10 +396,10 @@ env
 # Execute the script
 #############################################################
 export RUN=$RUN1 # vertical script needs this
-${ANALYSISSH:-$SCRGSI/exglobal_analysis.sh.ecf}
+${ANALYSISSH:-$SCRGSI/exglobal_analysis.sh}
 
 ##########
-# NOTES: 1) script exglobal_analysis.sh.ecf compresses the contents of
+# NOTES: 1) script exglobal_analysis.sh compresses the contents of
 #           RADSTAT, PCPSTAT, OZNSTAT, and CNVSTAT.  These stat files
 #           files are tarballs of compressed files.
 #        2) SFCANL, SIGANL are input to the GFS forecast following the analysis

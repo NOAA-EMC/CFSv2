@@ -123,7 +123,7 @@ fi
   
 if [ $RUN_MONTHLY = YES ]
 then
-  ${MONTHLYMEANSH:-$HOMEcfs/scripts/excfs_cdas_monthly.sh.ecf} $cmonth
+  ${MONTHLYMEANSH:-$HOMEcfs/scripts/excfs_cdas_monthly.sh} $cmonth
   export err=$?; err_chk
 
   if [ $err -eq 0 ]; then

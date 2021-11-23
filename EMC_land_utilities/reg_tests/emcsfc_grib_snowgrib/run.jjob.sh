@@ -22,7 +22,7 @@ export COMROOT=/com
 export FIXgrib=/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/jisni_port/fix
 export EXECgrib=/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/EMC_land_utilities/exec
 
-export EXSNOWGRIBSH=/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/EMC_land_utilities/scripts/exsnowgrib.sh.ecf
+export EXSNOWGRIBSH=/gpfs/dell2/emc/modeling/noscrub/George.Gayno/landutil.git/EMC_land_utilities/scripts/exsnowgrib.sh
 export SENDCOM=NO
 export SENDDBN_GB2=NO
 

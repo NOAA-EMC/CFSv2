@@ -107,7 +107,7 @@ export mppnccombine=${mppnccombine:-$EXECcfs/cfs_mppnccombine}
 export AM_EXEC=${AM_EXEC:-${EXEC_AMD:-$EXECcfs}/cfs_atmos_fcst}
 export OM_EXEC=${OM_EXEC:-${EXEOMD:-$EXECcfs}/cfs_ocean_mom4ice}
 export C_EXEC=${C_EXEC:-${EXEC_CD:-$EXECcfs}/cfs_mlc_coupler}
-export FORECASTSH=${FORECASTSH:-$FCSTSHDIR/excfs_fcst.sh.ecf}
+export FORECASTSH=${FORECASTSH:-$FCSTSHDIR/excfs_fcst.sh}
 export CHGRESSH=${CHGRESSH:-$HOMEgsm/ush/global_chgres.sh}
 export CHGRESEXEC=${CHGRESEXEC:-$HOMEgsm/exec/global_chgres}
 export CFSPREPAREPOSTSH=${CFSPREPAREPOSTSH:-$USHcfs/cfs_prepare_post.sh}
@@ -314,7 +314,7 @@ if [ $YYYYSTART -le $YYYYEND ] ; then
    #############################################################
     SCRIPTDIR=${SCRIPTDIR:-$HOMEcfs/scripts}
     FCST_SCRIPT_DIR=${FCST_SCRIPT_DIR:-$SCRIPTDIR}
-    FCST_SCRIPT=${FCST_SCRIPT:-$FCST_SCRIPT_DIR/exrun_cfs.sh.ecf}
+    FCST_SCRIPT=${FCST_SCRIPT:-$FCST_SCRIPT_DIR/exrun_cfs.sh}
     $FCST_SCRIPT; export err=$?; err_chk
   fi
 else 

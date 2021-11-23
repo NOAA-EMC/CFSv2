@@ -16,7 +16,7 @@ export FIXgrib=$HOMEgrib/fix
 # run the JISNI procedure
 # -----------------------
 
-$HOMEgrib/scripts/exsnowgrib.sh.ecf
+$HOMEgrib/scripts/exsnowgrib.sh
 
 # copy snowdepth files to cfs filenames
 # -------------------------------------

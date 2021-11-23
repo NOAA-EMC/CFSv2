@@ -76,7 +76,7 @@ env
 ########################################
 # Run the script 
 ########################################
-$HOMEcfs/scripts/excfs_grib_awips.sh.ecf 
+$HOMEcfs/scripts/excfs_grib_awips.sh 
 export err=$?;err_chk
 
 ########################################

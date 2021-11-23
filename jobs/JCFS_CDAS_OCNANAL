@@ -122,7 +122,7 @@ export APRUN="aprun -n1"
 # -------------------------------------------------------
 
 if [[ $cyc = 00 || ${GODAS:-00} = 24 ]]; then
-  ${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh.ecf}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
+  ${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
 else 
   # use guess as analysis
   ##OCNGES=$ptmp/nwges/prod/cdas.$xpdy/cdas1.t${xcyc}z.next_ocnr.tar

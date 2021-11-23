@@ -39,7 +39,7 @@ export FIXcfs=$HOMEcfs/fix
 #############################################################
 # execute the script
 #############################################################
-${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_switch.sh.ecf}
+${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_switch.sh}
 err=$?; err_chk
 
 msg="JOB $job HAS COMPLETED NORMALLY."

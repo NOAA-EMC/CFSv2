@@ -83,9 +83,9 @@ export DUMP_FROM_PROD=${DUMP_FROM_PROD:-YES}
 
 if [ "$DUMP_FROM_PROD" = NO ]
 then
-  ${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh.ecf} 
+  ${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh} 
 else
-  ${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh.ecf}
+  ${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh}
 fi
 
 cat $pgmout
