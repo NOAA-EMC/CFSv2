@@ -107,9 +107,9 @@ export MP_SHARED_MEMORY=no
 ##############################################
 # Define GES directories
 ##############################################
- export gespath=${gespath:-${GESROOT}/${envir}}
- export GESdir=${GESdir:-$gespath/cdas.$PDY}
- mkdir -m 775 -p $GESdir
+export gespath=${gespath:-${GESROOT}/${envir}}
+export GESdir=${GESdir:-$gespath/cdas.$PDY}
+#mkdir -m 775 -p $GESdir
 
 ############################################
 # determine  the current day of the forecast
@@ -236,11 +236,12 @@ if [[ $rc -ne 0 ]] ; then
 fi
 
 ###########################################################
-# copy the OM restart files to GESdir for use in next GODAS
+# copy the OM restart files to COMOUT for use in next GODAS
 ###########################################################
 
 cd $DATA/IRESTART
 FDATE=$($NDATE $((FHINI+6)) $CDATE)
+OCNR=$RUN1.$cycle.next_ocnr.tar
 tar -cvf $OCNR ${FDATE}*
 
 if [ $SENDCOM = YES ] ; then

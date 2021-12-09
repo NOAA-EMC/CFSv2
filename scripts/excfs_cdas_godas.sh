@@ -393,7 +393,7 @@ fi
 
 if [ $SENDCOM = YES ] ; then
   cp ocnanl.$CDUMP.$CDATE.tar $COMOUT/${RUN1}.t${cyc}z.ocnanl.tar
-  cp ocnanl.$CDUMP.$CDATE.tar $GESdir/${RUN1}.t${cyc}z.ocnanl.tar
+##cp ocnanl.$CDUMP.$CDATE.tar $GESdir/${RUN1}.t${cyc}z.ocnanl.tar
 fi
 
 #-------------------------------------------------------------------------------
