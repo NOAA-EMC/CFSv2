@@ -1,3 +1,4 @@
+#!/usr/bin/env ksh
 ############################################################################
 echo "---------------------------------------------------------------------"
 echo "extropcy_qc_reloc.sh.ecf - Tropical Cyclone QC/Relocation Prcocessing"

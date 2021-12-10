@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ####  UNIX Script Documentation Block
 #
 # Script name:         tropcy_relocate.sh
@@ -596,7 +597,7 @@ else
    export OMP_NUM_THREADS=$RELOX_threads        
    export MP_TASK_AFFINITY=core:$RELOX_threads
 
-   time mpirun -n 3 $RELOX >stdo.prints
+   time mpiexec -n 3 $RELOX >stdo.prints
    errSTATUS=$?
    
 #  copy relocation print output here and there

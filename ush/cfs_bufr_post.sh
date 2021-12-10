@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eua
 #
 #   This script originally written by Jack Woollen

@@ -1,3 +1,4 @@
+#!/usr/bin/env ksh
 # This script is executed by the script tropcy_relocate.sh
 # --------------------------------------------------------
 

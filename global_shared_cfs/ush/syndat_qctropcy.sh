@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 set +x
 
 #          SCRIPT NAME :  syndat_qctropcy.sh

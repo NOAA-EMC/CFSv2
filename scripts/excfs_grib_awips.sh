@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ######################################################################
 #  UTILITY SCRIPT NAME :  excfs_grib_awips.sh
 #         DATE WRITTEN :  03/30/2015
