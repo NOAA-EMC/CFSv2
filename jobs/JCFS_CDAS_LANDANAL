@@ -10,7 +10,6 @@ set -xa
 # SENDDBN: Set to NO for developers, default to YES
 # COM_IN:  Directory for input files, default to /com/$NET/${envir}
 # COM_OUT: Directory for output file, default to /com/$NET/${envir}
-# gespath: Directory for the guess or restart files, default to /nwges/${envir}
 #####################################################################################
 
 ####################################
@@ -70,14 +69,9 @@ export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m775 -p $COMOUT
 
 ##############################################
-# Define GES directories
+# Define OMP_NUM_THREADS
 ##############################################
-export gespath=${gespath:-${GESROOT}/$envir}
-export GESdir=$gespath/cdas.$PDY
-mkdir -m 775 -p $GESdir
-
-export RESDIR=${RESDIR:-$GESdir}
-mkdir -p $RESDIR
+export OMP_NUM_THREADS=1
 
 env
 

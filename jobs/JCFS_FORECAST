@@ -70,7 +70,7 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
+# SAVEGES  - Copy Files From TMPDIR to COMOUT  
 # RERUN    - Rerun fcst from beginning (default no)
 # VERBOSE  - Specify Verbose Output 
 ####################################
@@ -153,13 +153,6 @@ export DISK_GLOB=${DISK_GLOB:-/global/save}
 export DISK_CLIM=${DISK_CLIM:-/climate/save}
 
 export MP_SHARED_MEMORY=no
-#
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/${NET}.$PDY
-#mkdir -m 775 -p $GESdir
 
 ############################################
 # determine  the current day of the forecast
@@ -297,17 +290,9 @@ if [ $YYYYSTART -le $YYYYEND ] ; then
    #######################################
    # Define the input IC files
    #######################################
-   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-     export SIGI=${SIGI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sanl}
-     export SFCI=${SFCI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sfcanl}
-     export OCNI=${OCNI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar}
-
-     if [ ! -s $SIGI -o ! -s $SFCI -o ! -s $OCNI ]; then
-       export SIGI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sanl
-       export SFCI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sfcanl
-       export OCNI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
-     fi
-   fi
+    export SIGI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sanl
+    export SFCI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sfcanl
+    export OCNI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
 
    #############################################################
    # Execute the script

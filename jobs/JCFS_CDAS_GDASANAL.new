@@ -95,15 +95,6 @@ mkdir -m775 -p $COMOUT
 export SFCANL_OUT=sfcanl
 export SIGANL_OUT=sanl
 
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.$PDY
-mkdir -m 775 -p $GESdir
-
-export SAVEGES=${SAVEGES:-NO} # put the analysis in GESdir
-
 ####################################
 # Specify Special Fcst Vars
 ####################################

@@ -33,11 +33,9 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun posts from beginning (default no)
 # VERBOSE  - Specify Verbose Output in global_postgp.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
 

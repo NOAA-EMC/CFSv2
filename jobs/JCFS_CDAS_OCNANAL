@@ -62,15 +62,6 @@ export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m775 -p $COMOUT
 
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.$PDY
-mkdir -m 775 -p $GESdir
-
-export RESDIR=${RESDIR:-$GESdir}
-
 ### Input parameters for GODAS
 export GODAS_PARM_INPUT=${GODAS_PARM_INPUT:-$PARMcfs/cfs_parm_om/cfs_godas_input}
 

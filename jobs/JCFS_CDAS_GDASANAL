@@ -13,7 +13,6 @@ export RUN_ENVIR=${RUN_ENVIR:-prod}
 # SENDDBN: Set to NO for developers, default to YES
 # COM_IN:  Directory for input files, default to /com/$NET/${envir}
 # COM_OUT: Directory for output file, default to /com/$NET/${envir}
-# gespath: Directory for the guess or restart files, default to /nwges/${envir}
 #####################################################################################
 
 ###############################################################
@@ -75,7 +74,6 @@ export cycle=t${cyc}z
 # RERUN    - Rerun fcst from beginning (default no)
 # VERBOSE  - Specify Verbose Output in exglobal_fcst.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export SENDECF=${SENDECF:-YES}
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
@@ -124,11 +122,6 @@ export COMIN=$COM_IN/cdas.${PDY}
 export COMOUT=$COM_OUT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
 
-##############################################
-# Define GES directories
-##############################################
-export GESdir=${GESDIR:-$GESROOT/$envir/cdas.$PDY}
-mkdir -m 775 -p $GESdir
 ####################################
 # Specify Special Fcst Vars
 ####################################

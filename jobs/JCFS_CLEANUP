@@ -52,11 +52,6 @@ export FIXcfs=$HOMEcfs/fix
 export COMROT=$COMROOT/${NET}/${envir}
 export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-
 env
 
 ###############################

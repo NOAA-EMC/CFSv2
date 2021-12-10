@@ -929,12 +929,6 @@ then
    fi
 fi
 
-if test "$SAVEGES" = "YES"
-then
-   cp $SFCANL  $GESdir/${RUN}.${cycle}.sfcanl
-   cp $SIGANL  $GESdir/${RUN}.${cycle}.sanl
-   cp $ABIAS   $GESdir/${RUN}.${cycle}.abias
-fi
 if test "$SENDCOM" = "YES"
 then
    cp $SFCANL  $COMOUT/${RUN}.${cycle}.sfcanl

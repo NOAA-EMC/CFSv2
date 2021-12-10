@@ -71,14 +71,6 @@ mkdir -m775 -p $COMOUT
 
 export COMINIC=$COMROT/cdas.$PDYm1
 
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.${PDY}
-export RESDIR=${RESDIR:-$GESdir}
-mkdir -p $RESDIR
-
 env
 
 #############################################################

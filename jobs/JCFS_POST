@@ -105,11 +105,9 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun fcst from beginning (default no)
 # VERBOSE  - Specify Verbose Output 
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
 export BATCH_POST=${BATCH_POST:-NO}

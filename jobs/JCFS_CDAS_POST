@@ -33,12 +33,10 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun posts from beginning (default no)
 # VERBOSE  - Specify Verbose Output in global_postgp.sh
 ####################################
 
-export SAVEGES=${SAVEGES:-YES}
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
 
@@ -82,13 +80,6 @@ export COMROT=$COMROOT/${NET}/${envir}
 export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
 mkdir -m775 -p $COMOUT
-
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.${PDY}
-mkdir -m 775 -p $GESdir
 
 ####################################
 # Specify Forecast Hour Range

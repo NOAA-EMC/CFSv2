@@ -13,7 +13,6 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 # SENDDBN: Set to NO for developers, default to YES
 # COMIN:   Directory for input files, default to $COMROOT/$NET/${envir}
 # COMOUT:  Directory for output file, default to $COMROOT/$NET/${envir}
-# gespath: Directory for the guess or restart files, default to /nwges/${envir}
 #####################################################################################
 
 ###############################################################
@@ -73,7 +72,6 @@ export cycle=t${cyc}z
 # RERUN    - Rerun fcst from beginning (default no)
 # VERBOSE  - Specify Verbose Output in exglobal_fcst.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export SENDECF=${SENDECF:-YES}
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
@@ -118,13 +116,6 @@ export COM_OUT=${COM_OUT:-$COMROOT/${NET}/${envir}}
 export  COMIN=$COM_IN/cdas.${PDY}
 export COMOUT=$COM_OUT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
-
-##############################################
-# Define GES directories
-##############################################
-export gespath=$GESROOT/$envir
-export GESdir=$gespath/cdas.$PDY
-mkdir -m 775 -p $GESdir
 
 ####################################
 # Specify Special Vars
@@ -225,9 +216,6 @@ ${ANGUPDATESH:-$HOMEcfs/scripts/excfs_cdas_angupdate.sh}
 # NOTES: 1) SATANGO is used in the following analysis cycle
 ##########
 
-if [ $SAVEGES = YES ] ; then
-   cp $SATANGO $GESdir/${RUN}.${cycle}.satang
-fi
 if [ $SENDCOM = YES ] ; then
    cp $SATANGO $COMOUT/${RUN}.${cycle}.satang
 fi

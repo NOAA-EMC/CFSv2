@@ -70,11 +70,9 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun fcst from beginning (default no)
 # VERBOSE  - Specify Verbose Output in excfs_cdas_fcst.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export VERBOSE=${VERBOSE:-YES}
 export BATCH_POST=${BATCH_POST:-NO}
 
@@ -103,13 +101,6 @@ export APROCS=${APROCS:-195}
 env
 
 export MP_SHARED_MEMORY=no
-
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=${GESdir:-$gespath/cdas.$PDY}
-#mkdir -m 775 -p $GESdir
 
 ############################################
 # determine  the current day of the forecast
@@ -156,38 +147,17 @@ export SIGO=$COMOUT/$RUN1.$cycle.sf'${FH}'
 export SFCO=$COMOUT/$RUN1.$cycle.bf'${FH}'
 export FLXO=$COMOUT/$RUN1.$cycle.sfluxgrbf'${FH}'
 export LOGO=$COMOUT/$RUN1.$cycle.logf'${FH}'
-#
-#restart File Names
-#
-export SIGR1=$GESdir/$RUN1.$cycle.sigr1.t${JCAP}l$LEVS.$start_date
-export SIGR2=$GESdir/$RUN1.$cycle.sigr2.t${JCAP}l$LEVS.$start_date
-export SFCR=$GESdir/$RUN1.$cycle.sfcr.t${JCAP}l$LEVS.$start_date
-export OCNR=$GESdir/$RUN1.$cycle.next_ocnr.tar
-#
 
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
 
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  export SIGI=${SIGI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sanl}
-  export SFCI=${SFCI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sfcanl}
-  export OCNI=${OCNI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar}
+##############################################
+# Define the guess files 
+##############################################
 
-  if [ ! -s $SIGI -o ! -s $SFCI -o ! -s $OCNI ]; then
-    export SIGI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sanl
-    export SFCI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sfcanl
-    export OCNI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
-  fi
-
-elif [ ${IC_FROM_DISK:-YES} = YES ] ; then
-   export nknd=${nknd:-""}
-   export SUFIN=${SUFIN:-.gdas$nknd}
-   export INI_DIR=${INI_DIR:-$DATA}
-   export SIGI=${SIGI:-$INI_DIR/siganl${SUFIN}.$CDATE}
-   export SFCI=${SFCI:-$INI_DIR/sfcanl${SUFIN}.$CDATE}
-   OCN_ICDIR=${OCN_ICDIR:-$INI_DIR}
-   export OCNI=${OCNI:-$OCN_ICDIR/ocnanl${SUFIN}.$CDATE.tar}
-fi
+export SIGI=$COMOUT/cdas1.t${cyc}z.sanl
+export SFCI=$COMOUT/cdas1.t${cyc}z.sfcanl
+export OCNI=$COMOUT/cdas1.t${cyc}z.ocnanl.tar
 
 if [ -s $SIGI -a -s $SFCI -a -s $OCNI ] ; then
    mkdir -p $DATA/INPUT
