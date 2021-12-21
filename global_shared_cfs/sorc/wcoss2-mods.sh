@@ -8,9 +8,6 @@ module load craype/2.7.8
 module load intel/19.1.3.304
 module load cray-mpich/8.1.7
 
-module use -a /lfs/h2/emc/global/noscrub/Jack.Woollen/modules 
-module load esmf_4_0_0rp2
-
 module load libjpeg/9c
 module load bacio/2.4.1
 module load sp/2.3.3
@@ -31,6 +28,9 @@ module load netcdf/3.6.3
 module load sigio/2.3.2
 module load sfcio/1.4.1
 module load gfsio/1.4.1
+
+module use -a /lfs/h2/emc/global/noscrub/Jack.Woollen/modules 
+module load esmf_4_0_0rp2
 
 module list
 

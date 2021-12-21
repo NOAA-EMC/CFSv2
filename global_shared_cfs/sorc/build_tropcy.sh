@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # 
 #  07052015	E.Mirvis -   made build more universal - environmental module based (see readme)
 #               EMC/NCEP/NOAA
@@ -14,11 +14,7 @@
 #        8) gettrk.fd/gettrk
 #
 
-set +x
-module purge
-source ./corn-mods.sh
-module list
-set -x
+set -euax
 
  export INC="${G2_INCd}"
  export LIBS="${W3EMC_LIBd} ${W3NCO_LIBd} ${BACIO_LIB4} ${G2_LIBd} ${PNG_LIB} ${JASPER_LIB} ${Z_LIB}"

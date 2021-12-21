@@ -19,7 +19,7 @@ ARFLAGS       = ruv
 #
 # CPP, Compiler, and Linker Options
 #
-FC       = ftn -O3 -convert big_endian -fp-model source -qopenmp 
+FC       = ftn -O2 -convert big_endian -fp-model source -qopenmp
 CPP      = /lib/cpp -P
 CPPFLAGS = -DLINUX 
 FREE     = -FR

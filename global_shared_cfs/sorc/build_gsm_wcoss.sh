@@ -1,14 +1,10 @@
-SHELL=/bin/sh
-set -x
+#!/usr/bin/env bash
+set -euax
 
 ##################################################################
 # gsm using module compile standard
 # 01/26/2016 Fanglin.Yang@noaa.gov:    Create module load version
 ##################################################################
-
-set +x
-source ./corn-mods.sh
-set -x
 
 curdir=$PWD; mkdir -p ../exec
 
