@@ -44,7 +44,6 @@ export CDUMP=${2:-${CDUMP:-gdas}}
 export expdir=${3:-$DATA/$name}                  # experiment directory
 export RESDIR=${4:-${RESDIR:-$expdir/RESTART}}
 export FIX_OCN=${5:-${FIX_OCN:-$HOMEcfs/fix/cfs_fix_om}}
-export COMOUT=${COMOUT:-$COMROOT/$NET/$envir/cdas.$(echo $CDATE | cut -c1-8)}
 
 mkdir -p $expdir
 mkdir -p $RESDIR

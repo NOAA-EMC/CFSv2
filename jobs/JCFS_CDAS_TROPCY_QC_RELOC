@@ -65,7 +65,7 @@ mkdir -p $ARCHSYND
 mkdir -p $ARCHSYND
 
 #  path to tropical cyclone record database (used by qctropcy processing)
-export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/prod}
+export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}}
 
 ##############################
 # Run setpdy and initialize PDY variables

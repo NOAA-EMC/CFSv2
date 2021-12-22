@@ -275,10 +275,11 @@ if [ $current_date -ge $start_date -a $current_date -lt $end_date ] ; then
 ##############################################
 YYYYMMDD=$(echo $start_date |cut -c1-8)
 HH=$(echo $start_date |cut -c9-10)
-export  COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
-export COMOUT=$COMROT/$RUN.$YYYYMMDD/$HH
+export   COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
+export  COMOUT=$COMROT/$RUN.$YYYYMMDD/$HH
+export COMCDAS=$COMROT/cdas.$YYYYMMDD
 export CLIMCOM=$COMOUT
-mkdir -m 775 -p $COMOUT
+mkdir -m775 -p $COMOUT
 
 ##############################################
 # Define forecast output/post input dirs

@@ -39,8 +39,6 @@ MM=`echo $rundate | cut -c5-6`
 # Base directories
 ######################
 
-COMROT=${COMROT:-$COMROOT/cfs/prod}
-
 HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM}
 

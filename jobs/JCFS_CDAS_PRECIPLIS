@@ -69,7 +69,7 @@ export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 export COMCDAS=${COMCDAS:-$(compath.py ${NET}/${cfs_ver})}
-export DCOM=${DCOM:-$DCOMROOT/prod})
+export DCOM=${DCOM:-${DCOMROOT}}
 
 export COMOUTGLDAS=$COMROT/cmap/gldas
 export COMOUTCMAP=$COMROT/cmap/pentad

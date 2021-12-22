@@ -185,7 +185,6 @@ else
      IC_FROM_PROD=${IC_FROM_PROD:-YES}
    fi
    if [ $IC_FROM_PROD = YES ] ; then
-     COMCDAS=${COMCDAS:-$COMROOT/cfs/prod}/cdas.$(echo $YMDH | cut -c1-8)
      export SIGI=${SIGI:-$COMCDAS/cdas1.t${cyc}z.sanl}
      export SFCI=${SFCI:-$COMCDAS/cdas1.t${cyc}z.sfcanl}
      if [ $COUP_FCST = YES ] ; then
@@ -284,13 +283,15 @@ else
      $FSYNC $COM_YMDH/sfcanl.$ENS_MEM.$YMDH
    fi
 
-#  If production, copy the IC files to cdas directory
+###If production, copy the IC files to cdas directory
+#
+#   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+#      COMCDAS=$COMROT/cdas.$(echo $YMDH | cut -c1-8)
+#      $NCP $SIGI $COMCDAS/cdas2.t${cyc}z.sanl
+#      $NCP $SFCI $COMCDAS/cdas2.t${cyc}z.sfcanl
+#
+### fi
 
-  # if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  #    COMCDAS=$COMROT/cdas.$(echo $YMDH | cut -c1-8)
-  #    $NCP $SIGI $COMCDAS/cdas2.t${cyc}z.sanl
-  #    $NCP $SFCI $COMCDAS/cdas2.t${cyc}z.sfcanl
-  # fi
    if [ $COUP_FCST = YES ] ; then
      $NCP $OCNI $COM_YMDH/ocnanl.$ENS_MEM.$YMDH.tar
      $FSYNC $COM_YMDH/ocnanl.$ENS_MEM.$YMDH.tar
@@ -302,9 +303,9 @@ else
      echo "done" > $RECOVERY/done.flag_released
    fi
  else
-#
+
 #  If ENS_NUM > 1 and PERTURB_IC=YES, create perturbed IC
-#
+
    if [ $ENS_MEM0 -gt 1 -a ${PERTURB_IC:-YES} = YES ] ; then
      COMANL_DIR0=${COMANL_DIR0:-$COMOUT/${YMDH}_01}
      if [ ! -d $COMANL_DIR0 ] ; then
