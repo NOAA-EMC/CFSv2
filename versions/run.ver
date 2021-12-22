@@ -1,4 +1,4 @@
-export version=v16.2.0
+export cfs_ver=v2.3.0 
 export gfs_ver=v16.2.0
 export ukmet_ver=v2.2.0
 export ecmwf_ver=v2.1.0
@@ -48,5 +48,5 @@ export sp_ver=2.3.3
 export ip_ver=3.3.3
 
 export envir=prod
-export NET=gfs
+export NET=cfs
 

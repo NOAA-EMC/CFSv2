@@ -931,9 +931,9 @@ fi
 
 if test "$SENDCOM" = "YES"
 then
-   cp $SFCANL  $COMOUT/${RUN}.${cycle}.sfcanl
-   cp $SIGANL  $COMOUT/${RUN}.${cycle}.sanl
-   cp $ABIAS   $COMOUT/${RUN}.${cycle}.abias
+   cp $SFCANL  $COMOUT/${RUN1}.${cycle}.sfcanl
+   cp $SIGANL  $COMOUT/${RUN1}.${cycle}.sanl
+   cp $ABIAS   $COMOUT/${RUN1}.${cycle}.abias
 fi
 
 ##############################################################
@@ -1033,7 +1033,7 @@ chgrp rstprod $CNVSTAT
 
 ################################################################################
 
-if test "$RUN" = 'gdas1'
+if test "$RUN1" = 'gdas1'
 then
     if test "$SENDDBN" = 'YES'
     then

@@ -439,8 +439,6 @@ if [ "$DO_QC" = 'YES' ]; then
 # ---> ON WCOSS prepbufr is already unblocked, so for now just copy it to the
 #      unblok file location used before on CCS - hopefully this can be removed
 #      someday!
-   ##########/nwprod/ush/cwordsh unblk prepda.${cycle} prepda.${cycle}.unblok
-   ##########err_cwordsh=$?
    cp -p  prepda.${cycle} prepda.${cycle}.unblok
    err_cwordsh=$?
    if [ $err_cwordsh -eq 0 ]; then
