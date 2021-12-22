@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 1 ] ; then
-     echo " No argument passed - forecast with default config file will be done"
+echo " No argument passed - forecast with default config file will be done"
 fi
 
 set -euax
@@ -92,7 +92,7 @@ set -a; . $CDAS_CONFIG_FILE; set +a
 set -u
 
 #############################################
-# Set the number of cores per model         
+# Set the number of cores per model
 #############################################
 export CPROCS=${CPROCS:-1}
 export OPROCS=${OPROCS:-56}
@@ -123,56 +123,56 @@ export HHSTART=$(echo $start_date | cut -c9-10)
 export ocnic_date=${ocnic_date:-$start_date}
 
 if [ ${LENDAY:-0} -gt 0 ] ; then
-  export end_date=$($NDATE $((LENDAY*24)) $start_date)
+export end_date=$($NDATE $((LENDAY*24)) $start_date)
 elif [ ${LENHR:-9} -gt 0 ] ; then
-  export end_date=$($NDATE $LENHR $start_date)
+export end_date=$($NDATE $LENHR $start_date)
 else
-  echo ' Need to specify propoer forecast length - run terminating'
-  exit
+echo ' Need to specify propoer forecast length - run terminating'
+exit
 fi
 
 ##############################################
 # Define COM directories
 ##############################################
 
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-mkdir -m755 -p $COMOUT
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+mkdir -m755 -p ${COMOUT}
 
 #
 # Output File Names
 #
-export SIGO=$COMOUT/$RUN1.$cycle.sf'${FH}'
-export SFCO=$COMOUT/$RUN1.$cycle.bf'${FH}'
-export FLXO=$COMOUT/$RUN1.$cycle.sfluxgrbf'${FH}'
-export LOGO=$COMOUT/$RUN1.$cycle.logf'${FH}'
+export SIGO=${COMOUT}/${RUN1}.${cycle}.sf'${FH}'
+export SFCO=${COMOUT}/${RUN1}.${cycle}.bf'${FH}'
+export FLXO=${COMOUT}/${RUN1}.${cycle}.sfluxgrbf'${FH}'
+export LOGO=${COMOUT}/${RUN1}.${cycle}.logf'${FH}'
 
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
 
 ##############################################
-# Define the guess files 
+# Define the guess files
 ##############################################
 
-export SIGI=$COMOUT/cdas1.t${cyc}z.sanl
-export SFCI=$COMOUT/cdas1.t${cyc}z.sfcanl
-export OCNI=$COMOUT/cdas1.t${cyc}z.ocnanl.tar
+export SIGI=${COMOUT}/${RUN1}.t${cyc}z.sanl
+export SFCI=${COMOUT}/${RUN1}.t${cyc}z.sfcanl
+export OCNI=${COMOUT}/${RUN1}.t${cyc}z.ocnanl.tar
 
 if [ -s $SIGI -a -s $SFCI -a -s $OCNI ] ; then
-   mkdir -p $DATA/INPUT
-   cp -p $OCNI $DATA/INPUT
-   cd $DATA/INPUT
-   tar -xvf $OCNI
-   cd $DATA 
-   msg="Forecast Starting with Initial Guess Fields"
-   postmsg "$jlogfile" "$msg"
+mkdir -p $DATA/INPUT
+cp -p $OCNI $DATA/INPUT
+cd $DATA/INPUT
+tar -xvf $OCNI
+cd $DATA
+msg="Forecast Starting with Initial Guess Fields"
+postmsg "$jlogfile" "$msg"
 else
-   msg="Initial Guess Fields Not Available to run $job"
-   postmsg "$jlogfile" "$msg"
-   export pgm=$job
-   export err=911
-   err_chk
+msg="Initial Guess Fields Not Available to run $job"
+postmsg "$jlogfile" "$msg"
+export pgm=$job
+export err=911
+err_chk
 fi
 
 #############################################################
@@ -186,8 +186,7 @@ export FHINI=0
 export VDATE=$($NDATE $FHINI $start_date)
 export EXEC_OMD=${EXEC_OMD:-HOMEcfs/exec}
 export FCSTEXEC=${AM_EXEC:-$HOMEcfs/exec/cfs_cdas_atmos_fcst}
-$FORECASTSH - $DATA $VDATE $EXEC_OMD $COMOUT \
-###    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
+$FORECASTSH - $DATA $VDATE $EXEC_OMD $COMOUT ###    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
 rc=$?
 
 set +e
@@ -196,13 +195,13 @@ cp $(basename $FORECASTSH).err.$FHINI  errfile
 set -e
 
 if [[ $rc -ne 0 ]] ; then
-  if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-     msg="Error in executing the forecast script"
-     postmsg "$jlogfile" "$msg"
-     export err=$rc; err_chk
-  else
-     $PERR;exit $rc
-  fi
+if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+msg="Error in executing the forecast script"
+postmsg "$jlogfile" "$msg"
+export err=$rc; err_chk
+else
+$PERR;exit $rc
+fi
 fi
 
 ###########################################################
@@ -215,7 +214,7 @@ OCNR=$RUN1.$cycle.next_ocnr.tar
 tar -cvf $OCNR ${FDATE}*
 
 if [ $SENDCOM = YES ] ; then
-  cp $OCNR $COMOUT/.
+cp $OCNR $COMOUT/.
 fi
 
 ###########################################################

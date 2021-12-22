@@ -35,13 +35,13 @@ export pgmout="OUTPUT.${pid}"
 ####################################
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 export HOMEobsproc_prep=${HOMEobsproc_prep:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
 
@@ -60,9 +60,9 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=${COMIN:-$COMROOT/${NET}/${envir}/${RUN}.${PDY}}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ##############################################
@@ -75,11 +75,11 @@ export POE=YES
 
 set +u
 if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-   NPROCS=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
+NPROCS=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
 elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-   NPROCS=$LSB_DJOB_NUMPROC
+NPROCS=$LSB_DJOB_NUMPROC
 else
-   NPROCS=1
+NPROCS=1
 fi
 set -u
 
@@ -92,8 +92,7 @@ export NSPLIT=$NPROCS
 
 #  BUFRLIST indicates the list of BUFR data dump file names to process
 
-export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc \
- sfcshp vadwnd wdsatr ascatw rassda gpsipw"}
+export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc  sfcshp vadwnd wdsatr ascatw rassda gpsipw"}
 
 # VARIABLES THAT CONTROL PROCESSING OF INDIVIDUAL PROGRAMS
 # --------------------------------------------------------
@@ -120,40 +119,39 @@ export OIQCBUFR=${OIQCBUFR:-YES}   # Execute program PREPOBS_OIQCBUFR if YES
 #       be set to YES for operational runs)
 
 export PREPDATA=YES   # Execute programs PREPOBS_MPCOPYBUFR, PREPOBS_PREPDATA,
-                      # PREPOBS_LISTHEADERS and PREPOBS_MONOPREPBUFR if YES
+# PREPOBS_LISTHEADERS and PREPOBS_MONOPREPBUFR if YES
 
 export GETGUESS=YES   # Encode first guess (background) values interpolated to
-                      # observation locations in the PREPBUFR file for use by
-                      # the q.c. programs.  This guess is always from a global
-                      # sigma guess file valid at the center PREPBUFR
-                      # processing date/time.
+# observation locations in the PREPBUFR file for use by
+# the q.c. programs.  This guess is always from a global
+# sigma guess file valid at the center PREPBUFR
+# processing date/time.
 
 export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
-                      # PREPOBS_PROFCQC, PREPOBS_CQCVAD, PREPOBS_CQCBUFR and
-                      # PREPOBS_OIQCBUFR will NEVER execute regardless of
-                      # switches above -
-                      # should be set to NO only as a last resort!!!
+# PREPOBS_PROFCQC, PREPOBS_CQCVAD, PREPOBS_CQCBUFR and
+# PREPOBS_OIQCBUFR will NEVER execute regardless of
+# switches above -
+# should be set to NO only as a last resort!!!
 
-# recent version of prepacqc
+# recent cfs_ver of prepacqc
 #export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
 #export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
 #export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
 
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
-export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     
+export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
 export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
-export USHOIQC=$HOMEcfs/obsproc_prep.v3.2.0/ush  
+export USHOIQC=$HOMEcfs/obsproc_prep.v3.2.0/ush
 export network_getges=cfs-cdas
-export GETGES_COM=$COMROOT
 
 env
 
 #############################################################
-# execute the script - use CFS versions of makeprepbufr
+# execute the script - use CFS cfs_vers of makeprepbufr
 #############################################################
 
-export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
-${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh} 
+export HOMEprep=$HOMEcfs
+${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh}
 export err=$?; err_chk
 
 cat $pgmout

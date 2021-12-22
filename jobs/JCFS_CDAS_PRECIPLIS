@@ -36,7 +36,7 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# VERBOSE  - Specify Verbose Output 
+# VERBOSE  - Specify Verbose Output
 ####################################
 export VERBOSE=${VERBOSE:-YES}
 
@@ -50,26 +50,26 @@ export CDATE=${PDY}${cyc}
 export GETPRECIP_FROM_CPC=${GETPRECIP_FROM_CPC:-NO}
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
 export EXECcfs=$HOMEcfs/exec
-export FIXcfs=$HOMEcfs/fix  
+export FIXcfs=$HOMEcfs/fix
 export FIX_LM=$FIXcfs/cfs_fix_lm
 
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
-export DCOM=${DCOM:-$DCOMROOT/prod}
-export COMCDAS=${COMCDAS:-${COMROOT}/cfs/${envir}}
+export COMCDAS=${COMCDAS:-$(compath.py ${NET}/${cfs_ver})}
+export DCOM=${DCOM:-$DCOMROOT/prod})
 
 export COMOUTGLDAS=$COMROT/cmap/gldas
 export COMOUTCMAP=$COMROT/cmap/pentad

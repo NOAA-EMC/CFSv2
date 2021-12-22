@@ -41,13 +41,13 @@ sh setpdy.sh
 
 export CDATE=${CDATE:-${PDY}$cyc}
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 export HOMEdump=$HOMEcfs
 
@@ -58,21 +58,21 @@ export FIXnst=$HOMEnst/fix
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m 755 -p $COMOUT
 
-export COMINm1=${COMINm1:-$COMROOT/${NET}/${envir}/${RUN}.${PDYm1}}  # for prev day snowdepth.global.grb
+export COMINm1=${COMINm1:-$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDYm1})}  # for prev day snowdepth.global.grb
 
 ##############################################
 # Define some INPUT directories
 ##############################################
 
-export COM_GDAS=${COM_GDAS:-$(compath.py prod/gfs/$gfs_ver)}
-export COM_ENGICE=${COM_ENGICE:-$(compath.py prod/omb/$omb_ver/sice)}       ## after 20190613
-export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc/atmos}
-export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc/atmos}
+export COM_GDAS=${COM_GDAS:-$(compath.py gfs/${gfs_ver})}
+export COM_ENGICE=${COM_ENGICE:-$(compath.py omb/${omb_ver}/sice)}       ## after 20190613
+export COMGDAS=${COMGDAS:-${COM_GDAS}/gdas.${PDY}/${cyc}/atmos}
+export COMGFS=${COMGFS:-${COM_GDAS}/gfs.${PDY}/${cyc}/atmos}
 
 ########################################################################
 # execute the script
@@ -83,9 +83,9 @@ export DUMP_FROM_PROD=${DUMP_FROM_PROD:-YES}
 
 if [ "$DUMP_FROM_PROD" = NO ]
 then
-  ${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh} 
+${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh}
 else
-  ${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh}
+${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh}
 fi
 
 cat $pgmout
@@ -96,7 +96,7 @@ postmsg "$jlogfile" "$msg"
 ########################################
 # Remove the Temporary working directory
 ########################################
-cd $DATAROOT  
+cd $DATAROOT
 if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
 
 date

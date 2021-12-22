@@ -53,20 +53,20 @@ sh setpdy.sh
 . ./PDY
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 MM_P1=`echo $PDY |cut -c5-6`
@@ -74,10 +74,10 @@ YYYY_P1=`echo $PDY |cut -c1-4`
 MM=`expr $MM_P1 - 1`
 if [ $MM -eq 0 ]
 then
-   MM=12
-   YYYY=`expr $YYYY_P1 - 1`
+MM=12
+YYYY=`expr $YYYY_P1 - 1`
 else
-   YYYY=$YYYY_P1
+YYYY=$YYYY_P1
 fi
 if [ $MM -lt 10 ]; then MM=0$MM; fi
 export cmonth=${cmonth:-$YYYY$MM}
@@ -106,32 +106,32 @@ env
 ###############################
 if [ -s $MONTHDIR/${cmonth}_mean.stamp ]
 then
-  status=`cat $MONTHDIR/${cmonth}_mean.stamp |awk -F" " '{print $1}'`
-  if [ $status = "done" ]; then
-     echo "Monthly mean calculation for $cmonth is done already"
-     echo "No more processing is needed, exiting..."
-     RUN_MONTHLY=NO
-  else
-     echo "The stamp file for $cmonth is present but the previous calcuation was not successful"
-     echo "Need to continure to run this job to generate the monthly mean files"
-     RUN_MONTHLY=YES
-  fi
+status=`cat $MONTHDIR/${cmonth}_mean.stamp |awk -F" " '{print $1}'`
+if [ $status = "done" ]; then
+echo "Monthly mean calculation for $cmonth is done already"
+echo "No more processing is needed, exiting..."
+RUN_MONTHLY=NO
 else
-  echo "The stamp file for $cmonth is not there"
-  echo "This might be the first day of the month"
-  RUN_MONTHLY=YES
+echo "The stamp file for $cmonth is present but the previous calcuation was not successful"
+echo "Need to continure to run this job to generate the monthly mean files"
+RUN_MONTHLY=YES
+fi
+else
+echo "The stamp file for $cmonth is not there"
+echo "This might be the first day of the month"
+RUN_MONTHLY=YES
 fi
 
 if [ $RUN_MONTHLY = YES ]
 then
-  ${MONTHLYMEANSH:-$HOMEcfs/scripts/excfs_cdas_monthly.sh} $cmonth
-  export err=$?; err_chk
+${MONTHLYMEANSH:-$HOMEcfs/scripts/excfs_cdas_monthly.sh} $cmonth
+export err=$?; err_chk
 
-  if [ $err -eq 0 ]; then
-    echo "done $cmonth" >$MONTHDIR/${cmonth}_mean.stamp
-  fi
+if [ $err -eq 0 ]; then
+echo "done $cmonth" >$MONTHDIR/${cmonth}_mean.stamp
+fi
 
-  cat $pgmout
+cat $pgmout
 fi
 
 msg="ENDED NORMALLY."

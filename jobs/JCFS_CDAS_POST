@@ -76,9 +76,9 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ####################################
@@ -118,7 +118,7 @@ export POSTGPVARS=${POSTGPVARS:-"KPO=37,PO=1000.,975.,950.,925.,900.,875.,850.,8
 
 #######################################
 # Specify Restart File Name to Key Off
- ######################################
+######################################
 restart_file=${restart_file:-$COMIN/${RUN1}.t${cyc}z.logf}
 
 ####################################

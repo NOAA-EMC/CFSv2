@@ -11,15 +11,15 @@ export RUN_ENVIR=${RUN_ENVIR:-nco}
 # DATA_IN: Location of working directory, default to /tmpnwprd1
 # DEV_ECF: If the job is to be running using ECF, default to YES
 # SENDDBN: Set to NO for developers, default to YES
-# COMIN:   Directory for input files, default to $COMROOT/$NET/${envir}
-# COMOUT:  Directory for output file, default to $COMROOT/$NET/${envir}
+# COMIN:   Directory for input files, default to $(compath.py $NET/${cfs_ver}
+# COMOUT:  Directory for output file, default to $(compath.py $NET/${cfs_ver}
 #####################################################################################
 
 ###############################################################
 # This block can be modified for different test environment
 ###############################################################
 if [[ $RUN_ENVIR = nco && $envir != prod ]]; then
-  export SENDDBN=${SENDDBN:-NO}
+export SENDDBN=${SENDDBN:-NO}
 fi
 
 export jlogfile=${jlogfile:-/dev/null}
@@ -28,12 +28,13 @@ export jlogfile=${jlogfile:-/dev/null}
 # Specify NET and RUN Name and model
 ####################################
 export NET=cfs
-export RUN=cdas1
+export RUN=cdas
+export RUN1=cdas1
 
 ####################################
 # set up job name and  environment
 ####################################
-export job=${job:-$RUN}
+export job=${job:-$RUN1}
 export envir=${envir:-prod}
 export host=${host:-`hostname | cut -c1`}
 
@@ -88,7 +89,7 @@ export PARMcfs=${PARMcfs:-$HOMEcfs/parm}
 export FIXcfs=${FIXcfs:-$HOMEcfs/fix/cfs_fix_cdas}
 export USHcfs=${USHcfs:-$HOMEcfs/ush}
 
-export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEcfs/global_shared_cfs} 
+export HOMEGLOBAL=${HOMEGLOBAL:-$HOMEcfs/global_shared_cfs}
 export EXECGLOBAL=${EXECGLOBAL:-$HOMEGLOBAL/exec}
 export PARMGLOBAL=${PARMGLOBAL:-$HOMEGLOBAL/parm}
 export USHGLOBAL=${USHGLOBAL:-$HOMEGLOBAL/ush}
@@ -110,11 +111,11 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COM_IN=${COM_IN:-$COMROOT/${NET}/${envir}}
-export COM_OUT=${COM_OUT:-$COMROOT/${NET}/${envir}}
+export COM_IN=${COM_IN:-$(compath.py ${NET}/${cfs_ver})}
+export COM_OUT=${COM_OUT:-$(compath.py ${NET}/${cfs_ver})}
 
-export  COMIN=$COM_IN/cdas.${PDY}
-export COMOUT=$COM_OUT/cdas.${PDY}
+export  COMIN=$COM_IN/$RUN.${PDY}
+export COMOUT=$COM_OUT/$RUN.${PDY}
 mkdir -m 775 -p $COMOUT
 
 ####################################
@@ -141,14 +142,14 @@ export SATANGL=${SATANGL:-${FIXcfs}/global_satangbias.txt}
 ####################################
 # Input Fields
 
-export PREINP=${PREINP:-${RUN}.${cycle}.}
+export PREINP=${PREINP:-${RUN1}.${cycle}.}
 export RADSTAT=${RADSTAT:-${COMIN}/${PREINP}radstat}
 
-############################################################################ 
+############################################################################
 #
 # Output File Names
 
-export SATANGO=${SATANGO:-$DATA/${RUN}.${cycle}.satang}
+export SATANGO=${SATANGO:-$DATA/${RUN1}.${cycle}.satang}
 
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
@@ -159,38 +160,38 @@ postmsg "$jlogfile" "$msg"
 # Define Previous Guess File Names
 ####################################
 if [ $RUN_GETGES = YES ] ; then
-  gesenvir=${envir}
-  export GETGESSH=$HOMEcfs/ush/global_getges.sh
-  $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
-  err1=$?
-  $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
-else                         
-  export SFCGES=$DATA/bges               
-  export GSATANG=$DATA/gsatang
+gesenvir=${envir}
+export GETGESSH=$HOMEcfs/ush/global_getges.sh
+$GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
+err1=$?
+$GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
+else
+export SFCGES=$DATA/bges
+export GSATANG=$DATA/gsatang
 fi
 export SFCGES=${SFCGES:-$DATA/bges}
 export GSATANG=${GSATANG:-$DATA/gsatang}
 
 if [ $err1 -eq 0 ] ; then
-   msg="Angupdate Start/Guess Fields Found"
-   postmsg "$jlogfile" "$msg"
+msg="Angupdate Start/Guess Fields Found"
+postmsg "$jlogfile" "$msg"
 else
-   msg="Angupdate Cannot Start/Guess Fields Not Available"
-   postmsg "$jlogfile" "$msg"
-   export pgm=$job
-   export err=911
-   err_chk
+msg="Angupdate Cannot Start/Guess Fields Not Available"
+postmsg "$jlogfile" "$msg"
+export pgm=$job
+export err=911
+err_chk
 fi
 
 ############################
 # Make use of updated angle dependent bias file, if it exists.
 if [[ -s $GSATANG ]]; then
-   export SATANGL=$GSATANG
+export SATANGL=$GSATANG
 fi
 
 # Make use of increment from GFS early cycle, if it exists
 if [[ -s $GESFIL ]]; then
-   export GINCIN=$GESFIL
+export GINCIN=$GESFIL
 fi
 
 
@@ -217,11 +218,11 @@ ${ANGUPDATESH:-$HOMEcfs/scripts/excfs_cdas_angupdate.sh}
 ##########
 
 if [ $SENDCOM = YES ] ; then
-   cp $SATANGO $COMOUT/${RUN}.${cycle}.satang
+cp $SATANGO $COMOUT/${RUN1}.${cycle}.satang
 fi
 
 if [ $SENDDBN = YES ] ; then
-   $DBNROOT/bin/dbn_alert MODEL CDAS1_MSC_satang $job $COMOUT/${RUN}.${cycle}.satang
+$DBNROOT/bin/dbn_alert MODEL CDAS1_MSC_satang $job $COMOUT/${RUN1}.${cycle}.satang
 fi
 
 cat $pgmout

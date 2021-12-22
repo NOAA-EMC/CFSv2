@@ -38,24 +38,24 @@ sh setpdy.sh
 . ./PDY
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 export hpsstar=$USHcfs/cfs_hpsstar
 
-COMROT=${COMROT:-$COMROOT/cfs/${envir}}
+COMROT=${COMROT:-$(compath.py -o $NET/$cfs_ver)}
 ###############################
 # Execute the Script
 ###############################
 rm -f $DATA/poescript
 for mem in 01 02 03 04
 do
-  mkdir -p $DATA/$mem
-  echo "${CFSARCHIVESH:-$HOMEcfs/ush/cfs_archive.sh} $PDYm1$cyc $mem $DATA/$mem" >>$DATA/poescript
+mkdir -p $DATA/$mem
+echo "${CFSARCHIVESH:-$HOMEcfs/ush/cfs_archive.sh} $PDYm1$cyc $mem $DATA/$mem" >>$DATA/poescript
 done
 
 chmod 775 $DATA/poescript

@@ -1,4 +1,4 @@
-#!/bin/ksh 
+#!/bin/ksh
 
 set -ex
 
@@ -24,7 +24,7 @@ echo $2
 # This script is based on the original SFM script authored by:           #
 #                  Hann-Ming Henry Juang  W/NP5 : 06/12/01               #
 ##########################################################################
- 
+
 ####################################
 # Specify NET and RUN Name and model
 ####################################
@@ -57,8 +57,8 @@ if [ $ENS_MEM -lt 10 ] ; then export ENS_MEM=0$ENS_MEM ; fi
 # Specify the year of the start and end of the hindcast
 #######################################################
 if [ $RTYPE = hindcast ] ; then
- export START_YEAR=${STARTYEAR:-1981}
- export END_YEAR=${END_YEAR:-2010}
+export START_YEAR=${STARTYEAR:-1981}
+export END_YEAR=${END_YEAR:-2010}
 fi
 
 
@@ -70,9 +70,9 @@ export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to COMOUT  
+# SAVEGES  - Copy Files From TMPDIR to COMOUT
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output 
+# VERBOSE  - Specify Verbose Output
 ####################################
 export SAVEGES=${SAVEGES:-YES}
 export RERUN=${RERUN:-NO}
@@ -88,13 +88,13 @@ sh setpdy.sh
 export CDATE=${CDATE:-${PDY}$cyc}
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix/cfs_fix_am  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix/cfs_fix_am
 export FIX_AM=$FIXcfs
 export FIXDIR=$FIXcfs
 export FIXGLOBAL=$FIXcfs
@@ -173,32 +173,32 @@ export DDSTART=$(echo $start_date | cut -c7-8)
 export HHSTART=$(echo $start_date | cut -c9-10)
 #
 if [[ $RTYPE = forecast ]] ; then
-  export YYYYEND=$YYYYSTART
+export YYYYEND=$YYYYSTART
 else        # This is for hindcast
-  export YYYYSTART=${YYYYSTART:-$START_YEAR}
-  export YYYYEND=$END_YEAR
+export YYYYSTART=${YYYYSTART:-$START_YEAR}
+export YYYYEND=$END_YEAR
 fi
 export YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
 
 export start_date=$YYYYSTART$MMSTART$DDSTART$HHSTART
 if [ $LENMON -gt 0 ] ; then
-  YYYYSS=$(echo $start_date | cut -c1-4)
-  MMSS=$(echo $start_date | cut -c5-6)
-  YYYYEE=$YYYYSS
-  MMEE=$((MMSS+LENMON+1))
-  while [[ $MMEE -gt 12 ]] ; do
-    MMEE=$((MMEE-12))
-    YYYYEE=$((YYYYEE+1))
-  done
-  if [[ $MMEE -lt 10 ]] ; then MMEE=0$MMEE; fi
-  export end_date=${YYYYEE}${MMEE}0100
+YYYYSS=$(echo $start_date | cut -c1-4)
+MMSS=$(echo $start_date | cut -c5-6)
+YYYYEE=$YYYYSS
+MMEE=$((MMSS+LENMON+1))
+while [[ $MMEE -gt 12 ]] ; do
+MMEE=$((MMEE-12))
+YYYYEE=$((YYYYEE+1))
+done
+if [[ $MMEE -lt 10 ]] ; then MMEE=0$MMEE; fi
+export end_date=${YYYYEE}${MMEE}0100
 elif [ $LENDAY -gt 0 ] ; then
-  export end_date=$($NDATE $((LENDAY*24)) $start_date)
+export end_date=$($NDATE $((LENDAY*24)) $start_date)
 elif [ $LENHR -gt 0 ] ; then
-  export end_date=$($NDATE $LENHR $start_date)
+export end_date=$($NDATE $LENHR $start_date)
 else
-  echo ' Need to specify propoer forecast length - run terminating'
-  exit
+echo ' Need to specify propoer forecast length - run terminating'
+exit
 fi
 #
 
@@ -206,39 +206,39 @@ fi
 # Specify the recovery and postjob directries
 #############################################
 
-export COMROT=${COMROOT}/$RUN/${envir}/$RUN
+export COMROT=$(compath.py $RUN/${cfs_ver}/$RUN)
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
 mkdir -p $RECOVERY $POSTDEFS
 
 if [[ ! -s $RECOVERY/stamp.$RUN ]] ; then
-  export current_date=$start_date
-  echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
+export current_date=$start_date
+echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
 
 else
 
-  read start_date current_date end_date2  YYYYSTART YYYYEND cycle < $RECOVERY/stamp.$RUN
+read start_date current_date end_date2  YYYYSTART YYYYEND cycle < $RECOVERY/stamp.$RUN
 
-  export start_date
-  export current_date
-  if [ $CDATE -eq $start_date ] ; then
-    ### This is used for the case when you want to extend the length of the forecast 
-    if [ $end_date -ne $end_date2 ] ; then
-      rm $RECOVERY/stamp.$RUN
-      echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
-    fi
-  else
-    end_date=$end_date2
-  fi
-  export CDATE=$start_date
-  export end_date
-  export YYYYSTART
-  export YYYYEND
-  export cycle
-  export MMSTART=$(echo $start_date | cut -c5-6)
-  export DDSTART=$(echo $start_date | cut -c7-8)
-  export HHSTART=$(echo $start_date | cut -c9-10)
+export start_date
+export current_date
+if [ $CDATE -eq $start_date ] ; then
+### This is used for the case when you want to extend the length of the forecast
+if [ $end_date -ne $end_date2 ] ; then
+rm $RECOVERY/stamp.$RUN
+echo $start_date $current_date $end_date  $YYYYSTART $YYYYEND $cycle > $RECOVERY/stamp.$RUN
+fi
+else
+end_date=$end_date2
+fi
+export CDATE=$start_date
+export end_date
+export YYYYSTART
+export YYYYEND
+export cycle
+export MMSTART=$(echo $start_date | cut -c5-6)
+export DDSTART=$(echo $start_date | cut -c7-8)
+export HHSTART=$(echo $start_date | cut -c9-10)
 fi
 
 #if [ -s $RECOVERY/done.flag_released ]; then
@@ -259,7 +259,7 @@ export IC_FROM_HPSS=${IC_FROM_HPSS:-NO}
 export IC_FROM_DISK=${IC_FROM_DISK:-YES}
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg" 
+postmsg "$jlogfile" "$msg"
 
 env
 
@@ -269,44 +269,44 @@ env
 
 
 if [ $YYYYSTART -le $YYYYEND ] ; then
-  if [ $current_date -ge $start_date -a $current_date -lt $end_date ] ; then
-  ##############################################
-  # Define COM directories
-  ##############################################
-    YYYYMMDD=$(echo $start_date |cut -c1-8)
-    HH=$(echo $start_date |cut -c9-10)
-    export  COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
-    export COMOUT=$COMROT/$RUN.$YYYYMMDD/$HH
-    export CLIMCOM=$COMOUT
-    mkdir -m 775 -p $COMOUT
+if [ $current_date -ge $start_date -a $current_date -lt $end_date ] ; then
+##############################################
+# Define COM directories
+##############################################
+YYYYMMDD=$(echo $start_date |cut -c1-8)
+HH=$(echo $start_date |cut -c9-10)
+export  COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
+export COMOUT=$COMROT/$RUN.$YYYYMMDD/$HH
+export CLIMCOM=$COMOUT
+mkdir -m 775 -p $COMOUT
 
-  ##############################################
-  # Define forecast output/post input dirs
-  ##############################################
-    export COM_YMDH=$COMOUT/${start_date}_${ENS_MEM}
-    mkdir -m 775 -p $COM_YMDH
-    export COM_ARCH=$COM_YMDH
+##############################################
+# Define forecast output/post input dirs
+##############################################
+export COM_YMDH=$COMOUT/${start_date}_${ENS_MEM}
+mkdir -m 775 -p $COM_YMDH
+export COM_ARCH=$COM_YMDH
 
-   #######################################
-   # Define the input IC files
-   #######################################
-    export SIGI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sanl
-    export SFCI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sfcanl
-    export OCNI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
+#######################################
+# Define the input IC files
+#######################################
+export SIGI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sanl
+export SFCI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sfcanl
+export OCNI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
 
-   #############################################################
-   # Execute the script
-   #############################################################
-    SCRIPTDIR=${SCRIPTDIR:-$HOMEcfs/scripts}
-    FCST_SCRIPT_DIR=${FCST_SCRIPT_DIR:-$SCRIPTDIR}
-    FCST_SCRIPT=${FCST_SCRIPT:-$FCST_SCRIPT_DIR/exrun_cfs.sh}
-    $FCST_SCRIPT; export err=$?; err_chk
-  fi
-else 
-  #############################################################
-  # Hard exit when trying to run a finished forecast
-  #############################################################
-  exit 99
+#############################################################
+# Execute the script
+#############################################################
+SCRIPTDIR=${SCRIPTDIR:-$HOMEcfs/scripts}
+FCST_SCRIPT_DIR=${FCST_SCRIPT_DIR:-$SCRIPTDIR}
+FCST_SCRIPT=${FCST_SCRIPT:-$FCST_SCRIPT_DIR/exrun_cfs.sh}
+$FCST_SCRIPT; export err=$?; err_chk
+fi
+else
+#############################################################
+# Hard exit when trying to run a finished forecast
+#############################################################
+exit 99
 fi
 
 
@@ -315,7 +315,7 @@ fi
 ###################################################
 ###cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg" 
+postmsg "$jlogfile" "$msg"
 
 ########################################
 # Remove the Temporary working directory

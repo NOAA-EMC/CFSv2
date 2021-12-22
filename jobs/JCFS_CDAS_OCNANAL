@@ -46,20 +46,20 @@ sh setpdy.sh
 . ./PDY
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ### Input parameters for GODAS
@@ -80,22 +80,22 @@ export GETGES_PROD=${GETGES_PROD:-YES}
 ####################################
 #  getges must provide omrestart, sstgrb and icegrb files
 if [ $GETGES_PROD = YES ] ; then
-  CDATEm1=`$NDATE -6 $CDATE`
-  cdaym1=`echo $CDATEm1 |cut -c1-8`
-  ccycm1=`echo $CDATEm1 |cut -c9-10`
-  export OCNGES=$COMROT/${RUN}.${cdaym1}/${RUN1}.t${ccycm1}z.next_ocnr.tar
+CDATEm1=`$NDATE -6 $CDATE`
+cdaym1=`echo $CDATEm1 |cut -c1-8`
+ccycm1=`echo $CDATEm1 |cut -c9-10`
+export OCNGES=$COMROT/${RUN}.${cdaym1}/${RUN1}.t${ccycm1}z.next_ocnr.tar
 fi
 
 export CDUMP=gdas
 
 if [ -s $OCNGES ] ; then
-   msg="Analysis Starting/Guess Fields Found"
-   postmsg "$jlogfile" "$msg"
+msg="Analysis Starting/Guess Fields Found"
+postmsg "$jlogfile" "$msg"
 else
-   msg="Analysis Cannot Start/Guess Fields Not Available"
-   postmsg "$jlogfile" "$msg"
-   export pgm=$job
-   export err=911; err_chk
+msg="Analysis Cannot Start/Guess Fields Not Available"
+postmsg "$jlogfile" "$msg"
+export pgm=$job
+export err=911; err_chk
 fi
 
 ############################
@@ -112,18 +112,18 @@ export APRUN="aprun -n1"
 # -------------------------------------------------------
 
 if [[ $cyc = 00 || ${GODAS:-00} = 24 ]]; then
-  ${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
-else 
-  # use guess as analysis
-  mkdir -p $DATA/OCNrest; cd $DATA/OCNrest; rm -f *
-  tar -xvf $OCNGES # This is the guess/restart files
-  for newname in $(ls -rt ${CDATE}* | cut -c11-) ; do
-    mv ${CDATE}$newname $newname
-  done
-  cp $FIXcfs/M4tables/input.nml .
-  cp $FIXcfs/M4tables/*_table   .
-  tar -cvf ocnanl.$CDATE.tar *.res *.nc *_table input.nml
-  cp ocnanl.$CDATE.tar $COMOUT/${RUN1}.t${cyc}z.ocnanl.tar
+${GODASSH:-$HOMEcfs/scripts/excfs_cdas_godas.sh}  $CDATE $CDUMP $DATA $RESDIR $FIX_OCN $DATA $Obs_dir
+else
+# use guess as analysis
+mkdir -p $DATA/OCNrest; cd $DATA/OCNrest; rm -f *
+tar -xvf $OCNGES # This is the guess/restart files
+for newname in $(ls -rt ${CDATE}* | cut -c11-) ; do
+mv ${CDATE}$newname $newname
+done
+cp $FIXcfs/M4tables/input.nml .
+cp $FIXcfs/M4tables/*_table   .
+tar -cvf ocnanl.$CDATE.tar *.res *.nc *_table input.nml
+cp ocnanl.$CDATE.tar $COMOUT/${RUN1}.t${cyc}z.ocnanl.tar
 fi
 
 export err=$?; err_chk

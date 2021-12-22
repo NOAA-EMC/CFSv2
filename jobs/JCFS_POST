@@ -1,17 +1,17 @@
-#!/bin/ksh 
+#!/bin/ksh
 
 set -x
 
 if [ $# -ne 2 ] ; then
 #    echo "Usage: $0 fore/hind cfs.config"
 #    exit 1
-     echo " No argument passed - forepost with default config file will be done"
+echo " No argument passed - forepost with default config file will be done"
 fi
 
 export MP_DEBUG_NOTIMEOUT=no
-export MP_SINGLE_THREAD=no  
-export MP_USE_BULK_XFER=no  
-export MP_COLLECTIVE_OFFLOAD=no  
+export MP_SINGLE_THREAD=no
+export MP_USE_BULK_XFER=no
+export MP_COLLECTIVE_OFFLOAD=no
 
 ####################################################
 # Runs POSTPROCESSOR FOR CFS HIND(FORE)CASTS
@@ -21,7 +21,7 @@ export MP_COLLECTIVE_OFFLOAD=no
 ####################################################
 
 set -xa
-                                                                       
+
 
 ####################################
 # Specify NET and RUN Name and model
@@ -56,18 +56,18 @@ if [ $ENS_MEM -lt 10 ] ; then export ENS_MEM=0$ENS_MEM ; fi
 # Specify the year of the start and end of the hindcast
 
 if [ $RUN = hindpost ] ; then
- export START_YEAR=${STARTYEAR:-1981}
- export END_YEAR=${END_YEAR:-2010}
+export START_YEAR=${STARTYEAR:-1981}
+export END_YEAR=${END_YEAR:-2010}
 fi
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 export HOMEpost=$HOMEcfs/global_shared_cfs
 
@@ -106,7 +106,7 @@ export cycle=t${cyc}z
 
 ####################################
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output 
+# VERBOSE  - Specify Verbose Output
 ####################################
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
@@ -117,7 +117,7 @@ export BATCH_POST=${BATCH_POST:-NO}
 ##############################
 sh setpdy.sh
 . ./PDY
-                                                                                       
+
 export CDATE=${CDATE:-${PDY}$cyc}
 
 #############################################
@@ -162,10 +162,10 @@ export MMSS_OCN=$(echo $ocnic_date | cut -c5-6)
 export DDSS_OCN=$(echo $ocnic_date | cut -c7-8)
 #
 if [[ $RTYPE = forepost ]] ; then
-  export YYYYEND=$YYYYSTART
+export YYYYEND=$YYYYSTART
 else        # This is for hindpost
-  export YYYYSTART=${YYYYSTART:-$START_YEAR}
-  export YYYYEND=$END_YEAR
+export YYYYSTART=${YYYYSTART:-$START_YEAR}
+export YYYYEND=$END_YEAR
 fi
 YYYY_NOW=${YYYY_NOW:-$YYYYSTART}
 
@@ -174,7 +174,7 @@ export NTHSTACK=102400000
 #############################################
 # Specify the recovery and postjob directries
 #############################################
-export COMROT=${COMROOT}/$RUN/${envir}/$RUN
+export COMROT=$(compath.py $RUN/${envir}/$RUN)
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
@@ -183,25 +183,25 @@ mkdir -p $RECOVERY $POSTDEFS
 ##############################################
 # Define COM directories
 ##############################################
-  YYYYMMDD=$(echo $start_date |cut -c1-8)
-  HH=$(echo $start_date |cut -c9-10)
-  export COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
-  export CLIMCOM=$COMIN  
-  mkdir -m 775 -p $COMIN 
+YYYYMMDD=$(echo $start_date |cut -c1-8)
+HH=$(echo $start_date |cut -c9-10)
+export COMIN=$COMROT/$RUN.$YYYYMMDD/$HH
+export CLIMCOM=$COMIN
+mkdir -m 775 -p $COMIN
 
 ##############################################
 # Define forecast output/post input dirs
 ##############################################
-  export COMOUT=$COMIN/${start_date}_${ENS_MEM}/daily_grib
-  export COM_YMDH=$COMIN/${start_date}_${ENS_MEM}
-  mkdir -m 775 -p $COMOUT  $COM_YMDH
+export COMOUT=$COMIN/${start_date}_${ENS_MEM}/daily_grib
+export COM_YMDH=$COMIN/${start_date}_${ENS_MEM}
+mkdir -m 775 -p $COMOUT  $COM_YMDH
 
 #############################################################
 # Execute the script
 #############################################################
 if [[ $YYYY_NOW -le $YYYYEND ]] ; then
-  export SUFIN= # sufin needs to be empty
-  $POST_SCRIPT
+export SUFIN= # sufin needs to be empty
+$POST_SCRIPT
 fi
 
 ########################################
