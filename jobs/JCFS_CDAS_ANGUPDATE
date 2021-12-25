@@ -154,31 +154,30 @@ postmsg "$jlogfile" "$msg"
 
 ####################################
 # Check if this is a restart
-#
 # Define Previous Guess File Names
 ####################################
+
+export GETGESSH=$HOMEGLOBAL/ush/getges.sh
+
 if [ $RUN_GETGES = YES ] ; then
-gesenvir=$(basename $COMROT)
-export GETGESSH=$HOMEcfs/ush/global_getges.sh
-$GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
-err1=$?
-$GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
-else
-export SFCGES=$DATA/bges
-export GSATANG=$DATA/gsatang
+  gesenvir=$(basename $COMROT)
+  $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
+  err1=$?
+  $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
 fi
+
 export SFCGES=${SFCGES:-$DATA/bges}
 export GSATANG=${GSATANG:-$DATA/gsatang}
 
 if [ $err1 -eq 0 ] ; then
-msg="Angupdate Start/Guess Fields Found"
-postmsg "$jlogfile" "$msg"
+  msg="Angupdate Start/Guess Fields Found"
+  postmsg "$jlogfile" "$msg"
 else
-msg="Angupdate Cannot Start/Guess Fields Not Available"
-postmsg "$jlogfile" "$msg"
-export pgm=$job
-export err=911
-err_chk
+  msg="Angupdate Cannot Start/Guess Fields Not Available"
+  postmsg "$jlogfile" "$msg"
+  export pgm=$job
+  export err=911
+  err_chk
 fi
 
 ############################

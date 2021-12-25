@@ -236,11 +236,12 @@ export SSMITBF=${SSMITBF:-/dev/null}
 #
 ####################################
 wgrib=$WGRIB
+RUN_GETGES=${RUN_GETGES:-YES}     
 prev_cdate=`$NDATE -6 $PDY$cyc`
-RUN_GETGES=${RUN_GETGES:-YES}        # Set to NO if not running getges.sh
+GETGESSH=${GETGESSH:-$HOMEGLOBAL/ush/getges.sh}
+
 if [ $RUN_GETGES = YES ]; then
   export envir_getges=$(basename $COMROT)
-  GETGESSH=${GETGESSH:-$HOMEcfs/ush/global_getges.sh}
   snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $envir_getges -n cfs-cdas -v $prev_cdate)
 else
   snoprv=${snoprv:-$FNSNOG}

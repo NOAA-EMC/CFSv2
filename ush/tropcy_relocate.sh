@@ -230,8 +230,6 @@ qid=$$
 
 if [ $# -ne 1 ] ; then
    if [ $MACHINE != sgi ]; then
-#      cp ${COMROOT}/date/$cycle ncepdate
-#      err0=$?
       ncepdate=${PDY}${cyc}      
       CDATE10=`cut -c7-16 ncepdate`
    else

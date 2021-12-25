@@ -195,7 +195,7 @@ cd $DATA||exit 99
 #  Update angle dependent bias 
 
 export OMP_NUM_THREADS=$NTHREADS_ANG
-export PGM='$APRUN $ANGUPDATEXEC'
+export PGM='mpiexec -n1 $ANGUPDATEXEC'
 export pgm=$PGM
 $LOGSCRIPT
 
