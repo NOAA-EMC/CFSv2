@@ -1,5 +1,5 @@
 #!/bin/ksh
-set -xa
+set -euax
 #
 # Specify whether the run is production or development
 #
@@ -11,8 +11,6 @@ export RUN_ENVIR=${RUN_ENVIR:-prod}
 # DATA_IN: Location of working directory, default to /tmpnwprd1
 # DEV_ECF: If the job is to be running using ECF, default to YES
 # SENDDBN: Set to NO for developers, default to YES
-# COM_IN:  Directory for input files, default to /com/$NET/${envir}
-# COM_OUT: Directory for output file, default to /com/$NET/${envir}
 #####################################################################################
 
 ###############################################################
@@ -116,11 +114,9 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COM_IN=${COM_IN:-$(compath.py ${NET}/${cfs_ver})}
-export COM_OUT=${COM_OUT:-$(compath.py ${NET}/${cfs_ver})}
-
-export COMIN=$COM_IN/cdas.${PDY}
-export COMOUT=$COM_OUT/cdas.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export COMIN=$COMROT/cdas.${PDY}
+export COMOUT=$COMROT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
 
 ####################################
@@ -243,12 +239,13 @@ wgrib=$WGRIB
 prev_cdate=`$NDATE -6 $PDY$cyc`
 RUN_GETGES=${RUN_GETGES:-YES}        # Set to NO if not running getges.sh
 if [ $RUN_GETGES = YES ]; then
-GETGESSH=${GETGESSH:-$HOMEcfs/ush/global_getges.sh}
-export gesenvir=${envir}
-snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $gesenvir -n cfs-cdas -v $prev_cdate)
+  export envir_getges=$(basename $COMROT)
+  GETGESSH=${GETGESSH:-$HOMEcfs/ush/global_getges.sh}
+  snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $envir_getges -n cfs-cdas -v $prev_cdate)
 else
-snoprv=${snoprv:-$FNSNOG}
+  snoprv=${snoprv:-$FNSNOG}
 fi
+
 if [ `$wgrib -4yr ${FNSNOA} 2>/dev/null|grep -i snowc |	  awk -F: '{print $3}'|awk -F= '{print $2}'` -le      `$wgrib -4yr $snoprv 2>/dev/null |grep -i snowc  |			awk -F: '{print $3}'|awk -F= '{print $2}'` ] ; then
 export FNSNOA=" "
 export CYCLVARS="FSNOL=99999.,FSNOS=99999.,"
@@ -285,14 +282,12 @@ postmsg "$jlogfile" "$msg"
 # Define Previous Guess File Names (dev users must provide from outside)
 ####################################
 if [ $RUN_GETGES = YES ]; then
-gesenvir=${gesenvir:-$envir}
 
-$GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas bges
-err1=$?
-$GETGESSH -t sfcgm3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas sfcgm3
-$GETGESSH -t sfcgp3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas sfcgp3
-$GETGESSH -t biascr -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas gbias
-$GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas gsatang
+$GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas bges   ; err1=$?
+$GETGESSH -t sfcgm3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgm3
+$GETGESSH -t sfcgp3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgp3
+$GETGESSH -t biascr -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gbias
+$GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gsatang
 fi
 
 export SFCGES=${SFCGES:-$DATA/bges}
@@ -376,8 +371,6 @@ $DBNROOT/bin/dbn_alert MODEL GDAS1_MSC_abias $job $COMOUT/${RUN1}.${cycle}.abias
 fi
 
 cat $pgmout
-
-grep memory $DATA/mpi*
 
 msg="ENDED NORMALLY."
 postmsg "$jlogfile" "$msg"

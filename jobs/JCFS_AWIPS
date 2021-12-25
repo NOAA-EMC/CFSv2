@@ -62,10 +62,10 @@ export FIXcfs=$HOMEcfs/fix
 ########################################
 # Set up the com directory
 ########################################
-export  COMROT=$(compath.py ${NET}/${cfs_ver)
-export   COMIN=$(compath.py ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
-export  COMOUT=$(compath.py ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
-export COMINm1=$(compath.py ${NET}/${cfs_ver}/${NET}/${RUN}.${PDYm1})
+export  COMROT=$(compath.py -o ${NET}/${cfs_ver)
+export   COMIN=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
+export  COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
+export COMINm1=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${PDYm1})
 
 export pcom=$COMOUT/wmo
 

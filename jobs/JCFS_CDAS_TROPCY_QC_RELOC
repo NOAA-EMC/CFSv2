@@ -1,5 +1,5 @@
-#!/bin/ksh
-set -xa
+#!/bin/bash
+set -euax
 
 # #### 06/12/2006 ##############################################
 # SETUP CDAS TROPICAL CYCLONE QC/RELOCATION PROCESSING VARIABLES
@@ -59,11 +59,6 @@ export EXECRELO=${HOMERELO}/exec
 export FIXRELO=${HOMERELO}/fix
 export USHRELO=${HOMERELO}/ush
 
-export HOMEarch=${HOMEarch:-$(compath.py arch/${envir})}
-export ARCHSYND=${HOMEarch}/syndat
-mkdir -p $ARCHSYND
-mkdir -p $ARCHSYND
-
 #  path to tropical cyclone record database (used by qctropcy processing)
 export TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}}
 
@@ -76,11 +71,18 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 export COMINcfs_cdas=$COMIN
+
+##############################################
+# Make the archsynd directory in COMROT
+##############################################
+export HOMEarch=${HOMEarch:-$COMROT/arch}
+export ARCHSYND=${HOMEarch}/syndat
+mkdir -p $ARCHSYND
 
 ##############################################
 # Specify varaibles specific to this execution of script
@@ -103,6 +105,7 @@ export LATB=880  # sigma guess parm needed by tropical cyclone reloc. processing
 export ndate=$NDATE
 export nhour=$NHOUR
 export network_getges=cfs-cdas
+export envir_getges=$(basename $COMROT)
 export USHGETGES=$HOMEglob/ush
 export GRIBVERSION=grib1
 export BKGFREQ=3

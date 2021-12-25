@@ -38,7 +38,6 @@ export TEMPDIR=${TEMPDIR:-$DATA}             # Working Directory
 mkdir -p $TEMPDIR
 
 cd $TEMPDIR
-COMROT=${COMROT:-$COMROOT/cfs/prod}
 
 # gdas2 files - These will all be from 00Z member 1 forecast
 member=01

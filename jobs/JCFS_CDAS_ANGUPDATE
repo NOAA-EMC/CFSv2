@@ -111,11 +111,9 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COM_IN=${COM_IN:-$(compath.py ${NET}/${cfs_ver})}
-export COM_OUT=${COM_OUT:-$(compath.py ${NET}/${cfs_ver})}
-
-export  COMIN=$COM_IN/$RUN.${PDY}
-export COMOUT=$COM_OUT/$RUN.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$COMROT/$RUN.${PDY}
+export COMOUT=$COMROT/$RUN.${PDY}
 mkdir -m 775 -p $COMOUT
 
 ####################################
@@ -160,7 +158,7 @@ postmsg "$jlogfile" "$msg"
 # Define Previous Guess File Names
 ####################################
 if [ $RUN_GETGES = YES ] ; then
-gesenvir=${envir}
+gesenvir=$(basename $COMROT)
 export GETGESSH=$HOMEcfs/ush/global_getges.sh
 $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
 err1=$?

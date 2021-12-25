@@ -61,22 +61,22 @@ set -x
 #
 # input FV3GFS 6-hourlay surface analysis file at Gaussian grids, for T1534, 3072 x 1536
 #
-  sfcanl=$COMROOT/gfs/prod/gdas.$cdate/gdas.$cycle.sfcanl.nemsio
-
+  sfcanl=$COM_GDAS/gdas.$cdate/gdas.$cycle.sfcanl.nemsio
   ln -fs $sfcanl sfcanl
+
 #
 # input Sea ice daily analysis, 1/12 lat/lon grids, 4320 x 2160
 #
-  iceanl=/gpfs/tp1/emc/globaldump/$cdate/gdas/gdas.$cycle.seaice.5min.blend.grb
-  ln -fs $iceanl iceanl
+# iceanl=/gpfs/tp1/emc/globaldump/$cdate/gdas/gdas.$cycle.seaice.5min.blend.grb
+# ln -fs $iceanl iceanl
+
 #
 # processing 1/12 degree RTG-like file
-#
-#
 # Surface land/water mask 1/12 lat/lon grids, 4320 x 2160
 #
   rtgmsk=$FixDir/rtgssthr_ls_nas.twelfthdeg.dat
   ln -fs $rtgmsk rtgmsk
+
 #
 # output RTG-like Tf analysis file (grib1)
 #

@@ -174,7 +174,7 @@ export NTHSTACK=102400000
 #############################################
 # Specify the recovery and postjob directries
 #############################################
-export COMROT=$(compath.py $RUN/${envir}/$RUN)
+export COMROT=$(compath.py -o $RUN/${envir}/$RUN)
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}

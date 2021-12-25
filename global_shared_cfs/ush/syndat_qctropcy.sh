@@ -74,9 +74,9 @@ echo "                        directories.  These must now be passed in. "
 #                (Default: not set)
 #   TIMEIT   - optional time and resource reporting (Default: not set)
 
-set -xua
+set -xuae
 
-ARCHSYND=${ARCHSYND:-$COMROOT/arch/prod/syndat}
+ARCHSYND=${ARCHSYND:-$COMROT/arch/syndat}
 HOMENHC=${HOMENHC:-/nhc/save/guidance/storm-data/ncep}
 TANK_TROPCY=${TANK_TROPCY:-${DCOMROOT}/prod}
 slmask=${slmask:-$FIXSYND/syndat_slmask.t126.gaussian}

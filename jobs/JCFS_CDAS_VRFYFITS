@@ -64,9 +64,9 @@ export YYYY=`echo $PDY |cut -c1-4`
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 export COMINIC=$COMROT/cdas.$PDYm1
@@ -107,18 +107,18 @@ expnams=${expnams:-'GFS16 CFS22'}
 for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS16 ]] ; then
-COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
-COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
-COMFIT=$(compath.py gfs/${gfs_ver})
+COM_INA='$(compath.py -o gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
+COM_INF='$(compath.py -o gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
+COMFIT=$(compath.py -o gfs/${gfs_ver})
 OMP_NUM_THREADS=1
 RUN_ENVIR=netcdf
 ACPROFit=YES
 CONVNETC=YES
 fi
 if [[ $EXPNAM = CFS22 ]] ; then
-COM_INA='$(compath.py cfs/prod/cdas.$PDY)'
-COM_INF='$(compath.py cfs/prod/cfs/cfs.$fdy/$fzz/6hrly_grib_01'
-COMFIT=$(compath.py cfs/${verson}) 
+COM_INA='$(compath.py -o cfs/prod/cdas.$PDY)'
+COM_INF='$(compath.py -o cfs/prod/cfs/cfs.$fdy/$fzz/6hrly_grib_01'
+COMFIT=$(compath.py -o cfs/${verson}) 
 OMP_NUM_THREADS=9
 RUN_ENVIR=cfs
 ACPROFit=NO

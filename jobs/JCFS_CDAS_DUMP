@@ -58,19 +58,19 @@ export FIXnst=$HOMEnst/fix
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m 755 -p $COMOUT
 
-export COMINm1=${COMINm1:-$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDYm1})}  # for prev day snowdepth.global.grb
+export COMINm1=$COMROT/${RUN}.${PDYm1}  # for prev day snowdepth.global.grb
 
 ##############################################
 # Define some INPUT directories
 ##############################################
 
-export COM_GDAS=${COM_GDAS:-$(compath.py gfs/${gfs_ver})}
-export COM_ENGICE=${COM_ENGICE:-$(compath.py omb/${omb_ver}/sice)}       ## after 20190613
+export COM_GDAS=${COM_GDAS:-$(compath.py $envir/com/gfs/${gfs_ver})}
+export COM_ENGICE=${COM_ENGICE:-$(compath.py $envir/com/omb/${omb_ver}/sice)}       ## after 20190613
 export COMGDAS=${COMGDAS:-${COM_GDAS}/gdas.${PDY}/${cyc}/atmos}
 export COMGFS=${COMGFS:-${COM_GDAS}/gfs.${PDY}/${cyc}/atmos}
 

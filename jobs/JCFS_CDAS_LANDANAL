@@ -8,8 +8,6 @@ set -xa
 # DATA_IN: Location of working directory, default to /tmpnwprd1
 # DEV_ECF: If the job is to be running using SMS, default to YES
 # SENDDBN: Set to NO for developers, default to YES
-# COM_IN:  Directory for input files, default to /com/$NET/${envir}
-# COM_OUT: Directory for output file, default to /com/$NET/${envir}
 #####################################################################################
 
 ####################################
@@ -63,9 +61,9 @@ export FIXcfs=$HOMEcfs/fix
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ##############################################

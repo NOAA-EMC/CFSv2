@@ -35,7 +35,6 @@ hpsstar=$USHcfs/cfs_hpsstar
 PUTCMD=putv            # putv does a bit comparison - at a speed cost
 PUTCMD=${PUTCMD:-put}
 
-COMROT=${COMROT:-$COMROOT/cfs/prod}
 POST_ANL=${POST_ANL:-YES}       # YES - Analysis step is done in post
 
 

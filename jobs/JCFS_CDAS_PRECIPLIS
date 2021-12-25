@@ -1,6 +1,6 @@
-#!/bin/ksh
+#!/bin/bash
 
-set -xa
+set -euax
 
 ####################################
 # Specify NET and RUN Name and model
@@ -63,12 +63,12 @@ export FIX_LM=$FIXcfs/cfs_fix_lm
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
-export COMCDAS=${COMCDAS:-$(compath.py ${NET}/${cfs_ver})}
+export COMCDAS=${COMCDAS:-$(compath.py -o ${NET}/${cfs_ver})}
 export DCOM=${DCOM:-${DCOMROOT}}
 
 export COMOUTGLDAS=$COMROT/cmap/gldas

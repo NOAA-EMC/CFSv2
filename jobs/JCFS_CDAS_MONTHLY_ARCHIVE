@@ -62,8 +62,8 @@ export FIXcfs=$HOMEcfs/fix
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 
 MM_P1=`echo $PDY |cut -c5-6`
 YYYY_P1=`echo $PDY |cut -c1-4`

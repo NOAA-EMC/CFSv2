@@ -557,7 +557,7 @@ $ERRSCRIPT||exit 11
 #  Make atmospheric analysis
 
 export OMP_NUM_THREADS=$NTHREADS_GSI
-export APRUN="mpiexec -n $NCPUS --depth $OMP_NUM_THREADS"
+export APRUN="mpiexec -n $NCPUS --depth $OMP_NUM_THREADS --cpu-bind depth"
 export PGM='$APRUN $DATA/$(basename $GSIEXEC)'
 export pgm=$PGM
 $LOGSCRIPT
