@@ -4,8 +4,8 @@ RSIZE = 8
 COMP=   ftn  ### ifort -nofree
 LIBS=   $(W3EMC_LIBd) $(W3NCO_LIBd) $(BACIO_LIB4)  
 LDFLAGS=  
-#FFLAGS= -O2 -xHost -i$(ISIZE) -real-size 32
-FFLAGS= -O2 -g -traceback -check bounds -check format -xHost -fpe0 -i$(ISIZE) -r$(RSIZE)    
+#FFLAGS= -O2 -i$(ISIZE) -real-size 32
+FFLAGS= -O2 -g -traceback -check bounds -check format -fpe0 -i$(ISIZE) -r$(RSIZE)    
 FFLAGS= -O2 -g -traceback                                          -i$(ISIZE) -r$(RSIZE)    
 
 gettrk:      gettrk_main.f gettrk_modules.o

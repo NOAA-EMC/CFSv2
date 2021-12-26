@@ -49,7 +49,7 @@ else
 fi
 #---------------------------------------------
 
-export FFLAGS=" -O2 -xHOST -convert big_endian -traceback -g -FR"
+export FFLAGS=" -O2 -convert big_endian -traceback -g -FR"
 export LIBSM="-L${SIGIO_DIR} -l${SIGIO_LIB4} \
               -L${BACIO_DIR} -l${BACIO_LIB4} \
               -L${W3NCO_DIR} -l${W3NCO_LIB4} "
