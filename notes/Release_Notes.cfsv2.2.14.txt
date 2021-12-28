@@ -1,0 +1,14 @@
+cfs trunk updated to version 2.2.14
+	
+Thu, Oct 14, 11:32 AM
+	
+You are receiving this message because you have been identified as a code manager on this project.  Please merge any updates in this revision with your code.  To update the recipient list for these notifications, contact nco.spa@noaa.gov.
+
+------------------------------------------------------------------------------------
+SVN Log: Emergency turn off IASI on MetOp-A for CFS (RFC 8691)
+------------------------------------------------------------------------------------
+r142 | xiaoxue.wang@noaa.gov | 2021-10-14 15:28:25 +0000 (Thu, 14 Oct 2021) | 1 line
+------------------------------------------------------------------------------------
+Changed paths:
+   M /trunk/fix/cfs_fix_cdas/global_satinfo.txt
+

@@ -1,0 +1,34 @@
+cfs trunk updated to version 2.2.9
+	
+Nov 24, 2020, 12:43 PM
+	
+SVN Log:
+------------------------------------------------------------------------
+r132 | xiaoxue.wang@noaa.gov | 2020-11-24 17:40:34 +0000 (Tue, 24 Nov 2020) | 1 line
+Changed paths:
+   M /trunk/exec/bufr_prepmods
+   M /trunk/jobs/JCFS_CDAS_PREP
+   A /trunk/notes/Release_Notes.cfsv2.1.33.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.1.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.2.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.3.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.4.1.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.4.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.5.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.6.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.7.txt
+   A /trunk/notes/Release_Notes.cfsv2.2.8.txt
+   M /trunk/obsproc_prep.v3.2.0/scripts/exglobal_makeprepbufr.sh.ecf
+   M /trunk/obsproc_prep.v3.2.0/ush/prepobs_makeprepbufr.sh
+   D /trunk/scripts/excfs_fcst.sh.ecf.20191206
+   D /trunk/scripts/exrun_cfs.sh.ecf.20191023
+   D /trunk/scripts/exrun_cfs.sh.ecf.20191206
+   M /trunk/sorc/bufr_prepmods.fd/bufr_prepmods.f
+   M /trunk/sorc/bufr_prepmods.fd/mnemonics.f
+   M /trunk/sorc/bufr_prepmods.fd/obname.f
+   A /trunk/sorc/build.bufr_prepmods
+   A /trunk/sorc/build.bufr_prepmods.out
+   M /trunk/ush/bufr_dumparte
+   M /trunk/ush/cfs_nstsstqd.sh
+
+Add new sbusurface buoy data to input data for GODAS ocean DA along with new obsproc_prep package update (RFC 7395)

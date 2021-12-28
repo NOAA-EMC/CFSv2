@@ -1,0 +1,15 @@
+cfs trunk updated to version 2.2.10
+	
+Wed, Dec 23, 2020, 11:39 AM
+	
+SVN Log: updating the co2 estimates for 2021
+------------------------------------------------------------------------
+r134 | alexander.richert@noaa.gov | 2020-12-23 16:34:14 +0000 (Wed, 23 Dec 2020) | 1 line
+Changed paths:
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2019.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2020.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2021.txt_proj
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2021.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2020.txt
+
+Updating cfs to version 2.2.10 via SVN updater script
