@@ -1,0 +1,18 @@
+#%Module1.0
+##
+## modulefile
+##
+
+conflict 
+
+
+set prodtop /lfs/h2/emc/global/noscrub/Jack.Woollen/CFSv2/global_shared_cfs/CRTMv206
+
+setenv  CRTM_SRC              $prodtop/sorc
+setenv  CRTM_LIB              $prodtop/libcrtm_v2.0.6.a 
+setenv  CRTM_INC              $prodtop/incmod/crtm_v2.0.6 
+setenv  CRTM_VER              2.0.6   
+
+prepend-path  LD_LIBRARY_PATH $prodtop
+
+

@@ -21,9 +21,11 @@ module load sigio/${sigio_ver}
 module load sp/${sp_ver}
 module load ip/${ip_ver}
 module load bufr/${bufr_ver}
-module load netcdf/3.6.3             
+module load netcdf/${netcdf3_ver}    
 module load sfcio/${sfcio_ver}
 module load gfsio/${gfsio_ver}
+module use -a $HOMEcfs/modules 
+module load esmf_${esmf4_ver} 
 
 set +eu
 SIGIO_LIB4=$SIGIO_LIB
@@ -33,8 +35,6 @@ SFCIO_INC4=$SFCIO_INC
 GFSIO_LIB4=$GFSIO_LIB
 GFSIO_INC4=$GFSIO_INC
 
-module use -a /lfs/h2/emc/global/noscrub/Jack.Woollen/modules 
-module load esmf_4_0_0rp2
 
 module list
 

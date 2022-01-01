@@ -1,0 +1,17 @@
+set -euax
+
+set +x
+module use -a /lfs/h2/emc/global/noscrub/Jack.Woollen/modules 
+module load esmf_4.0.0rp2
+module load crtm_2.0.6
+module load wrflib_1.1.0
+module list
+echo
+module show esmf_4.0.0rp2
+echo
+module show crtm_2.0.6
+echo
+module show wrflib_1.1.0
+echo
+set -x
+
