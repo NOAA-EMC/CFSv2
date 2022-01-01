@@ -81,7 +81,7 @@ export FORT70=$PRPI.oiqcbufr
 export FORT81=obogram.out
 export FORT82=obogram.bin
 
-mpirun -n 28 $OIQCX > outout 2> errfile
+mpiexec -n $NCPUS $OIQCX > outout 2> errfile
 export err=$?
 
 if [[ $err -eq 4 ]] ; then
