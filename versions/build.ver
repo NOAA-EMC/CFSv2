@@ -18,7 +18,8 @@ export esmf4_ver=4.0.0rp
 export nco_ver=4.7.9
 export wgrib2_ver=2.0.7
 
-export crtm_ver=2.3.0
+export crtm_ver=2.0.6
+
 
 export g2tmpl_ver=1.9.1
 export bacio_ver=2.4.1
@@ -31,7 +32,7 @@ export g2_ver=3.4.1
 export zlib_ver=1.2.11
 export sp_ver=2.3.3
 export ip_ver=3.3.3
-export wrf_io_ver=1.1.1
+export wrflib_ver=1.1.0
 export gfsio_ver=1.4.1
 export sfcio_ver=1.4.1
 

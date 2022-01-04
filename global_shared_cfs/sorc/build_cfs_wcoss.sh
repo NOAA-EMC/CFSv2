@@ -28,10 +28,10 @@ module load zlib/${zlib_ver}
 module load sigio/${sigio_ver}
 module load sfcio/${sfcio_ver}
 module load gfsio/${gfsio_ver}
-module load netcdf/3.6.3             
+module load netcdf/${netcdf3_ver} 
 module use  $HOMEcfs/modules 
-module load wrflib_1.1.0 
-module load crtm_2.0.6               
+module load crtm_${crtm_ver} 
+module load wrflib_${wrflib_ver} 
 module list
 set -x
 

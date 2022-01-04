@@ -1,7 +1,7 @@
 set -euax
 
 set +x
-module use -a /lfs/h2/emc/global/noscrub/Jack.Woollen/modules 
+module use -a $PWD  
 module load esmf_4.0.0rp2
 module load crtm_2.0.6
 module load wrflib_1.1.0

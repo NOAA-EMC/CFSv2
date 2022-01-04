@@ -101,9 +101,9 @@ OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o \
 
 $(TARGET):	$(OBJST) $(OBJS)
 	$(FC) -o $@ $(OBJST) $(OBJS) $(LIBS)
-	mkdir -p include/post_4
-	$(AR) $(ARFLAGS) $(LIB_TARGET) $(OBJST) $(OBJS)
-	mv *.mod include/post_4
+	#mkdir -p include/post_4
+	#$(AR) $(ARFLAGS) $(LIB_TARGET) $(OBJST) $(OBJS)
+	#mv *.mod include/post_4
 
 .f.o:
 	$(FC) $(FFLAGS) -c $<
