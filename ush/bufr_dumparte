@@ -3,7 +3,7 @@ set -uxa
 
 export DUMPOPS=${DUMPJB:-$HOMEdump/ush/dumpjb}
 export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-export ARGOTANK=${ARGOTANK:-$DCOMROOT/prod} 
+export ARGOTANK=${ARGOTANK:-$DCOMROOT} 
 export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
 export DUPC=OFF
 

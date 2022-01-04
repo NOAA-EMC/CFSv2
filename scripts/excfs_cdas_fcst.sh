@@ -1188,11 +1188,7 @@ if [ $mpmd = yes ] ; then
 fi
 set -x
 
-##cat $MP_CMDFILE
-##mpiexec -n $nprocst  cfp $MP_CMDFILE ###| grep "CFP RANK" # run the cmdfile processor
-
-eval $mpie  
-
+mpiexec -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am
 export err=$?; err_chk
   
 #------------------------------------------------------------------------------#
@@ -1248,7 +1244,8 @@ until [ $p_date -gt $end_date ] ; do
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
 
-mpiexec -n 28 cfp cmdfile_mpp | grep "CFP RANK" # run the cmdfile processor
+ncfp=$(wc -l cmdfile_mpp|cut -d' ' -f1)
+mpiexec -n $ncfp cfp cmdfile_mpp | grep "CFP RANK" # run the cmdfile processor
 export err=$?; err_chk
 
 # rename the ocn and ice files to reflect the correct time

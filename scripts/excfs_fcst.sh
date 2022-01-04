@@ -100,7 +100,6 @@
 #     IGEN          Output generating code
 #                   overridden by $7; defaults to 0
 #     FIXDIR        Directory for global fixed files
-#                   defaults to $HOMEDIR/fix/cfs_fix_am
 #     EXEC_AMD      Directory for global AM executables
 #                   defaults to $NWROOT/exec
 #     DATA          working directory
@@ -415,11 +414,8 @@ export D3DO;  if [ 8 -lt $n_pp ] ; then D3DO=$8;  else D3DO=${D3DO};      fi
 
 #  Directories.
 
-export HOMEDIR=${HOMEDIR:-$NWROOT}
 export cfsp=${cfsp:-"cfs_"}
 export FIXSUBDA=${FIXSUBDA:-fix/${cfsp}fix_am}
-export FIXDIR=${FIXDIR:-$HOMEDIR/$FIXSUBDA}
-export NWPROD=${NWPROD:-$HOMEDIR}
 export FIX_RAD=${FIX_RAD:-$FIXDIR}
 export DATA=${DATA:-$(pwd)}
 export COMOUT=${COMOUT:-$(pwd)}
@@ -433,7 +429,6 @@ export XC=${XC:-""}
 export SUFOUT=${SUFOUT:-""}
 export NCP=${NCP:-/bin/cp}
 
-export HOMEcfs=${HOMEcfs:-${HOMEDIR:-$NWPROD}}
 export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
 export EXEC_AMD=${EXEC_AMD:-EXECcfs}
 
@@ -1202,9 +1197,12 @@ EOF
 # run the coupled model
 #------------------------------------------------------------------------------#
 
-export OMP_NUM_THREADS=1
-#pirun -mxm -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
-mpiexec     -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
+export OMP_NUM_THREADS=2
+export OMP_PROC_BIND=true
+export OMP_STACKSIZE=2048m 
+export thread="--depth $OMP_NUM_THREADS --cpu-bind depth"
+
+time mpiexec --cpu-bind core -n $NPROCS_c $thread $PGM_c : -n $NPROCS_o $thread $PGM_oc : -n $NPROCS_a $thread $PGM_am   ##1>out.poe.$nhourb 2>err.poe.$nhourb
 export ERR=$?; export err=$ERR; err_chk
 
 #------------------------------------------------------------------------------#
@@ -1260,9 +1258,8 @@ set -x
 
 #  mpi_combine the decomposed ocean files into global files
 
-nprocs=128 ###$LSB_DJOB_NUMPROC
 ncmds=$(wc -l cmdfile_mpp|sed 's/cmdfile_mpp//')
-[[ $nprocs -lt $ncmds ]] && ncmds=$nprocs
+[[ $NCPUS -lt $ncmds ]] && ncmds=$NCPUS  
 
 mpiexec -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp  
 export err=$?; err_chk

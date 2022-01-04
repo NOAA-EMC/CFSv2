@@ -127,9 +127,9 @@ SUFOUT=$SUFIN.$yyyymm
 echo "SUFIN is $SUFIN"
 echo "SUFOUT is $SUFOUT"
 
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
-   nprocs=$LSB_DJOB_NUMPROC
-   ntasks=$LSB_DJOB_NUMPROC
+if [ -n "$NCPUS" ]; then
+   nprocs=$NCPUS
+   ntasks=$NCPUS
 else
    echo "nprocs not defined for this platform"
    export err=99; err_chk

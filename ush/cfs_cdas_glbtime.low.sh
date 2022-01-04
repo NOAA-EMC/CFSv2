@@ -57,8 +57,8 @@ flxplist='soilm1 soilm2 soilm3 soilm4 weasd'
 	
 # find the number of procs
 
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
-   ntasks=$LSB_DJOB_NUMPROC
+if [ -n "$NCPUS" ]; then
+   ntasks=$NCPUS
 else
    echo "ntasks not defined for this platform"
    export err=99; err_chk
@@ -156,7 +156,7 @@ fi
 # concat the separate cmdfiles and run cfp
 
 cat cmdfile.* >cfpfile
-$cfprun cfpfile |grep 'CFP RANK'
+mpiexec -n $NCPUS cfp cfpfile |grep 'CFP RANK'
 export err=$?; err_chk
 
 rm  cfpfile cmdfile.$$* 

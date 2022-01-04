@@ -51,6 +51,21 @@ set +u
 [ -n "$LOADL_PROCESSOR_LIST" ] && export XLSMPOPTS=parthds=2:usrthds=2:stack=64000000
 set -u
 
+#########################module load ibmpe ics lsf uncomment if not in profile
+
+#  seems to run ok w next 10 lines commented out (even though Jack had them in
+#   his version of this script)
+###export LANG=en_US
+###export MP_EAGER_LIMIT=65536
+###export MP_EUIDEVELOP=min
+###export MP_EUIDEVICE=sn_all
+###export MP_EUILIB=us
+###export MP_MPILIB=mpich2
+###export MP_USE_BULK_XFER=yes
+###export MPICH_ALLTOALL_THROTTLE=0
+###export MP_COLLECTIVE_OFFLOAD=yes
+###export KMP_STACKSIZE=1024m
+
 echo "      $CDATE10" > cdate.dat
 export FORT11=cdate.dat
 export FORT14=$PRPI
@@ -66,29 +81,21 @@ export FORT70=$PRPI.oiqcbufr
 export FORT81=obogram.out
 export FORT82=obogram.bin
 
-# find the number of procs
-
-if [ -n "$NCPUS" ]; then
-   nprocs=$LSB_DJOB_NUMPROC
-   export APRUN="mpiexec -n $nprocs"
-else
-   echo "nprocs not defined for this platform"
-   export err=99; err_chk
-fi
-
-# run the oiqc
-
-$APRUN  $OIQCX > outout 2> errfile
+mpiexec -n $NCPUS $OIQCX > outout 2> errfile
 export err=$?
 
-cat errfile >> outout
-cat outout >> oiqcbufr.out
-cp outout obcnt.out
+if [[ $err -eq 4 ]] ; then
+  echo "WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT --> non-fatal"
+  export err=0
+else
+  err_chk
+fi
 
-set +u
+cat errfile >> outout
+cat outout  >> oiqcbufr.out
+cp outout obcnt.out
 [ -n "$pgmout" ]  &&  cat outout >> $pgmout
 rm outout
-set -u
 
 set +x
 echo
@@ -96,22 +103,6 @@ echo 'The foreground exit status for PREPOBS_OIQCBUFR is ' $err
 echo
 set -x
 
-if [ "$err" -eq '4' ]; then
-msg="WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT \
---> non-fatal"
-   set +x
-   echo
-   echo "$msg"
-   echo
-   set -x
-   set +u
-   [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
-   set -u
-   err=0
-else
-   err_chk
-fi
-
 mv $PRPI.oiqcbufr $PRPI
 
-exit 0
+exit $err

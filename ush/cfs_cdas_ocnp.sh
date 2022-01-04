@@ -266,7 +266,7 @@ until [[ $date -gt $edate ]] ; do
 done
 
 if [ -s $cmd ] ; then
-  mpiexec -n $LSB_DJOB_NUMPROC cfp $cmd  |grep 'CFP RANK'
+  mpiexec -n $NCPUS cfp $cmd  |grep 'CFP RANK'
   export err=$?; err_chk
 fi
 

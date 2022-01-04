@@ -293,7 +293,7 @@ $mRSTsh
 
   echo "Begining GODAS-M4 single analysis at $yr-$mo-$dy"
 
-  mpiexec -n $LSB_DJOB_NUMPROC $pgm > fms.out 
+  mpiexec -n $NCPUS $pgm > fms.out 
   export err=$?; err_chk  
 
   echo "Job done."
