@@ -39,6 +39,7 @@ export cycle=t${cyc}z
 
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
+export OMP_NUM_THREADS=1
 
 ####################################
 # Specify cfs directories

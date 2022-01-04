@@ -94,8 +94,9 @@ set -u
 #############################################
 # Set the number of cores per model
 #############################################
+export OMP_NUM_THREADS=1
 export CPROCS=${CPROCS:-1}
-export OPROCS=${OPROCS:-56}
+export OPROCS=${OPROCS:-63}
 export APROCS=${APROCS:-195}
 
 env

@@ -93,8 +93,7 @@ export SIGHDR=${SIGHDR:-$EXECcfs/cfs_sighdr}
 export sigavg=${sigavg:-$EXECcfs/cfs_sigavg}
 export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
 
-export LSB_DJOB_NUMPROC=${LSB_DJOB_NUMPROC:-1}
-export cfprun="mpiexec -n $LSB_DJOB_NUMPROC cfp"
+export cfprun="mpiexec -n $NCPUS cfp"
 export NCP=${NCP:-/bin/cp}
 
 ####################################
@@ -174,7 +173,7 @@ export NTHSTACK=102400000
 #############################################
 # Specify the recovery and postjob directries
 #############################################
-export COMROT=$(compath.py -o $RUN/${envir}/$RUN)
+export COMROT=$(compath.py -o $RUN/${cfs_ver}/$RUN)
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}

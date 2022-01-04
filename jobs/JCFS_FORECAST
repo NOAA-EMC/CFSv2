@@ -140,8 +140,8 @@ export dt_ocean=1800
 export cnvgwd=.true.
 
 export NPROCS_c=1
-export NPROCS_o=60
-export NPROCS_a=128
+export NPROCS_o=63
+export NPROCS_a=32  
 
 #############################################
 # Get the variables setup from config script
@@ -149,10 +149,9 @@ export NPROCS_a=128
 export CONFIG_FILE=${CONFIG_FILE:-$PARMcfs/cfs_parm_am/cfs_config}
 set -a; . $CONFIG_FILE; set +a
 
-export DISK_GLOB=${DISK_GLOB:-/global/save}
-export DISK_CLIM=${DISK_CLIM:-/climate/save}
-
-export MP_SHARED_MEMORY=no
+#export DISK_GLOB=${DISK_GLOB:-/global/save}
+#export DISK_CLIM=${DISK_CLIM:-/climate/save}
+#export MP_SHARED_MEMORY=no
 
 ############################################
 # determine  the current day of the forecast

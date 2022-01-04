@@ -43,8 +43,6 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush
 export FIXcfs=$HOMEcfs/fix
 
-export HOMEobsproc_prep=${HOMEobsproc_prep:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
-
 export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
 
@@ -66,19 +64,12 @@ mkdir -m775 -p $COMOUT
 # Specify varaibles specific to this execution of script
 ##############################################
 
+export OMP_NUM_THREADS=1
 export POE=YES
 #  NPROCS indicates the number of POE tasks
 #   {Applies only when PREPDATA=YES below and POE=YES (default)}
 
-set +u
-if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-NPROCS=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-NPROCS=$LSB_DJOB_NUMPROC
-else
-NPROCS=1
-fi
-set -u
+export NPROCS=$NCPUS
 
 #  NSPLIT indicates the number of tasks for running PREPDATA
 #   (PREPDATA processing will be split into this many parts)
@@ -126,23 +117,13 @@ export GETGUESS=YES   # Encode first guess (background) values interpolated to
 
 export envir_getges=$(basename $COMROT) 
 export USHGETGES=$HOMEcfs/global_shared_cfs/ush
+export network_getges=cfs-cdas
 
 export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
-# PREPOBS_PROFCQC, PREPOBS_CQCVAD, PREPOBS_CQCBUFR and
-# PREPOBS_OIQCBUFR will NEVER execute regardless of
-# switches above -
-# should be set to NO only as a last resort!!!
-
-# recent cfs_ver of prepacqc
-#export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
-#export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
-#export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
-
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
 export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
 export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
-export USHOIQC=$HOMEcfs/obsproc_prep.v3.2.0/ush
-export network_getges=cfs-cdas
+export USHOIQC=$HOMEcfs/ush
 
 env
 
@@ -150,8 +131,8 @@ env
 # execute the script - use CFS cfs_vers of makeprepbufr
 #############################################################
 
-export HOMEprep=$HOMEcfs
-${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh}
+export HOMEprep=${HOMEprep:-$HOMEcfs}
+RUN=$RUN1 ${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh}
 export err=$?; err_chk
 
 cat $pgmout
