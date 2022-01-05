@@ -88,7 +88,7 @@ elif [ $plat = wcoss2 ]; then
  module load sp/${sp_ver}
  module load bufr/${bufr_ver}
  module load sfcio/${sfcio_ver}
- module load netcdf/${netcdf_ver}
+ module load netcdf/${netcdf4_ver}
  export export NETCDF_INCLUDE="-I $NETCDF/include"
  export export NETCDF_LDFLAGS="-L $NETCDF/lib -lnetcdf -lnetcdff"
  export SIGIO_LIB4=$SIGIO_LIB

@@ -830,7 +830,7 @@ if [ $dogrib2means = "YES" ] ; then
   # Submit MPMD Job to do grib2 conversion
   # --------------------------------------
 
-  mpiexec -n28 cfp $poescript | grep 'CFP RANK'
+  mpiexec -n$NCPUS cfp $poescript | grep 'CFP RANK'
   export err=$?; pgm="$(basename $0) mmean cfp"; err_chk
 
   # Cleanup
@@ -1059,7 +1059,7 @@ if [ $dogrib2time = "YES" ] ; then
   # Submit MPMD Job to do grib2 conversion
   # --------------------------------------
 
-  mpiexec -n28 cfp $poescript | grep 'CFP RANK'
+  mpiexec -n$NCPUS cfp $poescript | grep 'CFP RANK'
   export err=$?; pgm="$(basename $0) tser cfp"; err_chk
 
   # Cleanup

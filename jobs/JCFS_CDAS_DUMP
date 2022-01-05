@@ -55,6 +55,8 @@ export HOMEnst=$HOMEcfs/nstrtg.v1.1.1
 export EXECnst=$HOMEnst/exec
 export FIXnst=$HOMEnst/fix
 
+export HOMEobsproc_dump=$HOMEbufr_dump 
+
 ##############################################
 # Define COM directories
 ##############################################

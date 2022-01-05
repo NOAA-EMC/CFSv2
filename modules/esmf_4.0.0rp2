@@ -3,17 +3,13 @@
 ## modulefile
 ##
 
-conflict 
-
-
-set prodtop /lfs/h2/emc/global/noscrub/Jack.Woollen/esmf_4.0.0rp2
-
-setenv  ESMF_SRC              $prodtop
-setenv  ESMF_LIB             "$prodtop/lib/libO/Linux.intel.64.intelmpi.default -lesmf -lstdc++"
-setenv  ESMF_MOD              $prodtop/mod/modO/Linux.intel.64.intelmpi.default
-setenv  ESMF_VER              4.0.0rp2
-
-setenv  ESMFMKFILE            $prodtop/lib/libO/Linux.intel.64.intelmpi.default/esmf.mk
+set     HOMEcfs       $::env(HOMEcfs)
+set     prodtop       $HOMEcfs/global_shared_cfs/modules/esmf_4.0.0rp2
+setenv  ESMF_SRC      $prodtop
+setenv  ESMF_LIB      "$prodtop/lib/libO/Linux.intel.64.intelmpi.default -lesmf -lstdc++"
+setenv  ESMF_MOD      $prodtop/mod/modO/Linux.intel.64.intelmpi.default
+setenv  ESMFMKFILE    $prodtop/lib/libO/Linux.intel.64.intelmpi.default/esmf.mk
+setenv  ESMF_VER      4.0.0rp2
 
 prepend-path  LD_LIBRARY_PATH $prodtop/lib/libO/Linux.intel.64.intelmpi.default
 

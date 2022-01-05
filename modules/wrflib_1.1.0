@@ -3,9 +3,8 @@
 ## modulefile
 ##
 
-conflict 
-
-set    prodtop    /lfs/h2/emc/global/noscrub/Jack.Woollen/wrflib_1.1.0
+set    HOMEcfs    $::env(HOMEcfs)
+set    prodtop    $HOMEcfs/global_shared_cfs/modules/wrflib_1.1.0
 
 setenv WRF_SRC    $prodtop 
 setenv WRF_INC    $prodtop/INC  

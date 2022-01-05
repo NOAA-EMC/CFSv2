@@ -2,15 +2,15 @@ set -euax
 
 set +x
 module use -a $PWD  
-module load esmf_4.0.0rp2
-module load crtm_2.0.6
-module load wrflib_1.1.0
 module list
 echo
+module load esmf_4.0.0rp2
 module show esmf_4.0.0rp2
 echo
+module load crtm_2.0.6
 module show crtm_2.0.6
 echo
+module load wrflib_1.1.0
 module show wrflib_1.1.0
 echo
 set -x
