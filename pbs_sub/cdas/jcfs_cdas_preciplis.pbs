@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N jcfs_cdas_preciplis_00      
+#PBS -o $out/cfs_cdas_preciplis_00
+#PBS -l select=1:ncpus=1:mem=5GB     
+#PBS -l walltime=01:00:00
+#PBS -A CFS-DEV
+#PBS -q dev
+#PBS -j oe  
+#PBS -V        
+
+#!/usr/bin/env bash
+set -euax  
+
+$homecfs/jobs/JCFS_CDAS_PRECIPLIS
+
+
+

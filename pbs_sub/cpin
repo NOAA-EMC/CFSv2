@@ -1,0 +1,41 @@
+set -euax
+
+cd $cfs/pbs_sub
+
+cp $da/runawips jcfs_awips.pbs
+cp $da/runcfs   jcfs_forecast.pbs
+cp $da/runcps   jcfs_post.pbs
+
+cd $cfs/pbs_sub; mkdir -p cdas; cd cdas 
+
+cp $da/runangu jcfs_cdas_angupdate.pbs
+cp $da/rundump jcfs_cdas_dump.pbs
+cp $da/runfcst jcfs_cdas_forecast.pbs
+cp $da/runanal jcfs_cdas_gdasanal.pbs
+cp $da/runlanl jcfs_cdas_landanal.pbs
+cp $da/runoanl jcfs_cdas_ocnanal.pbs
+cp $da/runpost jcfs_cdas_post.pbs
+cp $da/runplis jcfs_cdas_preciplis.pbs
+cp $da/runprep jcfs_cdas_prep.pbs
+cp $da/runrelo jcfs_cdas_tropcy_qc_reloc.pbs
+
+cd $cfs/pbs_sub; mkdir -p cfs_hur; cd cfs_hur
+
+>archive_cfs_hur.pbs
+>jcfs_forecast_hur.pbs
+>jcfs_post_hur.pbs
+>transfer_cfs_hur.pbs
+
+cd $cfs/pbs_sub; mkdir -p misc; cd misc 
+
+cp $da/runarch.cfs  jcfs_archive.pbs
+cp $da/runarch.cdas jcfs_cdas_archive.pbs
+cp $da/runvrfy      jcfs_cdas_vrfyfits.pbs
+cp $da/runclen      jcfs_cleanup.pbs
+
+cd $cfs/pbs_sub; mkdir -p monthly; cd monthly 
+
+cp $oth/runarch.mnth jcfs_cdas_monthly_archive.pbs
+cp $oth/runmean      jcfs_cdas_monthly_mean.pbs
+cp $oth/runtime      jcfs_cdas_monthly_time.pbs
+
