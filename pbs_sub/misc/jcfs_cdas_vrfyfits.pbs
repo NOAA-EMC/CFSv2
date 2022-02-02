@@ -1,7 +1,7 @@
 #!/bin/bash            
 #PBS -N jcfs_cdas_vrfyfits_00 
 #PBS -o $out/cfs_cdas_vrfyfits_00   
-#PBS -l place=vscatter,select=1:ncpus=4:mem=120GB   
+#PBS -l place=vscatter,select=1:ncpus=4:mem=150GB   
 #PBS -l walltime=01:00:00
 #PBS -A CFS-DEV
 #PBS -q dev

@@ -122,8 +122,11 @@ export network_getges=cfs-cdas
 export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
 export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
 export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
-export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
-export USHOIQC=$HOMEcfs/ush
+
+export HOMEobsproc=/lfs/h1/ops/para/packages/obsproc.${obsproc_ver} 
+export HOMEobsproc=$HOMEcfs/obsproc  
+export ushscript_prep=$HOMEobsproc/ush
+#export USHOIQC=${USHOIQC:-$HOMEobsproc/ush}
 
 env
 
@@ -131,8 +134,7 @@ env
 # execute the script - use CFS cfs_vers of makeprepbufr
 #############################################################
 
-export HOMEprep=${HOMEprep:-$HOMEcfs}
-RUN=$RUN1 ${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh}
+RUN=$RUN1 ${PREPSH:-$HOMEobsproc/scripts/exglobal_makeprepbufr.sh}
 export err=$?; err_chk
 
 cat $pgmout
