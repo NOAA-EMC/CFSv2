@@ -29,8 +29,8 @@ export REMOTE_CMAP_DIR=${REMOTE_CMAP_DIR:-/cpc/data/cpcsat/CMAP_PEN_RT}
 export REMOTE_GAGE_DIR=${REMOTE_GAGE_DIR:-/cpc/data/cpcsat/cpcUniGaugeRT/PRODUCTS/GRID/$yyyy/gridGLB/DEG0.500M}
 
 # When GETPRECIP_FROM_CPC is set to NO, obtain the precip file from /dcom (this is the default)
-LOCAL_CMAP_DIR=${LOCAL_CMAP_DIR:-$DCOM/pentad}
-LOCAL_GAGE_DIR=${LOCAL_GAGE_DIR:-$DCOM}
+LOCAL_CMAP_DIR=${LOCAL_CMAP_DIR:-$DCOMIN/pentad}
+LOCAL_GAGE_DIR=${LOCAL_GAGE_DIR:-$DCOMIN}
 
 #########################################################
 # Start retrieving the pentad file (in grads format)from 

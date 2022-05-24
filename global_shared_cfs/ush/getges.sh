@@ -446,15 +446,6 @@ elif [[ $netwk = cfs-cdas ]];then
   biascr) geslist='
    $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias'
    ;;
-  biascr_pc) geslist='
-   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias_pc'
-   ;;
-  biascr_air) geslist='
-   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias_air'
-   ;;
-  radstat) geslist='
-   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.radstat'
-   ;;
   satang) geslist='
    $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.satang'
    ;;

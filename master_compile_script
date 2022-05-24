@@ -1,10 +1,9 @@
-#!/usr/bin/env bash
 set -euax
 
 
 for dir in 206 esm wrf cfs shr nst jis f2o; do
 
-script -c "$PWD/master_build_all.sh  $dir" $dir.log
+script -c "./master_build_all.sh  $dir" $dir.log
 
 done
 

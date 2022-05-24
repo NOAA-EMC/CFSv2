@@ -90,7 +90,7 @@ do
   # Post Files to PCOM
   ##############################
  
-  mv grib2_cfs_${type}.01.${cfs_day}${cyc}.daily   $pcom/grib2_cfs_${type}.01.${cyc}.daily
+  mv grib2_cfs_${type}.01.${cfs_day}${cyc}.daily   $COMOUTwmo/grib2_cfs_${type}.01.${cyc}.daily
  
   fi
  
@@ -102,7 +102,7 @@ do
 #
 #    Distribute Data to TOC (AWIPS)
 #
-     $DBNROOT/bin/dbn_alert NTC_LOW $NET $job   $pcom/grib2_cfs_${type}.01.${cyc}.daily
+     $DBNROOT/bin/dbn_alert NTC_LOW $NET $job   $COMOUTwmo/grib2_cfs_${type}.01.${cyc}.daily
   else
      msg="File grib2_cfs_${type}.01.${cfs_day}${cyc}.daily  not posted to db_net."
      postmsg "$jlogfile" "$msg"

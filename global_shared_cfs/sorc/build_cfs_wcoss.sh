@@ -4,9 +4,8 @@ set -euax
 [[ $# -eq 1 ]] && build=$1 || build=all
 
 set +x
-module purge
+module reset
 source $HOMEcfs/versions/build.ver
-module load envvar/${envvar_ver}
 module load PrgEnv-intel/${PrgEnv_intel_ver}
 module load craype/${craype_ver}
 module load intel/${intel_ver}

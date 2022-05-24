@@ -22,7 +22,6 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -31,10 +30,7 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -65,7 +61,7 @@ export FIXPREP=$FIXcfs/cfs_fix_prep
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -136,8 +132,8 @@ fi
 # Define COM directories
 ##############################################
 
-export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m755 -p ${COMOUT}
 
@@ -150,7 +146,7 @@ export FLXO=${COMOUT}/${RUN1}.${cycle}.sfluxgrbf'${FH}'
 export LOGO=${COMOUT}/${RUN1}.${cycle}.logf'${FH}'
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ##############################################
 # Define the guess files
@@ -167,10 +163,10 @@ cd $DATA/INPUT
 tar -xvf $OCNI
 cd $DATA
 msg="Forecast Starting with Initial Guess Fields"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 else
 msg="Initial Guess Fields Not Available to run $job"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 export pgm=$job
 export err=911
 err_chk
@@ -198,7 +194,7 @@ set -e
 if [[ $rc -ne 0 ]] ; then
 if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
 msg="Error in executing the forecast script"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 export err=$rc; err_chk
 else
 $PERR;exit $rc
@@ -218,25 +214,13 @@ if [ $SENDCOM = YES ] ; then
 cp $OCNR $COMOUT/.
 fi
 
-###########################################################
-# copy the nwges files into the nwges subdirectory
-###########################################################
-
-NWGES=$COMOUT/nwges; mkdir -p $NWGES
-cp $COMOUT/$RUN1.$cycle.next_ocnr.tar $NWGES
-cp $COMOUT/$RUN1.$cycle.ocnanl.tar    $NWGES
-cp $COMOUT/$RUN1.$cycle.sfcanl        $NWGES
-cp $COMOUT/$RUN1.$cycle.satang        $NWGES
-cp $COMOUT/$RUN1.$cycle.abias         $NWGES
-cp $COMOUT/$RUN1.$cycle.sanl          $NWGES
-
 ###################################################
 # msg end of job and clean up temperary directory
 ###################################################
 
 cat $DATA/$pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

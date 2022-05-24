@@ -8,7 +8,6 @@ export NET=cfs
 export RUN=cfs
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES
@@ -17,17 +16,14 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -63,7 +59,7 @@ err=$?; err_chk
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

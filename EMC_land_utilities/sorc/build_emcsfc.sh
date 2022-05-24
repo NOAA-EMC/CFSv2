@@ -10,9 +10,8 @@
 set -euax
 
 set +x
-module purge
+module reset
 source $HOMEcfs/versions/build.ver
-module load envvar/${envvar_ver}
 module load PrgEnv-intel/${PrgEnv_intel_ver}
 module load craype/${craype_ver}
 module load intel/${intel_ver}
@@ -35,7 +34,7 @@ for directory in emcsfc_snow2mdl.fd  emcsfc_grib_snowgrib.fd  ## only compile th
 do
 echo
 cd $directory
-makefile.sh           
+./makefile.sh           
 cd ..
 echo
 done

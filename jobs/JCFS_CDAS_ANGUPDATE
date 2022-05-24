@@ -22,8 +22,6 @@ if [[ $RUN_ENVIR = nco && $envir != prod ]]; then
 export SENDDBN=${SENDDBN:-NO}
 fi
 
-export jlogfile=${jlogfile:-/dev/null}
-
 ####################################
 # Specify NET and RUN Name and model
 ####################################
@@ -34,7 +32,6 @@ export RUN1=cdas1
 ####################################
 # set up job name and  environment
 ####################################
-export job=${job:-$RUN1}
 export envir=${envir:-prod}
 export host=${host:-`hostname | cut -c1`}
 
@@ -48,11 +45,7 @@ date
 # SETUP CDAS ANALYSIS PROCESSING VARIABLES
 # #############################################
 
-####################################
-# obtain unique process id (pid) and make temp directory
-####################################
-export pid=${pid:-$$}
-export DATA=$DATAROOT/${job}.${pid}
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -61,8 +54,7 @@ cd $DATA
 ####################################
 export cyc=${cyc:-00}
 export outid="LL$job"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -111,9 +103,10 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$COMROT/$RUN.${PDY}
-export COMOUT=$COMROT/$RUN.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMINcfs_cdas=${COMINcfs_cdas:-$COMIN}
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m 775 -p $COMOUT
 
 ####################################
@@ -150,17 +143,17 @@ export RADSTAT=${RADSTAT:-${COMIN}/${PREINP}radstat}
 export SATANGO=${SATANGO:-$DATA/${RUN1}.${cycle}.satang}
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ####################################
 # Check if this is a restart
 # Define Previous Guess File Names
 ####################################
 
-export GETGESSH=$HOMEGLOBAL/ush/getges.sh
+export GETGESSH=$HOMEprepobs/ush/getges.sh
 
 if [ $RUN_GETGES = YES ] ; then
-  gesenvir=$(basename $COMROT)
+  gesenvir=${gesenvir:-${envir:-prod}}
   $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas bges
   err1=$?
   $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v $PDY$cyc -e $gesenvir -n cfs-cdas gsatang
@@ -171,10 +164,10 @@ export GSATANG=${GSATANG:-$DATA/gsatang}
 
 if [ $err1 -eq 0 ] ; then
   msg="Angupdate Start/Guess Fields Found"
-  postmsg "$jlogfile" "$msg"
+  postmsg  "$msg"
 else
   msg="Angupdate Cannot Start/Guess Fields Not Available"
-  postmsg "$jlogfile" "$msg"
+  postmsg "$msg"
   export pgm=$job
   export err=911
   err_chk
@@ -226,7 +219,7 @@ cat $pgmout
 
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ##############################
 # Remove the Temporary working directory

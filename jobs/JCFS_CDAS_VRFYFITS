@@ -10,27 +10,19 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 date
 export PS4='$SECONDS + '
 
-# #############################################
-# SETUP FITS TO OBS PROCESSING VARIABLES
-# ##############################################
-
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -89,7 +81,8 @@ export KMP_AFFINITY=disabled
 export KEEPDATA=${KEEPDATA:-NO}
 
 export NEMS=${NEMS:-YES}
-export PRVT=${PRVT:-$HOMEcfs/fix/cfs_fix_cdas/prepobs_errtable.global}
+export COMINgfs=${COMINgfs:-$(compath.py gfs/${gfs_ver})}
+export PRVT=${PRVT:-$COMINgfs/fix/prepobs_errtable.global}
 export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 
 ################################################################
@@ -108,6 +101,7 @@ for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS16 ]] ; then
 COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
+COM_INAprep='$(compath.py obsproc/${obsproc_ver})/gdas.${PDY}/${cyc}/atmos'
 COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
 COMFIT=$(compath.py -o gfs/${gfs_ver})
 OMP_NUM_THREADS=1
@@ -117,7 +111,7 @@ CONVNETC=YES
 fi
 if [[ $EXPNAM = CFS22 ]] ; then
 COM_INA='$(compath.py -o cfs/${cfs_ver}/cdas.$PDY)'
-COM_INF='$(compath.py -o cfs/${cfs_ver}/cfs/cfs.$fdy/$fzz/6hrly_grib_01)'
+COM_INF='$(compath.py -o cfs/${cfs_ver}/cfs.$fdy/$fzz/6hrly_grib_01)'
 COMFIT=$(compath.py -o cfs/${cfs_ver})
 OMP_NUM_THREADS=9
 RUN_ENVIR=cfs
@@ -146,7 +140,7 @@ done
 ###################################################
 cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

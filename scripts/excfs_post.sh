@@ -75,7 +75,7 @@ echo " Network id is ................................ $NET"
 echo " Run id for com processing is ......... ....... $RUN"
 echo "  "
 echo " standard output in file ...................... $pgmout"
-echo " unique processing id for run ................. $pid"
+echo " unique processing id for run ................. $jobid"
 echo " SENDCOM=YES means save com files ............. $SENDCOM"
 echo " ------------------------------------------------------------"
 set -x

@@ -9,10 +9,7 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -30,8 +27,7 @@ export RUN1=cdas1
 # Determine Job Output Name on System
 ####################################
 
-export jlogfile=${jlogfile:-/dev/null}
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 ##########################################################
 # define cfs directories/scripts/executables
@@ -72,7 +68,7 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 export COMINcfs_cdas=$COMIN
@@ -105,8 +101,8 @@ export LATB=880  # sigma guess parm needed by tropical cyclone reloc. processing
 export ndate=$NDATE
 export nhour=$NHOUR
 export network_getges=cfs-cdas
-export envir_getges=$(basename $COMROT)
-export USHGETGES=$HOMEglob/ush
+export envir_getges=${envir_getges:-${envir:-prod}}
+export USHGETGES=${HOMEprepobs}/ush
 export GRIBVERSION=grib1
 export BKGFREQ=3
 export quiet=NO
@@ -122,7 +118,7 @@ export err=$?; err_chk
 
 #############################################################
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

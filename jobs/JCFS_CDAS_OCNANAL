@@ -14,24 +14,19 @@ export RUN1=cdas1
 export job=${job:-$RUN}
 export envir=${envir:-prod}
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
-date
 export PS4='$SECONDS + '
 date
 
 ###########################################################
-## obtain unique process id (pid) and make temp directory
-###########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -57,9 +52,10 @@ export FIXcfs=$HOMEcfs/fix
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
-export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=${COMROT:-$(compath.py -o ${NET}/${cfs_ver})}
+export  COMIN=${COMIN:-$(compath.py ${NET}/${cfs_ver})/${RUN}.${PDY}}
+export COMOUT=${COMOUT:-$(compath.py -o ${NET}/${cfs_ver})/${RUN}.${PDY}}
+export COMDIR=${COMDIR:-$(compath.py ${NET}/${cfs_ver})/${RUN}.${PDY}}
 mkdir -m775 -p $COMOUT
 
 ### Input parameters for GODAS
@@ -68,11 +64,13 @@ export GODAS_PARM_INPUT=${GODAS_PARM_INPUT:-$PARMcfs/cfs_parm_om/cfs_godas_input
 set -a; . $GODAS_PARM_INPUT; set +a
 
 export Obs_dir=${Obs_dir:-$DATA/GDS_Obs}
+export  GESDIR=${GESDIR:-$(compath.py ${NET}/${cfs_ver})/nwges}
+#export  RESDIR=${RESDIR:-$GESDIR}
 
 mkdir -p $COMROT $RESDIR $Obs_dir
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 # Define Previous Guess File Names (DEV users should set it to NO in the config file)
 export GETGES_PROD=${GETGES_PROD:-YES}
@@ -90,10 +88,10 @@ export CDUMP=gdas
 
 if [ -s $OCNGES ] ; then
 msg="Analysis Starting/Guess Fields Found"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 else
 msg="Analysis Cannot Start/Guess Fields Not Available"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 export pgm=$job
 export err=911; err_chk
 fi
@@ -128,7 +126,7 @@ fi
 
 export err=$?; err_chk
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

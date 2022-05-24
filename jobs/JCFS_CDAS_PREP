@@ -5,10 +5,8 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
 ##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -27,12 +25,7 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
-export jlogfile=${jlogfile:-/dev/null}
-export pgmout="OUTPUT.${pid}"
-
-####################################
-# Specify Execution Areas
-####################################
+export pgmout="OUTPUT.$$"
 
 ##########################################################
 # define cfs directories/scripts/executables
@@ -43,6 +36,7 @@ export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush
 export FIXcfs=$HOMEcfs/fix
 
+export HOMEobsproc=${HOMEobsproc:-${PACKAGEROOT}/obsproc.${obsproc_ver}}
 export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
 
@@ -115,18 +109,24 @@ export GETGUESS=YES   # Encode first guess (background) values interpolated to
 # sigma guess file valid at the center PREPBUFR
 # processing date/time.
 
-export envir_getges=$(basename $COMROT) 
-export USHGETGES=$HOMEcfs/global_shared_cfs/ush
-export network_getges=cfs-cdas
+#export envir_getges=$(basename $COMROT) 
+#export envir_getges=${envir_getges:-${envir:-prod}}
+#export USHGETGES=$HOMEcfs/global_shared_cfs/ush
+#export USHGETGES=$HOMEprepobs/ush
+#export network_getges=cfs-cdas
 
 export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
-export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
-export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
 
-export HOMEobsproc=/lfs/h1/ops/para/packages/obsproc.${obsproc_ver} 
-export HOMEobsproc=$HOMEcfs/obsproc  
-export ushscript_prep=$HOMEobsproc/ush
-#export USHOIQC=${USHOIQC:-$HOMEobsproc/ush}
+# HOMEgfs is directory path to prepobs_errtable.global (PRVT), used in
+# prepobs_makeprepbufr.sh and its child scripts prepobs_syndata.sh and
+# prepobsp_prevents.sh.
+export HOMEgfs=${HOMEgfs:-$(compath.py gfs/${gfs_ver})} 
+
+export PRVT=$HOMEgfs/fix/prepobs_errtable.global
+#export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
+#export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
+#export USHOIQC=$HOMEcfs/ush
+export ushscript_prep=${ushscript_prep:-$USHprepobs}
 
 env
 
@@ -134,12 +134,12 @@ env
 # execute the script - use CFS cfs_vers of makeprepbufr
 #############################################################
 
-RUN=$RUN1 ${PREPSH:-$HOMEobsproc/scripts/exglobal_makeprepbufr.sh}
+RUN=$RUN1 ${PREPSH:-$HOMEcfs/scripts/exglobal_makeprepbufr.sh}
 export err=$?; err_chk
 
 cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 
 ########################################

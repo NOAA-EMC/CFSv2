@@ -20,8 +20,6 @@ if [[ $RUN_ENVIR = nco && $envir != prod ]]; then
 export SENDDBN=${SENDDBN:-NO}
 fi
 
-export jlogfile=${jlogfile:-/dev/null}
-
 ####################################
 # Specify NET and RUN Name and model
 ####################################
@@ -45,13 +43,7 @@ date
 # #############################################
 # SETUP CDAS ANALYSIS PROCESSING VARIABLES
 # #############################################
-
-####################################
-# obtain unique process id (pid) and make temp directory
-####################################
-export pid=${pid:-$$}
-
-export DATA=$DATAROOT/${job}.${pid}
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -61,8 +53,7 @@ cd $DATA
 export cyc=${cyc:-00}
 export outid="LL$job"
 [ $envir != prod ]  && export outid="LL${job}_${envir}"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -116,6 +107,7 @@ sh setpdy.sh
 ##############################################
 export COMROT=$(compath.py -o ${NET}/${cfs_ver})
 export COMIN=$COMROT/cdas.${PDY}
+export COMINcfs_cdas=${COMINcfs_cdas:-$COMIN}
 export COMOUT=$COMROT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
 
@@ -179,7 +171,8 @@ export CONVINFO=${CONVINFO:-${FIXcfs}/global_convinfo.txt}
 export OZINFO=${OZINFO:-${FIXcfs}/global_ozinfo.txt}
 export PCPINFO=${PCPINFO:-${FIXcfs}/global_pcpinfo.txt}
 
-export OBERROR=${OBERROR:-${FIXcfs}/prepobs_errtable.global}
+export COMINgfs=${COMINgfs:-$(compath.py gfs/${gfs_ver})}
+export OBERROR=${OBERROR:-${COMINgfs}/fix/prepobs_errtable.global}
 #
 # Analysis Input Fields
 #
@@ -238,10 +231,10 @@ export SSMITBF=${SSMITBF:-/dev/null}
 wgrib=$WGRIB
 RUN_GETGES=${RUN_GETGES:-YES}     
 prev_cdate=`$NDATE -6 $PDY$cyc`
-GETGESSH=${GETGESSH:-$HOMEGLOBAL/ush/getges.sh}
+GETGESSH=${GETGESSH:-$HOMEprepobs/ush/getges.sh}
 
 if [ $RUN_GETGES = YES ]; then
-  export envir_getges=$(basename $COMROT)
+  export envir_getges=${envir_getges:-${envir:-prod}}
   snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $envir_getges -n cfs-cdas -v $prev_cdate)
 else
   snoprv=${snoprv:-$FNSNOG}
@@ -275,7 +268,7 @@ export OZNSTAT=${OZNSTAT:-${COMOUT}/${RUN1}.${cycle}.oznstat}
 export IGEN=${IGEN:-197}
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ####################################
 # Check if this is a restart
@@ -300,10 +293,10 @@ export GESFIL=${GESFIL:-$DATA/gesfile}
 
 if [ $err1 -eq 0 ] ; then
 msg="Analysis Starting/Guess Fields Found"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 else
 msg="Analysis Cannot Start/Guess Fields Not Available"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 export pgm=$job
 export err=911
 err_chk
@@ -374,7 +367,7 @@ fi
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ##############################
 # Remove the Temporary working directory

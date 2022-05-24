@@ -3,7 +3,6 @@ export bufr_ver=11.4.0
 export cray_mpich_ver=8.1.9
 export craype_ver=2.7.8
 export crtm_ver=2.0.6
-export envvar_ver=1.0
 export esmf4_ver=4.0.0rp2
 export g2_ver=3.4.1
 export g2tmpl_ver=1.9.1

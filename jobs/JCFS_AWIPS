@@ -11,20 +11,16 @@ set -xa
 export PS4='$SECONDS + '
 date
 export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}
-export jlogfile=${jlogfile:-/dev/null}
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export cycle=t${cyc}z
 
 #################################
@@ -63,13 +59,13 @@ export FIXcfs=$HOMEcfs/fix
 # Set up the com directory
 ########################################
 export  COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export   COMIN=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
-export  COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${cfs_day})
-export COMINm1=$(compath.py -o ${NET}/${cfs_ver}/${NET}/${RUN}.${PDYm1})
+export   COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${cfs_day})
+export  COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${cfs_day})
+export COMINm1=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDYm1})
 
-export pcom=$COMOUT/wmo
+export COMOUTwmo=${COMOUTwmo:-$COMOUT/wmo}
 
-mkdir -m755 -p $COMOUT $pcom
+mkdir -m755 -p $COMOUT $COMOUTwmo
 
 env
 

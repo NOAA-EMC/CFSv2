@@ -46,7 +46,8 @@ HRLY6DIR=${HRLY6DIR:-$COMFCST/6hrly_grib_$member}
 
 COMANALYSIS=${COMANALYSIS:-$COMROT/cdas.$YYYYMMDD}
 
-HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
+#HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
+HPSSROT=${HPSSROT:-/NCEPPROD/hpsspara/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM/$YYYYMMDD/Analysis}
 
 # Analysis files staging area

@@ -73,7 +73,7 @@ do
     TEMPDIR=$workdir/$member
     mkdir -p $TEMPDIR
 
-    COMFCST=$COMROT/cfs/cfs.$YYYYMMDD/$HH
+    COMFCST=$COMROT/cfs.$YYYYMMDD/$HH
     COMANALYSIS=${COMANALYSIS:-$COMROT/cdas.$YYYYMMDD}
 
     # Monthly means

@@ -25,7 +25,7 @@ export rm_com=${rm_com:-yes}
 export clean_com=${clean_com:-yes}
 export thin_com_cdas=${thin_com_cdas:-yes}
 export thin_com_cfs=${thin_com_cfs:-yes}
-export rm_nwges=${rm_nwges:-yes}
+#export rm_nwges=${rm_nwges:-yes}
 
 ##########################################
 
@@ -42,9 +42,9 @@ then
   date_45=$($NDATE -$HOURS_TO_KEEP $PDY$cyc)
   day_45=`echo $date_45 |cut -c1-8`
   rm -rf $COMROT/cdas.$day_45
-  rm -rf $COMROT/cfs/cfs.$day_45
+  rm -rf $COMROT/cfs.$day_45
   
-  ls -1d $COMROT/cdas.* $COMROT/cfs/cfs.* >rm_dirlist
+  ls -1d $COMROT/cdas.* $COMROT/cfs.* >rm_dirlist
   for dir in `cat rm_dirlist`
   do
      pday=$(echo $dir |awk ' BEGIN { FS="."} { print $NF }')
@@ -105,7 +105,7 @@ if test "$thin_com_cfs" = "yes"
 then
   days_to_keep_cfs=${days_to_keep_cfs:-7}
   last_day_to_keep_cfs=`finddate.sh $PDY d-$days_to_keep_cfs`
-  ls -1d $COMROT/cfs/cfs.* >dirlist
+  ls -1d $COMROT/cfs.* >dirlist
   rm -f thin_dirlist
   for dir in `cat dirlist`
   do
@@ -134,14 +134,14 @@ fi
 # 4. Clean up the $GESROOT directories
 #
 #########################################################################
-days_to_keep_nwges=${days_to_keep_nwges:-3}
-gespath=${gespath:-$GESROOT/${envir}}
-rm_nwges_day=`finddate.sh $PDY d-$days_to_keep_nwges`
+#days_to_keep_nwges=${days_to_keep_nwges:-3}
+#gespath=${gespath:-$GESROOT/${envir}}
+#rm_nwges_day=`finddate.sh $PDY d-$days_to_keep_nwges`
 
-if [ $rm_nwges = yes ]; then
-  cd $gespath
-  rm -rf cdas.$rm_nwges_day
-fi
+#if [ $rm_nwges = yes ]; then
+#  cd $gespath
+#  rm -rf cdas.$rm_nwges_day
+#fi
 
 #####################################################################
 

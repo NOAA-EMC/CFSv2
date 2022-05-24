@@ -33,7 +33,6 @@ export RTYPE=${1:-${RTYPE:-forecast}}
 export RUN=${RUN:-cfs}
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -42,10 +41,7 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -65,7 +61,7 @@ fi
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -205,7 +201,7 @@ fi
 # Specify the recovery and postjob directries
 #############################################
 
-export COMROT=$(compath.py -o $RUN/${cfs_ver}/$RUN)
+export COMROT=$(compath.py -o $RUN/${cfs_ver})
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}
@@ -258,7 +254,7 @@ export IC_FROM_HPSS=${IC_FROM_HPSS:-NO}
 export IC_FROM_DISK=${IC_FROM_DISK:-YES}
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg  "$msg"
 
 env
 
@@ -290,9 +286,9 @@ export COM_ARCH=$COM_YMDH
 #######################################
 # Define the input IC files
 #######################################
-export SIGI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sanl
-export SFCI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.sfcanl
-export OCNI=$COMROT/../cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
+export SIGI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sanl
+export SFCI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sfcanl
+export OCNI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
 
 #############################################################
 # Execute the script
@@ -315,7 +311,7 @@ fi
 ###################################################
 ###cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

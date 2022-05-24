@@ -9,7 +9,6 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES
@@ -18,17 +17,14 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -77,8 +73,8 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 
-export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
@@ -155,7 +151,7 @@ err=$?; err_chk
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

@@ -29,7 +29,7 @@ cd $DATA
 gdas1=gdas
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 cat break > $pgmout
 
@@ -42,7 +42,7 @@ export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
 export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}         # preferred, but don't know how RUN will be set in J-Script
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 [ "$SENDCOM" = 'NO' ]  &&  COMSP=$DATA/
 
@@ -113,11 +113,11 @@ pgm=$(basename $0)
    if [ -s $engicegrb ]; then
       cp $engicegrb ${COMSP}engicegrb
       msg="todays engice grib file located and copied to /com"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
    elif [ -s $engiceold ]; then
       cp $engiceold ${COMSP}engicegrb
       msg="**todays engice grib file not located - copy 1-day old file"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
       cp $COMGDAS/$gdas1.t${cyc}z.engicegrb ${COMSP}engicegrb
    else
@@ -129,7 +129,7 @@ pgm=$(basename $0)
       echo " "
       set -x
       msg="**CANNOT LOCATE ENGICE GRIB FILE --> EXIT DATA DUMP"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
       err_exit
    fi
 
@@ -151,8 +151,8 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
   done
 
   # tcvital files
-  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 ${COMSP}syndata.tcvitals.tm00
-  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 ${COMSP}jtwc-fnoc.tcvitals.tm00
+  cp $COMTC/$gdas1.t${cyc}z.syndata.tcvitals.tm00 ${COMSP}syndata.tcvitals.tm00
+  cp $COMTC/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 ${COMSP}jtwc-fnoc.tcvitals.tm00
 
   # RFC #1550 Update WCOSS to send more CDAS data to NOMADS -20151211
   if [ $SENDDBN = YES ]; then
@@ -216,7 +216,7 @@ for CTYPE in $DUMP_LIST; do
     echo $CTYPE.$DATE >> $flist
   else
     msg="Warning:  NO $CTYPE DUMP FOR ${DATE}"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
   fi
   DATE=`finddate.sh $DATE d+1`
   done
@@ -232,7 +232,7 @@ for CTYPE in $DUMP_LIST; do
     export err=$?; err_chk
 
     msg="Done processing $CTYPE for ${START_DATE} to ${END_DATE}"
-    postmsg "$jlogfile" "$msg"
+    postmsg  "$msg"
 
     if [ "$SENDCOM" = 'YES' ]; then
       [ -s $CTYPE.all ] && cp $CTYPE.all ${COMSP}c${CTYPE}.$tmmark.mbufr_d
@@ -279,6 +279,6 @@ cat  break $pgmout break > allout
 
 sleep 10
 msg='ENDED NORMALLY.'
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ################## END OF SCRIPT #######################

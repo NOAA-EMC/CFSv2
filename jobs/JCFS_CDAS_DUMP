@@ -9,17 +9,12 @@ date
 # ##############################################################
 
 ########################################################
-# obtain unique process id (pid) and make temp directory
-########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 export cycle=t${cyc}z
 export tmmark=tm00
-
-export jlogfile=${jlogfile:-/dev/null}
 
 ##########################
 # Specify NET and RUN Name
@@ -31,7 +26,7 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 ##############################
 # Run setpdy and initialize PDY variables
@@ -71,11 +66,17 @@ export COMINm1=$COMROT/${RUN}.${PDYm1}  # for prev day snowdepth.global.grb
 # Define some INPUT directories
 ##############################################
 
-export COM_GDAS=${COM_GDAS:-$(compath.py $envir/com/gfs/${gfs_ver})}
-export COM_ENGICE=${COM_ENGICE:-$(compath.py $envir/com/omb/${omb_ver}/sice)}       ## after 20190613
+#export COM_GDAS=${COM_GDAS:-$(compath.py $envir/com/gfs/${gfs_ver})}
+export COM_GDAS=${COM_GDAS:-$(compath.py obsproc/$obsproc_ver)}
 export COMGDAS=${COMGDAS:-${COM_GDAS}/gdas.${PDY}/${cyc}/atmos}
-export COMGFS=${COMGFS:-${COM_GDAS}/gfs.${PDY}/${cyc}/atmos}
 
+#export COM_ENGICE=${COM_ENGICE:-$(compath.py $envir/com/omb/${omb_ver}/sice)}       ## after 20190613
+export COM_ENGICE=${COM_ENGICE:-$(compath.py seaice_analysis/${seaice_analysis_ver})/seaice_analysis}       ## after 20190613
+
+#export COMGFS=${COMGFS:-${COM_GDAS}/gfs.${PDY}/${cyc}/atmos}
+export COMGFS=${COMGFS:-$(compath.py gfs/$gfs_ver)/gfs.${PDY}/${cyc}/atmos}
+
+export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/atmos} 
 ########################################################################
 # execute the script
 # Set DUMP_FROM_PROD to NO if getting the dump files from /global/dump
@@ -93,7 +94,7 @@ fi
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

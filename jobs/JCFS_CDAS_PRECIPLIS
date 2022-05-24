@@ -9,7 +9,6 @@ export NET=cfs
 export RUN=cdas
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 
@@ -21,17 +20,14 @@ export PS4='$SECONDS + '
 # ##############################################
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -63,13 +59,13 @@ export FIX_LM=$FIXcfs/cfs_fix_lm
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 export COMCDAS=${COMCDAS:-$(compath.py -o ${NET}/${cfs_ver})}
-export DCOM=${DCOM:-${DCOMROOT}}
+export DCOMIN=${DCOMIN:-${DCOMROOT}}
 
 export COMOUTGLDAS=$COMROT/cmap/gldas
 export COMOUTCMAP=$COMROT/cmap/pentad
@@ -84,10 +80,10 @@ mkdir -m 775 -p $COMOUTGLDAS $COMOUTCMAP $COMOUTGAGE $COMOUT
 ${PREPCIPLISSSH:-$HOMEcfs/scripts/excfs_cdas_preciplis.sh}
 err=$?; err_chk
 
-cat $pgmout
+#cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

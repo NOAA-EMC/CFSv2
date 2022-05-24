@@ -31,7 +31,6 @@ export RTYPE=${1:-${RTYPE:-forepost}}
 export RUN=${RUN:-cfs}
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -41,10 +40,7 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -101,7 +97,7 @@ export NCP=${NCP:-/bin/cp}
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -136,7 +132,7 @@ export MP_SHARED_MEMORY=no
 ####################################
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ############################################
 # determine  the current day of the forecast
@@ -175,7 +171,7 @@ export NTHSTACK=102400000
 #############################################
 # Specify the recovery and postjob directries
 #############################################
-export COMROT=$(compath.py -o $RUN/${cfs_ver}/$RUN)
+export COMROT=$(compath.py -o $RUN/${cfs_ver})
 export YYYYMMDD=$(echo $start_date |cut -c1-8)
 export RECOVERY=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.recovery/$cyc/cfs_m${ENS_MEM}
 export POSTDEFS=$COMROT/$RUN.$YYYYMMDD/recovery/$RUN.defines/$cyc/cfs_m${ENS_MEM}

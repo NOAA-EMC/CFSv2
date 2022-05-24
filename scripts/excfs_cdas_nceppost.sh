@@ -11,7 +11,7 @@ set -euxa
 cd $DATA
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 export MP_LABELIO=YES
 
@@ -149,7 +149,7 @@ do
     set -x
 
     msg="Starting post for fhr=$fhr"
-    postmsg "$jlogfile" "$msg"
+    postmsg "$msg"
 
     ###############################
     # Put restart files into $GESROOT 
@@ -449,6 +449,6 @@ fi
 ########################################################
 
 msg='ENDED NORMALLY.'
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ################## END OF SCRIPT #######################
