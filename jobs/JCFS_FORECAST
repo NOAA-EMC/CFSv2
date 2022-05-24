@@ -90,10 +90,10 @@ export CDATE=${CDATE:-${PDY}$cyc}
 export EXECcfs=$HOMEcfs/exec
 export PARMcfs=$HOMEcfs/parm
 export USHcfs=$HOMEcfs/ush
-export FIXcfs=$HOMEcfs/fix/cfs_fix_am
-export FIX_AM=$FIXcfs
-export FIXDIR=$FIXcfs
-export FIXGLOBAL=$FIXcfs
+export FIXcfs=$HOMEcfs/fix
+export FIX_AM=$FIXcfs/cfs_fix_am
+export FIXDIR=$FIXcfs/cfs_fix_am
+export FIXGLOBAL=$FIXcfs/cfs_fix_am
 export PARM_AM=$PARMcfs/cfs_parm_am
 export FCSTSHDIR=$HOMEcfs/scripts
 
