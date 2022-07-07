@@ -2,7 +2,7 @@
 set -euax
 
 machine=wcoss
-ptmp="/lfs/h1/nco/ptmp/$LOGNAME/cfsv2"   ###/makefcst
+ptmp=$FORECAST_MAKEDIR   ###/makefcst
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian

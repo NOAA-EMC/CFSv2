@@ -68,7 +68,7 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 export COMROT=$(compath.py -o ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 export COMINcfs_cdas=$COMIN
@@ -92,8 +92,8 @@ mkdir -p $ARCHSYND
 export PROCESS_TROPCY=NO   # Turn on tropical cyclone tcvitals QC proc. if YES
 export DO_RELOCATE=YES     # Turn on tropical cyclone relocation proc. if YES
 
-export LONB=1760 # sigma guess parm needed by tropical cyclone reloc. processing
-export LATB=880  # sigma guess parm needed by tropical cyclone reloc. processing
+export LONB=0 # 1760 # sigma guess parm needed by tropical cyclone reloc. processing
+export LATB=0 # 880  # sigma guess parm needed by tropical cyclone reloc. processing
 
 #############################################################
 # Specify ndate/nhour used by getges.sh

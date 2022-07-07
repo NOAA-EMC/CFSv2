@@ -53,9 +53,9 @@ export FIXcfs=$HOMEcfs/fix
 # Define COM directories
 ##############################################
 export COMROT=${COMROT:-$(compath.py -o ${NET}/${cfs_ver})}
-export  COMIN=${COMIN:-$(compath.py ${NET}/${cfs_ver})/${RUN}.${PDY}}
+export  COMIN=${COMIN:-$(compath.py  -o ${NET}/${cfs_ver})/${RUN}.${PDY}}
 export COMOUT=${COMOUT:-$(compath.py -o ${NET}/${cfs_ver})/${RUN}.${PDY}}
-export COMDIR=${COMDIR:-$(compath.py ${NET}/${cfs_ver})/${RUN}.${PDY}}
+export COMDIR=${COMDIR:-$(compath.py -o ${NET}/${cfs_ver})/${RUN}.${PDY}}
 mkdir -m775 -p $COMOUT
 
 ### Input parameters for GODAS
@@ -64,7 +64,7 @@ export GODAS_PARM_INPUT=${GODAS_PARM_INPUT:-$PARMcfs/cfs_parm_om/cfs_godas_input
 set -a; . $GODAS_PARM_INPUT; set +a
 
 export Obs_dir=${Obs_dir:-$DATA/GDS_Obs}
-export  GESDIR=${GESDIR:-$(compath.py ${NET}/${cfs_ver})/nwges}
+export  GESDIR=${GESDIR:-$(compath.py -o ${NET}/${cfs_ver})/nwges}
 #export  RESDIR=${RESDIR:-$GESDIR}
 
 mkdir -p $COMROT $RESDIR $Obs_dir

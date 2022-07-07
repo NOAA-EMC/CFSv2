@@ -101,7 +101,7 @@ for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS16 ]] ; then
 COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
-COM_INAprep='$(compath.py obsproc/${obsproc_ver})/gdas.${PDY}/${cyc}/atmos'
+COM_PRP='$(compath.py obsproc/${obsproc_ver})/gdas.${PDY}/${cyc}/atmos'
 COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
 COMFIT=$(compath.py -o gfs/${gfs_ver})
 OMP_NUM_THREADS=1

@@ -93,7 +93,7 @@ set -u
 export OMP_NUM_THREADS=1
 export CPROCS=${CPROCS:-1}
 export OPROCS=${OPROCS:-63}
-export APROCS=${APROCS:-195}
+export APROCS=${APROCS:-192}
 
 env
 
@@ -132,8 +132,8 @@ fi
 # Define COM directories
 ##############################################
 
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m755 -p ${COMOUT}
 

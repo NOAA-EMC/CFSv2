@@ -73,8 +73,8 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 
-export COMROT=$(compath.py ${NET}/${cfs_ver})
-export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 

@@ -3,6 +3,8 @@ set -euax
 
 export HOMEcfs=$PWD; source $HOMEcfs/versions/build.ver
 
+echo temp dir for forecast builds: $FORECAST_MAKEDIR
+
 [[ $# -eq 0 || $1 = 206 ]] && { cd $HOMEcfs/global_shared_cfs/CRTMv206; ./build; }
 
 [[ $# -eq 0 || $1 = esm ]] && { cd $HOMEcfs/global_shared_cfs/modules/esmf_4.0.0rp2; ./build_esmflib; }

@@ -356,7 +356,7 @@ cat << EOF > fort.35
  /
 EOF
 
-eval $APRUNCY $CYCLEXEC <<EOF $REDOUT$PGMOUT $REDERR$PGMERR
+eval $APRUNCY $CYCLEXEC <<EOF $REDOUT$PGMOUT ##$REDERR$PGMERR
  &NAMCYC 
   idim=$LONB, jdim=$LATB, lsoil=$LSOIL,
   iy=$iy, im=$im, id=$id, ih=$ih, fh=$FHOUR,

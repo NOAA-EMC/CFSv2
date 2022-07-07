@@ -29,7 +29,9 @@ export COMBFRSH=${COMBFRSH:-$HOMEcfs/ush/${cfsp}combfr.sh}
 
 set -x
 
+set +e
 tar -xvf $cnvstat; gunzip -v  diag_conv_*
+set -e
 
 if [[ ${CONVNETC:-NO} = NO ]]; then
    export CNVDIAGEXEC=$HOMEcfs/exec/${cfsp}post_convdiag

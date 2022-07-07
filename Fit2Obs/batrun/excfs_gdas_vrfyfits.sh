@@ -53,10 +53,10 @@ hh=$(echo $CDATE | cut -c9-10)
 cyc=$hh
 
 eval COMLIC=$COM_INA
-eval COMLICprep=$COM_INAprep
+eval COMPRP=$COM_PRP     
 if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
   [[ $RUN_ENVIR = nemsio ]] && suffix=nemsio || suffix=nc
-  export PRPI=$COMLICprep/gdas.t${hh}z.prepbufr
+  export PRPI=$COMPRP/gdas.t${hh}z.prepbufr
   export PRPO=$COMLOX/gdas.t${hh}z.prepqa
   export PRPF=$COMLOX/gdas.t${hh}z.prepqf
   export sig1=$COMLIC/gdas.t${hh}z.atmanl.$suffix
