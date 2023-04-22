@@ -5,7 +5,7 @@
 #PBS -l walltime=06:00:00
 #PBS -l debug=true
 #PBS -A %PROJ%-%PROJENVIR%
-#PBS -l place=vscatter,select=1:ncpus=6:mem=5GB
+#PBS -l place=vscatter,select=1:ncpus=12:mem=5GB
 
 export model=cfs
 %include <head.h>
@@ -16,6 +16,8 @@ set -x
 
 export envir=%ENVIR%
 export cyc=%CYC%
+
+export OMP_NUM_THREADS=1
 
 module load PrgEnv-intel/${PrgEnv_intel_ver}
 module load craype/${craype_ver}

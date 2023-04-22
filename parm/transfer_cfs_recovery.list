@@ -34,3 +34,15 @@ B 100000
 D
 # This directory is a good candidate for compression
 #Z
+
+_COMROOT_/cfs/_SHORTVER_/cfs._PDY_/wmo/
+B 100000
+D
+# This directory is a good candidate for compression
+#Z
+
+_COMROOT_/cfs/_SHORTVER_/cfs._PDYm1_/wmo/
+B 100000
+D
+# This directory is a good candidate for compression
+#Z

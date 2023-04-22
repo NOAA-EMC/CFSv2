@@ -1159,7 +1159,7 @@ EOF
 
 mpmd=yes; MP_CMDFILE=mp_cmdfile
 
-set +x; echo making cmdfile for mpmd execution
+set -x; echo making cmdfile for mpmd execution
 if [ $mpmd = yes ] ; then
   rm -f $MP_CMDFILE
   i=1
@@ -1194,7 +1194,7 @@ export err=$?; err_chk
 #------------------------------------------------------------------------------#
 # End MPMD execution section (4)
 #------------------------------------------------------------------------------#
-set +x
+set -x
 #------------------------------------------------------------------------------#
 # Begin post-execution section of OM script (5)
 #------------------------------------------------------------------------------#

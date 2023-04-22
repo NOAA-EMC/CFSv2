@@ -23,7 +23,7 @@
 # directory are included, so if no exclude patterns match that file, it will be
 # transferred.
 
-_COMROOT_/cfs/_SHORTVER/cfs._PDY_/00/
+_COMROOT_/cfs/_SHORTVER_/cfs._PDY_/00/
 + /*grib_04/***
 + /_PDY_00_04/***
 - *

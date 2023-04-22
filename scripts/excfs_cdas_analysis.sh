@@ -589,7 +589,7 @@ then
    $NCP $PCPINFO  pcpinfo
    ${NPC:-cp} $OBERROR  errtable
 
-   set +x
+   set -x
    # CRTM Spectral and Transmittance coefficients
    nsatsen=`cat satinfo | $wc -l`
    isatsen=1
@@ -1046,7 +1046,7 @@ fi
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 $ENDSCRIPT
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

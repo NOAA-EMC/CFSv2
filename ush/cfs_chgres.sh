@@ -459,7 +459,7 @@ rm -f chgres.out.sig chgres.out.sfc chgres.out.nst chgres.out.grd fort.35 fort.8
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 $ENDSCRIPT
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

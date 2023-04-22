@@ -89,7 +89,7 @@ export SIGHDR=${SIGHDR:-$EXECcfs/cfs_sighdr}
 export sigavg=${sigavg:-$EXECcfs/cfs_sigavg}
 export sstavg=${sstavg:-$EXECcfs/cfs_sstavg}
 
-export cfprun="mpiexec -n $NCPUS cfp"
+export cfprun="mpiexec -np $NCPUS --cpu-bind verbose,depth cfp"
 export nprocs=$NCPUS
 export ntasks=$NCPUS
 export NCP=${NCP:-/bin/cp}

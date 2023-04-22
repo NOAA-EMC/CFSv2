@@ -53,7 +53,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
 
 # create snowdepth.global.grb from AFWA snow fields
 
-set +x
+set -x
 echo
 echo '------------------------------------------------------------------------------------'
 echo 'JISNI processing -------------------------------------------------------------------'
@@ -62,7 +62,7 @@ set -x
 #${JISNISH:-$USHcfs/cfs_snowdepth.sh} >$PWD/sdout.$$ 2>&1
 ${JISNISH:-$USHcfs/cfs_snowdepth.sh} 
 export err=$?; pgm=cfs_snowdepth.sh; err_chk
-set +x
+set -x
 echo '------------------------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
 echo
@@ -70,7 +70,7 @@ set -x
 
 # create the nsstsstqd files 
 
-set +x
+set -x
 echo
 echo '------------------------------------------------------------------------------------'
 echo 'NSST SST QD processing -------------------------------------------------------------------'
@@ -78,7 +78,7 @@ echo '--------------------------------------------------------------------------
 set -x
 ${NSTSSTQD:-$HOMEcfs/ush/cfs_nstsstqd.sh} $CDATE $SFCanl >$PWD/nstout.$$ 2>&1
 export err=$?; export pgm=cfs_nstsstqd.sh; err_chk
-set +x
+set -x
 echo '------------------------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
 echo
@@ -121,7 +121,7 @@ pgm=$(basename $0)
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
       cp $COMGDAS/$gdas1.t${cyc}z.engicegrb ${COMSP}engicegrb
    else
-      set +x
+      set -x
       echo " "
       echo " ############################################"
       echo " cannot locate engice grib file - fatal error"
@@ -264,7 +264,7 @@ echo " " >> $pgmout
 
 
 # GOOD RUN
-set +x
+set -x
 echo " "
 echo " ****** PROCESSING COMPLETED NORMALLY"
 echo " ****** PROCESSING COMPLETED NORMALLY"

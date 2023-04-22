@@ -5,7 +5,7 @@
 #PBS -l walltime=01:00:00
 #PBS -l debug=true
 #PBS -A %PROJ%-%PROJENVIR%
-#PBS -l place=vscatter,select=1:ncpus=4:mem=15GB
+#PBS -l place=vscatter,select=1:ncpus=20:mem=60GB
 
 export model=cfs
 %include <head.h>

@@ -41,13 +41,12 @@ cd $TEMPDIR
 
 # gdas2 files - These will all be from 00Z member 1 forecast
 member=01
-COMFCST=${COMFCST:-$COMROT/cfs/cfs.$YYYYMMDD/00}
+COMFCST=${COMFCST:-$COMROT/cfs.$YYYYMMDD/00}
 HRLY6DIR=${HRLY6DIR:-$COMFCST/6hrly_grib_$member}
 
 COMANALYSIS=${COMANALYSIS:-$COMROT/cdas.$YYYYMMDD}
 
-#HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
-HPSSROT=${HPSSROT:-/NCEPPROD/hpsspara/runhistory}
+HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM/$YYYYMMDD/Analysis}
 
 # Analysis files staging area
@@ -523,7 +522,7 @@ if [ $dohpsslic = "YES" ] ; then
 
     # Always pull these from the member 01 control run
     member='01'
-    COMDIR=$COMROT/cfs/cfs.$CDAY/$hh/6hrly_grib_$member
+    COMDIR=$COMROT/cfs.$CDAY/$hh/6hrly_grib_$member
 
     ## Grab the gdas2 files from the forecast directory 
     for type in $rstlista

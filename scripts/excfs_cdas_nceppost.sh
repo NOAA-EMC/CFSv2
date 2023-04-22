@@ -282,7 +282,7 @@ fi  # PROCESS_SPL
 
 echo "End Processing PGB and SPL files"
 
-set +x
+set -x
 
 ########################################################
 # Process Ocean data

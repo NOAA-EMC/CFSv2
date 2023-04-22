@@ -89,7 +89,7 @@ if [ "$CHGRP_RSTPROD" = 'YES' ]; then
 prepbufr_pre-qc, prepbufr, prepbufr.acft_profiles*, acqc_???*, \
 acqc_merged*_sorted, tosslist, prepbufr.unblok"
    $DATA/postmsg "$jlogfile" "$msg"
-set +x
+set -x
    echo " "
    echo "$msg"
    echo " "
@@ -182,9 +182,9 @@ fi
 # netcdf history or nemsio (as done in tropical cyclone relocation processing) - 03/2017, 11/2019
 if [ "$GETGUESS" = 'YES' ]; then
    if [[ "$NETCDF_IN" == .true. ]]; then
-      set +x; echo -e "\n\"sges_pathname\" files point to netcdf history files\n";set -x
+      set -x; echo -e "\n\"sges_pathname\" files point to netcdf history files\n";set -x
    elif [[ "$NEMSIO_IN" == .true. ]]; then
-      set +x; echo -e "\n\"sges_pathname\" files point to nemsio files\n";set -x
+      set -x; echo -e "\n\"sges_pathname\" files point to nemsio files\n";set -x
    fi
    if [ -s sgesprepA_pathname ]; then
       cp sgesprep_pathname \
@@ -596,7 +596,7 @@ if [ "$warning" = 'yes' ]; then
    msg="**WARNING: Since user $USER is not in rstprod group all RESTRICTED \
 files are replaced with a null file"
    $DATA/postmsg "$jlogfile" "$msg"
-set +x
+set -x
    echo " "
    echo "$msg"
    echo " "
@@ -606,7 +606,7 @@ fi
 ########################################################
 
 # GOOD RUN
-set +x
+set -x
 echo " "
 echo " ****** PROCESSING COMPLETED NORMALLY"
 echo " ****** PROCESSING COMPLETED NORMALLY"

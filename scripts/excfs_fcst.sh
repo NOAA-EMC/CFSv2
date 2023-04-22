@@ -1236,7 +1236,7 @@ export mpinccombine=${mpinccombine:-$EXECcfs/${cfsp}mpinccombine}
 hh_inc_m=$((hh_inc_ocn/2))
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
-set +x
+set -x
 until [ $p_date -gt $end_date ] ; do
   year=`echo $p_date | cut -c1-4`
   month=`echo $p_date | cut -c5-6`
@@ -1268,7 +1268,7 @@ export err=$?; err_chk
 
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
-set +x
+set -x
 until [ $p_date -gt $end_date ] ; do
   year=`echo $p_date | cut -c1-4`
   month=`echo $p_date | cut -c5-6`

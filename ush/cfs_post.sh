@@ -69,7 +69,7 @@ if [ $cck -eq 0 -o $cca -eq 0 ] ; then
                                                       
 #  run mpmd ocean post in parallel from bdate to cdate
 
-   set +x
+   set -x
 
    cdate=$bdate; rm -f cfpfile; nprocs=24
    while [[ $cdate -le $edate ]]; do

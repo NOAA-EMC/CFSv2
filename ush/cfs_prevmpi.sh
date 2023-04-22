@@ -87,7 +87,7 @@ set +u
 [ -n "$pgmout" ]  &&  cat outout >> $pgmout
 set -u
 rm outout
-set +x
+set -x
 echo
 echo 'The foreground exit status for PREPOBS_PREVENTS is ' $err
 echo

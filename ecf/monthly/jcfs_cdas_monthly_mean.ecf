@@ -3,7 +3,7 @@
 #PBS -q %QUEUE%
 #PBS -S /bin/bash
 #PBS -A %PROJ%-%PROJENVIR%
-#PBS -l place=vscatter,select=1:ncpus=8:mem=10GB
+#PBS -l place=vscatter,select=1:ncpus=60:mem=180GB
 #PBS -l walltime=10:00:00
 #PBS -l debug=true
 
@@ -16,6 +16,8 @@ set -x
 
 export envir=%ENVIR%
 export cyc=%CYC%
+
+export OMP_NUM_THREADS=1
 
 module load PrgEnv-intel/${PrgEnv_intel_ver}
 module load intel/${intel_ver}

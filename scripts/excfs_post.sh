@@ -17,7 +17,7 @@
 ######################################################################
 timechk() {
 #!/usr/bin/env bash
-set +x
+set -x
 
 tbeg=$1
 tnow=`date +"%H%M%S"`
@@ -50,7 +50,7 @@ return 0
 
 set -u
 
-set +x
+set -x
 echo " ------------------------------------------------------------"
 echo "  "
 echo "               IBM-SP $RUN_ENVIR PROCESSING     "
