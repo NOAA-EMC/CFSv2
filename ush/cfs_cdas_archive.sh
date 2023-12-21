@@ -66,6 +66,7 @@ PUTCMD=${PUTCMD:-putv}
 finc=6     # File increment of 6 hours
 rcall=0    # ERROR code tracking
 rwall=0    # For WARNING messages only
+rmiss=0    # for missing archived file count
 
 hhlist='00 06 12 18'
 
@@ -145,7 +146,9 @@ if [ $dohpssanl = "YES" ] ; then
 
       else
         echo "ERROR: $file not found for $CDAY$hh"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
     done
   done   # typelista
@@ -164,7 +167,9 @@ if [ $dohpssanl = "YES" ] ; then
 
     else
       echo "ERROR: $file not found for $CDAY$hh"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
   done   # typelist0
 
@@ -182,7 +187,9 @@ if [ $dohpssanl = "YES" ] ; then
       #((rw+=$?))
     else
        echo "ERROR: $file not found for $CDAY$hh"
-      ((rc+=1))
+       echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
     # cdas1.t00z.LIS.diagnos.20101031.tar
@@ -197,7 +204,9 @@ if [ $dohpssanl = "YES" ] ; then
       #((rw+=$?))
     else
        echo "ERROR: $file not found for $CDAY$hh"
-      ((rc+=1))
+       echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
   done   # typelist24
 
@@ -380,7 +389,9 @@ if [ $dohpsshic = "YES" ] ; then
       /bin/ls $file >> $hpsslist
       if [[ $? -ne 0 ]] ; then
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
      # $CHKFILEANLSH $type $file
@@ -395,7 +406,9 @@ if [ $dohpsshic = "YES" ] ; then
       /bin/ls $file >> $hpsslist
       if [[ $? -ne 0 ]] ; then
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
      # $CHKFILEANLSH noah.rst $file
@@ -414,7 +427,9 @@ if [ $dohpsshic = "YES" ] ; then
       /bin/ls $file >> $hpsslist
       if [[ $? -ne 0 ]] ; then
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
      #  $CHKFILEANLSH bf06.LIS $file
@@ -537,7 +552,9 @@ if [ $dohpsslic = "YES" ] ; then
 
       else
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
     done
 
@@ -558,7 +575,9 @@ if [ $dohpsslic = "YES" ] ; then
 
           else
             echo "ERROR: $file does not exist"
-            ((rc+=1))
+            echo "`pwd`/$file" >> $TEMPDIR/missing
+            ((rmiss+=1))
+#           ((rc+=1))
           fi
 
         # sig or sfc types 
@@ -577,7 +596,9 @@ if [ $dohpsslic = "YES" ] ; then
 
             else
               echo "ERROR: $file does not exist"
-              ((rc+=1))
+              echo "`pwd`/$file" >> $TEMPDIR/missing
+              ((rmiss+=1))
+#             ((rc+=1))
             fi
           done
         fi
@@ -602,7 +623,9 @@ if [ $dohpsslic = "YES" ] ; then
 
       else
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
     done
   done  # hh cycles
@@ -734,7 +757,9 @@ if [ $dohpsshigh = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
 
           # Check grib record counts
@@ -750,7 +775,9 @@ if [ $dohpsshigh = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
           # Check grib record counts
           rcnt=`$WGRIB2 -s $file | wc -l`
@@ -779,7 +806,9 @@ if [ $dohpsshigh = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
           # Check grib record counts
           rcnt=`$WGRIB2 -s $file | wc -l`
@@ -920,7 +949,9 @@ if [ $dohpsslow = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
 
           # Check grib record counts
@@ -936,7 +967,9 @@ if [ $dohpsslow = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
           # Check grib record counts
           rcnt=`$WGRIB2 -s $file | wc -l`
@@ -971,7 +1004,9 @@ if [ $dohpsslow = "YES" ] ; then
         ls $file >> $hpsslist
         if [[ $? -ne 0 ]] ; then
           echo "ERROR: $file does not exist"
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         else
           # Check grib record counts
           rcnt=`$WGRIB2 -s $file | wc -l`
@@ -1082,7 +1117,9 @@ if [ $dohpssgdas2 = "YES" ] ; then
         /bin/ls $file >> $hpsslist
       else
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
       #$CHKFILESH $type $CDUMP $file
@@ -1096,7 +1133,9 @@ if [ $dohpssgdas2 = "YES" ] ; then
         /bin/ls $file >> $hpsslist
       else
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
       ## FIX - Add check for pgbanl and ipvanl - grib types
@@ -1120,7 +1159,9 @@ if [ $dohpssgdas2 = "YES" ] ; then
         /bin/ls $file >> $hpsslist
       else
         echo "ERROR: $file does not exist"
-        ((rc+=1))
+        echo "`pwd`/$file" >> $TEMPDIR/missing
+        ((rmiss+=1))
+#       ((rc+=1))
       fi
 
       ## FIX - check checker
@@ -1146,7 +1187,9 @@ if [ $dohpssgdas2 = "YES" ] ; then
       /bin/ls $file >> $hpsslist
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
   done
 
@@ -1236,6 +1279,7 @@ if [ $dohpssdumps = "YES" ] ; then
   /bin/ls -1 *$type >> $hpsslist
   if [[ $? -ne 0 ]] ; then
     echo "ERROR: $type dump data not found $COMANALYSIS"
+    echo "$type dump data not found $COMANALYSIS" >> $TEMPDIR/missing
     ((rc+=1))
   fi
 
@@ -1258,7 +1302,9 @@ if [ $dohpssdumps = "YES" ] ; then
           echo "WARNING: $file not found."
         else
           echo "ERROR: $file not found."
-          ((rc+=1))
+          echo "`pwd`/$file" >> $TEMPDIR/missing
+          ((rmiss+=1))
+#         ((rc+=1))
         fi
       fi
 
@@ -1367,7 +1413,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1383,7 +1431,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1399,7 +1449,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1415,7 +1467,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1431,7 +1485,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1448,7 +1504,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1465,7 +1523,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
 
@@ -1482,7 +1542,9 @@ if [ $doocndiag = "YES" ] ; then
       fi
     else
       echo "ERROR: $file does not exist"
-      ((rc+=1))
+      echo "`pwd`/$file" >> $TEMPDIR/missing
+      ((rmiss+=1))
+#     ((rc+=1))
     fi
 
   done  # hhlist
@@ -1537,6 +1599,17 @@ fi   # doocndiag
 ###########################################################
 # END of OCNDIAG Archive
 ###########################################################
+
+if [ $rmiss -gt '0' ]; then
+  echo "WARNING: There are some $rmiss archived files not found as below - "
+  cat $TEMPDIR/missing
+  MAILTO=${MAILTO:-"nco.spa@noaa.gov"}
+  subject="WARNING: $PDY $ECF_NAME archived files not found"
+  echo "The following $job archived files not found, please check and take proper actions - " > $TEMPDIR/email.body
+  cat $TEMPDIR/missing >> $TEMPDIR/email.body
+  echo >>  $TEMPDIR/email.body
+  mail.py -s "${subject}" -v "${MAILTO}" < $TEMPDIR/email.body
+fi
 
 export err=$rcall; err_chk
 exit $rcall
