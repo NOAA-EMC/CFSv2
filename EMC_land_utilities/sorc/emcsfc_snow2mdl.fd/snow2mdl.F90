@@ -1,32 +1,23 @@
+!> @file
+!! @brief Interpolate snow data to model grid and grib the result.
+!! @author George Gayno  org: w/np2 @date 2005-Dec-16
+      
+!> Interpolate snow data to model grid and grib the result.
+!!
+!! program history log:
+!! -  2005-Dec-16  gayno   - initial version
+!! -  2007-Sep-20  gayno   - Tested for b-grids. Added improved
+!!                          thinning for gfs grid.
+!! -  2008-Feb-04  gayno   - Added autosnow data.
+!! -  2014-Sep-26  gayno   - Added option to output analysed
+!!                          snow in grib2.
+!!
+!! variable definitions:
+!! -  snow_cvr_mdl  - 
+!! -  snow_dep_mdl  - 
+!!                              
+!! @author George Gayno  org: w/np2 @date 2005-Dec-16
  module snow2mdl
-!$$$  module documentation block
-!
-! $Revision$
-!
-! module:    snow2mdl
-!   prgmmr: gayno         org: w/np2     date: 2005-dec-16
-!
-! abstract: interpolate snow data to model grid and grib the result
-!
-! program history log:
-!   2005-DEC-16  gayno   - initial version
-!   2007-SEP-20  gayno   - tested for b-grids. added improved
-!                          thinning for gfs grid.
-!   2008-feb-04  gayno   - added autosnow data
-!   2014-sep-26  gayno   - added option to output analysed
-!                          snow in grib2.
-!
-! usage: use snow2mdl
-!
-! remarks: some variable definitions
-!   snow_cvr_mdl  - snow cover on model grid in percent
-!   snow_dep_mdl  - snow depth on model grid in meters 
-!                              
-! attributes:
-!   language: fortran 90
-!   machine:  ibm wcoss
-!
-!$$$
 
  use program_setup,        only   : lat_threshold,          &
                                     model_snow_file,        &
@@ -89,123 +80,106 @@
                                     kgds_autosnow,     &
                                     bad_afwa_nh, bad_afwa_sh 
 
- use read_write_utils,     only   : uninterpred
-
  private
 
- real, allocatable               :: snow_cvr_mdl(:,:)  ! cover in % on mdl grid                                   
- real, allocatable               :: snow_dep_mdl(:,:)  ! depth on model grid
+ real, allocatable               :: snow_cvr_mdl(:,:)  !< snow cover on model grid in percent
+ real, allocatable               :: snow_dep_mdl(:,:)  !< snow depth on model grid in meters
 
- public                          :: interp
+ public                          :: interp !< Interpolate snow data to model grid.
 
  contains
-
+!> Interpolate snow data to model grid.
+!!
+!! program history log:
+!! 2005-dec-16  gayno    - initial version
+!! 2007-sep-20  gayno    - tested for b-grids. added improved
+!!                         thinning for gfs grid.
+!! 2008-feb-04  gayno    - add use of autosnow data
+!! 2014-sep-29  gayno    - add option to output model snow
+!!                         data in grib2 format.
+!!
+!! condition codes: all fatal
+!!   54 - selected input snow data not valid for model grid
+!!   55 - error in ipolates interpolating snow data 
+!! 
+!! @note The determination of cover and depth on the model
+!! grid depends on the input snow data selected.
+!!
+!!  nam grids:
+!!
+!!   1) nesdis/ims only - An analysis of snow cover on the
+!!      model grid is produced.  No depth analysis is
+!!      produced.
+!!
+!!   2) afwa only - An analysis of snow cover and depth on
+!!      the model grid is produced.  Depth is determined from
+!!      the afwa data.  Cover is set to 100% where afwa indicates
+!!      snow and 0% otherwise.
+!!
+!!   3) nesdis/ims and afwa - An analysis of snow cover and
+!!      depth on the model grid is produced.  Cover is
+!!      determined by the nesdis/ims data.  If cover is
+!!      greater than user-defined threshold (variable
+!!      snow_cvr_threshold) the depth is set to the afwa
+!!      value or a nominal value, whichever is greater.
+!!      The nominal value is user-defined (varaible
+!!      min_snow_depth).  If cover is less than user-
+!!      defined threshold, the depth is set to 0,
+!!      regardless of the afwa depth value.
+!!
+!!  gfs grid:
+!!
+!!   1) nesdis/ims and autosnow only - An analysis of snow
+!!      cover and depth on the model grid is produced.
+!!      Cover is determined from the ims and autosnow data.
+!!      If cover is greater than the user-defined
+!!      threshold (variable snow_cvr_threshold), the
+!!      the depth is set to the user-defined default
+!!      depth (variable min_snow_depth).
+!!
+!!   2) afwa only - An analysis of snow cover and depth on
+!!      the model grid is produced.  Depth is determined from
+!!      the afwa data.  Cover is set to 100% where afwa indicates
+!!      snow and 0% otherwise.
+!!
+!!   3) nesdis/ims, autosnow and afwa - An analysis of snow
+!!      cover and depth on the model grid is produced.  Cover is
+!!      determined by the ims and autosnow data.  If cover is
+!!      greater than user-defined threshold (variable
+!!      snow_cvr_threshold) the depth is set to the afwa
+!!      value or a nominal value, whichever is greater.
+!!      The nominal value is user-defined (varaible
+!!      min_snow_depth).  If cover is less than user-
+!!      defined threshold, the depth is set to 0,
+!!      regardless of the afwa depth value.
+!!      
+!!  @author George Gayno org: w/np2  @date 2005-Dec-16
  subroutine interp
-!$$$  subprogram documentation block
-!
-! subprogram:   interp
-!   prgmmr: gayno          org: w/np2     date: 2005-dec-16
-!
-! abstract:  interpolate snow data to model grid.
-!
-! program history log:
-! 2005-dec-16  gayno    - initial version
-! 2007-sep-20  gayno    - tested for b-grids. added improved
-!                         thinning for gfs grid.
-! 2008-feb-04  gayno    - add use of autosnow data
-! 2014-sep-29  gayno    - add option to output model snow
-!                         data in grib2 format.
-!
-! usage: call interp
-!
-!   input argument list:  n/a
-!
-!   output argument list: n/a
-!
-! files: none
-!
-! condition codes: all fatal
-!   54 - selected input snow data not valid for model grid
-!   55 - error in ipolates interpolating snow data 
-! 
-! remarks: The determination of cover and depth on the model
-!   grid depends on the input snow data selected:
-!
-!   nam grids:
-!   ---------
-!
-!   1) nesdis/ims only - An analysis of snow cover on the
-!      model grid is produced.  No depth analysis is
-!      produced.
-!
-!   2) afwa only - An analysis of snow cover and depth on
-!      the model grid is produced.  Depth is determined from
-!      the afwa data.  Cover is set to 100% where afwa indicates
-!      snow and 0% otherwise.
-!
-!   3) nesdis/ims and afwa - An analysis of snow cover and
-!      depth on the model grid is produced.  Cover is
-!      determined by the nesdis/ims data.  If cover is
-!      greater than user-defined threshold (variable
-!      snow_cvr_threshold) the depth is set to the afwa
-!      value or a nominal value, whichever is greater.
-!      The nominal value is user-defined (varaible
-!      min_snow_depth).  If cover is less than user-
-!      defined threshold, the depth is set to 0,
-!      regardless of the afwa depth value.
-!
-!   gfs grid:
-!   --------
-!
-!   1) nesdis/ims and autosnow only - An analysis of snow
-!      cover and depth on the model grid is produced.
-!      Cover is determined from the ims and autosnow data.
-!      If cover is greater than the user-defined
-!      threshold (variable snow_cvr_threshold), the
-!      the depth is set to the user-defined default
-!      depth (variable min_snow_depth).
-!
-!   2) afwa only - An analysis of snow cover and depth on
-!      the model grid is produced.  Depth is determined from
-!      the afwa data.  Cover is set to 100% where afwa indicates
-!      snow and 0% otherwise.
-!
-!   3) nesdis/ims, autosnow and afwa - An analysis of snow
-!      cover and depth on the model grid is produced.  Cover is
-!      determined by the ims and autosnow data.  If cover is
-!      greater than user-defined threshold (variable
-!      snow_cvr_threshold) the depth is set to the afwa
-!      value or a nominal value, whichever is greater.
-!      The nominal value is user-defined (varaible
-!      min_snow_depth).  If cover is less than user-
-!      defined threshold, the depth is set to 0,
-!      regardless of the afwa depth value.
-!      
-! attributes:
-!   language: fortran 90
-!   machine:  IBM WCOSS
-!
-!$$$
-
  use gdswzd_mod
 
+! Required when using iplib v4.0 or higher.
+#ifdef IP_V4
+ use ipolates_mod
+#endif
+
  implicit none
+
+ integer, parameter        :: km=1
 
  integer                   :: i, j, ii, jj, ij
  integer                   :: ijmdl2, istart, iend, imid, iii
  integer, allocatable      :: idum(:,:)
- integer                   :: int_opt, ipopt(20)
+ integer                   :: int_opt, ipopt(20), ibi(km)
  integer                   :: kgds_mdl_tmp(200)
- integer                   :: no, ibo, iret, nret
+ integer                   :: no, ibo(km), iret, nret
 
- logical*1, allocatable    :: bitmap_mdl(:)
+ logical*1, allocatable    :: bitmap_mdl(:,:)
 
- real                      :: dum
- real                      :: gridi(1)
- real                      :: gridj(1)
+ real                      :: gridi(1), gridj(1)
+ real                      :: lats(1), lons(1)
  real, allocatable         :: lsmask_1d(:)
- real, allocatable         :: snow_cvr_mdl_1d(:)
- real, allocatable         :: snow_dep_mdl_tmp(:) 
+ real, allocatable         :: snow_cvr_mdl_1d(:,:)
+ real, allocatable         :: snow_dep_mdl_tmp(:,:) 
  real                      :: sumc, sumd, x1, r, fraction, gridis, gridie
  real, parameter           :: undefined_value = -999.
 
@@ -262,6 +236,7 @@
  NESDIS_IMS : if (use_nesdis) then
 
    ipopt = 0
+   ibi = 1
    if (nesdis_res < (0.5*resol_mdl)) then
      print*,"- INTERPOLATE NH NESDIS/IMS DATA TO MODEL GRID USING BUDGET METHOD."
      ipopt(1)=2  ! break model grid cell into 25 points.
@@ -281,16 +256,17 @@
      no = ijmdl  ! an input when kgds(1) < 0 (subset of grid)
    end if
 
-   allocate (snow_cvr_mdl_1d(ijmdl))
+   allocate (snow_cvr_mdl_1d(ijmdl,km))
    snow_cvr_mdl_1d = 0.0
 
-   allocate (bitmap_mdl(ijmdl))
+   allocate (bitmap_mdl(ijmdl,km))
    bitmap_mdl=.false.  ! if interpolation routine can't find data
                        ! at a point, this flag is false.
 
+ 
    call ipolates(int_opt, ipopt, kgds_nesdis, kgds_mdl_tmp,   &
                 (inesdis*jnesdis), ijmdl,               &
-                 1, 1, bitmap_nesdis, snow_cvr_nesdis,  &
+                 km, ibi, bitmap_nesdis, snow_cvr_nesdis,  &
                  no, lats_mdl, lons_mdl, ibo, bitmap_mdl,     &
                  snow_cvr_mdl_1d, iret)
 
@@ -312,22 +288,24 @@
 
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.0) cycle  ! only consider nh model points
-     if (.not. bitmap_mdl(ij)) then 
+     if (.not. bitmap_mdl(ij,km)) then 
        if (lats_mdl(ij) <= lat_threshold) then
-         snow_cvr_mdl_1d(ij) = 0.0
+         snow_cvr_mdl_1d(ij,km) = 0.0
        else 
+         lats(1)=lats_mdl(ij)
+         lons(1)=lons_mdl(ij)
          call gdswzd(kgds_nesdis,-1,1,undefined_value,gridi,gridj, &
-                     lons_mdl(ij),lats_mdl(ij),nret) 
+                     lons,lats,nret) 
          if (nret /= 1) then
            print*,"- WARNING: MODEL POINT OUTSIDE NESDIS/IMS GRID: ", ipts_mdl(ij), jpts_mdl(ij)
-           snow_cvr_mdl_1d(ij) = 0.0
+           snow_cvr_mdl_1d(ij,km) = 0.0
          else
            ii = nint(gridi(1))
            jj = nint(gridj(1))
            if (sea_ice_nesdis(ii,jj) == 1) then
-             snow_cvr_mdl_1d(ij) = 100.0
+             snow_cvr_mdl_1d(ij,km) = 100.0
            else
-             snow_cvr_mdl_1d(ij) = 0.0
+             snow_cvr_mdl_1d(ij,km) = 0.0
            end if
          end if
        end if
@@ -351,6 +329,7 @@
 !----------------------------------------------------------------------
 
    ipopt = 0
+   ibi = 1
    if (afwa_res < (0.5*resol_mdl)) then
      print*,"- INTERPOLATE GLOBAL AFWA DATA TO MODEL GRID USING BUDGET METHOD."
      ipopt(1)=-1  ! break model grid cell into 25 points.
@@ -369,15 +348,15 @@
      no = ijmdl  ! an input when kgds(1) < 0 (subset of grid)
    end if
 
-   allocate (snow_dep_mdl_tmp(ijmdl))
+   allocate (snow_dep_mdl_tmp(ijmdl,km))
    snow_dep_mdl_tmp = 0.0
 
-   allocate (bitmap_mdl(ijmdl))
+   allocate (bitmap_mdl(ijmdl,km))
    bitmap_mdl = .false.
 
    call ipolates(int_opt, ipopt, kgds_afwa_global, kgds_mdl_tmp,    &
                 (iafwa*jafwa), ijmdl,  &
-                 1, 1, bitmap_afwa_global, snow_dep_afwa_global, &
+                 km, ibi, bitmap_afwa_global, snow_dep_afwa_global, &
                  no, lats_mdl, lons_mdl, ibo, bitmap_mdl,     &
                  snow_dep_mdl_tmp, iret)
 
@@ -397,11 +376,11 @@
 !----------------------------------------------------------------------
 
    do ij = 1, ijmdl
-     if (.not. bitmap_mdl(ij)) then
+     if (.not. bitmap_mdl(ij,km)) then
        if (abs(lats_mdl(ij)) >= lat_threshold) then
-         snow_dep_mdl_tmp(ij) = min_snow_depth
+         snow_dep_mdl_tmp(ij,km) = min_snow_depth
        else
-         snow_dep_mdl_tmp(ij) = 0.0
+         snow_dep_mdl_tmp(ij,km) = 0.0
        endif
      endif
    enddo
@@ -422,6 +401,7 @@
 !----------------------------------------------------------------------
 
    ipopt = 0
+   ibi = 1
    if (afwa_res < (0.5*resol_mdl)) then
      print*,"- INTERPOLATE NH AFWA DATA TO MODEL GRID USING BUDGET METHOD."
      ipopt(1)=-1  ! break model grid cell into 25 points.
@@ -440,15 +420,15 @@
      no = ijmdl  ! an input when kgds(1) < 0 (subset of grid)
    end if
 
-   allocate (snow_dep_mdl_tmp(ijmdl))
+   allocate (snow_dep_mdl_tmp(ijmdl,km))
    snow_dep_mdl_tmp = 0.0
 
-   allocate (bitmap_mdl(ijmdl))
+   allocate (bitmap_mdl(ijmdl,km))
    bitmap_mdl = .false.
 
    call ipolates(int_opt, ipopt, kgds_afwa_nh, kgds_mdl_tmp,    &
                 (iafwa*jafwa), ijmdl,  &
-                 1, 1, bitmap_afwa_nh, snow_dep_afwa_nh, &
+                 1, ibi, bitmap_afwa_nh, snow_dep_afwa_nh, &
                  no, lats_mdl, lons_mdl, ibo, bitmap_mdl,     &
                  snow_dep_mdl_tmp, iret)
 
@@ -469,11 +449,11 @@
 
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.) then  ! only consider model pts in n hemi.
-       if (.not. bitmap_mdl(ij)) then
+       if (.not. bitmap_mdl(ij,km)) then
          if (abs(lats_mdl(ij)) >= lat_threshold) then
-           snow_dep_mdl_tmp(ij) = min_snow_depth
+           snow_dep_mdl_tmp(ij,km) = min_snow_depth
          else
-           snow_dep_mdl_tmp(ij) = 0.0
+           snow_dep_mdl_tmp(ij,km) = 0.0
          endif
        endif
      endif
@@ -497,11 +477,11 @@
    print*,"- BLEND NESDIS/IMS AND AFWA DATA IN NH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.0) then
-       if (snow_cvr_mdl_1d(ij) >= snow_cvr_threshold) then
+       if (snow_cvr_mdl_1d(ij,km) >= snow_cvr_threshold) then
          snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) =   &
-                      max(snow_dep_mdl_tmp(ij), min_snow_depth)
+                      max(snow_dep_mdl_tmp(ij,km), min_snow_depth)
        endif   
-       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij)
+       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij,km)
      endif
    enddo
    deallocate (snow_cvr_mdl_1d)
@@ -509,11 +489,11 @@
    print*,"- BLEND NESDIS/IMS AND AFWA DATA IN NH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.0) then
-       if (snow_cvr_mdl_1d(ij) >= snow_cvr_threshold) then
+       if (snow_cvr_mdl_1d(ij,km) >= snow_cvr_threshold) then
          snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) =   &
-                      max(snow_dep_mdl_tmp(ij), min_snow_depth)
+                      max(snow_dep_mdl_tmp(ij,km), min_snow_depth)
        endif   
-       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij)
+       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij,km)
      endif
    enddo
    deallocate (snow_cvr_mdl_1d)
@@ -522,9 +502,9 @@
    print*,"- SET DEPTH/COVER FROM AFWA DATA IN NH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.0) then
-       if (snow_dep_mdl_tmp(ij) > 0.0) then
+       if (snow_dep_mdl_tmp(ij,km) > 0.0) then
          snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = 100.0
-         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij)
+         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij,km)
        endif
      endif
    enddo
@@ -532,9 +512,9 @@
    print*,"- SET DEPTH/COVER FROM AFWA DATA IN NH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.0) then
-       if (snow_dep_mdl_tmp(ij) > 0.0) then
+       if (snow_dep_mdl_tmp(ij,km) > 0.0) then
          snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = 100.0
-         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij)
+         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij,km)
        endif
      endif
    enddo
@@ -543,10 +523,10 @@
    print*,"- SET DEPTH/COVER FROM NESDIS/IMS DATA IN NH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) >= 0.0) then
-       if (snow_cvr_mdl_1d(ij) >= snow_cvr_threshold) then
+       if (snow_cvr_mdl_1d(ij,km) >= snow_cvr_threshold) then
          snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = min_snow_depth
        endif   
-       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij)
+       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij,km)
      endif
    enddo
    deallocate (snow_cvr_mdl_1d)
@@ -559,6 +539,7 @@
  AUTOSNOW : if (use_autosnow) then
 
    ipopt = 0
+   ibi = 1
    if (autosnow_res < (0.5*resol_mdl)) then
      print*,"- INTERPOLATE AUTOSNOW DATA TO MODEL GRID USING BUDGET METHOD."
      ipopt(1)=2    ! break model grid cell into 25 points.
@@ -578,16 +559,16 @@
      no = ijmdl  ! an input when kgds(1) < 0 (subset of grid)
    end if
 
-   allocate (snow_cvr_mdl_1d(ijmdl))
+   allocate (snow_cvr_mdl_1d(ijmdl,km))
    snow_cvr_mdl_1d = 0.0
 
-   allocate (bitmap_mdl(ijmdl))
+   allocate (bitmap_mdl(ijmdl,km))
    bitmap_mdl=.false.  ! if interpolation routine can't find data
                        ! at a point, this flag is false.
 
    call ipolates(int_opt, ipopt, kgds_autosnow, kgds_mdl_tmp,   &
                 (iautosnow*jautosnow), ijmdl,               &
-                 1, 1, bitmap_autosnow, snow_cvr_autosnow,  &
+                 1, ibi, bitmap_autosnow, snow_cvr_autosnow,  &
                  no, lats_mdl, lons_mdl, ibo, bitmap_mdl,     &
                  snow_cvr_mdl_1d, iret)
 
@@ -606,11 +587,11 @@
 
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.0) then
-       if (.not. bitmap_mdl(ij)) then
+       if (.not. bitmap_mdl(ij,km)) then
          if (abs(lats_mdl(ij)) <= lat_threshold) then
-           snow_cvr_mdl_1d(ij) = 0.0
+           snow_cvr_mdl_1d(ij,km) = 0.0
          else 
-           snow_cvr_mdl_1d(ij) = 100.0
+           snow_cvr_mdl_1d(ij,km) = 100.0
          end if
        end if
      end if
@@ -632,6 +613,7 @@
 !----------------------------------------------------------------------
 
    ipopt = 0
+   ibi = 1
    if (afwa_res < (0.5*resol_mdl)) then
      print*,"- INTERPOLATE SH AFWA DATA TO MODEL GRID USING BUDGET METHOD."
      ipopt(1)=-1  ! break model grid cell into 25 points.
@@ -650,15 +632,15 @@
      no = ijmdl  ! an input when kgds(1) < 0 (subset of grid)
    end if
 
-   allocate (snow_dep_mdl_tmp(ijmdl))
+   allocate (snow_dep_mdl_tmp(ijmdl,km))
    snow_dep_mdl_tmp = 0.0
 
-   allocate (bitmap_mdl(ijmdl))
+   allocate (bitmap_mdl(ijmdl,km))
    bitmap_mdl = .false.
 
    call ipolates(int_opt, ipopt, kgds_afwa_sh, kgds_mdl_tmp,    &
                 (iafwa*jafwa), ijmdl,  &
-                 1, 1, bitmap_afwa_sh, snow_dep_afwa_sh, &
+                 1, ibi, bitmap_afwa_sh, snow_dep_afwa_sh, &
                  no, lats_mdl, lons_mdl, ibo, bitmap_mdl,     &
                  snow_dep_mdl_tmp, iret)
 
@@ -677,11 +659,11 @@
 
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.) then
-       if (.not. bitmap_mdl(ij)) then
+       if (.not. bitmap_mdl(ij,km)) then
          if (abs(lats_mdl(ij)) >= lat_threshold) then
-           snow_dep_mdl_tmp(ij) = min_snow_depth
+           snow_dep_mdl_tmp(ij,km) = min_snow_depth
          else
-           snow_dep_mdl_tmp(ij) = 0.0
+           snow_dep_mdl_tmp(ij,km) = 0.0
          endif
        endif
      endif
@@ -700,11 +682,11 @@
    print*,"- BLEND AUTOSNOW AND AFWA DATA IN SH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.0) then
-       if (snow_cvr_mdl_1d(ij) >= snow_cvr_threshold) then
+       if (snow_cvr_mdl_1d(ij,km) >= snow_cvr_threshold) then
          snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) =   &
-                      max(snow_dep_mdl_tmp(ij), min_snow_depth)
+                      max(snow_dep_mdl_tmp(ij,km), min_snow_depth)
        endif   
-       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij)
+       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij,km)
      endif
    enddo
    deallocate (snow_cvr_mdl_1d)
@@ -713,9 +695,9 @@
    print*,"- SET DEPTH/COVER FROM AFWA DATA IN SH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.0) then
-       if (snow_dep_mdl_tmp(ij) > 0.0) then
+       if (snow_dep_mdl_tmp(ij,km) > 0.0) then
          snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = 100.0
-         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij)
+         snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_dep_mdl_tmp(ij,km)
        endif
      endif
    enddo
@@ -724,10 +706,10 @@
    print*,"- SET DEPTH/COVER FROM AUTOSNOW IN SH."
    do ij = 1, ijmdl
      if (lats_mdl(ij) < 0.0) then
-       if (snow_cvr_mdl_1d(ij) >= snow_cvr_threshold) then
+       if (snow_cvr_mdl_1d(ij,km) >= snow_cvr_threshold) then
          snow_dep_mdl(ipts_mdl(ij),jpts_mdl(ij)) = min_snow_depth
        endif   
-       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij)
+       snow_cvr_mdl(ipts_mdl(ij),jpts_mdl(ij)) = snow_cvr_mdl_1d(ij,km)
      endif
    enddo
    deallocate (snow_cvr_mdl_1d)
@@ -742,9 +724,9 @@
  if (kgds_mdl(1) == 4 .and. thinned) then
 
    ijmdl2 = sum(lonsperlat_mdl) * 2
-   allocate (snow_cvr_mdl_1d(ijmdl2))
+   allocate (snow_cvr_mdl_1d(ijmdl2,km))
    allocate (lsmask_1d(ijmdl2))
-   allocate (snow_dep_mdl_tmp(ijmdl2))
+   allocate (snow_dep_mdl_tmp(ijmdl2,km))
 
    lsmask_1d = 0.0
    snow_cvr_mdl_1d = 0.0
@@ -781,10 +763,10 @@
          sumc = sumc + fraction * snow_cvr_mdl(iii,j)
          sumd = sumd + fraction * snow_dep_mdl(iii,j)
        enddo
-       snow_cvr_mdl_1d(ij) = sumc / r
-       snow_dep_mdl_tmp(ij) = 0.0
-       if (snow_cvr_mdl_1d(ij) > snow_cvr_threshold) then
-         snow_dep_mdl_tmp(ij) = max(sumd / r,min_snow_depth)
+       snow_cvr_mdl_1d(ij,km) = sumc / r
+       snow_dep_mdl_tmp(ij,km) = 0.0
+       if (snow_cvr_mdl_1d(ij,km) > snow_cvr_threshold) then
+         snow_dep_mdl_tmp(ij,km) = max(sumd / r,min_snow_depth)
        end if
     enddo
    enddo
@@ -798,9 +780,9 @@
    allocate (idum(imdl,jmdl))
    idum = 0
    call uninterpred(1, idum, lsmask_1d, lsmask_mdl, imdl, jmdl, ijmdl2, lonsperlat_mdl)
-   call uninterpred(1, idum, snow_cvr_mdl_1d, snow_cvr_mdl, imdl, jmdl, ijmdl2, lonsperlat_mdl)
+   call uninterpred(1, idum, snow_cvr_mdl_1d(:,km), snow_cvr_mdl, imdl, jmdl, ijmdl2, lonsperlat_mdl)
    deallocate(snow_cvr_mdl_1d)
-   call uninterpred(1, idum, snow_dep_mdl_tmp, snow_dep_mdl, imdl, jmdl, ijmdl2, lonsperlat_mdl)
+   call uninterpred(1, idum, snow_dep_mdl_tmp(:,km), snow_dep_mdl, imdl, jmdl, ijmdl2, lonsperlat_mdl)
    deallocate(snow_dep_mdl_tmp)
    deallocate(idum)
 
@@ -825,37 +807,20 @@
 
  end subroutine interp
 
+!> Write grib2 snow cover and depth on the model grid. 
+!!
+!! program history log:
+!! 2014-sep-26  gayno    - initial version
+!!
+!! output file: 
+!!     - snow on the model grid, grib 2, unit=lugb
+!!
+!! condition codes: all fatal
+!!   - 48 error writing model snow flie
+!!   - 49 error opening model snow flie
+!!
+!! @author George Gayno  org: w/np2   @date 2014-Sep-26
  subroutine write_grib2
-!$$$  subprogram documentation block
-!
-! subprogram:   write_grib2
-!   prgmmr: gayno          org: w/np2     date: 2014-sep-26
-!
-! abstract:  output snow cover and depth on the model grid 
-!            in grib 2 format.
-!
-! program history log:
-! 2014-sep-26  gayno    - initial version
-!
-! usage: call write_grib2
-!
-!   input argument list:  n/a
-!
-!   output argument list: n/a
-!
-! files:
-!   input: none
-!
-!   output: 
-!     - snow on the model grid, grib 2, unit=lugb
-!
-! condition codes: all fatal
-!    48 - error writing model snow flie
-!    49 - error opening model snow flie
-!
-! remarks: none.
-!
-!$$$
 
  use grib_mod
 
@@ -1020,39 +985,22 @@
 
  end subroutine write_grib2
 
+!> Write grib1 snow cover and depth on the model grid.
+!!
+!! program history log:
+!! 2005-dec-16  gayno    - Initial version
+!! 2014-sep-26  gayno    - Rename as write_grib1 (was gribit).
+!!
+!!  output file:
+!!     - snow on model grid, grib 1, unit=lugb
+!!
+!! condition codes:
+!!   - 57 - error writing model snow depth record
+!!   - 58 - error writing model snow cover record
+!!   - 59 - error opening model snow file
+!!
+!! @author George Gayno org: w/np2 @date  2005-Dec-16
  subroutine write_grib1
-!$$$  subprogram documentation block
-!
-! subprogram:   write_grib1
-!   prgmmr: gayno          org: w/np2     date: 2005-dec-16
-!
-! abstract:  output snow cover and depth on the model grid
-!            in grib1 format.
-!
-! program history log:
-! 2005-dec-16  gayno    - initial version
-! 2014-sep-26  gayno    - rename as write_grib1 (was gribit)
-!
-! usage: call write_grib1
-!
-!   input argument list:  n/a
-!
-!   output argument list: n/a
-!
-! files:
-!   input: none
-!
-!   output:
-!     - snow on model grid, grib 1, unit=lugb
-!
-! condition codes:
-!    57 - error writing model snow depth record
-!    58 - error writing model snow cover record
-!    59 - error opening model snow file
-!
-! remarks: none.
-!      
-!$$$
 
  implicit none
 
@@ -1147,5 +1095,99 @@
  return
 
  end subroutine write_grib1
+
+!> Fills out full grid using thinned grid data. Use an iord of
+!! "1" to use a nearest neighbor approach.
+!!
+!! @param[in] iord Interpolation method. '1' neighbor; '2' bilinear.
+!! @param[in] kmsk Mask of the input data. For masked fields, set to '1' 
+!! for defined points, '0' for undefined points. Not used for unmasked
+!! fields - set to '0'.
+!! @param[in] fi 1-d array to be processed.
+!! @param[out] f 2-d array on the full grid.
+!! @param[in] lonl 'i' dimension of 2-d data.
+!! @param[in] latd 'j' dimension of 2-d data.
+!! @param[in] len Number of elements of 1-d data.
+!! @param[in] lonsperlat  Definition of thinned (or reduced) grid. Number of
+!! "i" points for each 'j' row.
+!!
+!! @author George Gayno  org: w/np2 @date 2005-Dec-16
+ subroutine uninterpred(iord,kmsk,fi,f,lonl,latd,len,lonsperlat)
+
+ implicit none
+
+ integer, intent(in)               :: len
+ integer, intent(in)               :: iord
+ integer, intent(in)               :: lonl
+ integer, intent(in)               :: latd
+ integer, intent(in)               :: lonsperlat(latd/2)
+ integer, intent(in)               :: kmsk(lonl*latd)
+ integer                           :: j,lons,jj,latd2,ii,i
+
+ real, intent(in)                  :: fi(len)
+ real, intent(out)                 :: f(lonl,latd)
+
+ latd2 = latd / 2
+ ii    = 1
+
+ do j=1,latd
+
+   jj = j
+   if (j .gt. latd2) jj = latd - j + 1
+   lons=lonsperlat(jj)
+
+   if(lons.ne.lonl) then
+     call intlon(iord,1,1,lons,lonl,kmsk(ii),fi(ii),f(1,j))
+   else
+     do i=1,lonl
+       f(i,j)  = fi(ii+i-1)
+     enddo
+   endif
+
+   ii = ii + lons
+
+ enddo
+
+ end subroutine uninterpred
+
+!> Convert data from the thinned (or reduced) to the full grid
+!! along a single row.
+!!
+!! @param[in] iord Interpolation method. '1' neighbor; '2' bilinear.
+!! @param[in] imon Not used.
+!! @param[in] imsk Flag to account for mask during conversion. '0' - use mask.
+!! @param[in] m1 Number of points along a row of the thinned grid.
+!! @param[in] m2 Number of points along a row on the full grid.
+!! @param[in] k1 Mask of input data.
+!! @param[in] f1 Data on the thinned (or reduced) grid.
+!! @param[out] f2 Data on the full grid.
+!!
+!! @author George Gayno  org: w/np2 @date 2005-Dec-16
+ subroutine intlon(iord,imon,imsk,m1,m2,k1,f1,f2)
+
+ implicit none
+
+ integer,intent(in)        :: iord,imon,imsk,m1,m2
+ integer,intent(in)        :: k1(m1)
+ integer                   :: i2,in,il,ir
+
+ real,intent(in)           :: f1(m1)
+ real,intent(out)          :: f2(m2)
+ real                      :: r,x1
+
+ r=real(m1)/real(m2)
+ do i2=1,m2
+   x1=(i2-1)*r
+   il=int(x1)+1
+   ir=mod(il,m1)+1
+   if(iord.eq.2.and.(imsk.eq.0.or.k1(il).eq.k1(ir))) then
+     f2(i2)=f1(il)*(il-x1)+f1(ir)*(x1-il+1)
+   else
+     in=mod(nint(x1),m1)+1
+     f2(i2)=f1(in)
+   endif
+ enddo
+
+ end subroutine intlon
 
  end module snow2mdl
