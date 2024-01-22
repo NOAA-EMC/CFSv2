@@ -70,6 +70,7 @@ C   LANGUAGE: FORTRAN77
 C   MACHINE:  WCOSS
 C
 C$$$
+      program grib_snowgrib
       implicit none
       integer, parameter :: io=720  ! dimensions of 0.5-degree
       integer, parameter :: jo=361  ! output grid.
@@ -80,7 +81,7 @@ C$$$
       integer :: kgdso(200), kpdso(200)
       integer :: i, iret, lun
       integer :: jyr, jmo, jdy, jcen, lengds
-      logical*1 :: lo(ijo)
+      logical*1 :: lo(io,jo)
       real :: snow1(io,jo)
       real :: snow2(io,jo)
       real :: snow3(io,jo)
@@ -91,6 +92,10 @@ C$$$
       data (kpdso(i),i=1,25)/47,77,4,8,65,1,0,5*0,1,2*0,1,
      &      2*0,2,0,20,1,3*0/
       data (kpdso(i),i=26,200)/175*-1/
+
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+
       CALL W3TAGB('GRIB_SNOWGRIB',2000,0027,0070,'NP23')                  
       call makgds(4,kgdso,gdsi,lengds,iret)
       print *, ' iret from makgds =', iret
@@ -98,13 +103,11 @@ C$$$
         print *, ' Fatal error in makgds'
         call errexit(9)
       endif
-      print *, ' process nh airforce data'
-      lun = 11
-      call snowget(lun,kgdsn,kgdso,io,jo,snow1)
-      print *, ' process sh airforce data'
+
+      print *, ' process gb airforce data'
       lun = 12
-      call snowget(lun,kgdss,kgdso,io,jo,snow2)
-      snow2 = snow1 + snow2
+      call snowget(lun,kgdss,kgdso,io,jo,lo,snow2)
+
       lun = 13
       print *, ' process ims data'
       call imssnw(lun,kgdso,jn,ijo,lo,snow3,jcen,jyr,jmo,jdy)
@@ -112,12 +115,18 @@ C$$$
       kpdso(9) = jmo
       kpdso(10) = jdy
       kpdso(21) = jcen
+
+      lo=.false.; where(snow2 > 0.0)  lo = .true.
+
+! write un-QC'd snow data to unit 51      
+
       print *, ' open fort.51'
       call baopenw(51,'fort.51',iret)
       if (iret /= 0) then
         print*, ' Fatal error opening fort.51'
         call errexit(10)
       endif
+
       print *, ' write snow depth'
       call putgb(51,ijo,kpdso,kgdso,lo,snow2,iret)
       if (iret /= 0) then
@@ -131,8 +140,14 @@ C$$$
         print*, ' Fatal error writing fort.51'
         call errexit(12)
       endif
+
+! blend and QC the snow data from AFWA and IMS snow files
+
       print *, ' qc data'
       call qcsnow(ijo,snow2,snow3)
+
+! write QC'd snow data to unit 52      
+
       print *, ' open fort.52'
       kpdso(5) = 65
       call baopenw(52,'fort.52',iret)
@@ -140,6 +155,7 @@ C$$$
         print*, ' Fatal error opening fort.52'
         call errexit(13)
       endif
+
       print *, ' write snow depth'
       call putgb(52,ijo,kpdso,kgdso,lo,snow2,iret)
       if (iret /= 0) then
@@ -153,10 +169,10 @@ C$$$
         print*, ' Fatal error writing fort.52'
         call errexit(15)
       endif
+
       print*, ' *** NORMAL TERMINATION ***'
       CALL W3TAGE('GRIB_SNOWGRIB')                                           
       end
-      subroutine snowget(lun,jgds,kgdso,io,jo,snowg)
 C$$$  SUBPROGRAM DOCUMENTATION BLOCK
 C                .      .    .                                       .
 C SUBPROGRAM:    snowget     process airforce daily 23-km snow 
@@ -190,16 +206,17 @@ C   LANGUAGE: Fortran 77
 C   MACHINE:  WCOSS
 C
 C$$$
+      subroutine snowget(lun,jgdss,kgdso,io,jo,lo,snowg)
       implicit none
 c
-      integer, intent(in   )      :: lun, jgds(200), kgdso(200), io, jo
-      real,    intent(  out)      :: snowg(io,jo)
+      integer, intent(in   )      :: lun, jgdss(200), kgdso(200), io, jo
+      real,    intent(  out)      :: snowg(io*jo)
 c
       character(len=7)            :: fngrib
       integer                     :: iret, lugi
-      integer                     :: ijafwa
+      integer                     :: i,ijafwa
       integer                     :: ibi, ibo, ipopt(20)
-      integer                     :: jpds(200)
+      integer                     :: jpds(200), jgds(200)
       integer                     :: kpds(200), kgds(200)
       integer                     :: lskip, numbytes
       integer                     :: numpts, message_num, no
@@ -207,77 +224,55 @@ c
       logical*1                   :: lo(io*jo)
       real, allocatable           :: snowa(:)
       real                        :: rlat(io*jo), rlon(io*jo)
-c
+
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+
       if (lun==11) fngrib = "fort.11"
       if (lun==12) fngrib = "fort.12"
-c
+
       call baopenr(lun,fngrib,iret)
       if (iret /= 0) then
         print*,' Fatal error. bad open, iret is ', iret
         call errexit(1)
       endif
-c
+
       lugi     = 0
       lskip    = -1
       jpds     = -1
       jpds(5)  = 66     ! snow depth
+      jgds     = -1
       call getgbh(lun, lugi, lskip, jpds, jgds, numbytes, 
      &            numpts, message_num, kpds, kgds, iret)
       if (iret /= 0) then
         print*,' Fatal error. Bad degrib of header, iret is ', iret
         call errexit(2)
       endif
-c
+
       print *, ' iyr, imo, idy =', kpds(8:10)
-c
+
       ijafwa = kgds(2) * kgds(3)
       allocate(bitmap(ijafwa))
       allocate(snowa(ijafwa))
-c
+
       call getgb(lun,lugi,ijafwa,lskip,jpds,jgds,numpts,lskip,
-     &           kpds,kgds,bitmap,snowa,iret)
+     &           kpds,kgdso,bitmap,snowg,iret)
       if (iret /= 0) then
         print*,' Fatal error. bad degrib of data, iret is ', iret
         call errexit(3)
       endif
-c
-      print *, ' smax, smin =', maxval(snowa), minval(snowa)
-c
-c  convert from depth in meters to liquid equivalent in mm
-c
-      snowa = snowa * 100.0
-c
-c  the afwa orientation angle is 180 degrees different from 
-c  the ncep iplib convention.
-c
-      kgds(7) = -80000  ! orientation angle
-c
-      call qc_snow_data(kgds,snowa,kgds(2),kgds(3))
-c
-      ipopt = 0
-      ipopt(1)=-1
-      ipopt(2)=-1
-      ibi = 1
-      call ipolates(3,ipopt,kgds,kgdso,ijafwa,(io*jo),1,ibi,bitmap,
-     & snowa,no,rlat,rlon,ibo,lo,snowg,iret)
-c
-      if (iret /= 0) then
-        print*,' Fatal error in ipolates, iret is ', iret
-        call errexit(4)
-      endif
-c
-      if(no /= (io*jo)) then
-        print *, ' Fatal error. input and out dimensions not equal'
-        call errexit(5)
-      endif
-c
-      print *, ' after ipolate, smax, smin =', 
-     &  maxval(snowg),minval(snowg)
-c
+
+      print *, ' smax, smin =', maxval(snowg), minval(snowg)
+
+      snowg = snowg * 100.0 ! convert depth to weight @ 100kg/m**3
+
+      !kgds(7) = -80000  ! orientation angle adjustment for iplib routines
+
+      call qc_snow_data(kgds,snowg,kgds(2),kgds(3))
+
       deallocate(bitmap,snowa)
       call baclose(lun,iret)
       end subroutine snowget
-      subroutine imssnw(lun,kgdso,jn,ijo,lo,snow3,icen,iyr,imo,idy)
 C$$$  SUBPROGRAM DOCUMENTATION BLOCK
 C                .      .    .                                       .
 C SUBPROGRAM:    imssnw     process nh ims snow cover data
@@ -312,7 +307,7 @@ C   LANGUAGE: Fortran 77
 C   MACHINE:  WCOSS
 C
 C$$$
-      use grib_mod
+      subroutine imssnw(lun,kgdso,jn,ijo,lo,snow3,icen,iyr,imo,idy)
       implicit none
       integer, intent(in   ) :: lun, kgdso(200), jn, ijo
       integer, intent(  out) :: icen, iyr, imo, idy
@@ -327,7 +322,10 @@ C$$$
       logical   :: unpack
       real :: work(jn,jn)
       real :: rlat(ijo), rlon(ijo), smax, smin
-      type(gribfield)            :: gfld
+
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+
       fngrib='fort.13'
       lugb=lun
       lugi=0
@@ -343,14 +341,17 @@ C$$$
         call errexit(6)
       endif
       print *, ' file ', fngrib,' opened. unit=',lugb
+
+! process grib1 file
+
       if (isgrib == 1) then ! grib 1 file
         jgds = -1
         jpds = -1
         jpds(5) = 238
         lskip = -1
-        mdata = jn * jn
+        mdata = ijo     
         call getgb(lugb,lugi,mdata,lskip,jpds,jgds,ndata,lskip,
-     &             kpds,kgds,lmsk,work,iret)
+     &             kpds,kgds,lmsk,snow3,iret)
         if(ndata.eq.0.or.iret.ne.0) then
           WRITE(6,*) ' Fatal Error in getgb'
           WRITE(6,*) ' KPDS=',KPDS(1:25)
@@ -365,90 +366,27 @@ C$$$
         imo = kpds(9)
         idy = kpds(10)
         icen = kpds(21)
+        call baclose(lugb,iret)
+
+! don't process grib2 file
+
       elseif (isgrib == 2) then
-        jj      = 0      ! search at beginning of file
-        jdisc   = 0      ! search for discipline; 0 - meteorological products
-        jpdtn   = 0      ! search for product definition template number; 0 - analysis at one level
-        jgdtn   = 20     ! search for grid definition template number; 20 - polar stereographic grid
-        jids    = -9999  ! array of values in identification section, set to wildcard
-        jgdt    = -9999  ! array of values in grid definition template 3.m
-        jpdt    = -9999  ! array of values in product definition template 4.n
-        jpdt(1) = 1      ! search for parameter category - moisture
-        jpdt(2) = 201    ! search for parameter number - snow cover in percent.
-        unpack  = .true. ! unpack data
-        nullify(gfld%idsect)
-        nullify(gfld%local)
-        nullify(gfld%list_opt)
-        nullify(gfld%igdtmpl)
-        nullify(gfld%ipdtmpl)
-        nullify(gfld%coord_list)
-        nullify(gfld%idrtmpl)
-        nullify(gfld%bmap)
-        nullify(gfld%fld)
-        call getgb2(lugb, lugi, jj, jdisc, jids, jpdtn, jpdt, jgdtn, 
-     &              jgdt, unpack, k, gfld, iret)
-        work = reshape(gfld%fld, (/jn,jn/))
-        WRITE(6,*) ' PDT=',gfld%ipdtmpl
-        WRITE(6,*) ' GDT=',gfld%igdtmpl
-        imo = gfld%idsect(7)
-        idy = gfld%idsect(8)
-        icen = gfld%idsect(6)/100
-        iyr = mod(gfld%idsect(6),100)
-        if (iyr == 0) then
-          iyr = 100
-        else
-          icen = icen + 1
-        endif
-        call gdt_to_gds(gfld%igdtmpl,gfld%igdtlen,kgds)
-        if (associated(gfld%idsect)) deallocate(gfld%idsect)
-        if (associated(gfld%local)) deallocate(gfld%local)
-        if (associated(gfld%list_opt)) deallocate(gfld%list_opt)
-        if (associated(gfld%igdtmpl)) deallocate(gfld%igdtmpl)
-        if (associated(gfld%ipdtmpl)) deallocate(gfld%ipdtmpl)
-        if (associated(gfld%coord_list)) deallocate(gfld%coord_list)
-        if (associated(gfld%idrtmpl)) deallocate(gfld%idrtmpl)
-        if (associated(gfld%bmap)) deallocate(gfld%bmap)
-        if (associated(gfld%fld)) deallocate(gfld%fld)
+         print*,'grib2 imssnow not allowed'
+         stop 99
       endif  ! is file grib1 or grib2?
-      call baclose(lugb,iret)
+
+! report min/max and exit
+
       print *, ' iyr, imo, idy, icen =', iyr,imo,idy,icen
-      li = .false.
       smax = -100.
       smin = 5000.
-      do j = 1, jn
-        do i = 1, jn
-          li(i,j) = work(i,j).gt.0.
-          smax = max(smax,work(i,j))
-          smin = min(smin,work(i,j))
-        enddo
+      do i = 1, ijo 
+      smax = max(smax,snow3(i))
+      smin = min(smin,snow3(i)) 
       enddo
       print *, ' In imssnw, smax, smin =', smax, smin
-      ipopt = 0
-      ipopt(1)=-1
-      ipopt(2)=-1
-      ibi = 1
-      ji = jn * jn
-      call ipolates(3,ipopt,kgds,kgdso,ji,ijo,1,ibi,li,work,
-     & no,rlat,rlon,ibo,lo,snow3,iret)
-      print *, ' iret from ipolates =', iret
-      if (iret /= 0) then
-        print *, ' Fatal error in ipolates'
-        call errexit(19)
-      endif
-      smax = -1.
-      smin = 5000.
-      do j = 1, ijo
-        smax = max(smax,snow3(j))
-        smin = min(smin,snow3(j))
-      enddo
-      print *, ' after ipolate, max, min =', smax, smin
-      if(no.ne.ijo) then
-        print *, ' Fatal error. input and out dimensions not equal'
-        call errexit(8)
-      endif
-      return
+
       end subroutine imssnw
-      subroutine qcsnow(ijo,snow2,snow3)
 C$$$  SUBPROGRAM DOCUMENTATION BLOCK
 C                .      .    .                                       .
 C SUBPROGRAM:    qcsnow      qc snow depth based on ims cover
@@ -478,31 +416,35 @@ C   LANGUAGE: Fortran 77
 C   MACHINE:  WCOSS
 C
 C$$$
+      subroutine qcsnow(ijo,snow2,snow3)
       implicit none
       integer, intent(in)    :: ijo
       real,    intent(inout) :: snow2(ijo), snow3(ijo)
       integer :: j, js, jo2
       integer :: nmod1, nmod2, nmod3
-c
+
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+
       nmod1 = 0
       nmod2 = 0
       nmod3 = 0
       jo2 = ijo / 2
       do j = 1, jo2
         js = j + jo2
-        if(snow3(j).ge.50..and.snow2(j).le.0.05) then
 c
 c  ims snow cover says there is snow but the airforce depth is near zero, 
 c  we add snow.  default snow depth is 2.5 mm water equivalent.
 c
+        if(snow3(j).ge.50..and.snow2(j).le.0.05) then
           snow2(j) = 2.5
           nmod1 = nmod1 + 1
         endif
-        if(snow3(j).lt.50.) then
 c
 c  ims snow cover says there is no snow but the airforce depth is 
 c  non-zero, we set depth to zero.
 c
+        if(snow3(j).lt.50.) then
           snow2(j) = 0.
           nmod2 = nmod2 + 1
         endif
@@ -515,12 +457,14 @@ c  snow cover field because ims cover field is NH only.
 c
         if(snow2(js).ge.0.05) snow3(js) = 100.
       enddo
+
+c  make report and exit routine 
+
       print *, ' Number of snow points added =', nmod1
       print *, ' Number of snow points removed =', nmod2
       print *, ' Number of snow points =', nmod3
       return
       end subroutine qcsnow
-      subroutine grib_check(lugb, file_name, isgrib)
 c$$$  subprogram documentation block
 c
 c subprogram:    grib_check
@@ -546,6 +490,7 @@ c   language: fortran 90
 c   machine:  IBM WCOSS
 c
 c$$$
+      subroutine grib_check(lugb, file_name, isgrib)
       implicit none
 
       character*(*), intent(in)         :: file_name
@@ -553,6 +498,9 @@ c$$$
       integer                           :: istat, iseek, mseek
       integer                           :: lskip, lgrib, version
       integer, intent(out)              :: isgrib
+
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
       print*," check file type of: ", trim(file_name)
       call baopenr (lugb, file_name, istat)
@@ -577,11 +525,7 @@ c$$$
         print*," file is not grib1 or grib2"
       endif
 
-      return
-
       end subroutine grib_check
-
-      SUBROUTINE SKGB2(LUGB,ISEEK,MSEEK,LSKIP,LGRIB,I1)
 c$$$  subprogram documentation block
 c
 c subprogram:   skgb2
@@ -614,6 +558,7 @@ c attributes:
 c   language: fortran
 c
 c$$$
+      SUBROUTINE SKGB2(LUGB,ISEEK,MSEEK,LSKIP,LGRIB,I1)
       INTEGER, INTENT( IN)     :: LUGB, ISEEK, MSEEK
       INTEGER, INTENT(OUT)     :: LSKIP, LGRIB, I1
       PARAMETER(LSEEK=128)
@@ -658,78 +603,6 @@ c  GRIB MESSAGE FOUND
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       RETURN
       END subroutine skgb2
-      subroutine gdt_to_gds(igdstmpl, igdtlen, kgds)
-c$$$  subprogram documentation block
-c
-c subprogram:    gdt_to_gds
-c   prgmmr: gayno          org: w/np2     date: 2014-sep-26
-c
-c abstract:  convert from the grib2 grid description template array
-c            used by the ncep grib2 library, to the grib1 grid
-c            description section array used by ncep ipolates library.
-c            polar stereographic grids only.
-c
-c program history log:
-c 2014-sep-26  gayno    - initial version
-c
-c usage: call gds_to_gds(igdstmpl,igdtlen,kgds)
-c
-c   input argument list:
-c     igdstmpl - grib2 grid desc template array
-c     igdtlen  - grib2 grid desc template array size
-c
-c   output argument list:
-c     kgds     - grib1 grid description section array
-c                used by ncep ipolates library.
-c
-c remarks: none.
-c
-c attributes:
-c   language: fortran 90
-c   machine:  IBM WCOSS
-c
-c$$$
-
-      implicit none
-
-      integer, intent(in   )  :: igdtlen, igdstmpl(igdtlen)
-      integer, intent(  out)  :: kgds(200)
-      integer                 :: iscale
-
-      kgds=0
-      iscale=1e6
-      kgds(1)=5                      ! oct 6, data representation type, polar
-      kgds(2)=igdstmpl(8)            ! octs 7-8, nx
-      kgds(3)=igdstmpl(9)            ! octs 8-10, ny
-      kgds(4)=nint(float(igdstmpl(10))/float(iscale)*1000.)  ! octs 11-13, lat of 1st grid point
-      kgds(5)=nint(float(igdstmpl(11))/float(iscale)*1000.)  ! octs 14-16, lon of 1st grid point
-
-      kgds(6)=0                      ! oct 17, resolution and component flags
-      if (igdstmpl(1) >= 2 .or. igdstmpl(1) <= 5) kgds(6)=64
-      if (igdstmpl(1) == 7) kgds(6)=64
-      if ( btest(igdstmpl(12),4).OR.btest(igdstmpl(12),5) ) 
-     &     kgds(6)=kgds(6)+128
-      if ( btest(igdstmpl(12),3) ) kgds(6)=kgds(6)+8
-c note: the header of the ims grib2 data indicates an elliptical earth.
-c that is wrong.  hardwire a fix here.
-      kgds(6) = 136
-
-      kgds(7)=nint(float(igdstmpl(14))/float(iscale)*1000.)  ! octs 18-20, lon of orientation
-      kgds(8)=nint(float(igdstmpl(15))/float(iscale)*1000.)  ! octs 21-23, dx
-      kgds(9)=nint(float(igdstmpl(16))/float(iscale)*1000.)  ! octs 24-26, dy
-
-      kgds(10)=0                ! oct 27, projection center flag
-      if (btest(igdstmpl(17),1)) kgds(10) = 128
-      kgds(11) = 0              ! oct 28, scan mode
-      if (btest(igdstmpl(18),7)) kgds(11) = 128
-      if (btest(igdstmpl(18),6)) kgds(11) = kgds(11) +  64
-      if (btest(igdstmpl(18),5)) kgds(11) = kgds(11) +  32
-
-      kgds(19)=0    ! oct 4, # vert coordinate parameters
-      kgds(20)=255  ! oct 5, used for thinned grids, set to 255
-
-      end subroutine gdt_to_gds
-      subroutine qc_snow_data(kgds,snow,io,jo)
 !$$$  subprogram documentation block
 !
 ! subprogram:    qc_snow_data
@@ -753,6 +626,7 @@ c that is wrong.  hardwire a fix here.
 !   machine:  IBM SP
 !
 !$$$
+      subroutine qc_snow_data(kgds,snow,io,jo)
       use gdswzd_mod
 
       implicit none
@@ -777,7 +651,7 @@ c that is wrong.  hardwire a fix here.
 
       print*,' ensure input data is not corrupt'
 
-      if (hemi == 0) then
+      !if (hemi == 0) then
 
         rlat=75.0
         rlon=-40.
@@ -823,7 +697,7 @@ c that is wrong.  hardwire a fix here.
           print*,' no snow in s india'
         endif
 
-      elseif (hemi == 128) then
+      !elseif (hemi == 128) then
 
         rlat=-88.0
         rlon=0.
@@ -869,9 +743,8 @@ c that is wrong.  hardwire a fix here.
           print*,' no snow in africa'
         endif
 
-      endif
+      !endif
 
       deallocate(snow_2d)
 
-      return
       end subroutine qc_snow_data

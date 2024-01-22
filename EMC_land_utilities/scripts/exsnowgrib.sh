@@ -68,18 +68,20 @@ IMS_FILE_NAME="imssnow96.grb"
 IMS_DIR="${TANKDIR}/${PDY}/wgrbbul"
 IMS_FILE=${IMS_DIR}/${IMS_FILE_NAME}
 
-AFWA_NH_FILE_NAME="NPR.SNWN.SP.S1200.MESH16"
-AFWA_SH_FILE_NAME="NPR.SNWS.SP.S1200.MESH16"
-AFWA_DIR="${TANKDIR}/${PDY}/wgrbbul"
-AFWA_NH_FILE=${AFWA_DIR}/${AFWA_NH_FILE_NAME}
-AFWA_SH_FILE=${AFWA_DIR}/${AFWA_SH_FILE_NAME}
+AFWA_DIR=${TANKDIR}/${PDY}/wgrbbul/557thWW_snow
+AFWA_GB_FILE_NAME=PS.557WW_SC.U_DI.C_GP.USAFSI_GR.C0P09DEG_AR.GLOBAL_PA.SNOW-ICE_DD.${PDY}_DT.1200_DF.GR2
+AFWA_GB_FILE=${AFWA_DIR}/${AFWA_GB_FILE_NAME}
 
 error=0
+
+cp $AFWA_GB_FILE afwa_gb_file; AFWA_GB_FILE=afwa_gb_file
+
+cp $IMS_FILE ims_file; IMS_FILE=ims_file
 
 # run snow2mdl program if data available
 # --------------------------------------
 
-if [[ -s $IMS_FILE && -s $AFWA_NH_FILE && -s $AFWA_SH_FILE ]]
+if [[ -s $IMS_FILE && -s $AFWA_GB_FILE ]]
 then
   TEMP_DATE=`$WGRIB -4yr $IMS_FILE | head -1`
   typeset -L10 IMS_DATE
@@ -108,11 +110,7 @@ then
        autosnow_file=""
        nesdis_snow_file="${IMS_FILE}"
        nesdis_lsmask_file=""
-       afwa_snow_global_file=""
-       afwa_snow_nh_file="${AFWA_NH_FILE}"
-       afwa_snow_sh_file="${AFWA_SH_FILE}"
-       afwa_lsmask_nh_file=""
-       afwa_lsmask_sh_file=""
+       afwa_snow_global_file="${AFWA_GB_FILE}"
       /
        &qc
         climo_qc_file="${FIXgrib}/emcsfc_snow_cover_climo.grib2"
@@ -221,14 +219,12 @@ ls -l $TANKDIR/${PDY}/wgrdbul
 cp $COMOUT/snowdepth.global.grb fort.52; errcp=$?
 [[ "$errcp" -ne '0' ]]  &&  cp $COMOLD/snowdepth.global.grb fort.52
 
-cp $TANKDIR/$PDY/wgrbbul/NPR.SNWN.SP.S1200.MESH16 fort.11
-cp $TANKDIR/$PDY/wgrbbul/NPR.SNWS.SP.S1200.MESH16 fort.12
-cp $TANKDIR/$PDY/wgrbbul/imssnow.grb fort.13
-
 # abort the job if both current data and backup are empty
 # -------------------------------------------------------
 
-if [ ! -s fort.11 -o ! -s fort.12 -o ! -s fort.13 ]
+IMS_FILE=${IMS_DIR}/imssnow96.grb # use higher resolution for imssnow
+
+if [ ! -s $IMS_FILE -o ! -s $AFWA_GB_FILE ]
 then
   if [ ! -s fort.52 ]
   then
@@ -248,6 +244,20 @@ echo "############################################################"
 echo " "
 set -x
 
+# use wgrib2 to convert IMS and AFWA files to 0.5 x 0.5 resolution
+
+cnvgrib -g12 $IMS_FILE imss.grb2
+wgrib2 imss.grb2      -new_grid latlon 0.0:720:0.5 90.0:361:-0.5 imss5x5.grb2 
+wgrib2 $AFWA_GB_FILE  -new_grid latlon 0.0:720:0.5 90.0:361:-0.5 afwa5x5.grb2
+cnvgrib -g21 imss5x5.grb2 imss5x5.grb1
+cnvgrib -g21 afwa5x5.grb2 afwa5x5.grb1
+
+echo
+wgrib -V afwa5x5.grb1
+echo
+wgrib -V imss5x5.grb1
+echo
+
 ###################################
 # Make the program unit assignments
 ###################################
@@ -255,11 +265,8 @@ set -x
 pgm=`basename  $EXECgrib/emcsfc_grib_snowgrib`
 . prep_step
 
-export FORT11="fort.11"
-export FORT12="fort.12"
-export FORT13="fort.13"
-export FORT51="fort.51"
-export FORT52="fort.52"
+ln -sf afwa5x5.grb1         fort.12
+ln -sf imss5x5.grb1         fort.13
 
 $EXECgrib/emcsfc_grib_snowgrib >> $pgmout 2> pgmerr
 export err=$?
