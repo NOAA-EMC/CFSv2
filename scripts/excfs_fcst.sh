@@ -590,7 +590,12 @@ export XLFRTEOPTS="unit_vars=yes:intrinthds=1"
 export PGM=$DATA/$(basename $AM_EXEC)
 export pgm=$PGM
 $LOGSCRIPT
-$NCP $AM_EXEC $DATA
+#$NCP $AM_EXEC $DATA  # This line is moved to parent script exrun_cfs.sh to avoid multiple copy
+if [ ! -f $(basename $AM_EXEC) ]; then
+  echo "FATAL: No $AM_EXEC executable in $DATA, check if executable copied correctly in parent script exrun_cfs.sh."
+  export err=9
+  err_chk 
+fi
 rm -f NULL
 FH=$((10#$FHINI))
 [[ $FH -lt 10 ]]&&FH=0$FH
