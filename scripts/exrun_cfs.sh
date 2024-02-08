@@ -15,6 +15,16 @@
 #   Main script to run (atmosphere/ocean) coupled forecast system (CFS)
 #   with MOM4 for seasonal climate prediction
 #   Version CFSV2
+#   Following variables are added for moving copy cfs_atmos_fcst line from excfs_fcst.sh to 
+#   here to avoid multiple copy to $DATA          -- 20240109
+#   Imported Shell Variables:
+#     EXEC_AMD      Directory for global AM executables
+#     NCP           Copy command
+#                   defaults to cp
+#     XC            Suffix to add to executables
+#                   defaults to none
+#   Modules and files referenced:
+#     programs   : $AM_EXEC
 
 # ####################
 #  START CFSV2 integration 
@@ -103,6 +113,16 @@ export FHBEG=0
 # cd to working directory
 ################################
 cd $DATA
+
+#
+# Following is to add cp exec command here to avoid multiple copy in loop -- 20240109
+#
+export NCP=${NCP:-/bin/cp}
+export XC=${XC:-""}
+export EXEC_AMD=${EXEC_AMD:-EXECcfs}
+export AM_EXEC=${AM_EXEC:-${EXEC_AMD}/global_fcst$XC}
+$NCP $AM_EXEC $DATA
+#### Adding section complete
 
 CFSRR_IC=${CFSRR_IC:-YES}
 export IC_FROM_DISK=${IC_FROM_DISK:-NO}
