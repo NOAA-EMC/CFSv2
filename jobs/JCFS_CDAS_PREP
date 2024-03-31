@@ -124,7 +124,7 @@ export HOMEgfs=${HOMEgfs:-$(compath.py gfs/${gfs_ver})}
 
 export PRVT=$HOMEgfs/fix/prepobs_errtable.global
 #export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
-#export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
+export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
 #export USHOIQC=$HOMEcfs/ush
 export ushscript_prep=${ushscript_prep:-$USHprepobs}
 
