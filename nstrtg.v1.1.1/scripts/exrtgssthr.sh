@@ -912,7 +912,7 @@ cat <<end_ft05 > rthranl.input
 end_ft05
 
 startmsg
-mpirun.lsf $EXECrtgsst/rtgssthr_rthranl4 < rthranl.input >> $pgmout 2>errfile
+mpiexec -n $NCPUS $EXECrtgsst/rtgssthr_rthranl4 < rthranl.input >> $pgmout 2>errfile
 export err=$?; err_chk
 $USHrtgsst/rtgssthr_errwarn.sh;export err=$?;err_chk
 
