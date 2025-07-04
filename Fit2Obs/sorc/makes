@@ -73,6 +73,29 @@ elif [ $plat = orion ]; then
  export export NETCDF_LDFLAGS="-L $NETCDF/lib -lnetcdf -lnetcdff"
  export FLAGS="-O3 -g -traceback"
  export FCMP="mpiifort"
+elif [ $plat = wcoss2 ]; then
+ module reset
+ source $HOMEcfs/versions/build.ver
+ module load PrgEnv-intel/${PrgEnv_intel_ver}
+ module load craype/${craype_ver}
+ module load intel/${intel_ver}
+ module load cray-mpich/${cray_mpich_ver}
+ module load w3emc/${w3emc_ver}
+ module load w3nco/${w3nco_ver}
+ module load bacio/${bacio_ver}
+ module load sigio/${sigio_ver}
+ module load sp/${sp_ver}
+ module load bufr/${bufr_ver}
+ module load sfcio/${sfcio_ver}
+ module load netcdf/${netcdf4_ver}
+ export export NETCDF_INCLUDE="-I $NETCDF/include"
+ export export NETCDF_LDFLAGS="-L $NETCDF/lib -lnetcdf -lnetcdff"
+ export SIGIO_LIB4=$SIGIO_LIB
+ export SIGIO_INC4=$SIGIO_INC
+ export SFCIO_LIB4=$SFCIO_LIB
+ export SFCIO_INC4=$SFCIO_INC
+ export FLAGS="-O3 -g -traceback"
+ export FCMP="ftn"          
 else
  echo no recognised platform
  exit 99

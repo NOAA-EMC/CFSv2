@@ -4,7 +4,6 @@ set -aeu
 export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4 $SP_LIB4 $SIGIO_LIB4 $SFCIO_LIB4 $BACIO_LIB4 $NEMSIO_LIB $W3NCO_LIB4 $NETCDF_LDFLAGS"
 export INCS="-I$SIGIO_INC4 -I$SFCIO_INC4 -I$NEMSIO_INC $NETCDF_INCLUDE"
 export FFLAGS="-O3 -g -traceback -qopenmp"
-export FCMP="mpiifort"
 
 rm -f *.o *.mod; make -f Makefile
 
