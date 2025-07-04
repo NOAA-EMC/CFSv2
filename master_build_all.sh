@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 set -euax
 
-export REPOROOT=$PWD  
+export HOMEcfs=$PWD; source $HOMEcfs/versions/build.ver
 
-export WRFPATH=/gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
-export WRFPATH=/gpfs/dell1/nco/ops/nwprod/lib/wrf_shared.v1.1.1
+[[ $# -eq 0 || $1 = 206 ]] && { cd $HOMEcfs/global_shared_cfs/CRTMv206; ./build; }
 
-[[ $# -eq 0 || $1 = 206 ]] && { cd $REPOROOT/global_shared_cfs/CRTMv206/sorc; . configure/ifort.setup; cd ..; ./build; }
+[[ $# -eq 0 || $1 = esm ]] && { cd $HOMEcfs/global_shared_cfs/modules/esmf_4.0.0rp2; ./build_esmflib; }
 
-[[ $# -eq 0 || $1 = cfs ]] && { cd $REPOROOT/sorc; mkdir -p ../exec; ./build_all.dell; }
+[[ $# -eq 0 || $1 = wrf ]] && { cd $HOMEcfs/global_shared_cfs/modules/wrflib_1.1.0; ./build_wrflib; }
 
-[[ $# -eq 0 || $1 = shr ]] && { cd $REPOROOT/global_shared_cfs/sorc; mkdir -p ../exec; ./build_cfs_wcoss.sh; }
+[[ $# -eq 0 || $1 = cfs ]] && { cd $HOMEcfs/sorc; mkdir -p ../exec; ./build_all.wcoss2; }
 
-[[ $# -eq 0 || $1 = prp ]] && { cd $REPOROOT/obsproc_prep.v3.2.0/sorc; mkdir -p ../exec; ./build_dell; }
+[[ $# -eq 0 || $1 = shr ]] && { cd $HOMEcfs/global_shared_cfs/sorc; mkdir -p ../exec; ./build_cfs_wcoss.sh; }
 
-[[ $# -eq 0 || $1 = nst ]] && { cd $REPOROOT/nstrtg.v1.1.1/sorc; mkdir -p ../exec; ./build_nstrtg.sh; }
+[[ $# -eq 0 || $1 = nst ]] && { cd $HOMEcfs/nstrtg.v1.1.1/sorc; mkdir -p ../exec; ./build_nstrtg.sh; }
 
-[[ $# -eq 0 || $1 = jis ]] && { cd $REPOROOT/EMC_land_utilities/sorc; mkdir -p ../exec; ./build_emcsfc.sh; }
+[[ $# -eq 0 || $1 = jis ]] && { cd $HOMEcfs/EMC_land_utilities/sorc; mkdir -p ../exec; ./build_emcsfc.sh; }
 
-[[ $# -eq 0 || $1 = f2o ]] && { cd $REPOROOT/Fit2Obs/sorc; mkdir -p ../exec; ./makes dell; }
+[[ $# -eq 0 || $1 = f2o ]] && { cd $HOMEcfs/Fit2Obs/sorc; mkdir -p ../exec; ./makes wcoss2; }
 
