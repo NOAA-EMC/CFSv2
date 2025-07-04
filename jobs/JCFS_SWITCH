@@ -3,10 +3,7 @@
 set -xa
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -18,7 +15,7 @@ export NET=cfs
 ####################################
 
 export jlogfile=${jlogfile:-/dev/null}
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 msg="HAS BEGUN on `hostname`"
 postmsg "$jlogfile" "$msg"
@@ -28,18 +25,18 @@ sh setpdy.sh
 . ./PDY
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 #############################################################
 # execute the script
 #############################################################
-${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_switch.sh.ecf}
+${CFSCLEANUPSH:-$HOMEcfs/scripts/excfs_switch.sh}
 err=$?; err_chk
 
 msg="JOB $job HAS COMPLETED NORMALLY."

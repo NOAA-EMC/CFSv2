@@ -8,9 +8,6 @@ set -xa
 # DATA_IN: Location of working directory, default to /tmpnwprd1
 # DEV_ECF: If the job is to be running using SMS, default to YES
 # SENDDBN: Set to NO for developers, default to YES
-# COM_IN:  Directory for input files, default to /com/$NET/${envir}
-# COM_OUT: Directory for output file, default to /com/$NET/${envir}
-# gespath: Directory for the guess or restart files, default to /nwges/${envir}
 #####################################################################################
 
 ####################################
@@ -21,7 +18,6 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 date
 export PS4='$SECONDS + '
@@ -30,18 +26,14 @@ export PS4='$SECONDS + '
 # SETUP CLDAS PREP PROCESSING VARIABLES
 # ##############################################
 
-##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -53,44 +45,39 @@ sh setpdy.sh
 export CDATE=${PDY}${cyc}
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ##############################################
-# Define GES directories
+# Define OMP_NUM_THREADS
 ##############################################
-export gespath=${gespath:-${GESROOT}/$envir}
-export GESdir=$gespath/cdas.$PDY
-mkdir -m 775 -p $GESdir
-
-export RESDIR=${RESDIR:-$GESdir}
-mkdir -p $RESDIR
+export OMP_NUM_THREADS=1
 
 env
 
 #############################################################
 # execute the script
 
-${CLDASSH:-$HOMEcfs/scripts/excfs_cdas_gldas.sh.ecf}
+${CLDASSH:-$HOMEcfs/scripts/excfs_cdas_gldas.sh}
 
 #############################################################
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

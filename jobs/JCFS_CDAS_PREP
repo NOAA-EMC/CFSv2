@@ -5,10 +5,8 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
 ##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -27,29 +25,20 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
-export jlogfile=${jlogfile:-/dev/null}
-export pgmout="OUTPUT.${pid}"
-
-####################################
-# Specify Execution Areas
-####################################
+export pgmout="OUTPUT.$$"
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
-export HOMEobsproc_prep=${HOMEobsproc_prep:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
-
+export HOMEobsproc=${HOMEobsproc:-${PACKAGEROOT}/obsproc.${obsproc_ver}}
 export PARMPREP=$PARMcfs/cfs_parm_prep
 export PARMSYND=$PARMcfs/cfs_parm_prep
-
-export envir_getges=${envir_getges:-prod}
-export USHGETGES=$HOMEcfs/global_shared_cfs/ush
 
 ##############################
 # Run setpdy and initialize PDY variables
@@ -60,28 +49,21 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=${COMIN:-$COMROOT/${NET}/${envir}/${RUN}.${PDY}}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 ##############################################
 # Specify varaibles specific to this execution of script
 ##############################################
 
+export OMP_NUM_THREADS=1
 export POE=YES
 #  NPROCS indicates the number of POE tasks
 #   {Applies only when PREPDATA=YES below and POE=YES (default)}
 
-set +u
-if [ -n "$LSB_PJL_TASK_GEOMETRY" ]; then
-   NPROCS=`echo $LSB_PJL_TASK_GEOMETRY | sed 's/[{}(),]/ /g' | wc -w`
-elif [ -n "$LSB_DJOB_NUMPROC" ]; then
-   NPROCS=$LSB_DJOB_NUMPROC
-else
-   NPROCS=1
-fi
-set -u
+export NPROCS=$NCPUS
 
 #  NSPLIT indicates the number of tasks for running PREPDATA
 #   (PREPDATA processing will be split into this many parts)
@@ -92,8 +74,7 @@ export NSPLIT=$NPROCS
 
 #  BUFRLIST indicates the list of BUFR data dump file names to process
 
-export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc \
- sfcshp vadwnd wdsatr ascatw rassda gpsipw"}
+export BUFRLIST=${BUFRLIST:-"adpupa proflr aircar aircft satwnd adpsfc  sfcshp vadwnd wdsatr ascatw rassda gpsipw"}
 
 # VARIABLES THAT CONTROL PROCESSING OF INDIVIDUAL PROGRAMS
 # --------------------------------------------------------
@@ -120,45 +101,45 @@ export OIQCBUFR=${OIQCBUFR:-YES}   # Execute program PREPOBS_OIQCBUFR if YES
 #       be set to YES for operational runs)
 
 export PREPDATA=YES   # Execute programs PREPOBS_MPCOPYBUFR, PREPOBS_PREPDATA,
-                      # PREPOBS_LISTHEADERS and PREPOBS_MONOPREPBUFR if YES
+# PREPOBS_LISTHEADERS and PREPOBS_MONOPREPBUFR if YES
 
 export GETGUESS=YES   # Encode first guess (background) values interpolated to
-                      # observation locations in the PREPBUFR file for use by
-                      # the q.c. programs.  This guess is always from a global
-                      # sigma guess file valid at the center PREPBUFR
-                      # processing date/time.
+# observation locations in the PREPBUFR file for use by
+# the q.c. programs.  This guess is always from a global
+# sigma guess file valid at the center PREPBUFR
+# processing date/time.
+
+#export envir_getges=$(basename $COMROT) 
+#export envir_getges=${envir_getges:-${envir:-prod}}
+#export USHGETGES=$HOMEcfs/global_shared_cfs/ush
+#export USHGETGES=$HOMEprepobs/ush
+#export network_getges=cfs-cdas
 
 export DO_QC=YES      # IF NO, programs PREPOBS_PREPACQC, PREPOBS_PREPACPF,
-                      # PREPOBS_PROFCQC, PREPOBS_CQCVAD, PREPOBS_CQCBUFR and
-                      # PREPOBS_OIQCBUFR will NEVER execute regardless of
-                      # switches above -
-                      # should be set to NO only as a last resort!!!
 
-# recent version of prepacqc
-#export HOMEobsproc_prepacqc=${HOMEobsproc_prepacqc:-${NWROOTp3}/obsproc_prep.${obsproc_prep_ver:?}}
-#export AQCX=${AQCX:-${HOMEobsproc_prepacqc:?}/exec/prepobs_prepacqc}
-#export SYNDX=${SYNDX:-${HOMEobsproc_prepacqc:?}/exec/syndat_syndata}
+# HOMEgfs is directory path to prepobs_errtable.global (PRVT), used in
+# prepobs_makeprepbufr.sh and its child scripts prepobs_syndata.sh and
+# prepobsp_prevents.sh.
+export HOMEgfs=${HOMEgfs:-$(compath.py gfs/${gfs_ver})} 
 
-export PRVT=$FIXcfs/cfs_fix_cdas/prepobs_errtable.global
-export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs     
+export PRVT=$HOMEgfs/fix/prepobs_errtable.global
+#export OIQCT=$FIXcfs/cfs_fix_cdas/prepobs_oiqc.oberrs
 export OIQCX=${OIQCX:-$EXECcfs/prepobs_oiqcbufr}
-export USHOIQC=$HOMEcfs/obsproc_prep.v3.2.0/ush  
-export network_getges=cfs-cdas
-export GETGES_COM=$COMROOT
+#export USHOIQC=$HOMEcfs/ush
+export ushscript_prep=${ushscript_prep:-$USHprepobs}
 
 env
 
 #############################################################
-# execute the script - use CFS versions of makeprepbufr
+# execute the script - use CFS cfs_vers of makeprepbufr
 #############################################################
 
-export HOMEprep=$HOMEcfs/obsproc_prep.v3.2.0
-${PREPSH:-$HOMEprep/scripts/exglobal_makeprepbufr.sh.ecf} 
+RUN=$RUN1 ${PREPSH:-$HOMEcfs/scripts/exglobal_makeprepbufr.sh}
 export err=$?; err_chk
 
 cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 
 ########################################

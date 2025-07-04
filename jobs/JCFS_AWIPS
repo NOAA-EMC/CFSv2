@@ -8,24 +8,20 @@ set -xa
 # ###################################
 # SET SHELL PROCESSING VARIABLES
 # ###################################
-export PS4='$SECONDS + ' 
+export PS4='$SECONDS + '
 date
 export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}
-export jlogfile=${jlogfile:-/dev/null}
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
-export cycle=t${cyc}z 
+export pgmout="OUTPUT.$$"
+export cycle=t${cyc}z
 
 #################################
 # Set up the NET and RUN
@@ -43,40 +39,40 @@ sh setpdy.sh
 export MINIMUM_SIZE=30000
 cfs_day=$PDY
 
-# Check for the latest data to use 
+# Check for the latest data to use
 #if [ $cyc -eq 00 -o $cyc -eq 12 ]; then
 #  cfs_day=$PDY
 #else
 #  cfs_day=$PDYm1
 #fi
-  
+
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 ########################################
 # Set up the com directory
 ########################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
-export COMOUT=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${cfs_day}
-export COMINm1=$COMROOT/${NET}/${envir}/${NET}/${RUN}.${PDYm1}
+export  COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export   COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${cfs_day})
+export  COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${cfs_day})
+export COMINm1=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDYm1})
 
-export pcom=$COMOUT/wmo 
+export COMOUTwmo=${COMOUTwmo:-$COMOUT/wmo}
 
-mkdir -m755 -p $COMOUT $pcom
+mkdir -m755 -p $COMOUT $COMOUTwmo
 
 env
 
 ########################################
-# Run the script 
+# Run the script
 ########################################
-$HOMEcfs/scripts/excfs_grib_awips.sh.ecf 
+$HOMEcfs/scripts/excfs_grib_awips.sh
 export err=$?;err_chk
 
 ########################################

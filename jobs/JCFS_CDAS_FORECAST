@@ -1,7 +1,7 @@
-#!/bin/ksh 
+#!/bin/bash
 
 if [ $# -ne 1 ] ; then
-     echo " No argument passed - forecast with default config file will be done"
+echo " No argument passed - forecast with default config file will be done"
 fi
 
 set -euax
@@ -22,7 +22,6 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CLIMATE FOREFCST PROCESSING VARIABLES
@@ -31,10 +30,7 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -57,7 +53,7 @@ export mppnccombine=${mppnccombine:-$EXECcfs/cfs_mppnccombine}
 export AM_EXEC=${AM_EXEC:-${EXEC_AMD:-$EXECcfs}/cfs_cdas_atmos_fcst}
 export OM_EXEC=${OM_EXEC:-${EXEOMD:-$EXECcfs}/cfs_ocean_mom4ice}
 export C_EXEC=${C_EXEC:-${EXEC_CD:-$EXECcfs}/cfs_mlc_coupler}
-export FORECASTSH=${FORECASTSH:-$HOMEcfs/scripts/excfs_cdas_fcst.sh.ecf}
+export FORECASTSH=${FORECASTSH:-$HOMEcfs/scripts/excfs_cdas_fcst.sh}
 export FIXGLOBAL=${FIXGLOBAL:-$FIXcfs/cfs_fix_am}
 export FIXDIR=${FIXDIR:-$FIXcfs/cfs_fix_am}
 export FIXPREP=$FIXcfs/cfs_fix_prep
@@ -65,16 +61,14 @@ export FIXPREP=$FIXcfs/cfs_fix_prep
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output in excfs_cdas_fcst.sh.ecf
+# VERBOSE  - Specify Verbose Output in excfs_cdas_fcst.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export VERBOSE=${VERBOSE:-YES}
 export BATCH_POST=${BATCH_POST:-NO}
 
@@ -94,22 +88,16 @@ set -a; . $CDAS_CONFIG_FILE; set +a
 set -u
 
 #############################################
-# Set the number of cores per model         
+# Set the number of cores per model
 #############################################
-export CPROCS=1
-export OPROCS=56
-export APROCS=195
+export OMP_NUM_THREADS=1
+export CPROCS=${CPROCS:-1}
+export OPROCS=${OPROCS:-63}
+export APROCS=${APROCS:-195}
 
 env
 
 export MP_SHARED_MEMORY=no
-
-##############################################
-# Define GES directories
-##############################################
- export gespath=${gespath:-${GESROOT}/${envir}}
- export GESdir=${GESdir:-$gespath/cdas.$PDY}
- mkdir -m 775 -p $GESdir
 
 ############################################
 # determine  the current day of the forecast
@@ -132,77 +120,56 @@ export HHSTART=$(echo $start_date | cut -c9-10)
 export ocnic_date=${ocnic_date:-$start_date}
 
 if [ ${LENDAY:-0} -gt 0 ] ; then
-  export end_date=$($NDATE $((LENDAY*24)) $start_date)
+export end_date=$($NDATE $((LENDAY*24)) $start_date)
 elif [ ${LENHR:-9} -gt 0 ] ; then
-  export end_date=$($NDATE $LENHR $start_date)
+export end_date=$($NDATE $LENHR $start_date)
 else
-  echo ' Need to specify propoer forecast length - run terminating'
-  exit
+echo ' Need to specify propoer forecast length - run terminating'
+exit
 fi
 
 ##############################################
 # Define COM directories
 ##############################################
 
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-mkdir -m755 -p $COMOUT
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+mkdir -m755 -p ${COMOUT}
 
 #
 # Output File Names
 #
-export SIGO=$COMOUT/$RUN1.$cycle.sf'${FH}'
-export SFCO=$COMOUT/$RUN1.$cycle.bf'${FH}'
-export FLXO=$COMOUT/$RUN1.$cycle.sfluxgrbf'${FH}'
-export LOGO=$COMOUT/$RUN1.$cycle.logf'${FH}'
-#
-#restart File Names
-#
-export SIGR1=$GESdir/$RUN1.$cycle.sigr1.t${JCAP}l$LEVS.$start_date
-export SIGR2=$GESdir/$RUN1.$cycle.sigr2.t${JCAP}l$LEVS.$start_date
-export SFCR=$GESdir/$RUN1.$cycle.sfcr.t${JCAP}l$LEVS.$start_date
-export OCNR=$GESdir/$RUN1.$cycle.next_ocnr.tar
-#
+export SIGO=${COMOUT}/${RUN1}.${cycle}.sf'${FH}'
+export SFCO=${COMOUT}/${RUN1}.${cycle}.bf'${FH}'
+export FLXO=${COMOUT}/${RUN1}.${cycle}.sfluxgrbf'${FH}'
+export LOGO=${COMOUT}/${RUN1}.${cycle}.logf'${FH}'
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
-if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  export SIGI=${SIGI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sanl}
-  export SFCI=${SFCI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.sfcanl}
-  export OCNI=${OCNI:-$gespath/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar}
+##############################################
+# Define the guess files
+##############################################
 
-  if [ ! -s $SIGI -o ! -s $SFCI -o ! -s $OCNI ]; then
-    export SIGI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sanl
-    export SFCI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.sfcanl
-    export OCNI=$COMROT/cdas.${PDY}/cdas1.t${cyc}z.ocnanl.tar
-  fi
-
-elif [ ${IC_FROM_DISK:-YES} = YES ] ; then
-   export nknd=${nknd:-""}
-   export SUFIN=${SUFIN:-.gdas$nknd}
-   export INI_DIR=${INI_DIR:-$DATA}
-   export SIGI=${SIGI:-$INI_DIR/siganl${SUFIN}.$CDATE}
-   export SFCI=${SFCI:-$INI_DIR/sfcanl${SUFIN}.$CDATE}
-   OCN_ICDIR=${OCN_ICDIR:-$INI_DIR}
-   export OCNI=${OCNI:-$OCN_ICDIR/ocnanl${SUFIN}.$CDATE.tar}
-fi
+export SIGI=${COMOUT}/${RUN1}.t${cyc}z.sanl
+export SFCI=${COMOUT}/${RUN1}.t${cyc}z.sfcanl
+export OCNI=${COMOUT}/${RUN1}.t${cyc}z.ocnanl.tar
 
 if [ -s $SIGI -a -s $SFCI -a -s $OCNI ] ; then
-   mkdir -p $DATA/INPUT
-   cp -p $OCNI $DATA/INPUT
-   cd $DATA/INPUT
-   tar -xvf $OCNI
-   cd $DATA 
-   msg="Forecast Starting with Initial Guess Fields"
-   postmsg "$jlogfile" "$msg"
+mkdir -p $DATA/INPUT
+cp -p $OCNI $DATA/INPUT
+cd $DATA/INPUT
+tar -xvf $OCNI
+cd $DATA
+msg="Forecast Starting with Initial Guess Fields"
+postmsg "$msg"
 else
-   msg="Initial Guess Fields Not Available to run $job"
-   postmsg "$jlogfile" "$msg"
-   export pgm=$job
-   export err=911
-   err_chk
+msg="Initial Guess Fields Not Available to run $job"
+postmsg "$msg"
+export pgm=$job
+export err=911
+err_chk
 fi
 
 #############################################################
@@ -216,45 +183,49 @@ export FHINI=0
 export VDATE=$($NDATE $FHINI $start_date)
 export EXEC_OMD=${EXEC_OMD:-HOMEcfs/exec}
 export FCSTEXEC=${AM_EXEC:-$HOMEcfs/exec/cfs_cdas_atmos_fcst}
-$FORECASTSH \
-    - $DATA $VDATE $EXEC_OMD $COMOUT \
-    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
+$FORECASTSH - $DATA $VDATE $EXEC_OMD $COMOUT ###    >$DATA/$(basename $FORECASTSH).out.$FHINI 2>$DATA/$(basename $FORECASTSH).err.$FHINI
 rc=$?
 
+set +e
 cat $(basename $FORECASTSH).out.$FHINI >> $pgmout
 cp $(basename $FORECASTSH).err.$FHINI  errfile
+set -e
+
 if [[ $rc -ne 0 ]] ; then
-  if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-     msg="Error in executing the forecast script"
-     postmsg "$jlogfile" "$msg"
-     export err=$rc; err_chk
-  else
-     $PERR;exit $rc
-  fi
+if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+msg="Error in executing the forecast script"
+postmsg "$msg"
+export err=$rc; err_chk
+else
+$PERR;exit $rc
+fi
 fi
 
 ###########################################################
-# copy the OM restart files to GESdir for use in next GODAS
+# copy the OM restart files to COMOUT for use in next GODAS
 ###########################################################
 
 cd $DATA/IRESTART
 FDATE=$($NDATE $((FHINI+6)) $CDATE)
+OCNR=$RUN1.$cycle.next_ocnr.tar
 tar -cvf $OCNR ${FDATE}*
 
 if [ $SENDCOM = YES ] ; then
-  cp $OCNR $COMOUT/.
+cp $OCNR $COMOUT/.
 fi
 
 ###################################################
 # msg end of job and clean up temperary directory
 ###################################################
+
 cat $DATA/$pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory
 ########################################
+
 cd $DATAROOT
 if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
 

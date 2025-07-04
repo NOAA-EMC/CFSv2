@@ -10,43 +10,35 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 date
 export PS4='$SECONDS + '
 
-# #############################################
-# SETUP FITS TO OBS PROCESSING VARIABLES
-# ##############################################
-
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# VERBOSE  - Specify Verbose Output 
+# VERBOSE  - Specify Verbose Output
 ####################################
 export VERBOSE=${VERBOSE:-YES}
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 ###############################################
 # Define the config file
@@ -64,20 +56,12 @@ export YYYY=`echo $PDY |cut -c1-4`
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
 
 export COMINIC=$COMROT/cdas.$PDYm1
-
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.${PDY}
-export RESDIR=${RESDIR:-$GESdir}
-mkdir -p $RESDIR
 
 env
 
@@ -91,20 +75,21 @@ fitdir=$HOMEf2o/batrun
 
 TMPDIR=$DATAROOT/fit2obs.$$; mkdir -p $TMPDIR
 export OMP_NUM_THREADS=${FITOMP:-1}
-export MPIRUN="mpirun -n 3"
+export MPIRUN="mpiexec -n 3"
 export KMP_AFFINITY=disabled
 
 export KEEPDATA=${KEEPDATA:-NO}
 
-export NEMS=${NEMS:-YES}   
-export PRVT=${PRVT:-$HOMEcfs/fix/cfs_fix_cdas/prepobs_errtable.global}
+export NEMS=${NEMS:-YES}
+export COMINgfs=${COMINgfs:-$(compath.py gfs/${gfs_ver})}
+export PRVT=${PRVT:-$COMINgfs/fix/prepobs_errtable.global}
 export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 
 ################################################################
-# Run the fits for this time for the CFS and the GFS models 
+# Run the fits for this time for the CFS and the GFS models
 # --------------------------------------------------------------
 # The vars COM_INA and COM_INF are quoted strings which evaluate
-# at runtime in Fit2Obs processing. They are 
+# at runtime in Fit2Obs processing. They are
 # pathname templates which may need to be changed. Also the tags
 # which cycle EXPNAM are preset configs for different models
 # and they might be adjusted too.
@@ -115,27 +100,28 @@ expnams=${expnams:-'GFS16 CFS22'}
 for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS16 ]] ; then
-   COM_INA='$COMROOT/gfs/prod/gdas.$PDY/$cyc/atmos'
-   COM_INF='$COMROOT/gfs/prod/gfs.$fdy/$fzz/atmos'
-   COMFIT=$COMROOT/gfs/prod
-   OMP_NUM_THREADS=1
-   RUN_ENVIR=netcdf
-   ACPROFit=YES  
-   CONVNETC=YES
+COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
+COM_INAprep='$(compath.py obsproc/${obsproc_ver})/gdas.${PDY}/${cyc}/atmos'
+COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
+COMFIT=$(compath.py -o gfs/${gfs_ver})
+OMP_NUM_THREADS=1
+RUN_ENVIR=netcdf
+ACPROFit=YES
+CONVNETC=YES
 fi
 if [[ $EXPNAM = CFS22 ]] ; then
-   COM_INA='$COMROOT/cfs/prod/cdas.$PDY'
-   COM_INF='$COMROOT/cfs/prod/cfs/cfs.$fdy/$fzz/6hrly_grib_01'
-   COMFIT=$COMROOT/cfs/prod
-   OMP_NUM_THREADS=9 
-   RUN_ENVIR=cfs 
-   ACPROFit=NO   
-   CONVNETC=NO
+COM_INA='$(compath.py -o cfs/${cfs_ver}/cdas.$PDY)'
+COM_INF='$(compath.py -o cfs/${cfs_ver}/cfs.$fdy/$fzz/6hrly_grib_01)'
+COMFIT=$(compath.py -o cfs/${cfs_ver})
+OMP_NUM_THREADS=9
+RUN_ENVIR=cfs
+ACPROFit=NO
+CONVNETC=NO
 fi
 
 ARCDIR=$DATA/$EXPNAM.fits
 time $fitdir/runfits $EXPNAM $CDATE $COMFIT
-err=$?; err_chk
+export err=$?; err_chk
 
 # tar up the fits and save in COMROT/fit2obs
 
@@ -154,7 +140,7 @@ done
 ###################################################
 cat $pgmout
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory
