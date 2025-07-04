@@ -189,9 +189,6 @@ if [ $COUP_FCST = YES ] ; then
   imos=160
   omres=${omres:-05}
   
-  NPROCS_o=${NPROCS_o:-60}
-  NPROCS_c=1
-  NPROCS_a=$((tasks-NPROCS_o-NPROCS_c))
   CouplingPeriod=${CouplingPeriod:-$DELTIM}
   FSICL=${FSICL:-99999}
 #
