@@ -15,6 +15,16 @@
 #   Main script to run (atmosphere/ocean) coupled forecast system (CFS)
 #   with MOM4 for seasonal climate prediction
 #   Version CFSV2
+#   Following variables are added for moving copy cfs_atmos_fcst line from excfs_fcst.sh to 
+#   here to avoid multiple copy to $DATA          -- 20240109
+#   Imported Shell Variables:
+#     EXEC_AMD      Directory for global AM executables
+#     NCP           Copy command
+#                   defaults to cp
+#     XC            Suffix to add to executables
+#                   defaults to none
+#   Modules and files referenced:
+#     programs   : $AM_EXEC
 
 # ####################
 #  START CFSV2 integration 
@@ -104,6 +114,16 @@ export FHBEG=0
 ################################
 cd $DATA
 
+#
+# Following is to add cp exec command here to avoid multiple copy in loop -- 20240109
+#
+export NCP=${NCP:-/bin/cp}
+export XC=${XC:-""}
+export EXEC_AMD=${EXEC_AMD:-EXECcfs}
+export AM_EXEC=${AM_EXEC:-${EXEC_AMD}/global_fcst$XC}
+$NCP $AM_EXEC $DATA
+#### Adding section complete
+
 CFSRR_IC=${CFSRR_IC:-YES}
 export IC_FROM_DISK=${IC_FROM_DISK:-NO}
 export IC_FROM_PROD=${IC_FROM_PROD:-YES}
@@ -185,7 +205,6 @@ else
      IC_FROM_PROD=${IC_FROM_PROD:-YES}
    fi
    if [ $IC_FROM_PROD = YES ] ; then
-     COMCDAS=${COMCDAS:-$COMROOT/cfs/prod}/cdas.$(echo $YMDH | cut -c1-8)
      export SIGI=${SIGI:-$COMCDAS/cdas1.t${cyc}z.sanl}
      export SFCI=${SFCI:-$COMCDAS/cdas1.t${cyc}z.sfcanl}
      if [ $COUP_FCST = YES ] ; then
@@ -284,13 +303,15 @@ else
      $FSYNC $COM_YMDH/sfcanl.$ENS_MEM.$YMDH
    fi
 
-#  If production, copy the IC files to cdas directory
+###If production, copy the IC files to cdas directory
+#
+#   if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
+#      COMCDAS=$COMROT/cdas.$(echo $YMDH | cut -c1-8)
+#      $NCP $SIGI $COMCDAS/cdas2.t${cyc}z.sanl
+#      $NCP $SFCI $COMCDAS/cdas2.t${cyc}z.sfcanl
+#
+### fi
 
-  # if [ $RUN_ENVIR = nco  -o $RUN_ENVIR = devpara ] ; then
-  #    COMCDAS=$COMROT/cdas.$(echo $YMDH | cut -c1-8)
-  #    $NCP $SIGI $COMCDAS/cdas2.t${cyc}z.sanl
-  #    $NCP $SFCI $COMCDAS/cdas2.t${cyc}z.sfcanl
-  # fi
    if [ $COUP_FCST = YES ] ; then
      $NCP $OCNI $COM_YMDH/ocnanl.$ENS_MEM.$YMDH.tar
      $FSYNC $COM_YMDH/ocnanl.$ENS_MEM.$YMDH.tar
@@ -302,9 +323,9 @@ else
      echo "done" > $RECOVERY/done.flag_released
    fi
  else
-#
+
 #  If ENS_NUM > 1 and PERTURB_IC=YES, create perturbed IC
-#
+
    if [ $ENS_MEM0 -gt 1 -a ${PERTURB_IC:-YES} = YES ] ; then
      COMANL_DIR0=${COMANL_DIR0:-$COMOUT/${YMDH}_01}
      if [ ! -d $COMANL_DIR0 ] ; then

@@ -556,8 +556,8 @@ $ERRSCRIPT||exit 11
 ################################################################################
 #  Make atmospheric analysis
 
-export APRUN="mpirun -n 140"
 export OMP_NUM_THREADS=$NTHREADS_GSI
+export APRUN="mpiexec -n $NCPUS --depth $OMP_NUM_THREADS --cpu-bind depth"
 export PGM='$APRUN $DATA/$(basename $GSIEXEC)'
 export pgm=$PGM
 $LOGSCRIPT
@@ -589,7 +589,7 @@ then
    $NCP $PCPINFO  pcpinfo
    ${NPC:-cp} $OBERROR  errtable
 
-   set +x
+   set -x
    # CRTM Spectral and Transmittance coefficients
    nsatsen=`cat satinfo | $wc -l`
    isatsen=1
@@ -929,17 +929,11 @@ then
    fi
 fi
 
-if test "$SAVEGES" = "YES"
-then
-   cp $SFCANL  $GESdir/${RUN}.${cycle}.sfcanl
-   cp $SIGANL  $GESdir/${RUN}.${cycle}.sanl
-   cp $ABIAS   $GESdir/${RUN}.${cycle}.abias
-fi
 if test "$SENDCOM" = "YES"
 then
-   cp $SFCANL  $COMOUT/${RUN}.${cycle}.sfcanl
-   cp $SIGANL  $COMOUT/${RUN}.${cycle}.sanl
-   cp $ABIAS   $COMOUT/${RUN}.${cycle}.abias
+   cp $SFCANL  $COMOUT/${RUN1}.${cycle}.sfcanl
+   cp $SIGANL  $COMOUT/${RUN1}.${cycle}.sanl
+   cp $ABIAS   $COMOUT/${RUN1}.${cycle}.abias
 fi
 
 ##############################################################
@@ -1039,7 +1033,7 @@ chgrp rstprod $CNVSTAT
 
 ################################################################################
 
-if test "$RUN" = 'gdas1'
+if test "$RUN1" = 'gdas1'
 then
     if test "$SENDDBN" = 'YES'
     then
@@ -1052,7 +1046,7 @@ fi
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 $ENDSCRIPT
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

@@ -29,7 +29,7 @@ cd $DATA
 gdas1=gdas
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 cat break > $pgmout
 
@@ -42,7 +42,7 @@ export PROCESS_OCN_DUMP=${PROCESS_OCN_DUMP:-YES}
 export COMSP=${COMSP:-$COMOUT/${RUN}1.${cycle}.}         # preferred, but don't know how RUN will be set in J-Script
 
 msg="$NET_uc ANALYSIS TIME IS $PDY$cyc"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 [ "$SENDCOM" = 'NO' ]  &&  COMSP=$DATA/
 
@@ -53,7 +53,7 @@ if [ "$PROCESS_GRIBFLDS" = 'YES' ]; then
 
 # create snowdepth.global.grb from AFWA snow fields
 
-set +x
+set -x
 echo
 echo '------------------------------------------------------------------------------------'
 echo 'JISNI processing -------------------------------------------------------------------'
@@ -62,7 +62,7 @@ set -x
 #${JISNISH:-$USHcfs/cfs_snowdepth.sh} >$PWD/sdout.$$ 2>&1
 ${JISNISH:-$USHcfs/cfs_snowdepth.sh} 
 export err=$?; pgm=cfs_snowdepth.sh; err_chk
-set +x
+set -x
 echo '------------------------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
 echo
@@ -70,7 +70,7 @@ set -x
 
 # create the nsstsstqd files 
 
-set +x
+set -x
 echo
 echo '------------------------------------------------------------------------------------'
 echo 'NSST SST QD processing -------------------------------------------------------------------'
@@ -78,7 +78,7 @@ echo '--------------------------------------------------------------------------
 set -x
 ${NSTSSTQD:-$HOMEcfs/ush/cfs_nstsstqd.sh} $CDATE $SFCanl >$PWD/nstout.$$ 2>&1
 export err=$?; export pgm=cfs_nstsstqd.sh; err_chk
-set +x
+set -x
 echo '------------------------------------------------------------------------------------'
 echo '------------------------------------------------------------------------------------'
 echo
@@ -113,15 +113,15 @@ pgm=$(basename $0)
    if [ -s $engicegrb ]; then
       cp $engicegrb ${COMSP}engicegrb
       msg="todays engice grib file located and copied to /com"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
    elif [ -s $engiceold ]; then
       cp $engiceold ${COMSP}engicegrb
       msg="**todays engice grib file not located - copy 1-day old file"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
    elif [ -s $COMGDAS/$gdas1.t${cyc}z.engicegrb ]; then
       cp $COMGDAS/$gdas1.t${cyc}z.engicegrb ${COMSP}engicegrb
    else
-      set +x
+      set -x
       echo " "
       echo " ############################################"
       echo " cannot locate engice grib file - fatal error"
@@ -129,7 +129,7 @@ pgm=$(basename $0)
       echo " "
       set -x
       msg="**CANNOT LOCATE ENGICE GRIB FILE --> EXIT DATA DUMP"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
       err_exit
    fi
 
@@ -151,8 +151,8 @@ if [ "$PROCESS_GDAS_DUMP" = 'YES' ]; then
   done
 
   # tcvital files
-  cp $COMGDAS/$gdas1.t${cyc}z.syndata.tcvitals.tm00 ${COMSP}syndata.tcvitals.tm00
-  cp $COMGDAS/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 ${COMSP}jtwc-fnoc.tcvitals.tm00
+  cp $COMTC/$gdas1.t${cyc}z.syndata.tcvitals.tm00 ${COMSP}syndata.tcvitals.tm00
+  cp $COMTC/$gdas1.t${cyc}z.jtwc-fnoc.tcvitals.tm00 ${COMSP}jtwc-fnoc.tcvitals.tm00
 
   # RFC #1550 Update WCOSS to send more CDAS data to NOMADS -20151211
   if [ $SENDDBN = YES ]; then
@@ -184,6 +184,8 @@ fi  #  endif $PROCESS_GDAS_DUMP
 if [ "$PROCESS_OCN_DUMP" = 'YES' ]; then
 
 ### dump ocean data
+#### Temparary put DCOMROOT to test so it can get mods data from com
+export DCOMROOT=/lfs/h1/ops/test/dcom
 DUMPMB=${DUMPMB:-$HOMEcfs/ush/bufr_dumpmb}
 DUMP_LIST="dbuoy bathy tesac"
 LOUD=${LOUD:-off}
@@ -216,7 +218,7 @@ for CTYPE in $DUMP_LIST; do
     echo $CTYPE.$DATE >> $flist
   else
     msg="Warning:  NO $CTYPE DUMP FOR ${DATE}"
-      postmsg "$jlogfile" "$msg"
+      postmsg "$msg"
   fi
   DATE=`finddate.sh $DATE d+1`
   done
@@ -232,7 +234,7 @@ for CTYPE in $DUMP_LIST; do
     export err=$?; err_chk
 
     msg="Done processing $CTYPE for ${START_DATE} to ${END_DATE}"
-    postmsg "$jlogfile" "$msg"
+    postmsg  "$msg"
 
     if [ "$SENDCOM" = 'YES' ]; then
       [ -s $CTYPE.all ] && cp $CTYPE.all ${COMSP}c${CTYPE}.$tmmark.mbufr_d
@@ -262,7 +264,7 @@ echo " " >> $pgmout
 
 
 # GOOD RUN
-set +x
+set -x
 echo " "
 echo " ****** PROCESSING COMPLETED NORMALLY"
 echo " ****** PROCESSING COMPLETED NORMALLY"
@@ -279,6 +281,6 @@ cat  break $pgmout break > allout
 
 sleep 10
 msg='ENDED NORMALLY.'
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ################## END OF SCRIPT #######################

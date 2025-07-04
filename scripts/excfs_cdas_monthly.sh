@@ -39,8 +39,6 @@ MM=`echo $rundate | cut -c5-6`
 # Base directories
 ######################
 
-COMROT=${COMROT:-$COMROOT/cfs/prod}
-
 HPSSROT=${HPSSROT:-/NCEPPROD/hpss${envir}/runhistory}
 HPSSBASE=${HPSSBASE:-$HPSSROT/cfs$YYYY/$YYYY$MM}
 
@@ -765,7 +763,7 @@ if [ $dogrib2means = "YES" ] ; then
 
         ## Add cnvgrib command to poescript
         ofile=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix.grib2
-        echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+        echo "$CNVGRIBFIX -g12 -p32 -nv $file $ofile" >> $poescript
 
         if [[ $name = "ocn" && $inclocnm = "YES" && $fh = "06" ]] ; then
 
@@ -779,7 +777,7 @@ if [ $dogrib2means = "YES" ] ; then
 
           ## Add cnvgrib command to poescript
           ofile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix.grib2
-          echo "$CNVGRIBFIX -g12 -p40 -nv $ocnmfile $ofile" >> $poescript
+          echo "$CNVGRIBFIX -g12 -p32 -nv $ocnmfile $ofile" >> $poescript
 
         fi
 
@@ -803,7 +801,7 @@ if [ $dogrib2means = "YES" ] ; then
 
           ## Add cnvgrib command to poescript
           ofile=$MONTHDIR/${name}${prefix}$fh.$CDUMP.$datefix.${hh}Z.grib2
-          echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+          echo "$CNVGRIBFIX -g12 -p32 -nv $file $ofile" >> $poescript
 
 
           # Add ocnm if ocn
@@ -819,7 +817,7 @@ if [ $dogrib2means = "YES" ] ; then
 
             ## Add cnvgrib command to poescript
             ofile=$MONTHDIR/ocnm${prefix}${fh}.$CDUMP.$datefix.${hh}Z.grib2
-            echo "$CNVGRIBFIX -g12 -p40 -nv $ocnmfile $ofile" >> $poescript
+            echo "$CNVGRIBFIX -g12 -p32 -nv $ocnmfile $ofile" >> $poescript
 
           fi
 
@@ -832,7 +830,7 @@ if [ $dogrib2means = "YES" ] ; then
   # Submit MPMD Job to do grib2 conversion
   # --------------------------------------
 
-  mpirun cfp $poescript | grep 'CFP RANK'
+  mpiexec -n$NCPUS cfp $poescript | grep 'CFP RANK'
   export err=$?; pgm="$(basename $0) mmean cfp"; err_chk
 
   # Cleanup
@@ -1030,7 +1028,7 @@ if [ $dogrib2time = "YES" ] ; then
 
       ## Add cnvgrib command to poescript
       ofile=${file}.grib2
-      echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+      echo "$CNVGRIBFIX -g12 -p32 -nv $file $ofile" >> $poescript
 
 
       ### Lowr-res versions of timeseries
@@ -1052,7 +1050,7 @@ if [ $dogrib2time = "YES" ] ; then
 
       ## Add cnvgrib command to poescript
       ofile=${file}.grib2
-      echo "$CNVGRIBFIX -g12 -p40 -nv $file $ofile" >> $poescript
+      echo "$CNVGRIBFIX -g12 -p32 -nv $file $ofile" >> $poescript
 
 
     done  ## end variable-loop namelist
@@ -1061,7 +1059,7 @@ if [ $dogrib2time = "YES" ] ; then
   # Submit MPMD Job to do grib2 conversion
   # --------------------------------------
 
-  mpirun cfp $poescript | grep 'CFP RANK'
+  mpiexec -n$NCPUS cfp $poescript | grep 'CFP RANK'
   export err=$?; pgm="$(basename $0) tser cfp"; err_chk
 
   # Cleanup

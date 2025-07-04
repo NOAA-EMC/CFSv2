@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/bin/ksh  
 #------------------------------------------------------------------------------#
 #### MLC AM/OM/Coupler script ##################################################
 #  
@@ -102,7 +102,7 @@
 #     FIXDIR        Directory for global fixed files
 #                   defaults to $HOMEDIR/fix/cfs_fix_am
 #     EXEC_AMD      Directory for global AM executables
-#                   defaults to $NWROOT/exec
+#                   defaults to $HOMEcfs/exec
 #     DATA          working directory
 #                   (if nonexistent will be made, used and deleted)
 #                   defaults to current working directory
@@ -117,7 +117,6 @@
 #                   defaults to cp
 #     SIGHDR        Command to read sigma header
 #                   (required if JCAP, LEVS, or FHINI are not specified)
-#                   defaults to ${EXEC_AMD}/${cfsp}_sighdr$XC
 #     JCAP          Spectral truncation
 #                   defaults to the value in the input sigma file header
 #     LEVS          Number of levels
@@ -375,21 +374,18 @@
 ####
 ################################################################################
 #  Set environment.
-set -eux
-
-export VERBOSE=${VERBOSE:-"YES"}
+export VERBOSE=${VERBOSE:-"NO"}
 if [[ $VERBOSE = YES ]] ; then
    echo $(date) EXECUTING $0 $* >&2
    set -x
 fi
 
-echo
-echo `date` executing forecast script
-echo $LD_LIBRARY_PATH
-echo
+NPROCS_c=${CPROCS}
+NPROCS_o=${OPROCS}
+NPROCS_a=${APROCS}
 
 export ENS_NUM=${ENS_NUM:-1}
-export FM=${FM:-""}
+export FM=${FM}
 
 #  Command line arguments.
 
@@ -403,7 +399,6 @@ if [ $n_pp -gt $# ] ; then
   echo "WARNING: no separator ( $separator ) in positional parameter list for $0 ."
   echo "         No positional parameters are recognized as OM related"
 fi
-
 export SIGI;  if [ 1 -lt $n_pp ] ; then SIGI=$1;  else SIGI=${SIGI:-?};   fi
 export SFCI;  if [ 2 -lt $n_pp ] ; then SFCI=$2;  else SFCI=${SFCI:-?};   fi
 export SIGO;  if [ 3 -lt $n_pp ] ; then SIGO=$3;  else SIGO=${SIGO};      fi
@@ -412,33 +407,19 @@ export FHOUT; if [ 5 -lt $n_pp ] ; then FHOUT=$5; else FHOUT=${FHOUT:-3}; fi
 export FHMAX; if [ 6 -lt $n_pp ] ; then FHMAX=$6; else FHMAX=${FHMAX:-0}; fi
 export IGEN;  if [ 7 -lt $n_pp ] ; then IGEN=$7;  else IGEN=${IGEN:-0};   fi
 export D3DO;  if [ 8 -lt $n_pp ] ; then D3DO=$8;  else D3DO=${D3DO};      fi
-
+#
 #  Directories.
-
-export HOMEDIR=${HOMEDIR:-$NWROOT}
+#
 export cfsp=${cfsp:-"cfs_"}
-export FIXSUBDA=${FIXSUBDA:-fix/${cfsp}fix_am}
-export FIXDIR=${FIXDIR:-$HOMEDIR/$FIXSUBDA}
-export NWPROD=${NWPROD:-$HOMEDIR}
+export FIXDIR=${FIXDIR:-$FIXcfs/cfs_fix_am}
 export FIX_RAD=${FIX_RAD:-$FIXDIR}
-export DATA=${DATA:-$(pwd)}
-export COMOUT=${COMOUT:-$(pwd)}
 export RESDIR=${RESDIR:-$DATA}
-
 #  Filenames.
-
 export model=global
-export model=${model:-global}
-export XC=${XC:-""}
-export SUFOUT=${SUFOUT:-""}
-export NCP=${NCP:-/bin/cp}
-
-export HOMEcfs=${HOMEcfs:-${HOMEDIR:-$NWPROD}}
-export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-export EXEC_AMD=${EXEC_AMD:-EXECcfs}
+export SUFOUT=${SUFOUT}
 
 export FSYNCEXEC=${FSYNC}
-export SIGHDR=${SIGHDR:-$EXECcfs/${cfsp}sighdr$XC}
+export SIGHDR=${SIGHDR:-$HOMEgsm/exec/global_sighdr}
 export JCAP=${JCAP:-$(echo jcap|eval $SIGHDR $SIGI)}
 export LEVS=${LEVS:-$(echo levs|eval $SIGHDR $SIGI)}
 export LONR=${LONR:-$(echo lonr|eval $SIGHDR ${SIGI}$FM)}
@@ -456,7 +437,6 @@ export NGPTC=${NGPTC:-$((JCAP/10))}
 export ADIAB=${ADIAB:-.false.}
 export pre_rad=${pre_rad:-.false.}
 export random_xkt2=${random_xkt2:-.true.}
-export AM_EXEC=${AM_EXEC:-${EXEC_AMD}/global_fcst$XC}
 export MTNRSL=${MTNRSL:-$JCAP}
 export SIGI2=${SIGI2:-NULL}
 export CO2CON=${CO2CON:-${FIXDIR}/${model}_co2con.l$LEVS.f77}
@@ -467,12 +447,15 @@ export O3FORC=${O3FORC:-${FIXDIR}/global_o3prdlos.f77}
 export O3CLIM=${O3CLIM:-${FIXDIR}/${model}_o3clim.txt}
 export FNGLAC=${FNGLAC:-${FIXDIR}/${model}_glacier.2x2.grb}
 export FNMXIC=${FNMXIC:-${FIXDIR}/${model}_maxice.2x2.grb}
+#export FNTSFC=${FNTSFC:-${FIXDIR}/${model}_oi2sst1x1monclim19822001.grb}
 export FNTSFC=${FNTSFC:-${FIXDIR}/cfs_oi2sst1x1monclim19822001.grb}
 export FNSNOC=${FNSNOC:-${FIXDIR}/${model}_snoclim.1.875.grb}
 export FNZORC=${FNZORC:-${FIXDIR}/${model}_zorclim.1x1.grb}
 export FNALBC=${FNALBC:-${FIXDIR}/${model}_albedo4.1x1.grb}
+#export FNAISC=${FNAISC:-${FIXDIR}/${model}_ice1x1monclim19822001.grb}
 export FNAISC=${FNAISC:-${FIXDIR}/cfs_ice1x1monclim19822001.grb}
 export FNTG3C=${FNTG3C:-${FIXDIR}/${model}_tg3clim.2.6x1.5.grb}
+#export FNVEGC=${FNVEGC:-${FIXDIR}/${model}_vegfrac.1x1.grb}
 export FNVEGC=${FNVEGC:-${FIXDIR}/${model}_vegfrac.0.144.decpercent.grb}
 export FNVETC=${FNVETC:-${FIXDIR}/${model}_vegtype.1x1.grb}
 export FNSOTC=${FNSOTC:-${FIXDIR}/${model}_soiltype.1x1.grb}
@@ -481,22 +464,25 @@ export FNVMNC=${FNVMNC:-${FIXDIR}/${model}_shdmin.0.144x0.144.grb}
 export FNVMXC=${FNVMXC:-${FIXDIR}/${model}_shdmax.0.144x0.144.grb}
 export FNSLPC=${FNSLPC:-${FIXDIR}/${model}_slope.1x1.grb}
 export FNABSC=${FNABSC:-${FIXDIR}/${model}_snoalb.1x1.grb}
+#export FNMSKH=${FNMSKH:-${FIXDIR}/${model}_seaice_newland.grb}
 export FNMSKH=${FNMSKH:-${FIXDIR}/seaice_newland.grb}
 export OROGRAPHY=${OROGRAPHY:-${FIXDIR}/${model}_orography.t$MTNRSL.grb}
-export FNTSFA=${FNTSFA:-""}
-export FNACNA=${FNACNA:-""}
-export FNSNOA=${FNSNOA:-""}
-
+export FNTSFA=${FNTSFA}
+export FNACNA=${FNACNA}
+export FNSNOA=${FNSNOA}
+#
 export AERODIR=${AERODIR:-${FIX_RAD}}
 export EMISDIR=${EMISDIR:-${FIX_RAD}}
 export SOLCDIR=${SOLCDIR:-${FIX_RAD}}
 export VOLCDIR=${VOLCDIR:-${FIX_RAD}}
 export CO2DIR=${CO2DIR:-${FIX_RAD}}
+#export ALBDIR=${ALBDIR:-${FIX_RAD}}
 export IEMS=${IEMS:-0}
 export ISOL=${ISOL:-0}
 export IAER=${IAER:-0}
 export ICO2=${ICO2:-0}
-
+#export IALB=${IALB:-0}
+#
 export SIGR1=${SIGR1:-${DATA}/sigr1}
 export SIGR2=${SIGR2:-${DATA}/sigr2}
 export SFCR=${SFCR:-${DATA}/sfcr}
@@ -505,13 +491,9 @@ export SFCO=${SFCO:-${COMOUT}/sfcf'${FH}'$SUFOUT}
 export FLXO=${FLXO:-${COMOUT}/flxf'${FH}'$SUFOUT}
 export LOGO=${LOGO:-${COMOUT}/logf'${FH}'$SUFOUT}
 export D3DO=${D3DO:-${COMOUT}/d3df'${FH}'$SUFOUT}
-export INISCRIPT=${INISCRIPT:-""}
-export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}
-export LOGSCRIPT=${LOGSCRIPT:-""}
-export ENDSCRIPT=${ENDSCRIPT:-""}
-
+export INISCRIPT=${INISCRIPT}
+export ENDSCRIPT=${ENDSCRIPT}
 #  Other variables.
-
 export FHINI=${FHINI:-$(echo ifhr|eval $SIGHDR $SIGI)}
 export CDATE=${CDATE:-$(echo idate|eval $SIGHDR $SIGI)}
 export FHSEG=${FHSEG:-0}
@@ -523,17 +505,17 @@ export FHLWR=${FHLWR:-1}
 export FHSWR=${FHSWR:-1}
 export FHROT=${FHROT:-0}
 export FHDFI=${FHDFI:-0}
-
+#
 export RUN_NAME=${RUN_NAME:-cfs_fcst}
 export RESTART_CONTROL_FILE=${RESTART_CONTROL_FILE:-$DATA/$RUN_NAME.2restart$SUFOUT}
 if [ ! -f $RESTART_CONTROL_FILE ] ; then
   FHDFI=${FHDFI_INIT:-$FHDFI}
   echo "FHDFI=$FHDFI"
 fi
-
-env>env.out
-
+#
+env
 export FHCYC=${FHCYC:-0}
+#
 export gfsio_in=${gfsio_in:-.false.}
 export gfsio_out=${gfsio_out:-.false.}
 export FCSTVARS="gfsio_in=$gfsio_in,gfsio_out=$gfsio_out,$FCSTVARS"
@@ -551,7 +533,7 @@ elif [ $IDVC = 3 ] ; then
  export GEN_COORD_HYBRID=.true.
  export HYBRID=.false.
 fi
-
+#
 export TFILTC=${TFILTC:-0.85}
 export FCSTVARS=${FCSTVARS:-""}
 export TRACERVARS=${TRACERVARS:-""}
@@ -565,7 +547,6 @@ export CYCLVARS=${CYCLVARS}
 export NTHREADS=${NTHREADS:-1}
 export NTHSTACK=${NTHSTACK:-128000000}
 export XLSMPOPTS=${XLSMPOPTS:-"parthds=$NTHREADS:stack=$NTHSTACK"}
-export OMP_NUM_THREADS=${OMP_NUM_THREADS:-$NTHREADS}
 export FILESTYLE=${FILESTYLE:-'L'}
 export PGMOUT=${PGMOUT:-${pgmout:-'&1'}}
 export PGMERR=${PGMERR:-${pgmerr:-'&2'}}
@@ -576,7 +557,6 @@ export REDERR=${REDERR:-'2>'}
 
 ################################################################################
 #  Preprocessing
-
 $INISCRIPT
 pwd=$(pwd)
 if [[ -d $DATA ]] ; then
@@ -594,19 +574,19 @@ cd $DATA||exit 99
 export XLFRTEOPTS="unit_vars=yes:intrinthds=1"
 export PGM=$DATA/$(basename $AM_EXEC)
 export pgm=$PGM
-$LOGSCRIPT
+startmsg   
 $NCP $AM_EXEC $DATA
 rm -f NULL
 FH=$((10#$FHINI))
-[[ $FH -lt 10 ]]&&FH=0$FH
-if [[ $FHINI -gt 0 ]] ; then
+[ $FH -lt 10 ]&&FH=0$FH
+if [ $FHINI -gt 0 ] ; then
    FH=$((10#$FHINI+10#$FHOUT))
-   [[ $FH -lt 10 ]]&&FH=0$FH
+   [ $FH -lt 10 ]&&FH=0$FH
 fi
-while [[ $FH -le $FHMAX ]] ; do
+while [ $FH -le $FHMAX ] ; do
    eval rm -f $LOGO
    ((FH=10#$FH+10#$FHOUT))
-   [[ $FH -lt 10 ]]&&FH=0$FH
+   [ $FH -lt 10 ]&&FH=0$FH
 done
 if [[ $FILESTYLE = "L" ]] ; then
    ln -fs $CO2CON fort.15
@@ -654,26 +634,26 @@ export FCSTVARS="IEMS=$IEMS,ISOL=$ISOL,IAER=$IAER,ICO2=$ICO2,$FCSTVARS"
 #
 #     For one member case i.e. control
 #
-if [[ $ENS_NUM -le 1 ]] ; then
+if [ $ENS_NUM -le 1 ] ; then
   FH=$((10#$FHINI))
-  [[ $FH -lt 10 ]]&&FH=0$FH
-  if [[ $FHINI -gt 0 ]] ; then
+  [ $FH -lt 10 ]&&FH=0$FH
+  if [ $FHINI -gt 0 ] ; then
     FH=$((10#$FHINI+10#$FHOUT))
-    [[ $FH -lt 10 ]]&&FH=0$FH
+    [ $FH -lt 10 ]&&FH=0$FH
   fi
 #        For Initial Conditions
   ln -fs $SIGI sig_ini
   ln -fs $SFCI sfc_ini
   ln -fs $SIGI2 sig_ini2
 #        For output
-  while [[ $FH -le $FHMAX ]] ; do
+  while [ $FH -le $FHMAX ] ; do
     eval ln -fs $SIGO SIG.F${FH}
     eval ln -fs $SFCO SFC.F${FH}
     eval ln -fs $FLXO FLX.F${FH}
     eval ln -fs $LOGO LOG.F${FH}
     eval ln -fs $D3DO D3D.F${FH}
     ((FH=10#$FH+10#$FHOUT))
-    [[ $FH -lt 10 ]]&&FH=0$FH
+    [ $FH -lt 10 ]&&FH=0$FH
   done
   ln -fs $SIGR1 SIGR1
   ln -fs $SIGR2 SIGR2
@@ -694,19 +674,19 @@ else
 #        For output
 
     FH=$((10#$FHINI))
-    [[ $FH -lt 10 ]]&&FH=0$FH
-    if [[ $FHINI -gt 0 ]] ; then
+    [ $FH -lt 10 ]&&FH=0$FH
+    if [ $FHINI -gt 0 ] ; then
       FH=$((10#$FHINI+10#$FHOUT))
-      [[ $FH -lt 10 ]]&&FH=0$FH
+      [ $FH -lt 10 ]&&FH=0$FH
     fi
-    while [[ $FH -le $FHMAX ]] ; do
+    while [ $FH -le $FHMAX ] ; do
       eval ln -fs $SIGO SIG.F${FH}${MN}
       eval ln -fs $SFCO SFC.F${FH}${MN}
       eval ln -fs $FLXO FLX.F${FH}${MN}
       eval ln -fs $LOGO LOG.F${FH}${MN}
       eval ln -fs $D3DO D3D.F${FH}${MN}
       ((FH=10#$FH+10#$FHOUT))
-      [[ $FH -lt 10 ]]&&FH=0$FH
+      [ $FH -lt 10 ]&&FH=0$FH
     done
     eval ln -fs ${SIGR1}${MN} SIGR1${MN}
     eval ln -fs ${SIGR2}${MN} SIGR2${MN}
@@ -717,15 +697,16 @@ fi
 # Create Configure file (i.e. .rc file) here
 # PE$n are to be imported from outside.  If PE$n are not set from outside, the
 # model would give equal processors for all ensembel members.
-
+#
+if [ $ENS_NUM -ne 1 ] ; then
  c=1
- while [ $c -le 21 ] ; do
+ while [ $c -le $ENS_NUM ] ; do
   eval export PE$c=\${PE$c:-0}
   c=$((c+1))
  done
-
+else
  export PE1=$NPROCS_a
-
+fi
 cat << EOF > gfs_namelist.rc
 
 #nam_gfs +++++++++++++++++++++++++++
@@ -887,17 +868,16 @@ export VDATE=$2                         ;# current forecast (model) time
 #export mom3rt=$3                        ;# restoring time scale (days)
 export EXEC_OMD=${3:-$EXECcfs}
                                          # MOM4 script/exec directory
-export COM_YMDH=${4:-$COM_YMDH}
+export COM_YMDH=${4:-$WORKDIR}
 #
-export ERRSCRIPT=${ERRSCRIPT:-'eval [[ $err = 0 ]]'}
-
 echo VDATE = $VDATE beginning MOM4ICE `date`
 #
 export DATAOUTpath=$WORKDIR/data/mom4ice
 #
 if [ ! -s $WORKDIR ] ; then
   echo "$WORKDIR does not exist."
-  export err=1; err_chk
+  export err=1
+  err_exit
 fi
 if [ ! -s $DATAOUTpath ] ; then
  mkdir -p $DATAOUTpath
@@ -906,7 +886,8 @@ cd $WORKDIR
 
 if [ $WORKDIR != $DATA ] ; then
   echo "WORKDIR=$WORKDIR differs from DATA=$DATA : must be the same"
-  export err=1; err_chk
+  export err=1
+  err_exit
 fi
 #
 # MOM4ICE setting
@@ -920,7 +901,6 @@ export PGM=$WORKDIR/$(basename $OM_EXEC)
 export pgm=$PGM
 $NCP $OM_EXEC $WORKDIR
 export PARM_OM=${PARM_OM:-$HOMEcfs/parm/${cfsp}parm_om}
-export FIX_OM=${FIX_OM:-$HOMEcfs/fix/${cfsp}fix_om}
 #
 #export days=${days:-1}
 export months=${months:-0}
@@ -948,16 +928,9 @@ export salt_sfc_restore=${salt_sfc_restore:-$FIX_OM/salt_sfc_restore_$omres.nc}
 export temp_sfc_restore=${temp_sfc_restore:-$FIX_OM/temp_sfc_restore_$omres.nc}
 export runoff=${runoff:-$FIX_OM/runoff_$omres.nc}
 export ohf_sice=${ohf_sice:-$FIX_OM/ohf_sice.nc}
-#
-# export mppnccombine=${mppnccombine:-$MOM4ICEDIR/bin/mppnccombine.ibm}
-# export PGM=$WORKDIR/$(basename $executable)
-# export bdate=$VDATE
-# export nxtdate=`$NDATE $FHCYC $VDATE`
-# export cdate=`echo $bdate | cut -c1-8`
-# export edate=`echo $nxtdate | cut -c1-8`
-#
+
 # get data sets, input data and executable
-#
+
 start_date=$($NDATE $FHINI $CDATE)
 end_date=$($NDATE $FHMAX $CDATE)
 syyyy=$(echo $start_date | cut -c1-4)
@@ -1000,8 +973,7 @@ elif [ $FHOUT -lt 100 ] ; then
  sed "s/hh/$FHOUT/g" diag_table >diag_table_nu
  /bin/mv diag_table_nu diag_table
 fi
-#
-# cd $INPUT
+
 $NCP -p $oisst_clim       $INPUT/oisst_clim.nc
 $NCP -p $r2ts_clim        $INPUT/r2ts_clim.nc
 $NCP -p $sst_ice_clim     $INPUT/sst_ice_clim.nc
@@ -1012,9 +984,9 @@ $NCP -p $chl              $INPUT/chl.nc
 $NCP -p $runoff           $INPUT/runoff.nc
 $NCP -p $ohf_sice         $INPUT/ohf_sice.nc
 $NCP -p $FIX_OM/MOM4LND${omres}GFSOCNt$JCAP.msk  MOM4LND_GFSOCN
-#
+
 echo "Retrieving climatological R2 forcing data..."
-#
+
 $NCP -p $FIX_OM/fluxes_init_OM_t$JCAP   fluxes_init_OM
 
 rc=$?
@@ -1022,10 +994,11 @@ if [ $rc -ne 0 ] ; then
   echo "Failure to copy climatological R2 forcing data, exiting"
   export err=$?; err_chk
 else
-  echo "Climatological R2 forcing data copied from $FIX_OM/fluxes_init_OM_t$JCAP"
+  echo "Climatological R2 forcing data copied from $OCN_FORCING_DIR"
 fi
 #
 cd $WORKDIR
+##cp -p $executable $executable:t   ???????????????????????????
 
 #------------------------------------------------------------------------------#
 # End pre-execution section of OM script (2)
@@ -1059,8 +1032,6 @@ export PGM_oc=$PGM
 # C_nprper   positive integer       C printout control                      120
 # C_npr1st  nonnegative integer     C printout control                      120
 
-export EXEC_CD=${EXEC_CD:-$EXECcfs}
-export C_EXEC=${C_EXEC:-${EXEC_CD}/${cfsp}mlc_coupler}
 export PGM=$WORKDIR/$(basename $C_EXEC)
 export PGM_c=$PGM
 $NCP $C_EXEC $WORKDIR
@@ -1069,7 +1040,8 @@ $NCP $C_EXEC $WORKDIR
 if [ $FHINI -gt 0 ] ; then
  if [ -f $RESTART_CONTROL_FILE -a ! -f fluxes_for_OM ] ; then
    echo "RESTART_CONTROL_FILE=$RESTART_CONTROL_FILE exists but fluxes_for_OM does not: aborting"
-   export err=1; err_chk
+   export err=1
+   err_exit $err
  fi
 fi 
 #<-:inserted
@@ -1086,22 +1058,18 @@ else
 fi
 
 CouplingPeriod=${CouplingPeriod:-${DELTIM:-3600}}
-#C_ostepmax=`expr $INCHOUR \* 3600 \/ $CouplingPeriod`
-#C_cstepmax=$((INCHOUR*3600/CouplingPeriod))
 C_cstepbeg=$((FHINI*3600/CouplingPeriod+1))
 C_cstepmax=$((FHMAX*3600/CouplingPeriod))
 C_cstepres=$((dt_rstrt/CouplingPeriod))
-#
+
 C_write_am_sst=${C_write_am_sst:-.true.}
 if [ $C_write_am_sst = .true. ] ; then
   eval ln -fs $AM_SST AM_SST
-# eval ln -fs AM_SST_${FHINI}_${FHMAX} AM_SST
 fi
-#
+
 #if [[ $JCAP = 126 ]] ; then C_IIF=2 ; fi
 C_IIF=2
 
-set +u
 nl=cpl_nml
 echo "Creating C namelist file $nl ..."
 echo '&CPL_SETTINGS'>$nl
@@ -1119,10 +1087,8 @@ if [ "$C_npr1st" ]       ; then echo "npr1st=$C_npr1st">>$nl; fi
 if [ "$C_write_am_sst" ] ; then echo "write_am_sst=$C_write_am_sst">>$nl; fi
 if [ "$cice_cover" ]     ; then echo "cice_cover=$cice_cover">>$nl; fi
 echo '/'>>$nl
-set -u 
 
 cat $nl
-
 
 #------------------------------------------------------------------------------#
 # End pre-execution section of Coupler script (3)
@@ -1131,16 +1097,6 @@ cat $nl
 #------------------------------------------------------------------------------#
 # Begin MPMD execution section (4)
 #------------------------------------------------------------------------------#
-
-NPROCS_c=${NPROCS_c:-0}
-NPROCS_a=${NPROCS_a:-0}
-NPROCS_o=${NPROCS_o:-0}
-if [ $NPROCS_c = 0 -a $NPROCS_a != 0 -a $NPROCS_o != 0 -o $NPROCS_c != 0 -a $NPROCS_c != 1 ] ; then
-  echo "Illegal combination of numbers of CPUs: NPROCS_c=$NPROCS_c, NPROCS_a=$NPROCS_a, NPROCS_o=$NPROCS_o"
-  export err=1; err_chk
-fi
-NPROCS=$((NPROCS_c+NPROCS_a+NPROCS_o))
-
 
 cat  > gfs_namelist <<EOF
  &nam_mrf
@@ -1198,18 +1154,47 @@ cat  > gfs_namelist <<EOF
   $CYCLVARS /
 EOF
 
-#------------------------------------------------------------------------------#
-# run the coupled model
-#------------------------------------------------------------------------------#
+  export nhourb=${nhourb:-$FHINI}
+  export OMP_NUM_THREADS=${OMP_NUM_THREADS:-$NTHREADS}
 
-export OMP_NUM_THREADS=2
-mpirun -mxm -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am   1>out.poe.$nhourb 2>err.poe.$nhourb
-export ERR=$?; export err=$ERR; err_chk
+mpmd=yes; MP_CMDFILE=mp_cmdfile
 
+set -x; echo making cmdfile for mpmd execution
+if [ $mpmd = yes ] ; then
+  rm -f $MP_CMDFILE
+  i=1
+  while [ $i -le $NPROCS_c ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_c"
+    echo $PGM_c>>$MP_CMDFILE
+    i=$((i+1))
+  done
+  j=1
+  while [ $j -le $NPROCS_o ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_oc"
+    echo $PGM_oc>>$MP_CMDFILE
+    j=$((j+1))
+    i=$((i+1))
+  done
+  j=1
+  while [ $j -le $NPROCS_a ] ; do
+    #echo "Adding line # $i to $MP_CMDFILE: $PGM_am"
+    echo $PGM_am>>$MP_CMDFILE
+    j=$((j+1))
+    i=$((i+1))
+  done
+  nprocs1=`cat $MP_CMDFILE|wc -w`
+  nprocst=$((NPROCS_c+NPROCS_o+NPROCS_a))
+  if [ $nprocs1 -ne $nprocst ] ; then echo "Bad $MP_CMDFILE, exiting..."; export err=1; err_chk ; fi
+fi
+set -x
+
+mpiexec -n $NPROCS_c $PGM_c : -n $NPROCS_o $PGM_oc : -n $NPROCS_a $PGM_am
+export err=$?; err_chk
+  
 #------------------------------------------------------------------------------#
 # End MPMD execution section (4)
 #------------------------------------------------------------------------------#
-
+set -x
 #------------------------------------------------------------------------------#
 # Begin post-execution section of OM script (5)
 #------------------------------------------------------------------------------#
@@ -1226,18 +1211,17 @@ echo VDATE = $VDATE after MOM4 run `date`
 # each file in ocn_list or ice_list is from an individual processor
 #
 #
-
 export mppnccombine=${mppnccombine:-$EXECcfs/${cfsp}mppnccombine}
-export mpinccombine=${mpinccombine:-$EXECcfs/${cfsp}mpinccombine}
 
-> cmdfile_mpp
+if [ ${MPMD_PROC:-YES}  = YES ] ; then
+ > cmdfile_mpp
+fi
 
-#  make the mpi_combine  filelist
+# write the cmdfile for combining mom4 tiles
 
 hh_inc_m=$((hh_inc_ocn/2))
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
-set +x
 until [ $p_date -gt $end_date ] ; do
   year=`echo $p_date | cut -c1-4`
   month=`echo $p_date | cut -c5-6`
@@ -1248,75 +1232,78 @@ until [ $p_date -gt $end_date ] ; do
   monthm=`echo $m_date | cut -c5-6`
   daym=`echo $m_date | cut -c7-8`
   hhm=`echo $m_date | cut -c9-10`
+  hhm=$((hhm+0)) ; if [ $hhm -lt 10 ]  ; then hhm=0$hhm ; fi
+
   export ocnfile=ocn_${yearm}_${monthm}_${daym}_${hhm}.nc
   export icefile=ice_${yearm}_${monthm}_${daym}_${hhm}.nc
-  echo $ocnfile >> cmdfile_mpp
-  echo $icefile >> cmdfile_mpp
+
+  echo $mppnccombine $ocnfile >> cmdfile_mpp
+  echo $mppnccombine $icefile >> cmdfile_mpp
+
   p_date=$($NDATE $hh_inc_ocn $p_date)
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
-set -x
 
-#  mpi_combine the decomposed ocean files into global files
-
-nprocs=$LSB_DJOB_NUMPROC
-ncmds=$(wc -l cmdfile_mpp|sed 's/cmdfile_mpp//')
-[[ $nprocs -lt $ncmds ]] && ncmds=$nprocs
-
-mpirun -n $ncmds $mpinccombine $mppnccombine cmdfile_mpp  
+ncfp=$(wc -l cmdfile_mpp|cut -d' ' -f1)
+mpiexec -n $ncfp cfp cmdfile_mpp | grep "CFP RANK" # run the cmdfile processor
 export err=$?; err_chk
 
-#  adjust the date stamps on the combined files
+# rename the ocn and ice files to reflect the correct time
 
 m_date=$($NDATE $hh_inc_m $start_date)
 p_date=$($NDATE $hh_inc_ocn $start_date)
-set +x
 until [ $p_date -gt $end_date ] ; do
   year=`echo $p_date | cut -c1-4`
   month=`echo $p_date | cut -c5-6`
   day=`echo $p_date | cut -c7-8`
   hh=`echo $p_date | cut -c9-10`
+  hh=$((hh+0)) ; if [ $hh -lt 10 ]  ; then hh=0$hh ; fi
   yearm=`echo $m_date | cut -c1-4`
   monthm=`echo $m_date | cut -c5-6`
   daym=`echo $m_date | cut -c7-8`
   hhm=`echo $m_date | cut -c9-10`
+  hhm=$((hhm+0)) ; if [ $hhm -lt 10 ]  ; then hhm=0$hhm ; fi
 
   export ocnfile=ocn_${yearm}_${monthm}_${daym}_${hhm}.nc
   export icefile=ice_${yearm}_${monthm}_${daym}_${hhm}.nc
 
-  echo mv $ocnfile $COM_YMDH/ocn_${year}_${month}_${day}_${hh}${SUFOUT}.nc
-  echo mv $icefile $COM_YMDH/ice_${year}_${month}_${day}_${hh}${SUFOUT}.nc
+  if [ $NPROCS_o -gt 1 ] ; then
+    mv $ocnfile $COM_YMDH/ocn_${year}_${month}_${day}_${hh}${SUFOUT}.nc
+    export err=$?; err_chk
+    mv $icefile $COM_YMDH/ice_${year}_${month}_${day}_${hh}${SUFOUT}.nc
+    export err=$?; err_chk
 
-  mv $ocnfile $COM_YMDH/ocn_${year}_${month}_${day}_${hh}${SUFOUT}.nc
-  rc=$? ; if [[ $rc -ne 0 ]] ; then exit 1 ; fi
-  mv $icefile $COM_YMDH/ice_${year}_${month}_${day}_${hh}${SUFOUT}.nc
-  rc=$? ; if [[ $rc -ne 0 ]] ; then exit 1 ; fi
+    for file in `ls | grep ocn_${yearm}_${monthm}_${daym}_${hhm}.nc.` ; do
+    /bin/rm $file
+    done
+    for file in `ls | grep ice_${yearm}_${monthm}_${daym}_${hhm}.nc.` ; do
+    /bin/rm $file
+    done
+  fi
+
   p_date=$($NDATE $hh_inc_ocn $p_date)
   m_date=$($NDATE $hh_inc_ocn $m_date)
 done
-set -x
 
 # save printout for analysis
 
 if [ -s printout ] ; then
     echo "=> Saving printout file: prnt.$diag_suffix"
     echo "=>         in directory: $DATAOUTpath"
-    ${NCP:-/bin/cp} printout $DATAOUTpath/prnt.$diag_suffix
+    $NCP printout $DATAOUTpath/prnt.$diag_suffix
 fi
 
-echo " "
+echo 
 echo "==> done"
-
+echo
 echo VDATE = $VDATE after ending MOM4 `date`
-#
-if [[ $VERBOSE = YES ]] ; then
-   echo $(date) EXITING $0 with return code $err >&2
-fi
+echo
+echo $(date) EXITING $0 with return code $err >&2
+echo
 
 #------------------------------------------------------------------------------#
 # End post-execution section of OM script (5)
 #------------------------------------------------------------------------------#
-
 
 #------------------------------------------------------------------------------#
 # Begin post-execution section of AM script (6)
@@ -1336,24 +1323,20 @@ rm -f SFC.F*
 rm -f FLX.F*
 rm -f LOG.F*
 rm -f D3D.F*
-rm -f ocn*nc.????
-rm -f ice*nc.????
+#rm -f sigr1 sigr2 sfcr
 
 ################################################################################
-#  Postprocessing
-################################################################################
 
-cd $pwd
-[[ $mkdata = YES ]]&&rmdir $DATA
-$ENDSCRIPT
+err=${err:-0}
 
 if [[ $VERBOSE = YES ]] ; then
    echo $(date) EXITING $0 with return code $err >&2
 fi
-err=${err:-0}
+
 if [ $err -eq 0 ] ; then
   date>$RESTART_CONTROL_FILE
 fi
+
 exit $err
 
 #------------------------------------------------------------------------------#

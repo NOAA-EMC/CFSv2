@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ##################################################################################
 # The purpose of this script is to remove or thin the old CDAS/CFS  directories 
 # to maintain a minimum usage of disk space for the CDAS/CFS system

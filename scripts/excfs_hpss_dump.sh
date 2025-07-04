@@ -135,7 +135,7 @@ fi   #  endif $PROCESS_OCN_DUMP
 
 
 # GOOD RUN
-set +x
+set -x
 echo " "
 echo " ****** PROCESSING COMPLETED NORMALLY"
 echo " ****** PROCESSING COMPLETED NORMALLY"

@@ -195,7 +195,7 @@ cd $DATA||exit 99
 #  Update angle dependent bias 
 
 export OMP_NUM_THREADS=$NTHREADS_ANG
-export PGM='$APRUN $ANGUPDATEXEC'
+export PGM='mpiexec -n1 $ANGUPDATEXEC'
 export pgm=$PGM
 $LOGSCRIPT
 
@@ -328,7 +328,7 @@ fi
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 $ENDSCRIPT
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

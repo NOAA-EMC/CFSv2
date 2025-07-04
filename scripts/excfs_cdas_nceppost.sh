@@ -11,7 +11,7 @@ set -euxa
 cd $DATA
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 export MP_LABELIO=YES
 
@@ -149,7 +149,7 @@ do
     set -x
 
     msg="Starting post for fhr=$fhr"
-    postmsg "$jlogfile" "$msg"
+    postmsg "$msg"
 
     ###############################
     # Put restart files into $GESROOT 
@@ -282,7 +282,7 @@ fi  # PROCESS_SPL
 
 echo "End Processing PGB and SPL files"
 
-set +x
+set -x
 
 ########################################################
 # Process Ocean data
@@ -358,7 +358,7 @@ done
 
 # run the cfp mpmd process
 
-mpirun cfp poescript.grb2 |grep 'CFP RANK'
+mpiexec -n 20 cfp poescript.grb2 |grep 'CFP RANK'
 export err=$?; err_chk
 
 # Copy all the grib2 files to COMOUT
@@ -449,6 +449,6 @@ fi
 ########################################################
 
 msg='ENDED NORMALLY.'
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ################## END OF SCRIPT #######################

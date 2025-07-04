@@ -262,7 +262,7 @@ fi
 ls -ltr $LISCARD
 echo 'executing LIS in directory ' $(pwd)
 PGM=$LISEXEC
-eval mpirun -n 28 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
+eval mpiexec -n 28 $PGM $REDOUT$PGMOUT $REDERR$PGMERR
 export err=$?; err_chk
 
 ################################################################
