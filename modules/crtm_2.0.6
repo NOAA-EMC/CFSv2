@@ -1,0 +1,16 @@
+#%Module1.0
+##
+## modulefile
+##
+
+
+set     HOMEcfs    $::env(HOMEcfs)
+set     prodtop    $HOMEcfs/global_shared_cfs/CRTMv206
+setenv  CRTM_SRC   $prodtop/sorc
+setenv  CRTM_LIB   $prodtop/libcrtm_v2.0.6.a 
+setenv  CRTM_INC   $prodtop/incmod/crtm_v2.0.6 
+setenv  CRTM_VER   v2.0.6   
+
+prepend-path  LD_LIBRARY_PATH $prodtop
+
+
