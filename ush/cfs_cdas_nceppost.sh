@@ -321,7 +321,7 @@ fi
 ln -sf ./gfs_cntrl.parm fort.14
 ln -sf griddef.out fort.110
 
-time mpirun.lsf $POSTGPEXEC < itag > outpost_gfs_${VDATE}
+time mpiexec -n 64 $POSTGPEXEC < itag > outpost_gfs_${VDATE}
 
 export ERR=$?
 export err=$ERR
@@ -393,7 +393,7 @@ fi
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 ${ENDSCRIPT:-echo}
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

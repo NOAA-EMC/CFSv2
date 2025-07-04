@@ -6,7 +6,7 @@ set -uax
 # Specify directory paths for this job
 ######################################
 
-export TANKDIR=${DCOMROOT}/prod
+export TANKDIR=${DCOMROOT}
 
 export HOMEgrib=$HOMEcfs/EMC_land_utilities
 export EXECgrib=$HOMEgrib/exec
@@ -16,7 +16,7 @@ export FIXgrib=$HOMEgrib/fix
 # run the JISNI procedure
 # -----------------------
 
-$HOMEgrib/scripts/exsnowgrib.sh.ecf
+$HOMEgrib/scripts/exsnowgrib.sh
 
 # copy snowdepth files to cfs filenames
 # -------------------------------------

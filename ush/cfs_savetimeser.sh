@@ -9,8 +9,6 @@ sdate=$1
 edate=$2
 inchour=$3
 
-export APRUN=${APRUN:-mpirun.lsf}
-
 endhour=$($NHOUR $edate $sdate) 
 if [ $endhour -lt $inchour ]; then
   inchour=$endhour
@@ -83,7 +81,7 @@ done
 
 # run the cfp mpmd
 
-mpirun cfp poescript | grep 'CFP RANK'
+$cfprun poescript | grep 'CFP RANK'
 export err=$?; err_chk
 
 # Move the grib2 files to time_grib directory

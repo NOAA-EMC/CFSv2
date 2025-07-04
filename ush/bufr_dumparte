@@ -3,7 +3,7 @@ set -uxa
 
 export DUMPOPS=${DUMPJB:-$HOMEdump/ush/dumpjb}
 export EXECcfs=${EXECcfs:-$HOMEcfs/exec}
-export ARGOTANK=${ARGOTANK:-$DCOMROOT/prod} 
+export ARGOTANK=${ARGOTANK:-$DCOMROOT} 
 export ARGODUMP=${ARGODUMP:-$EXECcfs/bufr_argodump}
 export DUPC=OFF
 
@@ -27,6 +27,7 @@ if [[ $3 = tesac && $# -eq 3 ]]; then
 
   echo
   ls -l tesac.org 
+  ls -l 031.ibm
   ls -l argomods 
   ls -l tesac.ibm
   echo

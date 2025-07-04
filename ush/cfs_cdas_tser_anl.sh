@@ -10,7 +10,7 @@ set -x
 
 #export MP_STDOUTMODE=ordered
 #export MP_LABELIO=yes
-export APRUN=${APRUN:-mpirun}
+export APRUN=${APRUN:-"mpiexec -n $NCPUS"}
 
 export yyyymm=${1:-${yyyymm:-$yyyy$mm}}
 export inp_file=${2:-${inp_file:-pgbf}}
@@ -127,9 +127,9 @@ SUFOUT=$SUFIN.$yyyymm
 echo "SUFIN is $SUFIN"
 echo "SUFOUT is $SUFOUT"
 
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
-   nprocs=$LSB_DJOB_NUMPROC
-   ntasks=$LSB_DJOB_NUMPROC
+if [ -n "$NCPUS" ]; then
+   nprocs=$NCPUS
+   ntasks=$NCPUS
 else
    echo "nprocs not defined for this platform"
    export err=99; err_chk
