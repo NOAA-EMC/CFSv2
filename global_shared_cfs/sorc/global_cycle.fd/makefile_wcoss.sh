@@ -5,7 +5,7 @@ set -x
 #-use standard module. called by ../../build_wcoss.sh
 #-----------------------------------------------------
 
-export FCMP=ifort
+export FCMP=ftn   
 
 ##export DEBUG='-ftrapuv -check all -check nooutput_conversion -fp-stack-check -fstack-protector -traceback -g'
 export FFLAGS="-O3 -r8 -convert big_endian -traceback -g"

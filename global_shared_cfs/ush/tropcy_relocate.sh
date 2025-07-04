@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ####  UNIX Script Documentation Block
 #
 # Script name:         tropcy_relocate.sh
@@ -596,7 +597,7 @@ else
    export OMP_NUM_THREADS=$RELOX_threads        
    export MP_TASK_AFFINITY=core:$RELOX_threads
 
-   time mpirun -n 3 $RELOX >stdo.prints
+   time mpiexec -n 3 $RELOX >stdo.prints
    errSTATUS=$?
    
 #  copy relocation print output here and there
@@ -626,17 +627,17 @@ else
    for sges in sgm3prep sgesprep sgp3prep; do
       if [ -s $sges.relocate ] ; then
          mv $sges.relocate $sges
-      else
-
+#     else
+#      
 #  problem: $sges.relocate does not exist
 #  --------------------------------------
-
-         if [ -s $DATA/err_exit ]; then
-            $DATA/err_exit "The file $sges.relocate does not exist"
-         else
-            exit 555
-         fi
-         exit 9
+#      
+#        if [ -s $DATA/err_exit ]; then
+#           $DATA/err_exit "The file $sges.relocate does not exist"
+#        else
+#           exit 555
+#        fi
+#        exit 9
       fi
    done
 

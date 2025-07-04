@@ -19,25 +19,10 @@ ARFLAGS       = ruv
 #
 # CPP, Compiler, and Linker Options
 #
-FC       = mpiifort -O3 -convert big_endian -fp-model source -qopenmp -xAVX
+FC       = ftn -O2 -convert big_endian -fp-model source -qopenmp
 CPP      = /lib/cpp -P
 CPPFLAGS = -DLINUX 
 FREE     = -FR
-
-#WRFPATH    = /gpfs/gp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
-#WRFPATH    = /gpfs/tp1/nco/ops/nwprod/sorc/wrf_shared.v1.1.0
-#WRFPATH    = /gpfs/dell1/nco/ops/nwtest/wrf_shared.v1.1.0  
-
-WRF_INC    = -I$(WRFPATH)/external/io_quilt -I$(WRFPATH)/frame
-WRF_LIB    = $(WRFPATH)/main/libwrflib.a  \
-             $(WRFPATH)/frame/pack_utils.o  \
-             $(WRFPATH)/frame/module_internal_header_util.o \
-             $(WRFPATH)/external/io_grib1/libio_grib1.a \
-             $(WRFPATH)/external/io_grib_share/libio_grib_share.a \
-             $(WRFPATH)/external/io_int/libwrfio_int.a \
-             $(WRFPATH)/external/io_netcdf/libwrfio_nf.a \
-             $(WRFPATH)/external/esmf_time_f90/libesmf_time.a \
-             $(WRFPATH)/external/RSL_LITE/librsl_lite.a
 
 CFLAGS   = -DLINUX -Dfunder -DFortranByte=char -DFortranInt=int -DFortranLlong='long long'
 
@@ -76,7 +61,7 @@ LIBS     = $(WRF_LIB) \
 
 
 OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o \
-        kinds_mod.o machine.o physcons.o \
+        kinds_mod.o machine.o physcons.o WRF_STUBS.o \
 	native_endianness.o blockIO.o initialize_byte_swap_wrf_binary_file.o \
         count_recs_wrf_binary_file.o inventory_wrf_binary_file.o \
         next_buf.o retrieve_index.o ZENSUN.o CLDFRAC_ZHAO.o \
@@ -116,9 +101,9 @@ OBJS =  wrf_io_flags.o getVariable.o getIVariable.o getIVariableN.o \
 
 $(TARGET):	$(OBJST) $(OBJS)
 	$(FC) -o $@ $(OBJST) $(OBJS) $(LIBS)
-	mkdir -p include/post_4
-	$(AR) $(ARFLAGS) $(LIB_TARGET) $(OBJST) $(OBJS)
-	mv *.mod include/post_4
+	#mkdir -p include/post_4
+	#$(AR) $(ARFLAGS) $(LIB_TARGET) $(OBJST) $(OBJS)
+	#mv *.mod include/post_4
 
 .f.o:
 	$(FC) $(FFLAGS) -c $<
