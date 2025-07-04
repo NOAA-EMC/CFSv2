@@ -1,0 +1,26 @@
+cfs trunk updated to version 2.2.15
+	
+Mon, Nov 1, 1:59 PM
+	
+-----------------------------------------------------------------------------------
+SVN Log: RFC 8837 - WCOSS: 2022 CO2 fix files update
+-----------------------------------------------------------------------------------
+r144 | simon.hsiao@noaa.gov | 2021-11-01 17:56:01 +0000 (Mon, 01 Nov 2021) | 1 line
+-----------------------------------------------------------------------------------
+Changed paths:
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2019.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2020.txt
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2020.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2021.txt_proj
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2021.txt_proj_u
+   A /trunk/fix/cfs_fix_am/co2dat_4a/global_co2historicaldata_2022.txt_proj
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2021.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_proj/global_co2historicaldata_2022.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2020.txt
+   A /trunk/fix/cfs_fix_am/fix_co2_update/global_co2historicaldata_2021.txt
+
+
+	
+	
+	
+
