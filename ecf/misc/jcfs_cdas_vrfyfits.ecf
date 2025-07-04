@@ -1,42 +1,34 @@
-#BSUB -J %E%cfs_cdas_vrfyfits_%CYC%
-#BSUB -o  /com/output/%ENVIR%/today/cfs_cdas_vrfyfits_%CYC%.o%J
-#BSUB -cwd /tmpnwprd
-#BSUB -q %QUEUE%
-#BSUB -L /bin/sh
-#BSUB -W 00:45
-#BSUB -n 4
-#BSUB -R span[ptile=4]
-#BSUB -P %PROJ%
-#BSUB -R rusage[mem=3000]
-##BSUB -R affinity[core]
-#BSUB -a intelmpi
+#PBS -N cfs_cdas_vrfyfits_%CYC%
+#PBS -j oe
+#PBS -q %QUEUE%
+#PBS -S /bin/bash
+#PBS -l walltime=00:45:00
+#PBS -l debug=true
+#PBS -l place=vscatter,select=1:ncpus=4:mem=150GB
+#PBS -A %PROJ%-%PROJENVIR%
 
+export model=cfs
 %include <head.h>
+%include <envir-p1.h>
 
 # EXPORT list here
-
+set -x
 export envir=%ENVIR%
 export cyc=%CYC%
-export job=cfs_cdas_vrfyfits_%CYC%
 
-# versions file for cfs sets $model_ver
-VERSION_FILE=/nw${envir}/versions/cfs.ver
-if [ -f $VERSION_FILE ]; then
-   . $VERSION_FILE
-else
-   ecflow_client --msg="***JOB ${ECF_NAME} ERROR: Version File $VERSION_FILE does not exist ***"
-   ecflow_client --abort
-   exit
-fi
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load cray-pals/${cray_pals_ver}
+module load libjpeg/${libjpeg_ver}
+module load grib_util/${grib_util_ver}
+module load netcdf/${netcdf4_ver}
+module load cfp/${cfp_ver}
+module list
 
 # CALL executable job script here
-/nw${envir}/cfs.${model_ver}/jobs/JCFS_CDAS_VRFYFITS
-
-if [ $? -ne 0 ]; then
-  ecflow_client --msg="***JOB ${ECF_NAME} ERROR RUNNING J-SCRIPT ***"
-  ecflow_client --abort
-  exit
-fi
+${HOMEcfs}/jobs/JCFS_CDAS_VRFYFITS
 
 %include <tail.h>
 %manual
