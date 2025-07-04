@@ -86,7 +86,7 @@ LIBtransf = -L$(CORELIB) -ltransf
 LIBhermes = -L$(CORELIB) -lhermes
 LIBgfio   = -L$(CORELIB) -lgfio
 
-DIRcrtm = /gpfs/dell2/emc/modeling/noscrub/Jack.Woollen/cfsv2_prod_dev_repository/global_shared_cfs/CRTMv206
+DIRcrtm = $(REPOROOT)/global_shared_cfs/CRTMv206
 
 LIBcrtm	= $(DIRcrtm)/libcrtm_v2.0.6.a
 CRTM_LIB = $(DIRcrtm)/libcrtm_v2.0.6.a

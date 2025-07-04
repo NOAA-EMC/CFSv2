@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eua
 export machine=wcoss
-export FC=ifort
+export FC=ftn   
 
-export FFLAGSM="-O2 -xHost -FR -convert big_endian -g -traceback"
+export FFLAGSM="-O2 -FR -convert big_endian -g -traceback"
 export LDFLAGSM=
 
 export INCSM=-I$SFCIO_INC4         

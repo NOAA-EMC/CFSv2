@@ -1,0 +1,3 @@
+set -euax
+
+cd ..; *corn cfs_cdas_atmos_fcst.fd

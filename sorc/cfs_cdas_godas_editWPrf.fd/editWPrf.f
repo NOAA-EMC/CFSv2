@@ -8,12 +8,12 @@
 !
 ! PROGRAM HISTORY LOG:
 ! 2003-07-23  David W. Behringer
-! 2005-10-06  Diane C. Stokes - discard profiles in Gulf of Mexico.
+! 2005-10-06  Diane C. Stokes - discard profiles in Gulf of America
 !                 Recent deployment of frequently reporting profiling 
 !                 buoys in this region is overwhelming analysis.  
 !                 This is temporary until a more suitable and generic 
 !                 fix is available.
-! 2005-11-01  David W. Behringer - profiles in the Gulf of Mexico are once
+! 2005-11-01  David W. Behringer - profiles in the Gulf of America are once
 !                 again allowed.  A modification to the program avePrfDly.f
 !                 identifies platforms that are reporting too frequently
 !                 and super-obs them.  The editing in editPrf.f has also
@@ -347,7 +347,7 @@
           safr = .false.
         end if
 !
-! Gulf of Mexico
+! Gulf of America
 !
         if (yp .gt. 21.0 .and. yp .lt. 31.0 .and. xp .gt. 260.0 .and. xp .lt. 279.0) then
           gom = .true.
@@ -838,7 +838,7 @@
 ! if largest histo values occur at depth, the profile may have a deep offset.
 !   Likely to be an issue for XBTs. Argo profiles are smoother to start with 
 !   and may have a broadly distributed histo
-!  exempt Gulf of Mexico because of Loop Current
+!  exempt Gulf of America because of Loop Current
 !  exempt Gulf Stream
 !
                 if (bathy .and. .not.gom .and. .not.glfstrm .and. nhdt .ge. nhst/2) then
@@ -909,7 +909,7 @@
                   np = npi
 !
 !   delete profiles displaying a constant offset from the reference
-!   exempt the Gulf of Mexico because of Loop Current
+!   exempt the Gulf of America because of Loop Current
 !
                   if (.not.gom) then
                     neg = 0
@@ -978,7 +978,7 @@
 !    thermocline (max gradient at k=ktc and within lower thermocline idtdz(k) <= 6)
 !    excluding part of N.Atlantic to avoid rejecting profiles influenced by "Meddies" and
 !     excluding part of S.Indian to avoid rejecting profiles influenced by complex 
-!     circulation.  excluding also Gulf Stream and Loop Current region of Gulf of Mexico
+!     circulation.  excluding also Gulf Stream and Loop Current region of Gulf of America
 !     in these cases there can be legitimate offsets below 1000 meters.
 !
                 if (noerr .and. npi-ktc .gt. 5 .and. .not.medi .and. .not.safr .and. .not.gom .and. .not.glfstrm) then

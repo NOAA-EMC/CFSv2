@@ -8,7 +8,7 @@ echo; make=`basename $PWD`
 echo make-ing ${make%.*}
 echo
 
-export FC=mpiifort
+export FC=ftn 
 
 make -f Makefile
 mv ${make%.*} ../../exec

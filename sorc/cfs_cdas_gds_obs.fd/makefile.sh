@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eua
 
-export FC=ifort 
+export FC=ftn   
 
 make -f Makefile
 

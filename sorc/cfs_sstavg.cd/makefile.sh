@@ -2,9 +2,9 @@
 set -x
 
 export machine=wcoss
-export CC=icc
+export CC=cc
 
-export FFLAGSM="-O3 -xHost -convert big_endian -traceback"
+export FFLAGSM="-O3 -convert big_endian -traceback"
 export LDFLAGSM=
  
 ##module unload NetCDF; module load NetCDF/4.5.0

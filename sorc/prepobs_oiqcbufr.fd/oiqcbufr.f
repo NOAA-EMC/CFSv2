@@ -10,7 +10,7 @@ C   A "COMPLEX" QUALITY CONTROL (FROM GANDIN,1985) EMPLOYING
 C   MULTIVARIATE OI TO CHECK ALL OBSERVATIONS AGAINST NEARBY
 C   NEIGHBORS. SEVERAL ITERATIONS OF THE BASIC SCHEME ARE REQUIRED
 C   TO COMPLETE THE PROCESS. DURING EACH ITERATION ALL OBSERVATIONS
-C   ARE SUBJETED TO FIVE INTERPOLATION CHECKS. CHECK #1 INTERPOLATES
+C   ARE SUBJECTED TO FIVE INTERPOLATION CHECKS. CHECK #1 INTERPOLATES
 C   COMPARISON VALUES FROM NEARBY TEMPERATURE DATA. CHECK #2 AND CHECK
 C   #3 INTERPOLATE COMPARISON VALUES FROM NEARBY ZONAL AND LONGITUDINAL
 C   WIND COMPONENTS RESPECTIVELY. CHECK #4 IS AN INTERPOLATION
@@ -28,12 +28,12 @@ C   WHICH IS USED TO MEASURE HOW THE ANALYSIS WOULD DRAW (OR NOT DRAW)
 C   TO THE OB BEING CHECKED. THE TOLERANCE ALLOWED FOR DEVIATION FROM
 C   THE EXPECTED OUTCOME OF THE INTERPOLATION CHECKS IS PROPORTIONAL
 C   TO A MEASURE OF THE DRAW COMPUTED USING THE RESULT OF CHECK #5.
-C   DURING EACH ITERATION EACH OBSEVATION EITHER PASSES OR FAILS THE
+C   DURING EACH ITERATION EACH OBSERVATION EITHER PASSES OR FAILS THE
 C   COMPLEX OF CHECKS JUST DESCRIBED. A "PASS" MEANS THAT OB MAY BE
 C   USED FOR CHECKING OBS DURING THE SUBSEQUENT ITERATION. A "FAIL"
 C   INDICATES THE OPPOSITE. THE SYSTEM IS ITERATED UNTIL IDENTICAL
 C   RESULTS IN TERMS OF OBS THAT PASS AND FAIL ARE OBTAINED IN TWO
-C   CONSEQUETIVE ITERATIONS UP TO FOUR COMPLETE ITERATIONS AT WHICH
+C   CONSECUTIVE ITERATIONS UP TO FOUR COMPLETE ITERATIONS AT WHICH
 C   POINT A FINAL ARBITRATION PROCEDURE IS INVOKED TO RESOLVE A (SMALL)
 C   NUMBER OF AMBIGUOUS CASES WHICH ARE PREVENTING CONVERGENCE OF THE
 C   SYSTEM.
@@ -71,6 +71,7 @@ C 2013-03-26  D. KEYSER   FINAL CHANGES TO RUN ON WCOSS
 C 2013-06-19  J. WOOLLEN  FIX SUBR. SYNCNDD TO PREVENT HANGUP IN
 C         RECEIVE BY A PROCESSOR WHEN THERE IS VERY LITTLE DATA OF A
 C         CERTAIN TYPE
+C 2019-06-20  S. Melchior Explicit declartion of bmiss in subr. STORE
 C
 C USAGE:
 C   INPUT FILES:
@@ -144,8 +145,8 @@ CTREE SATPUT
 C-----------------------------------------------------------------------
       PROGRAM PREPOBS_OIQCBUFR
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -195,10 +196,10 @@ C-----------------------------------------------------------------------
       print*
       print*,'nprocs = ',nprc
       print*
-      CALL W3TAGB('PREPOBS_OIQCBUFR',2013,0170,0088,'NP22')
+      CALL W3TAGB('PREPOBS_OIQCBUFR',2019,0171,0088,'NP22')
       print*
       print*
-      print*, '--> WELCOME TO PREPOBS_OIQCBUFR - VERSION 06-19-2013'
+      print*, '--> WELCOME TO PREPOBS_OIQCBUFR - VERSION 06-20-2019'
       print*
       print*
       endif
@@ -1034,8 +1035,8 @@ C
 C-----------------------------------------------------------------------
       SUBROUTINE MAKEAMAP
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -1164,8 +1165,8 @@ C
 C$$$
       SUBROUTINE OBOGRAM(LDAT,LASC,LBIN)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -1413,8 +1414,8 @@ C
 C$$$
       SUBROUTINE OUTPUT
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -1764,8 +1765,8 @@ C
 C$$$
       SUBROUTINE PREPQM(LUBIN,LUBOT)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -1809,7 +1810,7 @@ C  -------------------------------
  
 C     CALL OPENBF(LUBIN,'IN',LUBIN)
       CALL UFBQCD(LUBIN,'OIQC',QCD)
-      call maxout(25000)
+      CALL MAXOUT(25000)
       CALL OPENBF(LUBOT,'OUT',LUBIN)
       imsg = 1
       irec = 1
@@ -2005,8 +2006,8 @@ C
 C$$$
       SUBROUTINE QCLOOP(QCPTS,MAXTRY)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OBS/ NREP,NLEV,SID(MAXREP),INOB(MAXREP),IMAP(360,181)
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
@@ -2120,7 +2121,7 @@ C  ---------------------------------------
          WRITE(6 ,30)ITRY,NFG,NFB,NFL,NBB,NCK
       endif
 
-30    FORMAT('ITERATION ',I2,' : NFLIP=',3I6,' NBAD=',I6,' NTOT=',I6)
+30    FORMAT('ITERATION ',I2,' : NFLIP=',3I6,' NBAD=',I9,' NTOT=',I9)
 
 C  FINISHED YET?
 C  -------------
@@ -2194,8 +2195,8 @@ C
 C$$$
       SUBROUTINE QCOI
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -2439,7 +2440,7 @@ C
 C$$$
       SUBROUTINE QCPTS
 
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /HVECT / NXXYY,MCHK(64,2),MOBS(64,10,4,2),
      .                     MDIM(64,4),AA(64,4,2),
@@ -2578,8 +2579,8 @@ C
 C$$$
       SUBROUTINE SATPTS
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -2703,8 +2704,8 @@ C
 C$$$
       SUBROUTINE SATPUT
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -2914,8 +2915,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE SEARCH
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -2990,8 +2991,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE SEARCHS(NPTR)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -3169,8 +3170,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE SRTPRS(ILEV,NLV,INL,INI)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -3235,8 +3236,8 @@ C----------------------------------------------------------------------
 C----------------------------------------------------------------------
       SUBROUTINE SELDAT(IND,NXY)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -3533,7 +3534,7 @@ C
 C$$$
       SUBROUTINE SSMIPTS
 
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXLEV=2000000)
 
       common /nddspt/ nd1(0:100),nd2(0:100)
       COMMON /CKLIST/ NDD,INDD(MAXLEV)
@@ -3588,8 +3589,8 @@ C
 C$$$
       SUBROUTINE SSMIPUT
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -3680,8 +3681,8 @@ C
 C-----------------------------------------------------------------------
       SUBROUTINE SSMISRCH(IND,NXY)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -3958,8 +3959,8 @@ C
 C$$$
       SUBROUTINE STOERR
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -4065,7 +4066,11 @@ C  STORE THE ERRORS IN THEIR RIGHTFUL PLACE
 C  ----------------------------------------
 
       IF(ZERA.EQ.0 .OR. ZERB.EQ.0. .OR. WERR.EQ.0.) THEN
-         PRINT *, 'STOERR - FORECAST ERROR IS ZERO'
+         print*,'zera=',zera
+         print*,'zerb=',zerb
+         print*,'werr=',werr
+         print*,'ddprs,ddpra,ddprb',ddprs,ddpra,ddprb
+         PRINT *,'STOERR - FORECAST ERROR IS ZERO'
          CALL W3TAGE('PREPOBS_OIQCBUFR')
          CALL ERREXIT(99)
       ENDIF
@@ -4124,6 +4129,7 @@ C 1986-03-21  G. DIMEGO  - ORIGINAL AUTHOR
 C 1988-11-24  D. DEAVEN  - CODED FOR CYBER 205
 C 1990-11-06  J. WOOLLEN - MODIFIED COMMON /BUFFS/ FOR QCOI
 C 1992-07-28  J. WOOLLEN - MODIFIED FOR STORSTAR VERSION
+C 2019-06-20  S. MELCHIOR - Explicit declaration of bmiss
 C
 C USAGE:    CALL STORE(LUDAT,LUBFI)
 C   INPUT ARGUMENT LIST:
@@ -4147,8 +4153,9 @@ C
 C$$$
       SUBROUTINE STORE(LUDAT,LUBFI)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
+
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -4453,10 +4460,10 @@ C  -----------------------------
                            WRITE(6,'(A80)')
       ENDIF
  
-101   FORMAT('TOTAL RECORDS: ',I8)
-102   FORMAT('TOTAL REPORTS: ',I8,'  ---  STORED: ',I8)
-103   FORMAT('TOTAL OBS    : ',I8,'  ---  STORED: ',I8)
-104   FORMAT('MAX OBS/PRFLE: ',I8)
+101   FORMAT('TOTAL RECORDS: ',I10)
+102   FORMAT('TOTAL REPORTS: ',I10,'  ---  STORED: ',I10)
+103   FORMAT('TOTAL OBS    : ',I10,'  ---  STORED: ',I10)
+104   FORMAT('MAX OBS/PRFLE: ',I10)
 105   CONTINUE
  
       RETURN
@@ -4488,8 +4495,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE syncstor(nrep0,nlev0,maxnlev)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -4651,8 +4658,8 @@ C
 C$$$
       SUBROUTINE TOSSLIST(LO)
 
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -4902,7 +4909,7 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE syncndd(arr,n,mdtp)
 
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXLEV=2000000)
 
       common /nddspt/ nd1(0:100),nd2(0:100)
       COMMON /CKLIST/ NDD,INDD(MAXLEV)
@@ -4944,8 +4951,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       SUBROUTINE NDDSPLIT(MYID,nd1,nd2)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,
@@ -5015,8 +5022,8 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       function jndd(n)
  
-      PARAMETER (MAXREP=900000)
-      PARAMETER (MAXLEV=1100000)
+      PARAMETER (MAXREP=1000000)
+      PARAMETER (MAXLEV=2000000)
 
       COMMON /OIQCDATA/   FLV (MAXREP     ) , FLT (MAXREP     ) ,
      .FLN (MAXREP     ) , FTM (MAXREP     ) , FKX (MAXREP     ) ,

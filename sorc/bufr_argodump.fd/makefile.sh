@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eua
 
-export FC=ifort
+export FC=ftn   
 
 export LIBS="$W3NCO_LIB4 $W3EMC_LIB4 $BUFR_LIB4"
 

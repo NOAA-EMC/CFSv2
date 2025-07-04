@@ -4,7 +4,7 @@
 
 set -x
 
-export CFLAGSM="-O3 -xHost"
+export CFLAGSM="-O3"
 export LDFLAGSM=
 
 export NCDF="-L$NETCDF/lib -lnetcdf"

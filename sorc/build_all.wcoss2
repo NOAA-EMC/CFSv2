@@ -1,0 +1,52 @@
+#!/bin/bash
+set -eua
+
+source $HOMEcfs/versions/build.ver
+
+module reset
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load libjpeg/${libjpeg_ver}
+module load libpng/${libpng_ver}
+module load w3emc/${w3emc_ver}
+module load w3nco/${w3nco_ver}
+module load bacio/${bacio_ver}
+module load g2/${g2_ver}
+module load zlib/${zlib_ver}
+module load jasper/${jasper_ver}
+module load sigio/${sigio_ver}
+module load sp/${sp_ver}
+module load ip/${ip_ver}
+module load bufr/${bufr_ver}
+module load netcdf/${netcdf3_ver}    
+module load sfcio/${sfcio_ver}
+module load gfsio/${gfsio_ver}
+module use -a $HOMEcfs/modules 
+module load esmf_${esmf4_ver} 
+
+set +eu
+SIGIO_LIB4=$SIGIO_LIB
+SIGIO_INC4=$SIGIO_INC
+SFCIO_LIB4=$SFCIO_LIB
+SFCIO_INC4=$SFCIO_INC
+GFSIO_LIB4=$GFSIO_LIB
+GFSIO_INC4=$GFSIO_INC
+
+
+module list
+
+export REPOROOT=$(cd ..;pwd)
+
+[[ $# -ne 0 ]] && makelist="$*" || makelist="*.cd *.fd"
+[[ $makelist = cm ]] && makelist="cfs_atmos_fcst.fd cfs_cdas_atmos_fcst.fd cfs_mlc_coupler.fd cfs_ocean_mom4ice.fd"
+here=$(pwd); exec=$(pwd)/../exec; mkdir -p $exec
+
+for make in $makelist; do
+echo '-----------------------------------------------------------------------------------------------------------------------------------------------'
+cd $here; cd $make; echo $make
+echo '-----------------------------------------------------------------------------------------------------------------------------------------------'
+./makefile.sh
+echo '-----------------------------------------------------------------------------------------------------------------------------------------------'
+done

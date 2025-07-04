@@ -1,8 +1,8 @@
 #!/bin/bash
-set -x
+set -euax
 
 machine=wcoss
-ptmp="/gpfs/hps/ptmp/$LOGNAME/cfsv2/makefcst"
+ptmp="/lfs/h1/emc/ptmp/$LOGNAME/cfsv2"   ###/makefcst
 
 #  WARNING!!! The default endianness is local to the machine.
 #   If your initial conditions are bigendian and want to compile on littleendian
@@ -14,9 +14,7 @@ sorc_dir=$(pwd)
 exec_dir=$(pwd)
 mkdir -p $exec_dir
 
-#make_dir=$ptmp/branch/sorc/$(basename $sorc_dir)
-#make_dir=/gpfs/hps/ptmp/emc.climpara/branch/sorc/$(basename $sorc_dir)
-make_dir=/gpfs/hps/ptmp/$LOGNAME/cfsv2/$(basename $sorc_dir)
+make_dir=$ptmp/$(basename $sorc_dir)
 
 #####################################################################
 if [ $make_dir = $(pwd) ] ; then
@@ -30,9 +28,8 @@ mkdir -p $make_dir
 cd $make_dir || exit 99
 [ $? -ne 0 ] && exit 8
 
-rm $make_dir/*.o
-rm $make_dir/*.mod
-
+rm -f $make_dir/*.o
+rm -f $make_dir/*.mod
 tar -cf- -C$sorc_dir .|tar -xf-
 
 if [ $NATIVE_ENDIAN = YES ] ; then
@@ -50,11 +47,11 @@ export PGSZM=
 export FRRM=-FR
 export FXXM=
 
-export OPTSB="-O3 -convert big_endian -fp-model precise "  
+export OPTSB="-O2 -convert big_endian -fp-model precise -g -traceback"  
 
 export OPTSBT=$OPTSB
 export OPTSIOM="$OPTSBT -r8 "
-export OPTSM="$OPTSBT -r8 -openmp"
+export OPTSM="$OPTSBT -r8 -qopenmp"
 export OPTS_SERM="$OPTSBT -r8 $ARCHM"
 export OPTS90M="$OPTSBT   -r8 "
 export OPTS90AM="$OPTSBT  -r8 "
@@ -65,12 +62,11 @@ export F90M=ftn ##mpfort
 export F77B=$F77M
 export FCC=cc
 export LDRM=ftn ##mpiifort
-export LDFLAGSM="$PGSZM -openmp -mkl"
-export FINCS= ""   #esmf include path found in Makefile
+export LDFLAGSM="$PGSZM -qopenmp -mkl"
+export FINCS=""   #esmf include path found in Makefile
 export FINCM="-I$W3EMC_INCd"
 
-export LIBSM="$BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd -L$ESMF_LIB $W3NCO_LIBd -lrt" 
-##export LIBSM="$BACIO_LIB4 $NEMSIO_LIB4 $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd  -lrt -lstdc++ -lesmf"
+export LIBSM="$BACIO_LIB4 $NEMSIO_LIB $SP_LIBd $W3EMC_LIBd $W3NCO_LIBd -L$ESMF_LIB -L$NETCDF_LIB  -lrt" 
 
 echo; make=`basename $PWD`
 echo make-ing ${make%.*}

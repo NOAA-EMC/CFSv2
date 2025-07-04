@@ -4,7 +4,7 @@ set -x
 export machine=wcoss
 export CC=cc
 
-export CFLAGSM="-O3 -xHost"
+export CFLAGSM="-O3"
 export LDFLAGSM=
  
 ##module unload NetCDF; module load NetCDF/4.2/serial

@@ -53,7 +53,7 @@ CMD = prepobs_oiqcbufr
 #### removed options "-fp-model strict" and "-auto" below as they increase run time
 
 FFLAGS = -O2 -convert big_endian -list -assume noold_ldout_format $(DEBUG) $(DEBUG2)
-FFLAGS = -O2 -convert big_endian -g -traceback
+FFLAGS = -O3 -convert big_endian -g -traceback
 
 
 # Lines from here on down should not need to be changed.  They are the actual

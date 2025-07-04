@@ -1,10 +1,10 @@
 # Template for INTEL
 #
-FC = mpiifort 
-LD = mpiifort 
-CC = mpicc
+FC = ftn 
+LD = ftn 
+CC = cc
 FFLAGS= -real-size 64 -integer-size 32 -O3 -convert big_endian -align dcommons -traceback $(INCL)
-F0FLAGS= -real-size 64 -integer-size 32 -O0 -xHost -convert big_endian -traceback $(INCL)
+F0FLAGS= -real-size 64 -integer-size 32 -O0 -convert big_endian -traceback $(INCL)
 CFLAGS =
 LDFLAGS = $(LIBS)
 
