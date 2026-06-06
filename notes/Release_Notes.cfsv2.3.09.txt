@@ -1,0 +1,43 @@
+Release Notes:  cfs.v2.3.9 - released to NCO on June 20 2024   
+
+Transition to use new AF snow files plus update oiqcbufr for more data
+Where is the release tag on subversion/git/vlab?
+git clone -b cfs.v2.3.9a  https://github.com/NOAA-EMC/CFSv2
+List of software changes: 
+
+needs to load module  wgrib2/2.0.8
+
+modifying oiqcbufr to enlarge an array size which enables reading and processing all the data found in the prepbufr file
+
+M   	jobs/JCFS_CDAS_PREP
+M   	sorc/prepobs_oiqcbufr.fd/Makefile
+M   	sorc/prepobs_oiqcbufr.fd/oiqcbufr.f
+M   	ush/prepobs_oiqcbufr.sh
+
+
+install updated script and snowgrib code to process AFWA global snow cover grid
+
+M   	EMC_land_utilities/scripts/exsnowgrib.sh
+
+M   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/Makefile
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/README.build
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/docs/CMakeLists.txt
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/docs/Doxyfile.in
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/docs/user_guide.md
+
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/driver.F90
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/grib_utils.F90
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/model_grid.F90
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/program_setup.F90
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/snow2mdl.F90
+A   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/snowdat.F90
+
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/driver.f
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/grib_utils.f
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/make.sh
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/model_grid.f
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/program_setup.f
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/snow2mdl.f   
+D   	EMC_land_utilities/sorc/emcsfc_snow2mdl.fd/snowdat.f    
+
+M   	EMC_land_utilities/sorc/emcsfc_grib_snowgrib.fd/snowgrib.f

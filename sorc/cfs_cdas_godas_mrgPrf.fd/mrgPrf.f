@@ -137,15 +137,18 @@
       integer(kind=8) :: scl=100000000
       logical flg1, flg2
 !
-      flg1 = .true.
-      flg2 = .true.
+      flg1 = .false.
+      flg2 = .false.
 !
-      read (nu1) iyear1,idate1,csign1,sid1,dtyp1,qkey1,y1,x1, &
+      read (nu1,end=2) iyear1,idate1,csign1,sid1,dtyp1,qkey1,y1,x1, &
                            &  np1,(z1(k),t1(k),k=1,np1)
       iyd1 = iyear1*scl + idate1
-      read (nu2) iyear2,idate2,csign2,sid2,dtyp2,qkey2,y2,x2, &
+      flg1 = .true.
+
+2     read (nu2) iyear2,idate2,csign2,sid2,dtyp2,qkey2,y2,x2, &
                            &  np2,(z2(k),t2(k),k=1,np2)
       iyd2 = iyear2*scl + idate2
+      flg2 = .true.
 !
       do while (flg1 .or. flg2)
         if (flg1 .and. flg2) then

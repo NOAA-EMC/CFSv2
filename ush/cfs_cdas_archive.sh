@@ -1603,12 +1603,16 @@ fi   # doocndiag
 if [ $rmiss -gt '0' ]; then
   echo "WARNING: There are some $rmiss archived files not found as below - "
   cat $TEMPDIR/missing
-  MAILTO=${MAILTO:-"nco.spa@noaa.gov"}
-  subject="WARNING: $PDY $ECF_NAME archived files not found"
-  echo "The following $job archived files not found, please check and take proper actions - " > $TEMPDIR/email.body
-  cat $TEMPDIR/missing >> $TEMPDIR/email.body
-  echo >>  $TEMPDIR/email.body
-  mail.py -s "${subject}" -v "${MAILTO}" < $TEMPDIR/email.body
+  # oznstat radstat and satang no longer merit an email. trim them out.
+  grep -E -v "oznstat|radstat|satang" $TEMPDIR/missing > $TEMPDIR/missing.trimmed
+  if [ -s $TEMPDIR/missing.trimmed ]; then
+    MAILTO=${MAILTO:-"nco.spa@noaa.gov"}
+    subject="WARNING: $PDY $ECF_NAME archived files not found"
+    echo "The following $job archived files not found, please check and take proper actions - " > $TEMPDIR/email.body
+    cat $TEMPDIR/missing.trimmed >> $TEMPDIR/email.body
+    echo >>  $TEMPDIR/email.body
+    mail.py -s "${subject}" -v "${MAILTO}" < $TEMPDIR/email.body
+  fi
 fi
 
 export err=$rcall; err_chk

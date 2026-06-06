@@ -2,9 +2,9 @@
 #PBS -j oe
 #PBS -q %QUEUE%
 #PBS -S /bin/bash
-#PBS -l walltime=00:45:00
+#PBS -l walltime=01:00:00
 #PBS -l debug=true
-#PBS -l place=vscatter,select=1:ncpus=4:mem=150GB
+#PBS -l place=vscatter,select=1:ncpus=4:mem=250GB
 #PBS -A %PROJ%-%PROJENVIR%
 
 export model=cfs

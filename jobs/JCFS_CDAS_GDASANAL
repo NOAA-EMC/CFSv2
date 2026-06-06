@@ -281,7 +281,9 @@ $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cf
 $GETGESSH -t sfcgm3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgm3
 $GETGESSH -t sfcgp3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgp3
 $GETGESSH -t biascr -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gbias
+set +e
 $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gsatang
+set -e
 fi
 
 export SFCGES=${SFCGES:-$DATA/bges}
