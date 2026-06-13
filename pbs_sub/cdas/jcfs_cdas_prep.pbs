@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -N jcfs_cdas_prep_00    
+#PBS -o $out/cfs_cdas_prep_00         
+#PBS -l select=1:ncpus=28:mem=20GB
+#PBS -l walltime=02:00:00
+#PBS -A CFS-DEV
+#PBS -q dev
+#PBS -j oe 
+#PBS -V
+
+#!/usr/bin/env bash
+set -euax  
+
+
+set +x
+module purge
+source $HOMEcfs/versions/run.ver
+module load envvar/${envvar_ver}
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load cray-pals/${cray_pals_ver}
+module load libjpeg/${libjpeg_ver}
+module load prod_util/${prod_util_ver}
+module load grib_util/${grib_util_ver}
+module load netcdf/${netcdf4_ver}
+module load cfp/${cfp_ver}
+module list
+set -x
+
+## these are for testing purposes because the obsproc module is not available ##
+## export HOMEprep=/lfs/h2/emc/global/noscrub/Lin.Gan/git/obsproc/install     ##
+## export HOMEobsproc=/lfs/h2/emc/global/noscrub/Lin.Gan/git/obsproc/install  ##
+## export ushscript_prep=$HOMEcfs/ush
+
+$HOMEcfs/jobs/JCFS_CDAS_PREP
+

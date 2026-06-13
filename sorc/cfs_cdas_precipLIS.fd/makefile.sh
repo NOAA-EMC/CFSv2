@@ -2,7 +2,7 @@
 set -eua
 
 export machine=wcoss
-export FC=ifort
+export FC=ftn  
 
 export FFLAGSM=
 export LDFLAGSM=

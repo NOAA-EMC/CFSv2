@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 # Script to recover JTWC Bulletins from Tank
 #  $TANK_TROPCY/$ymddir/wtxtbul/tropcyc
 

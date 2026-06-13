@@ -1,5 +1,5 @@
 #!/bin/ksh
-set -xa
+set -euax
 #
 # Specify whether the run is production or development
 #
@@ -11,30 +11,26 @@ export RUN_ENVIR=${RUN_ENVIR:-prod}
 # DATA_IN: Location of working directory, default to /tmpnwprd1
 # DEV_ECF: If the job is to be running using ECF, default to YES
 # SENDDBN: Set to NO for developers, default to YES
-# COM_IN:  Directory for input files, default to /com/$NET/${envir}
-# COM_OUT: Directory for output file, default to /com/$NET/${envir}
-# gespath: Directory for the guess or restart files, default to /nwges/${envir}
 #####################################################################################
 
 ###############################################################
 # This block can be modified for different test environment
 ###############################################################
 if [[ $RUN_ENVIR = nco && $envir != prod ]]; then
-  export SENDDBN=${SENDDBN:-NO}
+export SENDDBN=${SENDDBN:-NO}
 fi
-
-export jlogfile=${jlogfile:-/dev/null}
 
 ####################################
 # Specify NET and RUN Name and model
 ####################################
 export NET=cfs
-export RUN=cdas1
+export RUN=cdas
+export RUN1=cdas1
 
 ####################################
 # set up job name and  environment
 ####################################
-export job=${job:-$RUN}
+export job=${job:-$RUN1}
 export envir=${envir:-prod}
 export host=${host:-`hostname | cut -c1`}
 
@@ -47,13 +43,7 @@ date
 # #############################################
 # SETUP CDAS ANALYSIS PROCESSING VARIABLES
 # #############################################
-
-####################################
-# obtain unique process id (pid) and make temp directory
-####################################
-export pid=${pid:-$$}
-
-export DATA=$DATAROOT/${job}.${pid}
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
@@ -63,8 +53,7 @@ cd $DATA
 export cyc=${cyc:-00}
 export outid="LL$job"
 [ $envir != prod ]  && export outid="LL${job}_${envir}"
-export jobid="${outid}.o${pid}"
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -73,9 +62,8 @@ export cycle=t${cyc}z
 # SENDCOM  - Copy Files From TMPDIR to $COMOUT
 # SENDDBN  - Issue DBNet Client Calls
 # RERUN    - Rerun fcst from beginning (default no)
-# VERBOSE  - Specify Verbose Output in exglobal_fcst.sh.ecf
+# VERBOSE  - Specify Verbose Output in exglobal_fcst.sh
 ####################################
-export SAVEGES=${SAVEGES:-YES}
 export SENDECF=${SENDECF:-YES}
 export SENDCOM=${SENDCOM:-YES}
 export SENDDBN=${SENDDBN:-YES}
@@ -102,7 +90,7 @@ export FIXGLOBAL=${FIXGLOBAL:-$HOMEcfs/fix/cfs_fix_am}
 # Set up the UTILITIES
 ##############################
 
-err_chk=err_chk  
+err_chk=err_chk
 startmsg=startmsg
 ERRSCRIPT=${ERRSCRIPT:-$err_chk}
 LOGSCRIPT=${LOGSCRIPT:-$startmsg}
@@ -117,18 +105,12 @@ sh setpdy.sh
 ##############################################
 # Define COM directories
 ##############################################
-export COM_IN=${COM_IN:-$COMROOT/${NET}/${envir}}
-export COM_OUT=${COM_OUT:-$COMROOT/${NET}/${envir}}
-
-export COMIN=$COM_IN/cdas.${PDY}
-export COMOUT=$COM_OUT/cdas.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export COMIN=$COMROT/cdas.${PDY}
+export COMINcfs_cdas=${COMINcfs_cdas:-$COMIN}
+export COMOUT=$COMROT/cdas.${PDY}
 mkdir -m 775 -p $COMOUT
 
-##############################################
-# Define GES directories
-##############################################
-export GESdir=$GESROOT/$envir/cdas.$PDY
-mkdir -m 775 -p $GESdir
 ####################################
 # Specify Special Fcst Vars
 ####################################
@@ -189,11 +171,12 @@ export CONVINFO=${CONVINFO:-${FIXcfs}/global_convinfo.txt}
 export OZINFO=${OZINFO:-${FIXcfs}/global_ozinfo.txt}
 export PCPINFO=${PCPINFO:-${FIXcfs}/global_pcpinfo.txt}
 
-export OBERROR=${OBERROR:-${FIXcfs}/prepobs_errtable.global}
+export COMINgfs=${COMINgfs:-$(compath.py gfs/${gfs_ver})}
+export OBERROR=${OBERROR:-${COMINgfs}/fix/prepobs_errtable.global}
 #
 # Analysis Input Fields
 #
-export PREINP=${PREINP:-${RUN}.${cycle}.}
+export PREINP=${PREINP:-${RUN1}.${cycle}.}
 export FNTSFA=${FNTSFA:-${COMIN}/${PREINP}sstgrb}
 export FNACNA=${FNACNA:-${COMIN}/${PREINP}engicegrb}
 export FNSNOA=${FNSNOA:-${COMIN}/${PREINP}snogrb_t574}
@@ -230,14 +213,14 @@ export TCVITL=${TCVITL:-${COMIN}/${PREINP}syndata.tcvitals.tm00}
 export AMSREBF=${AMSREBF:-/dev/null}
 export SSMITBF=${SSMITBF:-/dev/null}
 
-############################################################################ 
+############################################################################
 #
-# Check grib date of current snogrb vs that of prev cycle 
+# Check grib date of current snogrb vs that of prev cycle
 #
-# if cdate_of_snogrb -le cdate_of_snoprv, i.e. file has not been updated 
+# if cdate_of_snogrb -le cdate_of_snoprv, i.e. file has not been updated
 #   then set namelist input to CYCLEXEC to use the snow from the guess
 #   FNSNOA=" ";CYCLVARS="FSNOL=99999.,FSNOS=99999.,"
-#   FNSNOA is the name of the snow depth  analysis file 
+#   FNSNOA is the name of the snow depth  analysis file
 #     when not supplied, signals to CYCLEXEC to blend guess and climatology
 #     (Note: file must be " ", not "" or the shell syntax for default
 #      values X=${X:-default} will reset to default if X="")
@@ -245,40 +228,39 @@ export SSMITBF=${SSMITBF:-/dev/null}
 #		use 100% guess
 #
 ####################################
-wgrib=$WGRIB              
+wgrib=$WGRIB
+RUN_GETGES=${RUN_GETGES:-YES}     
 prev_cdate=`$NDATE -6 $PDY$cyc`
-RUN_GETGES=${RUN_GETGES:-YES}        # Set to NO if not running getges.sh
+GETGESSH=${GETGESSH:-$HOMEprepobs/ush/getges.sh}
+
 if [ $RUN_GETGES = YES ]; then
- GETGESSH=${GETGESSH:-$HOMEcfs/ush/global_getges.sh}
- export gesenvir=${envir}
- snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $gesenvir -n cfs-cdas -v $prev_cdate)
+  export envir_getges=${envir_getges:-${envir:-prod}}
+  snoprv=$($GETGESSH -q -t snogrb_$JCAP -e $envir_getges -n cfs-cdas -v $prev_cdate)
 else
- snoprv=${snoprv:-$FNSNOG}
+  snoprv=${snoprv:-$FNSNOG}
 fi
-if [ `$wgrib -4yr ${FNSNOA} 2>/dev/null|grep -i snowc |\
-	  awk -F: '{print $3}'|awk -F= '{print $2}'` -le \
-     `$wgrib -4yr $snoprv 2>/dev/null |grep -i snowc  |\
-			awk -F: '{print $3}'|awk -F= '{print $2}'` ] ; then
-	export FNSNOA=" "
-	export CYCLVARS="FSNOL=99999.,FSNOS=99999.,"
+
+if [ `$wgrib -4yr ${FNSNOA} 2>/dev/null|grep -i snowc |	  awk -F: '{print $3}'|awk -F= '{print $2}'` -le      `$wgrib -4yr $snoprv 2>/dev/null |grep -i snowc  |			awk -F: '{print $3}'|awk -F= '{print $2}'` ] ; then
+export FNSNOA=" "
+export CYCLVARS="FSNOL=99999.,FSNOS=99999.,"
 fi
 export FSMCL2=99999
 if [ $cyc -eq 00 ]; then
-  export CYCLVARS="FSNOL=-2"
+export CYCLVARS="FSNOL=-2"
 fi
-############################################################################ 
+############################################################################
 #
 # Output File Names
 #
-export SFCANL=${SFCANL:-$DATA/${RUN}.${cycle}.sfcanl}
-export SIGANL=${SIGANL:-$DATA/${RUN}.${cycle}.sanl}
-export ABIAS=${ABIAS:-$DATA/${RUN}.${cycle}.abias}
-export GINCOUT=${GINCOUT:-$DATA/${RUN}.${cycle}.gesfile}
-export PCPSTAT=${PCPSTAT:-${COMOUT}/${RUN}.${cycle}.pcpstat}
-export RADSTAT=${RADSTAT:-${COMOUT}/${RUN}.${cycle}.radstat}
-export GSISTAT=${GSISTAT:-${COMOUT}/${RUN}.${cycle}.gsistat}
-export CNVSTAT=${CNVSTAT:-${COMOUT}/${RUN}.${cycle}.cnvstat}
-export OZNSTAT=${OZNSTAT:-${COMOUT}/${RUN}.${cycle}.oznstat}
+export SFCANL=${SFCANL:-$DATA/${RUN1}.${cycle}.sfcanl}
+export SIGANL=${SIGANL:-$DATA/${RUN1}.${cycle}.sanl}
+export ABIAS=${ABIAS:-$DATA/${RUN1}.${cycle}.abias}
+export GINCOUT=${GINCOUT:-$DATA/${RUN1}.${cycle}.gesfile}
+export PCPSTAT=${PCPSTAT:-${COMOUT}/${RUN1}.${cycle}.pcpstat}
+export RADSTAT=${RADSTAT:-${COMOUT}/${RUN1}.${cycle}.radstat}
+export GSISTAT=${GSISTAT:-${COMOUT}/${RUN1}.${cycle}.gsistat}
+export CNVSTAT=${CNVSTAT:-${COMOUT}/${RUN1}.${cycle}.cnvstat}
+export OZNSTAT=${OZNSTAT:-${COMOUT}/${RUN1}.${cycle}.oznstat}
 
 #
 # PDS Grid Designator
@@ -286,7 +268,7 @@ export OZNSTAT=${OZNSTAT:-${COMOUT}/${RUN}.${cycle}.oznstat}
 export IGEN=${IGEN:-197}
 
 msg="HAS BEGUN on `hostname`"
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ####################################
 # Check if this is a restart
@@ -294,14 +276,14 @@ postmsg "$jlogfile" "$msg"
 # Define Previous Guess File Names (dev users must provide from outside)
 ####################################
 if [ $RUN_GETGES = YES ]; then
-  gesenvir=${gesenvir:-$envir}
 
-  $GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas bges
-err1=$?
-  $GETGESSH -t sfcgm3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas sfcgm3
-  $GETGESSH -t sfcgp3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas sfcgp3
-  $GETGESSH -t biascr -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas gbias
-  $GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $gesenvir -n cfs-cdas gsatang
+$GETGESSH -t sfcges -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas bges   ; err1=$?
+$GETGESSH -t sfcgm3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgm3
+$GETGESSH -t sfcgp3 -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas sfcgp3
+$GETGESSH -t biascr -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gbias
+set +e
+$GETGESSH -t satang -r ${JCAP_ges}$LEVS_ges -v ${PDY}$cyc -e $envir_getges -n cfs-cdas gsatang
+set -e
 fi
 
 export SFCGES=${SFCGES:-$DATA/bges}
@@ -312,25 +294,25 @@ export GSATANG=${GSATANG:-$DATA/gsatang}
 export GESFIL=${GESFIL:-$DATA/gesfile}
 
 if [ $err1 -eq 0 ] ; then
-   msg="Analysis Starting/Guess Fields Found"
-   postmsg "$jlogfile" "$msg"
+msg="Analysis Starting/Guess Fields Found"
+postmsg "$msg"
 else
-   msg="Analysis Cannot Start/Guess Fields Not Available"
-   postmsg "$jlogfile" "$msg"
-   export pgm=$job
-   export err=911
-   err_chk
+msg="Analysis Cannot Start/Guess Fields Not Available"
+postmsg "$msg"
+export pgm=$job
+export err=911
+err_chk
 fi
 
 ############################
 # Make use of updated angle dependent bias file, if it exists.
 if [[ -s $GSATANG ]]; then
-   export SATANGL=$GSATANG
+export SATANGL=$GSATANG
 fi
 
 # Make use of increment from GFS early cycle, if it exists
 if [[ -s $GESFIL ]]; then
-   export GINCIN=$GESFIL
+export GINCIN=$GESFIL
 fi
 
 ################################################################################
@@ -338,8 +320,8 @@ fi
 # Set T574 weighting factor for negative moisture constraint
 export SETUP="factqmin=300.0,"
 if [[ $RUN = gfs ]]; then
-  export SETUP="diag_rad=.false.,diag_pcp=.false.,diag_conv=.false.,diag_ozone=.false.,write_diag(3)=.false.,factqmin=300.0,"
-fi 
+export SETUP="diag_rad=.false.,diag_pcp=.false.,diag_conv=.false.,diag_ozone=.false.,write_diag(3)=.false.,factqmin=300.0,"
+fi
 
 ############################
 # WCOSS environment settings
@@ -359,8 +341,6 @@ export MP_COLLECTIVE_OFFLOAD=no
 export KMP_STACKSIZE=2048m
 
 export NTHREADS_GSI=${NTHREADS_GSI:-2}
-export MP_TASK_AFFINITY=${MP_TASK_AFFINITY:-cpu:$NTHREADS_GSI}
-export APRUN='mpirun -n 140'
 
 export RTMFIX=$HOMEcfs/global_shared_cfs/CRTMv205
 
@@ -368,11 +348,11 @@ env
 
 #############################################################
 # Execute the script
-${ANALYSISSH:-$HOMEcfs/scripts/excfs_cdas_analysis.sh.ecf}
+${ANALYSISSH:-$HOMEcfs/scripts/excfs_cdas_analysis.sh}
 #############################################################
 
 ##########
-# NOTES: 1) script excfs_cdas_analysis.sh.ecf compresses the contents of
+# NOTES: 1) script excfs_cdas_analysis.sh compresses the contents of
 #           RADSTAT, PCPSTAT, OZNSTAT, and CNVSTAT.  These stat files
 #           files are tarballs of compressed files.
 #        2) SFCANL, SIGANL are input to the GFS forecast following the analysis
@@ -383,15 +363,13 @@ ${ANALYSISSH:-$HOMEcfs/scripts/excfs_cdas_analysis.sh.ecf}
 ##########
 
 if [ $SENDDBN = YES ] ; then
-   $DBNROOT/bin/dbn_alert MODEL GDAS1_MSC_abias $job $COMOUT/${RUN}.${cycle}.abias
+$DBNROOT/bin/dbn_alert MODEL GDAS1_MSC_abias $job $COMOUT/${RUN1}.${cycle}.abias
 fi
 
 cat $pgmout
 
-grep memory $DATA/mpi*
-
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ##############################
 # Remove the Temporary working directory

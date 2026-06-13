@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -N jcfs_post_cfs_m1_00
+#PBS -o $out/cfs_post_cfs_m1_00
+#PBS -l place=vscatter,select=1:ncpus=4:mem=10GB
+#PBS -l walltime=6:00:00
+#PBS -A CFS-DEV
+#PBS -q dev
+#PBS -j oe  
+#PBS -V          
+
+#!/usr/bin/env bash
+set -euax 
+
+set +x;
+module purge
+source $HOMEcfs/versions/run.ver
+module load envvar/${envvar_ver}
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load libjpeg/${libjpeg_ver}
+module load prod_util/${prod_util_ver}
+module load grib_util/${grib_util_ver}
+module load cray-pals/${cray_pals_ver}
+module load wgrib2/${wgrib2_ver}
+module load libjpeg/${libjpeg_ver}
+module load cfp/${cfp_ver}
+module list
+set -x
+
+$HOMEcfs/jobs/JCFS_POST forepost
+
+

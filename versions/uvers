@@ -1,0 +1,33 @@
+set -eua
+
+mods=$1
+
+here=$PWD; cd $cfs
+grepr 'module load' sorc|grep {      > $here/bmods
+grep -r 'module load' $cfs/pbs_sub   > $here/rmods
+cd $here
+
+cat $mods | cut -d':' -f2 | cut -d' ' -f3 |sort|uniq  >uniq.mods
+
+sed -e"s?crtm_?crtm/?     " uniq.mods >temp; mv temp uniq.mods
+sed -e"s?esmf_?esmf/?     " uniq.mods >temp; mv temp uniq.mods
+sed -e"s?wrflib_?wrflib/? " uniq.mods >temp; mv temp uniq.mods
+
+echo
+cat uniq.mods
+echo
+
+source master.ver    
+
+set +ue
+
+while read line; do
+mod=$(echo $line|cut -d'/' -f1)_ver
+ver=$(echo $line|cut -d'/' -f2)
+[[ $mod = PrgEnv-intel_ver ]] && mod=PrgEnv_intel_ver
+[[ $mod = cray-pals_ver    ]] && mod=cray_pals_ver        
+[[ $mod = cray-mpich_ver   ]] && mod=cray_mpich_ver  
+eval echo export ${mod}=${ver}
+done<uniq.mods
+
+rm -f *mods

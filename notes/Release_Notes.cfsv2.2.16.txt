@@ -1,0 +1,1 @@
+ update global_convinfo.txt file to move vad winds (type 224) to use flag -1 (monitor)

@@ -9,17 +9,12 @@ date
 # ##############################################################
 
 ########################################################
-# obtain unique process id (pid) and make temp directory
-########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 export cycle=t${cyc}z
 export tmmark=tm00
-
-export jlogfile=${jlogfile:-/dev/null}
 
 ##########################
 # Specify NET and RUN Name
@@ -31,7 +26,7 @@ export RUN1=cdas1
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 
 ##############################
 # Run setpdy and initialize PDY variables
@@ -41,13 +36,13 @@ sh setpdy.sh
 
 export CDATE=${CDATE:-${PDY}$cyc}
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 
 export HOMEdump=$HOMEcfs
 
@@ -55,24 +50,35 @@ export HOMEnst=$HOMEcfs/nstrtg.v1.1.1
 export EXECnst=$HOMEnst/exec
 export FIXnst=$HOMEnst/fix
 
+export HOMEobsproc_dump=$HOMEbufr_dump 
+
 ##############################################
 # Define COM directories
 ##############################################
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py -o ${NET}/${cfs_ver})
+export  COMIN=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m 755 -p $COMOUT
 
-export COMINm1=${COMINm1:-$COMROOT/${NET}/${envir}/${RUN}.${PDYm1}}  # for prev day snowdepth.global.grb
+export COMINm1=$COMROT/${RUN}.${PDYm1}  # for prev day snowdepth.global.grb
 
 ##############################################
 # Define some INPUT directories
 ##############################################
 
-export COM_GDAS=${COM_GDAS:-$(compath.py com/gfs/prod)}
-export COM_ENGICE=${COM_ENGICE:-$(compath.py com/omb/prod/sice)}       ## after 20190613
-export COMGDAS=${COMGDAS:-$COM_GDAS/gdas.${PDY}/$cyc/atmos}
-export COMGFS=${COMGFS:-$COM_GDAS/gfs.${PDY}/$cyc/atmos}
+#export COM_GDAS=${COM_GDAS:-$(compath.py $envir/com/gfs/${gfs_ver})}
+export COM_GDAS=${COM_GDAS:-$(compath.py obsproc/$obsproc_ver)}
+export COMGDAS=${COMGDAS:-${COM_GDAS}/gdas.${PDY}/${cyc}/atmos}
+
+#export COM_ENGICE=${COM_ENGICE:-$(compath.py $envir/com/omb/${omb_ver}/sice)}       ## after 20190613
+export COM_ENGICE=${COM_ENGICE:-$(compath.py seaice_analysis/${seaice_analysis_ver})/seaice_analysis}       ## after 20190613
+
+gfs=$(echo $gfs_ver|cut -d'.' -f1)
+
+export COMGFS=${COMGFS:-$(compath.py gfs/$gfs_ver)/gfs.${PDY}/${cyc}/atmos}
+
+[[ $gfs == v16 ]] && export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/atmos}
+[[ $gfs == v17 ]] && export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/obs} 
 
 ########################################################################
 # execute the script
@@ -83,20 +89,20 @@ export DUMP_FROM_PROD=${DUMP_FROM_PROD:-YES}
 
 if [ "$DUMP_FROM_PROD" = NO ]
 then
-  ${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh.ecf} 
+${DUMPDV:-$HOMEcfs/scripts/excfs_hpss_dump.sh}
 else
-  ${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh.ecf}
+${DUMPSH:-$HOMEcfs/scripts/excfs_cdas_dump.sh}
 fi
 
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory
 ########################################
-cd $DATAROOT  
+cd $DATAROOT
 if [ ${KEEPDATA:-NO} = NO ] ; then rm -rf $DATA ; fi
 
 date

@@ -9,7 +9,6 @@ export RUN=cdas
 export RUN1=cdas1
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES
@@ -18,29 +17,25 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
 ####################################
-# SAVEGES  - Copy Files From TMPDIR to $GESdir
 # RERUN    - Rerun posts from beginning (default no)
 # VERBOSE  - Specify Verbose Output in global_postgp.sh
 ####################################
 
-export SAVEGES=${SAVEGES:-YES}
 export RERUN=${RERUN:-NO}
 export VERBOSE=${VERBOSE:-YES}
+export OMP_NUM_THREADS=1
 
 ####################################
 # Specify cfs directories
@@ -78,17 +73,10 @@ sh setpdy.sh
 # Define COM directories
 ##############################################
 
-export COMROT=$COMROOT/${NET}/${envir}
-export  COMIN=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
-export COMOUT=$COMROOT/${NET}/${envir}/${RUN}.${PDY}
+export COMROT=$(compath.py ${NET}/${cfs_ver})
+export  COMIN=$(compath.py ${NET}/${cfs_ver}/${RUN}.${PDY})
+export COMOUT=$(compath.py -o ${NET}/${cfs_ver}/${RUN}.${PDY})
 mkdir -m775 -p $COMOUT
-
-##############################################
-# Define GES directories
-##############################################
-export gespath=${gespath:-${GESROOT}/${envir}}
-export GESdir=$gespath/cdas.${PDY}
-mkdir -m 775 -p $GESdir
 
 ####################################
 # Specify Forecast Hour Range
@@ -127,7 +115,7 @@ export POSTGPVARS=${POSTGPVARS:-"KPO=37,PO=1000.,975.,950.,925.,900.,875.,850.,8
 
 #######################################
 # Specify Restart File Name to Key Off
- ######################################
+######################################
 restart_file=${restart_file:-$COMIN/${RUN1}.t${cyc}z.logf}
 
 ####################################
@@ -147,7 +135,6 @@ env
 # Various script parmeters
 ###############################
 
-export APRUN="mpirun -n 28"                                     
 export GRIBVERSION=grib1
 export OCNDIR=$COMOUT
 
@@ -158,13 +145,13 @@ export REDERR='2>'
 # Execute the Script
 ###############################
 
-${CFSNCEPPOSTSH:-$HOMEcfs/scripts/excfs_cdas_nceppost.sh.ecf}
+${CFSNCEPPOSTSH:-$HOMEcfs/scripts/excfs_cdas_nceppost.sh}
 err=$?; err_chk
 
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory

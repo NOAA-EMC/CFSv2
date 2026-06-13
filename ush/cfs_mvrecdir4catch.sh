@@ -29,7 +29,7 @@ if [ $CatchRestart = NO ]; then
   rm -rf $RecvCATCHfore $RecvCATCHpost
   mkdir -p -m 775 $RecvCATCHfore $RecvCATCHpost
   if [ ! -s $RecvPRODfore ]; then
-    set +x
+    set -x
     echo " Rerun from Beginning! "
     set -x
     export CatchRestart=Yes
@@ -51,7 +51,7 @@ if [ $CatchRestart = NO ]; then
     export CatchRestart=Yes
     echo $CatchRestart > $RecvCATCHfore/catch.stamp
 
-    set +x
+    set -x
     echo " Recovery directories are moved to catchup area"
     set -x
   fi

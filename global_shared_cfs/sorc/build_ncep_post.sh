@@ -1,4 +1,4 @@
-SHELL=/bin/sh
+#!/usr/bin/env bash
 
 ####################################################################################################
 #
@@ -9,19 +9,9 @@ SHELL=/bin/sh
 #
 #####################################################################################################
 #####################################################################################################
-
-
-# Lin Gan Module Load
-module purge
+set -euax
 
 # Lin Gan modifiy to use NCO vertical structure prefix for NCO deployment - 20160131
-#module load ../modulefiles/post/v7.0.0
-source dell-mods.sh
-module list
-set -x
-
-CRTM_LIB=$REPOROOT/global_shared_cfs/CRTMv206/libcrtm_v2.0.6.a
-CRTM_INC=$REPOROOT/global_shared_cfs/CRTMv206/incmod/crtm_v2.0.6
 
 cd ncep_post.fd
 

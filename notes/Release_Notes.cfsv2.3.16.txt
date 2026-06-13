@@ -1,0 +1,23 @@
+Release Notes:  cfs.v2.3.16 - released to NCO on June 12 2026   
+
+Refactor several scripts to be able to locate gfs/v17 directories and filenames.
+
+Where is the release tag on subversion/git/vlab?
+
+git clone -b cfs.v2.3.16  https://github.com/NOAA-EMC/CFSv2
+
+List of software changes: 
+
+modified:   Fit2Obs/batrun/excfs_gdas_vrfyfits.sh
+new file:   Fit2Obs/batrun/excfs_gdas_vrfyfits.v17.sh
+modified:   Fit2Obs/batrun/runfits
+modified:   Fit2Obs/ush/cfs_prevmpi.sh
+modified:   jobs/JCFS_CDAS_DUMP
+modified:   jobs/JCFS_CDAS_VRFYFITS
+new file:   notes/Release_Notes.cfsv2.3.16.txt
+
+Implementation:
+
+The revised code will work with either gfs/v16 or gfs/v17 (depending on ${gfs_ver})
+
+

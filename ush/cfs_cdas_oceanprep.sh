@@ -224,12 +224,12 @@ echo "#############################################################" >> $logfile
 # Check for data availability
 echo "#############################################################" >> $logfile
 
-if [ ! -s bathy.noqc ]; then
-  echo "#############################################################" >> $logfile
-  echo "BATHY data not found" >> $logfile
-  echo "#############################################################" >> $logfile
-  exit 99
-fi
+#if [ ! -s bathy.noqc ]; then
+#  echo "#############################################################" >> $logfile
+#  echo "BATHY data not found" >> $logfile
+#  echo "#############################################################" >> $logfile
+#  exit 99
+#fi
 if [ ! -s tesac.noqc ]; then
   echo "#############################################################" >> $logfile
   echo "TESAC data not found" >> $logfile
@@ -261,6 +261,7 @@ else
   exit 99
 fi
 
+if [[ -s bathy.noqc ]]; then
 echo " " >> $logfile
 echo "############################################################" >> $logfile
 echo "     Edit bathy" >> $logfile
@@ -310,6 +311,10 @@ $aprun $execdir_godasprep/${cfsg}avePrfDly >> $logfile
 export err=$?; err_chk
 
 echo " " >> $logfile
+else
+>bathy.dav
+fi
+
 echo "############################################################" >> $logfile
 echo "     Edit tesac" >> $logfile
 echo "############################################################" >> $logfile

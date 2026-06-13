@@ -13,7 +13,7 @@
 #
 echo executing $0
 
-set -eux
+set -u
 
 export cfs_endfhrs_sh=${cfs_endfhrs_sh:-$USHcfs/cfs_endfhrs.sh}
 export cfs_pgbscript=${cfs_pgbscript:-$USHcfs/cfs_pgb.sh}
@@ -69,7 +69,7 @@ if [ $cck -eq 0 -o $cca -eq 0 ] ; then
                                                       
 #  run mpmd ocean post in parallel from bdate to cdate
 
-   set +x
+   set -x
 
    cdate=$bdate; rm -f cfpfile; nprocs=24
    while [[ $cdate -le $edate ]]; do
@@ -77,7 +77,9 @@ if [ $cck -eq 0 -o $cca -eq 0 ] ; then
    cdate=$($NDATE $INTSIG $cdate)
    done
 
-   mpirun cfp cfpfile |grep 'CFP RANK'
+   echo $cfprun
+   $cfprun cfpfile |grep 'CFP RANK'
+   export err=$?; err_chk
    
 #  Collect time series of selected variables
 
@@ -230,9 +232,6 @@ if [ $MCOUNT -gt 0 ] ; then
   done
 fi
 
-if [ $RUN_ENVIR = dev ]; then
-  $PERR;exit $rc
-else
-  export err=$rc; err_chk
-fi
+echo $0 finished rc=$rc
+export err=$rc; err_chk
 

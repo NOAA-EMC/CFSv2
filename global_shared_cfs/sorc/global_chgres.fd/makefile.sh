@@ -1,6 +1,6 @@
 #!/bin/ksh
 set -x
-export FCMP=${1:-mpiifort}
+export FCMP=${1:-ftn}
 export FCMP95=${2:-${FCMP}}
 
 ###### LIBS="-L$LIBDIR -lgfsio_v1.1.0_4 -lsigio_4  -lsfcio_4 -lbacio_4 -llandsfcutil_d -lip_d -lw3emc_d -lw3nco_d -lnemsio -lsp_v2.0.1_d "

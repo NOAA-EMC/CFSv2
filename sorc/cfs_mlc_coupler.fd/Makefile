@@ -10,3 +10,5 @@ coupler_module.o:	coupler_module.f
 	$(F77) $(FFLAGS) -c coupler_module.f
 $(PROG).o:	$(PROG).f
 	$(F77) $(FFLAGS) -c $(PROG).f
+clean:
+	rm -f *.o *.mod       

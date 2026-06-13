@@ -11,7 +11,7 @@ export LIBS=$(W3EMC_LIB4) $(W3NCO_LIB4) $(BUFR_LIB4) $(BACIO_LIB4)
 export NCDF=$(NETCDF_LDFLAGS) 
 export INC=$(NETCDF_INCLUDE) 
 
-export FFLAGS=-O3 -free -xHost -check bounds -convert big_endian -g -traceback
+export FFLAGS=-O3 -free -check bounds -convert big_endian -g -traceback
 
 all: $(long_name) $(long_sname) $(long_ename)
 $(short_name).o: $(short_name).f

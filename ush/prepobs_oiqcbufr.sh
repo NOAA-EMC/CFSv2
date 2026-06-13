@@ -27,11 +27,18 @@ qid=$$
 #              script if not passed in)
 #   pgmout   - string indicating path to for standard output file (skipped
 #              over by this script if not passed in)
+#   sys_tp   - system type and phase.  (if not passed in, an attempt is made to
+#              set this string using getsystem, an NCO script in prod_util)
+#   SITE     - site name (may have been set by local shell startup script)
+#   launcher_OIQCX - launcher for OIQCX executable (on Cray-XC40, defaults to
+#                    aprun using 16 tasks)
 
 cd $DATA
 PRPI=$1
 if [ ! -s $PRPI ] ; then exit 1;fi
 CDATE10=$2
+
+jlogfile=${jlogfile:=""}
 
 rm $PRPI.oiqcbufr
 rm tosslist
@@ -46,10 +53,10 @@ else
    unset FORT00 `env | grep "^FORT[0-9]\{1,\}=" | awk -F= '{print $1}'`
 fi
 
-#### THE BELOW LIKELY NO LONGER APPLIES ON WCOSS
-set +u
-[ -n "$LOADL_PROCESSOR_LIST" ] && export XLSMPOPTS=parthds=2:usrthds=2:stack=64000000
-set -u
+#### THE BELOW APPLIED TO THE CCS (IBM AIX)  (kept for reference)
+#set +u
+#[ -n "$LOADL_PROCESSOR_LIST" ] && export XLSMPOPTS=parthds=2:usrthds=2:stack=64000000
+#set -u
 
 echo "      $CDATE10" > cdate.dat
 export FORT11=cdate.dat
@@ -65,37 +72,37 @@ export FORT65=tosslist
 export FORT70=$PRPI.oiqcbufr
 export FORT81=obogram.out
 export FORT82=obogram.bin
+TIMEIT=${TIMEIT:-""}
+[ -s $DATA/time ] && TIMEIT="$DATA/time -p"
+# $TIMEIT mpirun $OIQCX > outout 2> errfile
+#$TIMEIT mpirun -genvall -n $LSB_DJOB_NUMPROC -machinefile $LSB_DJOB_HOSTFILE $OIQCX > outout 2> errfile
 
-# find the number of procs
-
-if [ -n "$LSB_DJOB_NUMPROC" ]; then
-   nprocs=$LSB_DJOB_NUMPROC
-   export APRUN="mpirun -n $nprocs"
-else
-   echo "nprocs not defined for this platform"
-   export err=99; err_chk
+SITE=${SITE:-""}
+sys_tp=${sys_tp:-$(getsystem)}
+getsystp_err=$?
+if [ $getsystp_err -ne 0 ]; then
+   msg="***WARNING: error using getsystem to determine system type and phase"
+   [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
 fi
+echo sys_tp is set to: $sys_tp
 
-# run the oiqc
+launcher_OIQCX=${launcher_OIQCX:-"mpiexec -n $NCPUS"}
 
-$APRUN  $OIQCX > outout 2> errfile
-export err=$?
+$TIMEIT $launcher_OIQCX $OIQCX > outout  2> errfile
 
+err=$?
 cat errfile >> outout
 cat outout >> oiqcbufr.out
 cp outout obcnt.out
-
 set +u
 [ -n "$pgmout" ]  &&  cat outout >> $pgmout
-rm outout
 set -u
-
+rm outout
 set +x
 echo
 echo 'The foreground exit status for PREPOBS_OIQCBUFR is ' $err
 echo
 set -x
-
 if [ "$err" -eq '4' ]; then
 msg="WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT \
 --> non-fatal"
@@ -104,14 +111,24 @@ msg="WRNG: SOME OBS NOT QC'd BY PGM PREPOBS_OIQCBUFR - # OF OBS > LIMIT \
    echo "$msg"
    echo
    set -x
-   set +u
    [ -n "$jlogfile" ] && $DATA/postmsg "$jlogfile" "$msg"
-   set -u
    err=0
+fi
+if [ -s $DATA/err_chk ]; then
+   $DATA/err_chk
 else
-   err_chk
+   if test "$err" -gt '0'
+   then
+######kill -9 ${qid} # need a WCOSS alternative to this even tho commented out
+                     #  in ops
+      exit 55
+   fi
 fi
 
-mv $PRPI.oiqcbufr $PRPI
+if [ "$err" -gt '0' ]; then
+   exit 9
+else
+   mv $PRPI.oiqcbufr $PRPI
+fi
 
 exit 0

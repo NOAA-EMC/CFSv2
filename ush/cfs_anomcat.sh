@@ -133,7 +133,7 @@ rm -f $da $db $dc
 cd $pwd
 [[ $mkdata = YES ]]&&rmdir $DATA
 ${ENDSCRIPT:-echo}
-set +x
+set -x
 if [[ "$VERBOSE" = "YES" ]]
 then
    echo $(date) EXITING $0 with return code $err >&2

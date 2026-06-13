@@ -230,8 +230,6 @@ qid=$$
 
 if [ $# -ne 1 ] ; then
    if [ $MACHINE != sgi ]; then
-#      cp ${COMROOT}/date/$cycle ncepdate
-#      err0=$?
       ncepdate=${PDY}${cyc}      
       CDATE10=`cut -c7-16 ncepdate`
    else
@@ -250,7 +248,7 @@ fi
 if test $err0 -ne 0
 then
 #  problem with obtaining date record so exit
-   set +x
+   set -x
    echo
    echo "problem with obtaining date record;"
    echo "ABNORMAL EXIT!!!!!!!!!!!"
@@ -269,7 +267,7 @@ pdy=`echo $CDATE10|cut -c1-8`
 cyc=`echo $CDATE10|cut -c9-10`
 modhr=`expr $cyc % 3`
 
-set +x
+set -x
 echo
 echo "CENTER DATE/TIME FOR RELOCATION PROCESSING IS $CDATE10"
 echo
@@ -337,7 +335,7 @@ if [ $modhr -ne 0 ]; then
 #  if center date/time for relocation processing isn't a multiple of 3-hrs, exit
 #  -----------------------------------------------------------------------------
 
-   set +x
+   set -x
    echo
    echo "cannot perform tropical cyclone processing because cycle hour is \
 not a multiple of 3-hrs;"
@@ -359,7 +357,7 @@ for fhr in 6 12 ;do
 #  use getges to overwrite with any found
 
       >tcvitals.m${fhr}
-      set +x
+      set -x
       echo
 echo "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
 echo "       Get TCVITALS file valid for -$fhr hrs relative to center"
@@ -369,7 +367,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       set -x
       $USHGETGES/getges.sh -e $envir_getges -n $network_getges \
        -v $CDATE10 -f $fhr -t tcvges tcvitals.m${fhr}
-      set +x
+      set -x
       echo
 echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       echo
@@ -409,7 +407,7 @@ for fhr in $( seq -6 $BKGFREQ 3 ) ; do
    [[ $RUN = cdas1 ]] && stype=sigg${tpref} ## for cfs
 
    if [ $sges != NULL -a ! -s $sges ]; then
-      set +x
+      set -x
       echo
 echo "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
 echo "     Get global sigma GUESS valid for $fhr hrs relative to center"
@@ -422,7 +420,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       errges=$?
       if test $errges -ne 0; then
 #  problem obtaining global sigma first guess so exit
-         set +x
+         set -x
          echo
          echo "problem obtaining global sigma guess valid $fhr hrs relative \
 to center relocation date/time;"
@@ -456,14 +454,14 @@ to center relocation date/time;"
          cp ${COMSP}sgesprep_pre-relocate_pathname.$tmmark \
           ${COMSP}sgesprep_pathname.$tmmark
       fi
-      set +x
+      set -x
       echo
 echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       echo
       set -x
    fi
    if [ ! -s $pges ]; then
-      set +x
+      set -x
       echo
 echo "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
 echo "  Get global pressure grib GUESS valid for $fhr hrs relative to center"
@@ -476,7 +474,7 @@ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       errges=$?
       if test $errges -ne 0; then
 #  problem obtaining global pressure grib guess so exit
-         set +x
+         set -x
          echo
          echo "problem obtaining global pressure grib guess valid $fhr hrs \
 relative to center relocation date/time;"
@@ -491,7 +489,7 @@ relative to center relocation date/time;"
          fi
          exit 9
       fi
-      set +x
+      set -x
       echo
 echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       echo
@@ -562,7 +560,7 @@ else
 #  problem: script tropcy_relocate_extrkr.sh failed
 #  ------------------------------------------------
 
-      set +x
+      set -x
       echo
       echo "$USHRELO/tropcy_relocate_extrkr.sh failed"
       echo "ABNORMAL EXIT!!!!!!!!!!!"
@@ -636,7 +634,7 @@ else
    export OMP_NUM_THREADS=$RELOX_threads        
    export MP_TASK_AFFINITY=core:$RELOX_threads
 
-   ${APRNRELOC:-mpirun.lsf} $RELOX >stdo.prints
+   mpiexec -n $NCPUS $RELOX >stdo.prints
    errSTATUS=$?
    
 #  copy relocation print output here and there

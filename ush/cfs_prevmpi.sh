@@ -74,7 +74,7 @@ export FORT51=$PRPI.prevents
 export FORT52=prevents.filtering
 
 export OMP_NUM_THREADS=${prevthrd:-4}
-export MPIRUN=${MPIRUN:-"mpirun -n 4"}
+export MPIRUN=${MPIRUN:-"mpiexec -n 4"}
 
 $MPIRUN $PREX $PREC  > outout  2> errfile
 export err=$?; err_chk
@@ -87,7 +87,7 @@ set +u
 [ -n "$pgmout" ]  &&  cat outout >> $pgmout
 set -u
 rm outout
-set +x
+set -x
 echo
 echo 'The foreground exit status for PREPOBS_PREVENTS is ' $err
 echo

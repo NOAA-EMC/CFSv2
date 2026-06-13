@@ -2,9 +2,9 @@
 set -x
 
 export machine=wcoss
-export FC=ifort
+export FC=ftn   
 
-export FFLAGSM="-O3 -free -xHost"
+export FFLAGSM="-O3 -free"
 export LDFLAGSM=
 
 export NCDF=$NETCDF_LDFLAGS                   

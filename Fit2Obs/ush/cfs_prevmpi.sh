@@ -47,6 +47,8 @@ qid=$$
 
 cd $DATA
 PRPI=$1; if [ ! -s $PRPI ] ; then exit 1 ;fi
+MPIRUN=${MPIRUN:-"mpiexec -n $NCPUS"}
+OMP_NUM_THREADS=1
 CDATE10=$2
 
 rm -f $PRPI.prevents
@@ -82,6 +84,8 @@ ln -sf $FORT51 fort.51
 ln -sf $FORT52 fort.52
 
 >outout # make outout empty
+
+which mpiexec
 
 $MPIRUN $PREX $PREC  ##> outout  2> errfile
 err=$?

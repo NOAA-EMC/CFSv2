@@ -5,7 +5,6 @@ set -aeu
 export LIBS="$W3EMC_LIB4 $W3NCO_LIB4 $BUFR_LIB4"
 export NETS="$NETCDF_INCLUDE $NETCDF_LDFLAGS "
 export FFLAGS="-O3 -g -traceback"
-export FCMP="mpiifort"
 
 
 make -f Makefile_convnetc

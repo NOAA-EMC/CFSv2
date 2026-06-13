@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # UTILITY SCRIPT NAME : mkbull_ntc.sh
 #              AUTHOR : David Michaud
 # 

@@ -1,0 +1,15 @@
+#!/bin/bash
+set -eua
+
+export FC=ftn
+
+export LIBS="$W3NCO_LIB4 $W3EMC_LIB4 $BUFR_LIB4"
+
+echo; make=`basename $PWD`
+echo make-ing ${make%.*}
+echo
+
+make -f Makefile
+mv ${make%.*} ../../exec
+rm -f *.o *.mod
+

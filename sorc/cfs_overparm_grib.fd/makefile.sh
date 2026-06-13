@@ -2,7 +2,7 @@
 set -x
 
 export machine=wcoss
-export FC=ifort
+export FC=ftn  
 
 export FFLAGSM="-convert big_endian -traceback"
 export LDFLAGSM=

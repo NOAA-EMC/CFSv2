@@ -1,17 +1,12 @@
-SHELL=/bin/sh
-set -x
+#!/usr/bin/env bash
+set -euax
 
 ##################################################################
 # gsm using module compile standard
 # 01/26/2016 Fanglin.Yang@noaa.gov:    Create module load version
 ##################################################################
 
-set +x
-module purge
-source ./dell-mods.sh
-set -x
-
-curdir=$PWD  
+curdir=$PWD; mkdir -p ../exec
 
 cd ${curdir}/global_chgres.fd
 ./makefile.sh

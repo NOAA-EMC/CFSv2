@@ -148,14 +148,14 @@ if [[ $gfile = '?' || $# -gt 1 || $err -ne 0 || -z $valid ||\
  exit 1
 fi
 #[[ $quiet = NO ]]&&set -x
-if [[ $envir != prod && $envir != test && $envir != para && $envir != dump && $envir != pr? && $envir != dev ]];then
- netwk=$envir
- envir=prod
- echo '************************************************************' >&2
- echo '* CAUTION: Using "-e" is deprecated in this case.          *' >&2
- echo '*          Please use "-n" instead.                        *' >&2       
- echo '************************************************************' >&2
-fi
+#if [[ $envir != prod && $envir != test && $envir != para && $envir != dump && $envir != pr? && $envir != dev ]];then
+# netwk=$envir
+# envir=prod
+# echo '************************************************************' >&2
+# echo '* CAUTION: Using "-e" is deprecated in this case.          *' >&2
+# echo '*          Please use "-n" instead.                        *' >&2       
+# echo '************************************************************' >&2
+#fi
 if [[ $netwk = namopl || $resol = namopl ]];then
   netwk=namopl
   typef=restrt
@@ -445,6 +445,15 @@ elif [[ $netwk = cfs-cdas ]];then
    ;;
   biascr) geslist='
    $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias'
+   ;;
+  biascr_pc) geslist='
+   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias_pc'
+   ;;
+  biascr_air) geslist='
+   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.abias_air'
+   ;;
+  radstat) geslist='
+   $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.radstat'
    ;;
   satang) geslist='
    $GETGES_COM/cfs/$envir/cdas.$day/cdas1.t${cyc}z.satang'

@@ -8,7 +8,6 @@ export NET=cfs
 export RUN=cfs
 
 export host=${host:-`hostname | cut -c1`}
-export jlogfile=${jlogfile:-/dev/null}
 
 ###############################################
 # SETUP CDAS POST PROCESSING VARIABLES
@@ -17,17 +16,14 @@ export PS4='$SECONDS + '
 date
 
 ##########################################################
-# obtain unique process id (pid) and make temp directory
-##########################################################
-export pid=$$
-export DATA=$DATAROOT/$job.$pid
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
 mkdir -p $DATA
 cd $DATA
 
 ####################################
 # Determine Job Output Name on System
 ####################################
-export pgmout="OUTPUT.${pid}"
+export pgmout="OUTPUT.$$"
 export pgmerr=errfile
 export cycle=t${cyc}z
 
@@ -38,24 +34,24 @@ sh setpdy.sh
 . ./PDY
 
 ##########################################################
-# define cfs directories/scripts/executables            
+# define cfs directories/scripts/executables
 ##########################################################
 
 export EXECcfs=$HOMEcfs/exec
-export PARMcfs=$HOMEcfs/parm 
-export USHcfs=$HOMEcfs/ush  
-export FIXcfs=$HOMEcfs/fix  
+export PARMcfs=$HOMEcfs/parm
+export USHcfs=$HOMEcfs/ush
+export FIXcfs=$HOMEcfs/fix
 export hpsstar=$USHcfs/cfs_hpsstar
 
-COMROT=${COMROT:-$COMROOT/cfs/${envir}}
+COMROT=${COMROT:-$(compath.py -o $NET/$cfs_ver)}
 ###############################
 # Execute the Script
 ###############################
 rm -f $DATA/poescript
 for mem in 01 02 03 04
 do
-  mkdir -p $DATA/$mem
-  echo "${CFSARCHIVESH:-$HOMEcfs/ush/cfs_archive.sh} $PDYm1$cyc $mem $DATA/$mem" >>$DATA/poescript
+mkdir -p $DATA/$mem
+echo "${CFSARCHIVESH:-$HOMEcfs/ush/cfs_archive.sh} $PDYm1$cyc $mem $DATA/$mem" >>$DATA/poescript
 done
 
 chmod 775 $DATA/poescript
@@ -66,20 +62,19 @@ export MP_EUIDEVICE=sn_all
 export MP_EUILIB=us
 
 # Execute the script.
-# mpirun.lsf -cmdfile $DATA/poescript -pgmmodel mpmd -ilevel 3 -labelio yes -stdoutmode ordered
 
 echo
 cat poescript
 echo
 
-mpirun cfp poescript | grep 'CFP RANK'
+mpiexec -n $NCPUS  cfp poescript | grep 'CFP RANK'
 export err=$?; err_chk
 
 cd $DATA
 cat $pgmout
 
 msg="ENDED NORMALLY."
-postmsg "$jlogfile" "$msg"
+postmsg "$msg"
 
 ########################################
 # Remove the Temporary working directory
