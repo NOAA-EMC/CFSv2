@@ -50,6 +50,7 @@ fh1=06
 fh2=00
 pdy=$(echo $CDATE | cut -c1-8)
 hh=$(echo $CDATE | cut -c9-10)
+cyc=$hh
 
 eval COMLIC=$COM_INA
 eval COMLICprep=$COM_INAprep
@@ -58,9 +59,9 @@ if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
   export PRPI=$COMLICprep/gdas.t${hh}z.prepbufr
   export PRPO=$COMLOX/gdas.t${hh}z.prepqa
   export PRPF=$COMLOX/gdas.t${hh}z.prepqf
-  export sig1=$COMLIC/gdas.t${hh}z.atmanl.$suffix
-  export sfc1=$COMLIC/gdas.t${hh}z.atmanl.$suffix
-  export CNVS=$COMLIC/gdas.t${hh}z.cnvstat
+  export sig1=$COMLIC/gdas.t${hh}z.analysis.atm.a006.nc
+  export sfc1=$COMLIC/gdas.t${hh}z.analysis.atm.a006.nc
+  export CNVS=$COMLIC/gdas.t${hh}z.cnvstat.tar
 elif [[ $RUN_ENVIR = cfs ]]; then
   tzz=t${hh}z
   export PRPI=$COMLIC/cdas1.$tzz.prepbufr       
@@ -125,12 +126,12 @@ if [[ $RUN_ENVIR = nemsio || $RUN_ENVIR = netcdf ]] ; then
   fh00=$fh;            [ $fh00 -lt 10 ] && fh00=0$fh00; [ $fh00 -lt 100 ] && fh00=0$fh00
   tzz=t$(echo $FDATE|cut -c9-10)z
   [[ $RUN_ENVIR = nemsio ]] && suffix=nemsio || suffix=nc
-  export sig1=$COMLICF/gfs.$tzz.atmf$fhm3.$suffix  
-  export sig2=$COMLICF/gfs.$tzz.atmf$fh00.$suffix
-  export sig3=$COMLICF/gfs.$tzz.atmf$fhp3.$suffix
-  export sfc1=$COMLICF/gfs.$tzz.atmf$fhm3.$suffix
-  export sfc2=$COMLICF/gfs.$tzz.atmf$fh00.$suffix
-  export sfc3=$COMLICF/gfs.$tzz.atmf$fhp3.$suffix
+  export sig1=$COMLICF/gfs.$tzz.atm.f$fhm3.$suffix  
+  export sig2=$COMLICF/gfs.$tzz.atm.f$fh00.$suffix
+  export sig3=$COMLICF/gfs.$tzz.atm.f$fhp3.$suffix
+  export sfc1=$COMLICF/gfs.$tzz.atm.f$fhm3.$suffix
+  export sfc2=$COMLICF/gfs.$tzz.atm.f$fh00.$suffix
+  export sfc3=$COMLICF/gfs.$tzz.atm.f$fhp3.$suffix
 elif [[ $RUN_ENVIR = cfs ]]; then
   CDAM3=$($NDATE -$tspan  $CDATE)
   CDAP3=$($NDATE +$tspan  $CDATE)

@@ -95,14 +95,26 @@ export HYBLEVS=${HYBLEVS:-$HOMEcfs/fix/cfs_fix_am/global_hyblev.l65.txt}
 # and they might be adjusted too.
 #################################################################
 
-expnams=${expnams:-'GFS16 CFS22'}
+gfs=$(echo $gfs_ver|cut -d'.' -f1)
+
+[[ $gfs == v17 ]] && expnams=${expnams:-'GFS17 CFS22'} || expnams=${expnams:-'GFS16 CFS22'}
 
 for EXPNAM in $expnams ; do
 
 if [[ $EXPNAM = GFS16 ]] ; then
-COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/atmos)'
-COM_INAprep='$(compath.py obsproc/${obsproc_ver})/gdas.${PDY}/${cyc}/atmos'
+COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${hh}//atmos)'
+COM_INAprep='$(compath.py obsproc/${obsproc_ver}/gdas.${PDY}/${hh}/atmos)'
 COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/atmos)'
+COMFIT=$(compath.py -o gfs/${gfs_ver})
+OMP_NUM_THREADS=1
+RUN_ENVIR=netcdf
+ACPROFit=YES
+CONVNETC=YES
+fi
+if [[ $EXPNAM = GFS17 ]] ; then
+COM_INA='$(compath.py gfs/${gfs_ver}/gdas.${PDY}/${cyc}/analysis/atmos)'
+COM_INAprep='$(compath.py obsproc/${obsproc_ver}/gdas.${PDY}/${cyc}/atmos)'
+COM_INF='$(compath.py gfs/${gfs_ver}/gfs.${fdy}/${fzz}/model/atmos/history)'
 COMFIT=$(compath.py -o gfs/${gfs_ver})
 OMP_NUM_THREADS=1
 RUN_ENVIR=netcdf

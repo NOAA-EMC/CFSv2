@@ -85,6 +85,8 @@ ln -sf $FORT52 fort.52
 
 >outout # make outout empty
 
+which mpiexec
+
 $MPIRUN $PREX $PREC  ##> outout  2> errfile
 err=$?
 

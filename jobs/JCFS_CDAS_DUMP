@@ -73,10 +73,13 @@ export COMGDAS=${COMGDAS:-${COM_GDAS}/gdas.${PDY}/${cyc}/atmos}
 #export COM_ENGICE=${COM_ENGICE:-$(compath.py $envir/com/omb/${omb_ver}/sice)}       ## after 20190613
 export COM_ENGICE=${COM_ENGICE:-$(compath.py seaice_analysis/${seaice_analysis_ver})/seaice_analysis}       ## after 20190613
 
-#export COMGFS=${COMGFS:-${COM_GDAS}/gfs.${PDY}/${cyc}/atmos}
+gfs=$(echo $gfs_ver|cut -d'.' -f1)
+
 export COMGFS=${COMGFS:-$(compath.py gfs/$gfs_ver)/gfs.${PDY}/${cyc}/atmos}
 
-export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/atmos} 
+[[ $gfs == v16 ]] && export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/atmos}
+[[ $gfs == v17 ]] && export COMTC=${COMTC:-$(compath.py gfs/$gfs_ver)/gdas.${PDY}/${cyc}/obs} 
+
 ########################################################################
 # execute the script
 # Set DUMP_FROM_PROD to NO if getting the dump files from /global/dump
